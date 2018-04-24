@@ -10,9 +10,9 @@ prometheus_alerts.yaml: mixin.libsonnet lib/alerts.jsonnet alerts/*.libsonnet
 prometheus_rules.yaml: mixin.libsonnet lib/rules.jsonnet rules/*.libsonnet
 	jsonnet -J . -S lib/rules.jsonnet > $@
 
-dashboards: mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
+dashboards_out: mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
 	@mkdir -p dashboards_out
-	jsonnet -J . -m dashboards_out lib/dashboards.jsonnet
+	jsonnet -J . -J vendor -m dashboards_out lib/dashboards.jsonnet
 
 lint: prometheus_alerts.yaml prometheus_rules.yaml
 	find . -name '*.libsonnet' -o -name '*.jsonnet' | \
