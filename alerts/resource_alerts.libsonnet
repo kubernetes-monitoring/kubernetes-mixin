@@ -7,11 +7,11 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace_name:kube_pod_container_resource_requests_cpu_cores:sum{%(kube_state_metrics_selector)s})
+              sum(namespace_name:kube_pod_container_resource_requests_cpu_cores:sum)
                 /
-              sum(node:node_num_cpu:sum{%(node_exporter_selector)s})
+              sum(node:node_num_cpu:sum)
                 >
-              (count(node:node_num_cpu:sum{%(node_exporter_selector)s})-1) / count(node:node_num_cpu:sum{%(node_exporter_selector)s})
+              (count(node:node_num_cpu:sum)-1) / count(node:node_num_cpu:sum)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -24,13 +24,13 @@
           {
             alert: 'KubeMemOvercommit',
             expr: |||
-              sum(namespace_name:kube_pod_container_resource_requests_memory_bytes:sum{%(kube_state_metrics_selector)s})
+              sum(namespace_name:kube_pod_container_resource_requests_memory_bytes:sum)
                 /
-              sum(node_memory_MemTotal{%(node_exporter_selector)s})
+              sum(node_memory_MemTotal)
                 >
-              (count(node:node_num_cpu:sum{%(node_exporter_selector)s})-1)
+              (count(node:node_num_cpu:sum)-1)
                 /
-              count(node:node_num_cpu:sum{%(node_exporter_selector)s})
+              count(node:node_num_cpu:sum)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -45,7 +45,7 @@
             expr: |||
               sum(kube_resourcequota{%(kube_state_metrics_selector)s, type="hard", resource="requests.cpu"})
                 /
-              sum(node:node_num_cpu:sum{%(node_exporter_selector)s})
+              sum(node:node_num_cpu:sum)
                 > %(namespace_overcommit_factor)s
             ||| % $._config,
             labels: {
