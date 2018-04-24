@@ -5,10 +5,10 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 ## To use
 
 Generally you want to vendor this repo with your infrastructure config.
-To do this, use [jsonnetpkg](...):
+To do this, use [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler):
 
 ```
-$ jsonnetpkg install -m vendor/kubernetes-mixin https://github.com/kubernetes-monitoring/kubernetes-mixin
+$ jb install github.com/kubernetes-monitoring/kubernetes-mixin
 ```
 
 You can then generate the alerts, dashboards and rules:
@@ -22,7 +22,7 @@ $ make dashboards
 You can also use the mixin with other packages:
 
 ```
-local kubernetes_mixin = (import kubernetes-mixin/mixin.libsonnet");
+local kubernetes_mixin = (import "kubernetes-mixin/mixin.libsonnet");
 ```
 
 ## Background
