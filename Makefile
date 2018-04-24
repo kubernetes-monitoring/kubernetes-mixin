@@ -5,14 +5,14 @@ fmt:
 		xargs -n 1 -- $(JSONNET_FMT) -i
 
 prometheus_alerts.yaml: mixin.libsonnet lib/alerts.jsonnet alerts/*.libsonnet
-	jsonnet -J . -S lib/alerts.jsonnet > $@
+	jsonnet -S lib/alerts.jsonnet > $@
 
 prometheus_rules.yaml: mixin.libsonnet lib/rules.jsonnet rules/*.libsonnet
-	jsonnet -J . -S lib/rules.jsonnet > $@
+	jsonnet -S lib/rules.jsonnet > $@
 
 dashboards_out: mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
 	@mkdir -p dashboards_out
-	jsonnet -J . -J vendor -m dashboards_out lib/dashboards.jsonnet
+	jsonnet -J vendor -m dashboards_out lib/dashboards.jsonnet
 
 lint: prometheus_alerts.yaml prometheus_rules.yaml
 	find . -name '*.libsonnet' -o -name '*.jsonnet' | \
