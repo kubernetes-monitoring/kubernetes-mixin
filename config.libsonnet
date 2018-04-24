@@ -1,7 +1,7 @@
 {
   _config+:: {
     // Selectors are inserted between {} in Prometheus queries.
-    cadvisor_selector: 'job="kubernetes-nodes"',
+    cadvisor_selector: 'job="kube-system/cadvisor"',
     kubelet_selector: 'job="kube-system/kubelet"',
     kube_state_metrics_selector: 'job="default/kube-state-metrics"',
     node_exporter_selector: 'job="default/node-exporter"',
