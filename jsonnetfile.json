@@ -1,0 +1,14 @@
+{
+    "dependencies": [
+        {
+            "name": "grafonnet",
+            "source": {
+                "git": {
+                    "remote": "git@github.com:grafana/grafonnet-lib",
+                    "subdir": "grafonnet"
+                }
+            },
+            "version": "master"
+        }
+    ]
+}
