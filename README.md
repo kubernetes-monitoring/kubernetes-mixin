@@ -24,7 +24,7 @@ $ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
 $ brew install jsonnet
 ```
 
-Then, grab the mixin and its dependancies:
+Then, grab the mixin and its dependencies:
 
 ```
 $ git clone https://github.com/kubernetes-monitoring/kubernetes-mixin
