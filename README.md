@@ -108,6 +108,39 @@ $ ks apply default
 
 TODO
 
+## Customising the mixin
+
+Kubernetes-mixin allows you to override the selectors used for various jobs,
+to match those used in your Prometheus set.
+
+In a new directory, add a file `mixin.libsonnet`:
+
+```
+local kubernetes = import "kubernetes-mixin/mixin.libsonnet";
+
+kubernetes {
+  _config+:: {
+    kube_state_metrics_selector: 'job="kube-state-metrics"',
+    cadvisor_selector: 'job="kubernetes-cadvisor"',
+    node_exporter_selector: 'job="kubernetes-node-exporter"',
+    kubelet_selector: 'job="kubernetes-kubelete"',
+  },
+}
+```
+
+Then, install the kubernetes-mixin:
+
+```
+$ jb init
+$ jb install github.com/kubernetes-monitoring/kubernetes-mixin
+```
+
+Generate the alerts:
+
+```
+$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "../mixin.libsonnet").prometheus_alerts)''
+```
+
 ## Background
 
 * For more motivation, see
