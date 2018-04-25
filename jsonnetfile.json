@@ -4,7 +4,7 @@
             "name": "grafonnet",
             "source": {
                 "git": {
-                    "remote": "git@github.com:grafana/grafonnet-lib",
+                    "remote": "https://github.com/grafana/grafonnet-lib",
                     "subdir": "grafonnet"
                 }
             },
