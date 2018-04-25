@@ -9,11 +9,6 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 This mixin is designed to be vendored into the repo with your infrastructure config.
 To do this, use [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler):
 
-```
-$ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
-$ jb install github.com/kubernetes-monitoring/kubernetes-mixin
-```
-
 You then have three options for deploying your dashboards
 1. Generate the config files and deploy them yourself
 1. Use ksonnet to deploy this mixin along with Prometheus and Grafana
@@ -21,8 +16,23 @@ You then have three options for deploying your dashboards
 
 ## Generate config files
 
-You can manually generate the alerts, dashboards and rules files with the following
-commands:
+You can manually generate the alerts, dashboards and rules files, but first you
+must install some tools:
+
+```
+$ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+$ brew install jsonnet
+```
+
+Then, grab the mixin and its dependancies:
+
+```
+$ git clone https://github.com/kubernetes-monitoring/kubernetes-mixin
+$ cd kubernetes-mixin
+$ jb install
+```
+
+Finally, build the mixin:
 
 ```
 $ make prometheus_alerts.yaml
@@ -71,6 +81,7 @@ Install kubernetes-mixin:
 
 ```
 $ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+$ jb init
 $ jb install github.com/kubernetes-monitoring/kubernetes-mixin
 ```
 
