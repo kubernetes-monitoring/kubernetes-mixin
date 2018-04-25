@@ -123,7 +123,7 @@ kubernetes {
     kube_state_metrics_selector: 'job="kube-state-metrics"',
     cadvisor_selector: 'job="kubernetes-cadvisor"',
     node_exporter_selector: 'job="kubernetes-node-exporter"',
-    kubelet_selector: 'job="kubernetes-kubelete"',
+    kubelet_selector: 'job="kubernetes-kubelet"',
   },
 }
 ```
