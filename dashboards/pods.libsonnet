@@ -9,7 +9,7 @@ local template = grafana.template;
 local numbersinglestat = promgrafonnet.numbersinglestat;
 
 {
-  grafana_dashboards+:: {
+  grafanaDashboards+:: {
     'pods.json':
       local memoryRow = row.new()
                         .addPanel(
@@ -24,15 +24,15 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by(container_name) (container_memory_usage_bytes{%(cadvisor_selector)s, namespace="$namespace", pod_name="$pod", container_name=~"$container", container_name!="POD"})' % $._config,
+          'sum by(container_name) (container_memory_usage_bytes{%(cadvisorSelector)s, namespace="$namespace", pod_name="$pod", container_name=~"$container", container_name!="POD"})' % $._config,
           legendFormat='Current: {{ container_name }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(cadvisor_selector)s, namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(cadvisorSelector)s, namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
           legendFormat='Requested: {{ container }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(cadvisor_selector)s, namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(cadvisorSelector)s, namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
           legendFormat='Limit: {{ container }}',
         ))
       );
@@ -49,7 +49,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisor_selector)s, image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
+          'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
           legendFormat='{{ container_name }}',
         ))
       );
@@ -67,7 +67,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisor_selector)s, pod_name="$pod"}[1m])))' % $._config,
+          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, pod_name="$pod"}[1m])))' % $._config,
           legendFormat='{{ pod_name }}',
         ))
       );

@@ -1,9 +1,9 @@
 local g = import '../lib/grafana.libsonnet';
 
 {
-  grafana_dashboards+:: {
+  grafanaDashboards+:: {
     'k8s-cluster-rsrc-use.json':
-      local legendLink = '%s/dashboard/file/k8s-node-rsrc-use.json' % $._config.grafana_prefix;
+      local legendLink = '%s/dashboard/file/k8s-node-rsrc-use.json' % $._config.grafanaPrefix;
 
       g.dashboard('K8s / USE Method / Cluster')
       .addRow(
