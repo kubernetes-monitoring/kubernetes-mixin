@@ -69,10 +69,10 @@
           },
           {
             // This rule results in the tuples (node, namespace, instance) => 1;
-            // it is used to calculate per-node metrics, given namespace & instance.
-            record: 'node_namespace_instance:kube_pod_info:',
+            // it is used to calculate per-node metrics, given namespace & pod.
+            record: 'node_namespace_pod:kube_pod_info:',
             expr: |||
-              max(label_replace(kube_pod_info{%(kubeStateMetricsSelector)s}, "instance", "$1", "pod", "(.*)")) by (node, namespace, instance)
+              max(kube_pod_info{%(kubeStateMetricsSelector)s}) by (node, namespace, pod)
             ||| % $._config,
           },
           {
@@ -81,8 +81,8 @@
             expr: |||
               count by (node) (sum by (node, cpu) (
                 node_cpu{%(nodeExporterSelector)s}
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               ))
             ||| % $._config,
           },
@@ -99,8 +99,8 @@
             expr: |||
               1 - avg by (node) (
                 rate(node_cpu{%(nodeExporterSelector)s,mode="idle"}[1m])
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:)
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:)
             ||| % $._config,
           },
           {
@@ -120,8 +120,8 @@
             expr: |||
               sum by (node) (
                 node_load1{%(nodeExporterSelector)s}
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
               /
               node:node_num_cpu:sum
@@ -143,8 +143,8 @@
             expr: |||
               sum by (node) (
                 (node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
-                * on (namespace, instance) group_left(node)
-                  node_namespace_instance:kube_pod_info:
+                * on (namespace, pod) group_left(node)
+                  node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -155,8 +155,8 @@
             expr: |||
               sum by (node) (
                 node_memory_MemTotal{%(nodeExporterSelector)s}
-                * on (namespace, instance) group_left(node)
-                  node_namespace_instance:kube_pod_info:
+                * on (namespace, pod) group_left(node)
+                  node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -186,14 +186,14 @@
               1 -
               sum by (node) (
                 (node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
               /
               sum by (node) (
                 node_memory_MemTotal{%(nodeExporterSelector)s}
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -211,8 +211,8 @@
               1e3 * sum by (node) (
                 (rate(node_vmstat_pgpgin{%(nodeExporterSelector)s}[1m])
                + rate(node_vmstat_pgpgout{%(nodeExporterSelector)s}[1m]))
-               * on (namespace, instance) group_left(node)
-                 node_namespace_instance:kube_pod_info:
+               * on (namespace, pod) group_left(node)
+                 node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -229,8 +229,8 @@
             expr: |||
               avg by (node) (
                 irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd).+"}[1m]) / 1e3
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -247,8 +247,8 @@
             expr: |||
               avg by (node) (
                 irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd).+"}[1m]) / 1e3
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -265,8 +265,8 @@
               sum by (node) (
                 (irate(node_network_receive_bytes{%(nodeExporterSelector)s,device="eth0"}[1m]) +
                 irate(node_network_transmit_bytes{%(nodeExporterSelector)s,device="eth0"}[1m]))
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
@@ -283,8 +283,8 @@
               sum by (node) (
                 (irate(node_network_receive_drop{%(nodeExporterSelector)s,device="eth0"}[1m]) +
                 irate(node_network_transmit_drop{%(nodeExporterSelector)s,device="eth0"}[1m]))
-              * on (namespace, instance) group_left(node)
-                node_namespace_instance:kube_pod_info:
+              * on (namespace, pod) group_left(node)
+                node_namespace_pod:kube_pod_info:
               )
             ||| % $._config,
           },
