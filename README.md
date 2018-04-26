@@ -120,10 +120,10 @@ local kubernetes = import "kubernetes-mixin/mixin.libsonnet";
 
 kubernetes {
   _config+:: {
-    kube_state_metrics_selector: 'job="kube-state-metrics"',
-    cadvisor_selector: 'job="kubernetes-cadvisor"',
-    node_exporter_selector: 'job="kubernetes-node-exporter"',
-    kubelet_selector: 'job="kubernetes-kubelet"',
+    kubeStateMetricsSelector: 'job="kube-state-metrics"',
+    cadvisorSelector: 'job="kubernetes-cadvisor"',
+    nodeExporterSelector: 'job="kubernetes-node-exporter"',
+    kubeletSelector: 'job="kubernetes-kubelet"',
   },
 }
 ```
@@ -138,7 +138,7 @@ $ jb install github.com/kubernetes-monitoring/kubernetes-mixin
 Generate the alerts:
 
 ```
-$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "../mixin.libsonnet").prometheus_alerts)''
+$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "../mixin.libsonnet").prometheusAlerts)''
 ```
 
 ## Background

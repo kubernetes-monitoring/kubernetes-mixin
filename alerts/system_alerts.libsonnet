@@ -1,12 +1,12 @@
 {
-  prometheus_alerts+:: {
+  prometheusAlerts+:: {
     groups+: [
       {
         name: 'kubernetes-system',
         rules: [
           {
             expr: |||
-              max(kube_node_status_ready{%(kube_state_metrics_selector)s, condition="false"} == 1) BY (node)
+              max(kube_node_status_ready{%(kubeStateMetricsSelector)s, condition="false"} == 1) BY (node)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -20,7 +20,7 @@
           {
             alert: 'KubeVersionMismatch',
             expr: |||
-              count(count(kubernetes_build_info{%(not_kube_dns_selector)s}) by (gitVersion)) > 1
+              count(count(kubernetes_build_info{%(notKubeDnsSelector)s}) by (gitVersion)) > 1
             ||| % $._config,
             'for': '1h',
             labels: {
@@ -49,7 +49,7 @@
           {
             alert: 'KubeClientErrors',
             expr: |||
-              sum(rate(ksm_scrape_error_total{%(kube_state_metrics_selector)s}[5m])) by (instance, job) > 0.1
+              sum(rate(ksm_scrape_error_total{%(kubeStateMetricsSelector)s}[5m])) by (instance, job) > 0.1
             ||| % $._config,
             'for': '15m',
             labels: {

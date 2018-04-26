@@ -1,12 +1,12 @@
 local g = import '../lib/grafana.libsonnet';
 
 {
-  grafana_dashboards+:: {
+  grafanaDashboards+:: {
     'k8s-resources-cluster.json':
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%s/dashboard/file/k8s-resources-namespace.json?var-datasource=$datasource&var-namespace=$__cell' % $._config.grafana_prefix,
+          link: '%s/dashboard/file/k8s-resources-namespace.json?var-datasource=$datasource&var-namespace=$__cell' % $._config.grafanaPrefix,
         },
       };
 
@@ -96,7 +96,7 @@ local g = import '../lib/grafana.libsonnet';
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%s/dashboard/file/k8s-resources-pod.json?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % $._config.grafana_prefix,
+          link: '%s/dashboard/file/k8s-resources-pod.json?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % $._config.grafanaPrefix,
         },
       };
 

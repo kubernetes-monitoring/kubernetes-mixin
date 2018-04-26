@@ -1,12 +1,12 @@
 {
-  prometheus_alerts+:: {
+  prometheusAlerts+:: {
     groups+: [
       {
         name: 'kubernetes-apps',
         rules: [
           {
             expr: |||
-              rate(kube_pod_container_status_restarts_total{%(kube_state_metrics_selector)s}[15m]) > 0
+              rate(kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s}[15m]) > 0
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -19,7 +19,7 @@
           },
           {
             expr: |||
-              sum by (namespace, pod) (kube_pod_status_phase{%(kube_state_metrics_selector)s, phase!~"Running|Succeeded"}) > 0
+              sum by (namespace, pod) (kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase!~"Running|Succeeded"}) > 0
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -32,9 +32,9 @@
           },
           {
             expr: |||
-              kube_deployment_status_observed_generation{%(kube_state_metrics_selector)s}
+              kube_deployment_status_observed_generation{%(kubeStateMetricsSelector)s}
                 !=
-              kube_deployment_metadata_generation{%(kube_state_metrics_selector)s}
+              kube_deployment_metadata_generation{%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -47,9 +47,9 @@
           },
           {
             expr: |||
-              kube_deployment_spec_replicas{%(kube_state_metrics_selector)s}
+              kube_deployment_spec_replicas{%(kubeStateMetricsSelector)s}
                 !=
-              kube_deployment_status_replicas_available{%(kube_state_metrics_selector)s}
+              kube_deployment_status_replicas_available{%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',

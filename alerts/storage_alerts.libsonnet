@@ -1,5 +1,5 @@
 {
-  prometheus_alerts+:: {
+  prometheusAlerts+:: {
     groups+: [
       {
         name: 'kubernetes-storage',
@@ -7,9 +7,9 @@
           {
             alert: 'KubePersistentVolumeUsageCritical',
             expr: |||
-              100 * kubelet_volume_stats_available_bytes{%(kubelet_selector)s}
+              100 * kubelet_volume_stats_available_bytes{%(kubeletSelector)s}
                 /
-              kubelet_volume_stats_capacity_bytes{%(kubelet_selector)s}
+              kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s}
                 < 3
             ||| % $._config,
             'for': '1m',
@@ -23,7 +23,7 @@
           {
             alert: 'KubePersistentVolumeFullInFourDays',
             expr: |||
-              predict_linear(kubelet_volume_stats_available_bytes{%(kubelet_selector)s}[1h], 4 * 24 * 3600) < 0
+              predict_linear(kubelet_volume_stats_available_bytes{%(kubeletSelector)s}[1h], 4 * 24 * 3600) < 0
             ||| % $._config,
             'for': '5m',
             labels: {
