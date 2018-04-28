@@ -6,6 +6,7 @@
     kubeStateMetricsSelector: 'job="default/kube-state-metrics"',
     nodeExporterSelector: 'job="default/node-exporter"',
     notKubeDnsSelector: 'job!="kube-system/kube-dns"',
+    podLabel: 'pod',
 
     // We alert when the aggregate (CPU, Memory) quota for all namespaces is
     // greater than the amount of the resources in the cluster.  We do however
