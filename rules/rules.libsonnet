@@ -59,6 +59,37 @@
         ],
       },
       {
+        name: 'kube-scheduler.rules',
+        rules: [
+          {
+            record: 'cluster_quantile:%s:histogram_quantile' % metric,
+            expr: |||
+              histogram_quantile(%(quantile)s, sum(rate(%(metric)s_microseconds_bucket{%(kubeSchedulerSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
+            ||| % ({ quantile: quantile, metric: metric } + $._config),
+            labels: {
+              quantile: quantile,
+            },
+          }
+          for quantile in ['0.99', '0.9', '0.5']
+          for metric in ['scheduler_e2e_scheduling_latency', 'scheduler_scheduling_algorithm_latency', 'scheduler_binding_latency']
+        ],
+      },
+      {
+        name: 'kube-apiserver.rules',
+        rules: [
+          {
+            record: 'cluster_quantile:apiserver_request_latencies:histogram_quantile',
+            expr: |||
+              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_latencies_bucket{%(kubeApiserverSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
+            ||| % ({ quantile: quantile } + $._config),
+            labels: {
+              quantile: quantile,
+            },
+          }
+          for quantile in ['0.99', '0.9', '0.5']
+        ],
+      },
+      {
         name: 'node.rules',
         rules: [
           {

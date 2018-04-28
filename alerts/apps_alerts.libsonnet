@@ -90,6 +90,49 @@
             'for': '15m',
             alert: 'KubeStatefulSetGenerationMismatch',
           },
+          {
+            alert: 'KubeDaemonSetRolloutStuck',
+            expr: |||
+              kube_daemonset_status_number_ready{%(kubeStateMetricsSelector)s}
+                /
+              kube_daemonset_status_desired_number_scheduled{%(kubeStateMetricsSelector)s} * 100 < 100
+            ||| % $._config,
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'Only {{$value}}% of desired pods scheduled and ready for daemon set {{$labels.namespace}}/{{$labels.daemonset}}',
+            },
+            'for': '15m',
+          },
+          {
+            alert: 'KubeDaemonSetNotScheduled',
+            expr: |||
+              kube_daemonset_status_desired_number_scheduled{%(kubeStateMetricsSelector)s}
+                -
+              kube_daemonset_status_current_number_scheduled{%(kubeStateMetricsSelector)s} > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are not scheduled.',
+            },
+            'for': '10m',
+          },
+          {
+            alert: 'KubeDaemonSetMisScheduled',
+            expr: |||
+              kube_daemonset_status_number_misscheduled{%(kubeStateMetricsSelector)s} > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are running where they are not supposed to run.',
+            },
+            'for': '10m',
+          },
         ],
       },
     ],
