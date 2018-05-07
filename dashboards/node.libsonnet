@@ -103,7 +103,7 @@ local gauge = promgrafonnet.gauge;
         |||
           (
             sum(node_filesystem_size{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
-          - sum(node_filesystem_free{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
+          - sum(node_filesystem_avail{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
           ) * 100
             /
           sum(node_filesystem_size{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
