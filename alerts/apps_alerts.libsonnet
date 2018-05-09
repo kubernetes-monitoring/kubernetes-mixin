@@ -40,7 +40,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Deployment {{ $labels.namespace }}/{{ labels.deployment }} generation mismatch',
+              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} generation mismatch',
             },
             'for': '15m',
             alert: 'KubeDeploymentGenerationMismatch',
