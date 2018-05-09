@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10.2-stretch
+
+    working_directory: /go/src/github.com/kubernetes-monitoring/kubernetes-mixin
+    steps:
+      - checkout
+      - run:
+          name: Install tools
+          command: |
+            go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+            go get github.com/prometheus/prometheus/cmd/promtool
+            sudo curl -o /usr/bin/jsonnet https://raw.githubusercontent.com/kubernetes-monitoring/kubernetes-mixin/${CIRCLE_SHA1}/.circleci/jsonnet
+            sudo chmod +x /usr/bin/jsonnet
+      - run: jb install
+      - run: make lint
