@@ -90,7 +90,7 @@
             // CPU utilisation is % CPU is not idle.
             record: ':node_cpu_utilisation:avg1m',
             expr: |||
-              1 - avg(rate(node_cpu{%(nodeExporterSelector)s,mode="idle"}[1m]))
+              1 - avg(rate(node_cpu{%(nodeExporterSelector)s,mode=~"idle|iowait"}[1m]))
             ||| % $._config,
           },
           {
@@ -98,7 +98,7 @@
             record: 'node:node_cpu_utilisation:avg1m',
             expr: |||
               1 - avg by (node) (
-                rate(node_cpu{%(nodeExporterSelector)s,mode="idle"}[1m])
+                rate(node_cpu{%(nodeExporterSelector)s,mode=~"idle|iowait"}[1m])
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:)
             ||| % $._config,
