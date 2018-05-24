@@ -11,6 +11,14 @@
     kubeApiserverSelector: 'job="kube-apiserver"',
     podLabel: 'pod',
 
+    // We build alerts for the presence of all these jobs.
+    jobs: {
+      Kubelet: $._config.kubeletSelector,
+      KubeScheduler: $._config.kubeSchedulerSelector,
+      KubeControllerManager: $._config.kubeControllerManagerSelector,
+      KubeAPI: $._config.kubeApiserverSelector,
+    },
+
     // We alert when the aggregate (CPU, Memory) quota for all namespaces is
     // greater than the amount of the resources in the cluster.  We do however
     // allow you to overcommit if you wish.

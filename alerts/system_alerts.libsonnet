@@ -60,19 +60,6 @@
             },
           },
           {
-            alert: 'KubeletDown',
-            expr: |||
-              absent(up{%(kubeletSelector)s} == 1)
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              message: 'Kubelet could not be scraped or all kubelets disappeared from Prometheus target discovery.',
-            },
-          },
-          {
             alert: 'KubeletTooManyPods',
             expr: |||
               kubelet_running_pod_count{%(kubeletSelector)s} > %(kubeletTooManyPods)s
@@ -83,32 +70,6 @@
             },
             annotations: {
               message: 'Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110.',
-            },
-          },
-          {
-            alert: 'KubeSchedulerDown',
-            expr: |||
-              absent(up{%(kubeSchedulerSelector)s} == 1)
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              message: 'There is no running Kubernetes scheduler. New pods are not being assigned to nodes.',
-            },
-          },
-          {
-            alert: 'KubeControllerManagerDown',
-            expr: |||
-              absent(up{%(kubeControllerManagerSelector)s} == 1)
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              message: 'There is no running Kubernetes controller-manager. Deployments, ReplicationControllers, etc. are not making progress.',
             },
           },
           {
@@ -165,19 +126,6 @@
             },
             annotations: {
               message: 'API server is erroring for {{ $value }}% of requests.',
-            },
-          },
-          {
-            alert: 'KubeAPIDown',
-            expr: |||
-              absent(up{%(kubeApiserverSelector)s} == 1)
-            ||| % $._config,
-            'for': '10m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: 'No API servers are reachable or all have disappeared from service discovery.',
             },
           },
           {
