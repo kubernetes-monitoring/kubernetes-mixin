@@ -62,9 +62,9 @@
           },
           {
             expr: |||
-              kube_statefulset_status_replicas_ready{%(kube_state_metrics_selector)s}
+              kube_statefulset_status_replicas_ready{%(kubeStateMetricsSelector)s}
                 !=
-              kube_statefulset_status_replicas{%(kube_state_metrics_selector)s}
+              kube_statefulset_status_replicas{%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -77,9 +77,9 @@
           },
           {
             expr: |||
-              kube_statefulset_status_observed_generation{%(kube_state_metrics_selector)s}
+              kube_statefulset_status_observed_generation{%(kubeStateMetricsSelector)s}
                 !=
-              kube_statefulset_metadata_generation{%(kube_state_metrics_selector)s}
+              kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
