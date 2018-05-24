@@ -60,6 +60,36 @@
             'for': '15m',
             alert: 'KubeDeploymentReplicasMismatch',
           },
+          {
+            expr: |||
+              kube_statefulset_status_replicas_ready{%(kubeStateMetricsSelector)s}
+                !=
+              kube_statefulset_status_replicas{%(kubeStateMetricsSelector)s}
+            ||| % $._config,
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica mismatch',
+            },
+            'for': '15m',
+            alert: 'KubeStatefulSetReplicasMismatch',
+          },
+          {
+            expr: |||
+              kube_statefulset_status_observed_generation{%(kubeStateMetricsSelector)s}
+                !=
+              kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s}
+            ||| % $._config,
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'StatefulSet {{ $labels.namespace }}/{{ labels.statefulset }} generation mismatch',
+            },
+            'for': '15m',
+            alert: 'KubeDeploymentGenerationMismatch',
+          },
         ],
       },
     ],
