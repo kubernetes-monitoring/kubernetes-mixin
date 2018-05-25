@@ -24,6 +24,8 @@
     // allow you to overcommit if you wish.
     namespaceOvercommitFactor: 1.5,
     kubeletTooManyPods: 100,
+    certExpirationWarningSeconds: 7 * 24 * 3600,
+    certExpirationCriticalSeconds: 1 * 24 * 3600,
 
     // For links between grafana dashboards, you need to tell us if your grafana
     // servers under some non-root path.

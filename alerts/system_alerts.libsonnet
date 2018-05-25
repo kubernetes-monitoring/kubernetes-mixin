@@ -129,27 +129,27 @@
             },
           },
           {
-            alert: 'KubeCertificateExpiration',
+            alert: 'KubeClientCertificateExpiration',
             expr: |||
-              sum(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s,le="604800"}) > 0
+              histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
             ||| % $._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubernetes API certificate is expiring in less than 7 days.',
+              message: 'Kubernetes API certificate is expiring in less than %d days.' % ($._config.certExpirationWarningSeconds / 3600 / 24),
             },
           },
           {
-            alert: 'KubeCertificateExpiration',
+            alert: 'KubeClientCertificateExpiration',
             expr: |||
-              sum(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s,le="86400"}) > 0
+              histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
             ||| % $._config,
             labels: {
-              severity: 'warning',
+              severity: 'critical',
             },
             annotations: {
-              message: 'Kubernetes API certificate is expiring in less than 1 day.',
+              message: 'Kubernetes API certificate is expiring in less than %d day.' % ($._config.certExpirationCriticalSeconds / 3600 / 24),
             },
           },
         ],
