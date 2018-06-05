@@ -17,7 +17,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'The persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has {{ printf "%0.0f" $value }}% free.',
+              message: 'The persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.exported_namespace }} has {{ printf "%0.0f" $value }}% free.',
             },
           },
           {
@@ -30,7 +30,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is expected to fill up within four days.',
+              message: 'Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.exported_namespace }} is expected to fill up within four days.',
             },
           },
         ],
