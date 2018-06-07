@@ -101,8 +101,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         row.new()
         .addPanel(replicasGraph);
 
-      dashboard.new('StatefulSets', time_from='now-1h')
-      .addTemplate(
+      dashboard.new(
+        'StatefulSets',
+        time_from='now-1h',
+        uid=($._config.grafanaDashboardIDs['statefulset.json']),
+      ).addTemplate(
         {
           current: {
             text: 'Prometheus',

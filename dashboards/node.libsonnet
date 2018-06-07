@@ -128,8 +128,11 @@ local gauge = promgrafonnet.gauge;
         )
         .addTarget(prometheus.target('rate(node_network_transmit_bytes{%(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m])' % $._config, legendFormat='{{device}}'));
 
-      dashboard.new('Nodes', time_from='now-1h')
-      .addTemplate(
+      dashboard.new(
+        'Nodes',
+        time_from='now-1h',
+        uid=($._config.grafanaDashboardIDs['nodes.json']),
+      ).addTemplate(
         {
           current: {
             text: 'Prometheus',

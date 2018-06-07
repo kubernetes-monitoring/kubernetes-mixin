@@ -3,10 +3,12 @@ local g = import '../lib/grafana.libsonnet';
 {
   grafanaDashboards+:: {
     'k8s-cluster-rsrc-use.json':
-      local legendLink = '%s/dashboard/file/k8s-node-rsrc-use.json' % $._config.grafanaPrefix;
+      local legendLink = '%(prefix)s/d/%(dashboardID)s/k8s-node-rsrc-use.json' % { prefix: $._config.grafanaPrefix, dashboardID: $._config.grafanaDashboardIDs['k8s-node-rsrc-use.json'] };
 
-      g.dashboard('K8s / USE Method / Cluster')
-      .addRow(
+      g.dashboard(
+        'K8s / USE Method / Cluster',
+        uid=($._config.grafanaDashboardIDs['k8s-cluster-rsrc-use.json']),
+      ).addRow(
         g.row('CPU')
         .addPanel(
           g.panel('CPU Utilisation') +
@@ -81,8 +83,10 @@ local g = import '../lib/grafana.libsonnet';
       ),
 
     'k8s-node-rsrc-use.json':
-      g.dashboard('K8s / USE Method / Node')
-      .addTemplate('node', 'kube_node_info', 'node')
+      g.dashboard(
+        'K8s / USE Method / Node',
+        uid=($._config.grafanaDashboardIDs['k8s-node-rsrc-use.json']),
+      ).addTemplate('node', 'kube_node_info', 'node')
       .addRow(
         g.row('CPU')
         .addPanel(

@@ -6,12 +6,14 @@ local g = import '../lib/grafana.libsonnet';
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%s/dashboard/file/k8s-resources-namespace.json?var-datasource=$datasource&var-namespace=$__cell' % $._config.grafanaPrefix,
+          link: '%(prefix)s/d/%(dashboardID)s/k8s-resources-namespace.json?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, dashboardID: $._config.grafanaDashboardIDs['k8s-resources-namespace.json'] },
         },
       };
 
-      g.dashboard('K8s / Compute Resources / Cluster')
-      .addRow(
+      g.dashboard(
+        'K8s / Compute Resources / Cluster',
+        uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
+      ).addRow(
         (g.row('Headlines') +
          {
            height: '100px',
@@ -96,12 +98,14 @@ local g = import '../lib/grafana.libsonnet';
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%s/dashboard/file/k8s-resources-pod.json?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % $._config.grafanaPrefix,
+          link: '%(prefix)s/d/%(dashboardID)s/k8s-resources-pod.json?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, dashboardID: $._config.grafanaDashboardIDs['k8s-resources-pod.json'] },
         },
       };
 
-      g.dashboard('K8s / Compute Resources / Namespace')
-      .addTemplate('namespace', 'kube_pod_info', 'namespace')
+      g.dashboard(
+        'K8s / Compute Resources / Namespace',
+        uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
+      ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addRow(
         g.row('CPU Usage')
         .addPanel(
@@ -164,8 +168,10 @@ local g = import '../lib/grafana.libsonnet';
         },
       };
 
-      g.dashboard('K8s / Compute Resources / Pod')
-      .addTemplate('namespace', 'kube_pod_info', 'namespace')
+      g.dashboard(
+        'K8s / Compute Resources / Pod',
+        uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
+      ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addTemplate('pod', 'kube_pod_info{namespace="$namespace"}', 'pod')
       .addRow(
         g.row('CPU Usage')
