@@ -251,7 +251,7 @@
             // Disk utilisation (ms spent, by rate() it's bound by 1 second)
             record: ':node_disk_utilisation:avg_irate',
             expr: |||
-              avg(irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd).+"}[1m]) / 1e3)
+              avg(irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
             ||| % $._config,
           },
           {
@@ -259,7 +259,7 @@
             record: 'node:node_disk_utilisation:avg_irate',
             expr: |||
               avg by (node) (
-                irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd).+"}[1m]) / 1e3
+                irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -269,7 +269,7 @@
             // Disk saturation (ms spent, by rate() it's bound by 1 second)
             record: ':node_disk_saturation:avg_irate',
             expr: |||
-              avg(irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd).+"}[1m]) / 1e3)
+              avg(irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
             ||| % $._config,
           },
           {
@@ -277,7 +277,7 @@
             record: 'node:node_disk_saturation:avg_irate',
             expr: |||
               avg by (node) (
-                irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd).+"}[1m]) / 1e3
+                irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
