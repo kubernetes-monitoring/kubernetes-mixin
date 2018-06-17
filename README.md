@@ -70,28 +70,22 @@ $ cd <application name>
 $ ks env add default
 ```
 
-Install the kubernetes-jsonnet package:
-
-```
-$ ks registry add kausal https://github.com/kausalco/public
-$ ks pkg install kausal/prometheus-ksonnet
-```
-
-Install kubernetes-mixin:
+Grab the kubernetes-jsonnet module using and its dependencies, which include
+the kubernetes-mixin:
 
 ```
 $ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
 $ jb init
-$ jb install github.com/kubernetes-monitoring/kubernetes-mixin
+$ jb install github.com/kausalco/public/prometheus-ksonnet
+
 ```
 
 Assuming you want to run in the default namespace ('environment' in ksonnet parlance), add the follow to the file `environments/default/main.jsonnet`:
 
 ```
 local prometheus = import "prometheus-ksonnet/prometheus-ksonnet.libsonnet";
-local kubernetes = import "kubernetes-mixin/mixin.libsonnet";
 
-prometheus + kubernetes {
+prometheus {
   _config+:: {
     namespace: "default",
   },
