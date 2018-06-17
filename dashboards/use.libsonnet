@@ -3,7 +3,7 @@ local g = import '../lib/grafana.libsonnet';
 {
   grafanaDashboards+:: {
     'k8s-cluster-rsrc-use.json':
-      local legendLink = '%(prefix)s/d/%(dashboardID)s/k8s-node-rsrc-use.json' % { prefix: $._config.grafanaPrefix, dashboardID: $._config.grafanaDashboardIDs['k8s-node-rsrc-use.json'] };
+      local legendLink = '%(prefix)s/d/%(uid)s/k8s-node-rsrc-use' % { prefix: $._config.grafanaPrefix, uid: std.base64('k8s-node-rsrc-use.json') };
 
       g.dashboard(
         'K8s / USE Method / Cluster',
