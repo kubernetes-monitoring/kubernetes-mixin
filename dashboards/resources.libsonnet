@@ -6,7 +6,7 @@ local g = import '../lib/grafana.libsonnet';
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.base64('k8s-resources-namespace.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-namespace.json') },
         },
       };
 
@@ -98,7 +98,7 @@ local g = import '../lib/grafana.libsonnet';
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.base64('k8s-resources-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-pod.json') },
         },
       };
 

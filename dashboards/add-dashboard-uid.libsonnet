@@ -5,7 +5,7 @@
   // of the file name.
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
-      uid: std.base64(filename),
+      uid: std.md5(filename),
     }
       for filename in std.objectFields(grafanaDashboards)
     }
