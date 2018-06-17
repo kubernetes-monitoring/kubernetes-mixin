@@ -3,7 +3,7 @@ JSONNET_FMT := jsonnet fmt -n 2 --max-blank-lines 2 --string-style s --comment-s
 all: fmt prometheus_alerts.yaml prometheus_rules.yaml dashboards_out lint
 
 fmt:
-	find . -name 'vendor' -prune -o -name '*.libsonnet' -o -name '*.jsonnet' -print | \
+	find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print | \
 		xargs -n 1 -- $(JSONNET_FMT) -i
 
 prometheus_alerts.yaml: mixin.libsonnet lib/alerts.jsonnet alerts/*.libsonnet
