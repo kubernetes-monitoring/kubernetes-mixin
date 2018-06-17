@@ -7,23 +7,18 @@ It is a recommended practice that you add an annotation of "runbook" to every pr
 
 Matthew Skelton & Rob Thatcher have an excellent [run book template](https://github.com/SkeltonThatcher/run-book-template). This template will help teams to fully consider most aspects of reliably operating most interesting software systems, if only to confirm that "this section definitely does not apply here" - a valuable realization.
 
-This page collects this repositories alerts and begins the process of describing what they mean and how it might be addressed. An example usage would be to add to a rule an annotation like this:
-
-```
-    annotations:
-      runbook: https://github.com/StevenACoffman/kubernetes-mixin/tree/master/runbooks#alert-name-kubeapidown
-```
+This page collects this repositories alerts and begins the process of describing what they mean and how it might be addressed. Links from alerts to this page are added [automatically](https://github.com/kubernetes-monitoring/kubernetes-mixin/blob/master/alerts/add-runbook-links.libsonnet).
 
 ### Group Name: "kubernetes-absent"
 ##### Alert Name: "KubeAPIDown"
-+ *Message*: `KubeAPI has disappeared from Prometheus target discovery.``
++ *Message*: `KubeAPI has disappeared from Prometheus target discovery.`
 + *Severity*: critical
 ##### Alert Name: "KubeControllerManagerDown"
-+ *Message*: `KubeControllerManager has disappeared from Prometheus target discovery.``
++ *Message*: `KubeControllerManager has disappeared from Prometheus target discovery.`
 + *Severity*: critical
 + *Runbook*: [Link](https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-controller-manager)
 ##### Alert Name: KubeSchedulerDown
-+ *Message*: KubeScheduler has disappeared from Prometheus target discovery
++ *Message*: `KubeScheduler has disappeared from Prometheus target discovery`
 + *Severity*: critical
 + *Runbook*: [Link](https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-scheduler)
 ##### Alert Name: KubeletDown
@@ -91,7 +86,6 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'`
 + *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
-    "annotations":
 + *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'`
 + *Severity*: warning
 ##### Alert Name: "KubeletTooManyPods"
