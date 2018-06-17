@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.2-stretch
+      - image: circleci/golang:1.10.3-stretch
 
     working_directory: /go/src/github.com/kubernetes-monitoring/kubernetes-mixin
     steps:
