@@ -10,6 +10,7 @@
     kubeControllerManagerSelector: 'job="kube-controller-manager"',
     kubeApiserverSelector: 'job="kube-apiserver"',
     podLabel: 'pod',
+    hostNetworkInterfaceSelector: 'device="eth0"',
 
     // We build alerts for the presence of all these jobs.
     jobs: {

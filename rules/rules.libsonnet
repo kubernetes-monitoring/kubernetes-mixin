@@ -286,16 +286,16 @@
           {
             record: ':node_net_utilisation:sum_irate',
             expr: |||
-              sum(irate(node_network_receive_bytes{%(nodeExporterSelector)s,device="eth0"}[1m])) +
-              sum(irate(node_network_transmit_bytes{%(nodeExporterSelector)s,device="eth0"}[1m]))
+              sum(irate(node_network_receive_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
+              sum(irate(node_network_transmit_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
             ||| % $._config,
           },
           {
             record: 'node:node_net_utilisation:sum_irate',
             expr: |||
               sum by (node) (
-                (irate(node_network_receive_bytes{%(nodeExporterSelector)s,device="eth0"}[1m]) +
-                irate(node_network_transmit_bytes{%(nodeExporterSelector)s,device="eth0"}[1m]))
+                (irate(node_network_receive_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]) +
+                irate(node_network_transmit_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -304,16 +304,16 @@
           {
             record: ':node_net_saturation:sum_irate',
             expr: |||
-              sum(irate(node_network_receive_drop{%(nodeExporterSelector)s,device="eth0"}[1m])) +
-              sum(irate(node_network_transmit_drop{%(nodeExporterSelector)s,device="eth0"}[1m]))
+              sum(irate(node_network_receive_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
+              sum(irate(node_network_transmit_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
             ||| % $._config,
           },
           {
             record: 'node:node_net_saturation:sum_irate',
             expr: |||
               sum by (node) (
-                (irate(node_network_receive_drop{%(nodeExporterSelector)s,device="eth0"}[1m]) +
-                irate(node_network_transmit_drop{%(nodeExporterSelector)s,device="eth0"}[1m]))
+                (irate(node_network_receive_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]) +
+                irate(node_network_transmit_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
