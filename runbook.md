@@ -49,9 +49,26 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeDaemonSetNotScheduled"
 + *Message*: `A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are not scheduled.`
 + *Severity*: warning
+
 ##### Alert Name: "KubeDaemonSetMisScheduled"
 + *Message*: `A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are running where they are not supposed to run.`
 + *Severity*: warning
+
+##### Alert Name: "KubeCronJobRunning"
++ *Message*: `CronJob {{ $labels.namespaces }}/{{ $labels.cronjob }} is taking more than 1h to complete.`
++ *Severity*: warning
++ *Action*: Check the cronjob using `kubectl decribe cronjob <cronjob>` and look at the pod logs using `kubectl logs <pod>` for further information.
+
+##### Alert Name: "KubeJobCompletion"
++ *Message*: `Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than 1h to complete.`
++ *Severity*: warning
++ *Action*: Check the job using `kubectl decribe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
+
+##### Alert Name: "KubeJobFailed"
++ *Message*: `Job {{ $labels.namespaces }}/{{ $labels.job }} failed to complete.`
++ *Severity*: warning
++ *Action*: Check the job using `kubectl decribe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
+
 ### Group Name: "kubernetes-resources"
 ##### Alert Name: "KubeCPUOvercommit"
 + *Message*: `Overcommited CPU resource requests on Pods, cannot tolerate node failure.`
