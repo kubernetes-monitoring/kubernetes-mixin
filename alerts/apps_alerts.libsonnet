@@ -143,7 +143,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'CronJob {{ $labels.namespaces }}/{{ $labels.cronjob }} is taking more than 1h to complete.',
+              message: 'CronJob {{ $labels.namespaces }}/{{ $labels.cronjob }} is taking more than 1h to complete.',
             },
           },
           {
@@ -156,7 +156,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than 1h to complete.',
+              message: 'Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than 1h to complete.',
             },
           },
           {
@@ -169,7 +169,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Job {{ $labels.namespaces }}/{{ $labels.job }} failed to complete.',
+              message: 'Job {{ $labels.namespaces }}/{{ $labels.job }} failed to complete.',
             },
           },
         ],
