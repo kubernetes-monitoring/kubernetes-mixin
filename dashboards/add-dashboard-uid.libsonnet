@@ -7,6 +7,6 @@
     [filename]: grafanaDashboards[filename] {
       uid: std.md5(filename),
     }
-      for filename in std.objectFields(grafanaDashboards)
-    }
+    for filename in std.objectFields(grafanaDashboards)
+  },
 }
