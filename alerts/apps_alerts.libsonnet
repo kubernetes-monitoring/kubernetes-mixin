@@ -133,6 +133,45 @@
             },
             'for': '10m',
           },
+          {
+            alert: 'KubeCronJobRunning',
+            expr: |||
+              time() - kube_cronjob_next_schedule_time{%(kubeStateMetricsSelector)s} > 3600
+            ||| % $._config,
+            'for': '1h',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'CronJob {{ $labels.namespaces }}/{{ $labels.cronjob }} is taking more than 1h to complete.',
+            },
+          },
+          {
+            alert: 'KubeJobCompletion',
+            expr: |||
+              kube_job_spec_completions{%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(kubeStateMetricsSelector)s}  > 0
+            ||| % $._config,
+            'for': '1h',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than 1h to complete.',
+            },
+          },
+          {
+            alert: 'KubeJobFailed',
+            expr: |||
+              kube_job_status_failed{%(kubeStateMetricsSelector)s}  > 0
+            ||| % $._config,
+            'for': '1h',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'Job {{ $labels.namespaces }}/{{ $labels.job }} failed to complete.',
+            },
+          },
         ],
       },
     ],
