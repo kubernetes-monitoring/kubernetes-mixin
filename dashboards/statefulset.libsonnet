@@ -74,7 +74,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       local replicasGraph =
         graphPanel.new(
           'Replicas',
-          datasource='prometheus',
+          datasource='$datasource',
         )
         .addTarget(prometheus.target(
           'max(kube_statefulset_replicas{%(kubeStateMetricsSelector)s, statefulset="$statefulset",namespace="$namespace"}) without (instance, pod)' % $._config,
@@ -124,7 +124,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       .addTemplate(
         template.new(
           'namespace',
-          'prometheus',
+          '$datasource',
           'label_values(kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
@@ -133,7 +133,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       .addTemplate(
         template.new(
           'statefulset',
-          'prometheus',
+          '$datasource',
           'label_values(kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s, namespace="$namespace"}, statefulset)' % $._config,
           label='Name',
           refresh='time',
