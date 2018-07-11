@@ -55,7 +55,8 @@ Prometheus-based monitoring system for Kubernetes:
 Make sure you have the ksonnet v0.8.0:
 
 ```
-$ brew install ksonnet/tap/ks
+$ brew install https://raw.githubusercontent.com/ksonnet/homebrew-tap/82ef24cb7b454d1857db40e38671426c18cd8820/ks.rb
+$ brew pin ks
 $ ks version
 ksonnet version: v0.8.0
 jsonnet version: v0.9.5
