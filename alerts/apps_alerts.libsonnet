@@ -57,7 +57,7 @@
             annotations: {
               message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica mismatch',
             },
-            'for': '15m',
+            'for': '1h',
             alert: 'KubeDeploymentReplicasMismatch',
           },
           {
