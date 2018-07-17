@@ -28,11 +28,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legendFormat='Current: {{ container_name }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(cadvisorSelector)s, namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s, namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Requested: {{ container }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(cadvisorSelector)s, namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(kubeStateMetricsSelector)s, namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Limit: {{ container }}',
         ))
       );
