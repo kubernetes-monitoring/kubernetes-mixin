@@ -48,7 +48,7 @@ local gauge = promgrafonnet.gauge;
         )
         .addTarget(prometheus.target(
           |||
-            sum by (instance) (
+            max(
               node_memory_MemTotal{%(nodeExporterSelector)s, instance="$instance"}
               - node_memory_MemFree{%(nodeExporterSelector)s, instance="$instance"}
               - node_memory_Buffers{%(nodeExporterSelector)s, instance="$instance"}
@@ -56,14 +56,14 @@ local gauge = promgrafonnet.gauge;
             )
           ||| % $._config, legendFormat='memory used'
         ))
-        .addTarget(prometheus.target('sum by (instance) (node_memory_Buffers{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory buffers'))
-        .addTarget(prometheus.target('sum by (instance) (node_memory_Cached{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
-        .addTarget(prometheus.target('sum by (instance) (node_memory_MemFree{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'));
+        .addTarget(prometheus.target('max(node_memory_Buffers{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory buffers'))
+        .addTarget(prometheus.target('max(node_memory_Cached{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
+        .addTarget(prometheus.target('max(node_memory_MemFree{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'));
 
       local memoryGauge = gauge.new(
         'Memory Usage',
         |||
-          sum by (instance) (
+          max(
             (
               (
                 node_memory_MemTotal{%(nodeExporterSelector)s, instance="$instance"}
@@ -82,9 +82,9 @@ local gauge = promgrafonnet.gauge;
           datasource='$datasource',
           span=9,
         )
-        .addTarget(prometheus.target('sum by (instance) (rate(node_disk_bytes_read{%(nodeExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
-        .addTarget(prometheus.target('sum by (instance) (rate(node_disk_bytes_written{%(nodeExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
-        .addTarget(prometheus.target('sum by (instance) (rate(node_disk_io_time_ms{%(nodeExporterSelector)s,  instance="$instance"}[2m]))' % $._config, legendFormat='io time')) +
+        .addTarget(prometheus.target('max(rate(node_disk_bytes_read{%(nodeExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
+        .addTarget(prometheus.target('max(rate(node_disk_bytes_written{%(nodeExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
+        .addTarget(prometheus.target('max(rate(node_disk_io_time_ms{%(nodeExporterSelector)s,  instance="$instance"}[2m]))' % $._config, legendFormat='io time')) +
         {
           seriesOverrides: [
             {
@@ -121,7 +121,7 @@ local gauge = promgrafonnet.gauge;
           span=6,
           format='bytes',
         )
-        .addTarget(prometheus.target('sum by (instance,device) (rate(node_network_receive_bytes{%(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
+        .addTarget(prometheus.target('max(rate(node_network_receive_bytes{%(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
 
       local networkTransmitted =
         graphPanel.new(
@@ -130,7 +130,7 @@ local gauge = promgrafonnet.gauge;
           span=6,
           format='bytes',
         )
-        .addTarget(prometheus.target('sum by (instance,device) (rate(node_network_transmit_bytes{%(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
+        .addTarget(prometheus.target('max(rate(node_network_transmit_bytes{%(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
 
       dashboard.new(
         'Nodes',
