@@ -16,13 +16,13 @@ local gauge = promgrafonnet.gauge;
           'Idle CPU',
           datasource='$datasource',
           span=6,
-          format='percent',
-          max=100,
+          format='percentunit',
+          max=1,
           min=0,
         )
         .addTarget(prometheus.target(
           |||
-            100 - (avg by (cpu) (irate(node_cpu{%(nodeExporterSelector)s, mode="idle", instance="$instance"}[5m])) * 100)
+            1 - (avg by (cpu) (irate(node_cpu{%(nodeExporterSelector)s, mode="idle", instance="$instance"}[5m])))
           ||| % $._config,
           legendFormat='{{cpu}}',
           intervalFactor=10,
@@ -33,11 +33,11 @@ local gauge = promgrafonnet.gauge;
           'System load',
           datasource='$datasource',
           span=6,
-          format='percent',
+          format='percentunit',
         )
-        .addTarget(prometheus.target('sum by (instance) (node_load1{%(nodeExporterSelector)s, instance="$instance"}) * 100' % $._config, legendFormat='load 1m'))
-        .addTarget(prometheus.target('sum by (instance) (node_load5{%(nodeExporterSelector)s, instance="$instance"}) * 100' % $._config, legendFormat='load 5m'))
-        .addTarget(prometheus.target('sum by (instance) (node_load15{%(nodeExporterSelector)s, instance="$instance"}) * 100' % $._config, legendFormat='load 15m'));
+        .addTarget(prometheus.target('max(node_load1{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 1m'))
+        .addTarget(prometheus.target('max(node_load5{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 5m'))
+        .addTarget(prometheus.target('max(node_load15{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 15m'));
 
       local memoryGraph =
         graphPanel.new(
