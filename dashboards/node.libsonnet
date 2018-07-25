@@ -35,9 +35,9 @@ local gauge = promgrafonnet.gauge;
           span=6,
           format='percent',
         )
-        .addTarget(prometheus.target('node_load1{%(nodeExporterSelector)s, instance="$instance"} * 100' % $._config, legendFormat='load 1m'))
-        .addTarget(prometheus.target('node_load5{%(nodeExporterSelector)s, instance="$instance"} * 100' % $._config, legendFormat='load 5m'))
-        .addTarget(prometheus.target('node_load15{%(nodeExporterSelector)s, instance="$instance"} * 100' % $._config, legendFormat='load 15m'));
+        .addTarget(prometheus.target('node_load1{%(nodeExporterSelector)s, instance="$instance"}' % $._config, legendFormat='load 1m'))
+        .addTarget(prometheus.target('node_load5{%(nodeExporterSelector)s, instance="$instance"}' % $._config, legendFormat='load 5m'))
+        .addTarget(prometheus.target('node_load15{%(nodeExporterSelector)s, instance="$instance"}' % $._config, legendFormat='load 15m'));
 
       local memoryGraph =
         graphPanel.new(
