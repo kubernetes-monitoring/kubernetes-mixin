@@ -88,6 +88,22 @@
               message: '{{ printf "%0.0f" $value }}% usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.',
             },
           },
+          {
+            alert: 'CPUThrottlingHigh',
+            expr: |||
+              100 * sum(increase(container_cpu_cfs_throttled_periods_total[5m])) by (container_name, pod_name, namespace) 
+                / 
+              sum(increase(container_cpu_cfs_periods_total[5m])) by (container_name, pod_name, namespace)
+                > %(cpuThrottlingPercent)s 
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: '{{ printf "%0.0f" $value }}% throttling of CPU in namespace {{ $labels.namespace }} for {{ $labels.container_name }}.',
+            },
+          },
         ],
       },
     ],
