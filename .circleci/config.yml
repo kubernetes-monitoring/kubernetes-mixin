@@ -15,4 +15,4 @@ jobs:
             sudo curl -o /usr/bin/jsonnet https://raw.githubusercontent.com/kubernetes-monitoring/kubernetes-mixin/${CIRCLE_SHA1}/.circleci/jsonnet
             sudo chmod +x /usr/bin/jsonnet
       - run: jb install
-      - run: make lint
+      - run: make
