@@ -71,30 +71,27 @@ local gauge = promgrafonnet.gauge;
       // cpu
       local cpuGraph = graphPanel.new(
         'CPU Utilizaion',
-          datasource='$datasource',
-          span=6,
-          format='percent',
-          max=100,
-          min=0,
-          legend={
-            show: 'true',
-            values: 'true',
-            min: 'false',
-            max: 'false',
-            current: 'true',
-            total: 'false',
-            avg: 'true',
-            alignAsTable: 'true',
-            rightSide: 'true'
-          }
-        )
-        .addTarget(prometheus.target(
-          |||
-            avg (sum by (cpu) (irate(node_cpu{job="node-exporter", mode!="idle", instance="$instance"}[2m])) ) * 100
-          ||| % $._config,
-          legendFormat='{{ cpu }}',
-          intervalFactor=10,
-        ));
+        datasource='$datasource',
+        span=6,
+        format='percent',
+        max=100,
+        min=0,
+        legend_show='true',
+        legend_values='true',
+        legend_min='false',
+        legend_max='false',
+        legend_current='true',
+        legend_total='false',
+        legend_avg='true',
+        legend_alignAsTable='true',
+        legend_rightSide='true',
+      ).addTarget(prometheus.target(
+        |||
+          avg (sum by (cpu) (irate(node_cpu{job="node-exporter", mode!="idle", instance="$instance"}[2m])) ) * 100
+        ||| % $._config,
+        legendFormat='{{ cpu }}',
+        intervalFactor=10,
+      ));
 
       local cpuGauge = gauge.new(
         'CPU Usage',
