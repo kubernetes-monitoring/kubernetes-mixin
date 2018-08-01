@@ -19,6 +19,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
            height: '100px',
            showTitle: false,
          })
+         .addPanel(
+           g.panel('CPU Utilisation') +
+           g.statPanel(':node_cpu_utilisation:avg1m')
+         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
           g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores) / sum(node:node_num_cpu:sum)')
@@ -26,6 +30,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('CPU Limits Commitment') +
           g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores) / sum(node:node_num_cpu:sum)')
+        )
+        .addPanel(
+          g.panel('Memory Utilisation') +
+          g.statPanel(':node_memory_utilisation:')
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
