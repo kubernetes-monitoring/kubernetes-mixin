@@ -11,23 +11,6 @@ local gauge = promgrafonnet.gauge;
 {
   grafanaDashboards+:: {
     'nodes.json':
-      local idleCPU =
-        graphPanel.new(
-          'Idle CPU',
-          datasource='$datasource',
-          span=6,
-          format='percentunit',
-          max=1,
-          min=0,
-        )
-        .addTarget(prometheus.target(
-          |||
-            1 - (avg by (cpu) (irate(node_cpu{%(nodeExporterSelector)s, mode="idle", instance="$instance"}[5m])))
-          ||| % $._config,
-          legendFormat='{{cpu}}',
-          intervalFactor=10,
-        ));
-
       local systemLoad =
         graphPanel.new(
           'System load',
@@ -38,6 +21,15 @@ local gauge = promgrafonnet.gauge;
         .addTarget(prometheus.target('max(node_load1{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 1m'))
         .addTarget(prometheus.target('max(node_load5{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 5m'))
         .addTarget(prometheus.target('max(node_load15{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 15m'));
+
+      local cpuByCore =
+        graphPanel.new(
+          'System load',
+          datasource='$datasource',
+          span=6,
+          format='percentunit',
+        )
+        .addTarget(prometheus.target('avg by (cpu) (irate(node_cpu{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[5m])) * 100' % $._config, legendFormat='{{cpu}}'));
 
       local memoryGraph =
         graphPanel.new(
@@ -73,6 +65,41 @@ local gauge = promgrafonnet.gauge;
               )
               / node_memory_MemTotal{%(nodeExporterSelector)s, instance="$instance"}
             ) * 100)
+        ||| % $._config,
+      ).withLowerBeingBetter();
+
+      // cpu
+      local cpuGraph = graphPanel.new(
+        'CPU Utilizaion',
+          datasource='$datasource',
+          span=6,
+          format='percent',
+          max=100,
+          min=0,
+          legend={
+            show: 'true',
+            values: 'true',
+            min: 'false',
+            max: 'false',
+            current: 'true',
+            total: 'false',
+            avg: 'true',
+            alignAsTable: 'true',
+            rightSide: 'true'
+          }
+        )
+        .addTarget(prometheus.target(
+          |||
+            avg (sum by (cpu) (irate(node_cpu{job="node-exporter", mode!="idle", instance="$instance"}[2m])) ) * 100
+          ||| % $._config,
+          legendFormat='{{ cpu }}',
+          intervalFactor=10,
+        ));
+
+      local cpuGauge = gauge.new(
+        'CPU Usage',
+        |||
+          avg(sum by (cpu) (irate(node_cpu{job="node-exporter", mode!="idle", instance="$instance"}[2m]))) * 100
         ||| % $._config,
       ).withLowerBeingBetter();
 
@@ -162,8 +189,13 @@ local gauge = promgrafonnet.gauge;
       )
       .addRow(
         row.new()
-        .addPanel(idleCPU)
         .addPanel(systemLoad)
+        .addPanel(cpuByCore)
+      )
+      .addRow(
+        row.new()
+        .addPanel(cpuGraph)
+        .addPanel(cpuGauge)
       )
       .addRow(
         row.new()
