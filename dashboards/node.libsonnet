@@ -87,7 +87,7 @@ local gauge = promgrafonnet.gauge;
         legend_rightSide='true',
       ).addTarget(prometheus.target(
         |||
-          avg (sum by (cpu) (irate(node_cpu{job="node-exporter", mode!="idle", instance="$instance"}[2m])) ) * 100
+          avg (sum by (cpu) (irate(node_cpu{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[2m])) ) * 100
         ||| % $._config,
         legendFormat='{{ cpu }}',
         intervalFactor=10,
@@ -96,7 +96,7 @@ local gauge = promgrafonnet.gauge;
       local cpuGauge = gauge.new(
         'CPU Usage',
         |||
-          avg(sum by (cpu) (irate(node_cpu{job="node-exporter", mode!="idle", instance="$instance"}[2m]))) * 100
+          avg(sum by (cpu) (irate(node_cpu{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[2m]))) * 100
         ||| % $._config,
       ).withLowerBeingBetter();
 
