@@ -178,6 +178,20 @@
               sum(node_memory_MemTotal{%(nodeExporterSelector)s})
             ||| % $._config,
           },
+          // Add separate rules for Free & Total, so we can aggregate across clusters
+          // in dashboards.
+          {
+            record: ':node_memory_MemFreeCachedBuffers:sum',
+            expr: |||
+              sum(node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: ':node_memory_MemTotal:sum',
+            expr: |||
+              sum(node_memory_MemTotal{%(nodeExporterSelector)s})
+            ||| % $._config,
+          },
           {
             // Available memory per node
             // SINCE 2018-02-08

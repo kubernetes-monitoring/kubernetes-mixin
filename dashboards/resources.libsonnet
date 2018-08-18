@@ -21,7 +21,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
          })
          .addPanel(
            g.panel('CPU Utilisation') +
-           g.statPanel(':node_cpu_utilisation:avg1m')
+           g.statPanel('1 - avg(rate(node_cpu{mode="idle"}[1m]))')
          )
         .addPanel(
           g.panel('CPU Requests Commitment') +
@@ -33,15 +33,15 @@ local g = import 'grafana-builder/grafana.libsonnet';
         )
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.statPanel(':node_memory_utilisation:')
+          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers:sum) / sum(:node_memory_MemTotal:sum)')
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes) / sum(node_memory_MemTotal)')
+          g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes) / sum(:node_memory_MemTotal:sum)')
         )
         .addPanel(
           g.panel('Memory Limits Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes) / sum(node_memory_MemTotal)')
+          g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes) / sum(:node_memory_MemTotal:sum)')
         )
       )
       .addRow(
