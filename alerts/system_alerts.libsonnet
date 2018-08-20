@@ -32,11 +32,14 @@
           },
           {
             alert: 'KubeClientErrors',
+            // Many clients use get requests to check the existance of objects,
+            // this is normal and an expected error, therefore it should be
+            // ignored in this alert.
             expr: |||
-              sum(rate(rest_client_requests_total{code!~"2.."}[5m])) by (instance, job) * 100
+              (sum(rate(rest_client_requests_total{code!~"2..|404"}[5m])) by (instance, job)
                 /
-              sum(rate(rest_client_requests_total[5m])) by (instance, job)
-                > 1
+              sum(rate(rest_client_requests_total[5m])) by (instance, job))
+              * 100 > 1
             |||,
             'for': '15m',
             labels: {
