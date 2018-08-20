@@ -75,7 +75,7 @@
           {
             alert: 'KubeAPILatencyHigh',
             expr: |||
-              cluster_quantile:apiserver_request_latencies:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"^(?:WATCH|WATCHLIST|PROXY|CONNECT)$"} > 1
+              cluster_quantile:apiserver_request_latencies:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"^(?:LIST|WATCH|WATCHLIST|PROXY|CONNECT)$"} > 1
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -88,7 +88,7 @@
           {
             alert: 'KubeAPILatencyHigh',
             expr: |||
-              cluster_quantile:apiserver_request_latencies:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"^(?:WATCH|WATCHLIST|PROXY|CONNECT)$"} > 4
+              cluster_quantile:apiserver_request_latencies:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"^(?:LIST|WATCH|WATCHLIST|PROXY|CONNECT)$"} > 4
             ||| % $._config,
             'for': '10m',
             labels: {
