@@ -6,7 +6,7 @@
         rules: [
           {
             expr: |||
-              rate(kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s}[15m]) > 0
+              rate(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[15m]) > 0
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -19,7 +19,7 @@
           },
           {
             expr: |||
-              sum by (namespace, pod) (kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}) > 0
+              sum by (namespace, pod) (kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}) > 0
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -32,9 +32,9 @@
           },
           {
             expr: |||
-              kube_deployment_status_observed_generation{%(kubeStateMetricsSelector)s}
+              kube_deployment_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
-              kube_deployment_metadata_generation{%(kubeStateMetricsSelector)s}
+              kube_deployment_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -47,9 +47,9 @@
           },
           {
             expr: |||
-              kube_deployment_spec_replicas{%(kubeStateMetricsSelector)s}
+              kube_deployment_spec_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
-              kube_deployment_status_replicas_available{%(kubeStateMetricsSelector)s}
+              kube_deployment_status_replicas_available{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -62,9 +62,9 @@
           },
           {
             expr: |||
-              kube_statefulset_status_replicas_ready{%(kubeStateMetricsSelector)s}
+              kube_statefulset_status_replicas_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
-              kube_statefulset_status_replicas{%(kubeStateMetricsSelector)s}
+              kube_statefulset_status_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -77,9 +77,9 @@
           },
           {
             expr: |||
-              kube_statefulset_status_observed_generation{%(kubeStateMetricsSelector)s}
+              kube_statefulset_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
-              kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s}
+              kube_statefulset_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -93,9 +93,9 @@
           {
             alert: 'KubeDaemonSetRolloutStuck',
             expr: |||
-              kube_daemonset_status_number_ready{%(kubeStateMetricsSelector)s}
+              kube_daemonset_status_number_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 /
-              kube_daemonset_status_desired_number_scheduled{%(kubeStateMetricsSelector)s} * 100 < 100
+              kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} * 100 < 100
             ||| % $._config,
             labels: {
               severity: 'critical',
@@ -108,9 +108,9 @@
           {
             alert: 'KubeDaemonSetNotScheduled',
             expr: |||
-              kube_daemonset_status_desired_number_scheduled{%(kubeStateMetricsSelector)s}
+              kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 -
-              kube_daemonset_status_current_number_scheduled{%(kubeStateMetricsSelector)s} > 0
+              kube_daemonset_status_current_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -123,7 +123,7 @@
           {
             alert: 'KubeDaemonSetMisScheduled',
             expr: |||
-              kube_daemonset_status_number_misscheduled{%(kubeStateMetricsSelector)s} > 0
+              kube_daemonset_status_number_misscheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -136,7 +136,7 @@
           {
             alert: 'KubeCronJobRunning',
             expr: |||
-              time() - kube_cronjob_next_schedule_time{%(kubeStateMetricsSelector)s} > 3600
+              time() - kube_cronjob_next_schedule_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 3600
             ||| % $._config,
             'for': '1h',
             labels: {
@@ -149,7 +149,7 @@
           {
             alert: 'KubeJobCompletion',
             expr: |||
-              kube_job_spec_completions{%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(kubeStateMetricsSelector)s}  > 0
+              kube_job_spec_completions{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
             ||| % $._config,
             'for': '1h',
             labels: {
@@ -162,7 +162,7 @@
           {
             alert: 'KubeJobFailed',
             expr: |||
-              kube_job_status_failed{%(kubeStateMetricsSelector)s}  > 0
+              kube_job_status_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
             ||| % $._config,
             'for': '1h',
             labels: {

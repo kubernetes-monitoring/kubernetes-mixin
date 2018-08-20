@@ -10,6 +10,8 @@
     kubeControllerManagerSelector: 'job="kube-controller-manager"',
     kubeApiserverSelector: 'job="kube-apiserver"',
     podLabel: 'pod',
+    namespaceSelector: null,
+    prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
     hostNetworkInterfaceSelector: 'device="eth0"',
 
     // We build alerts for the presence of all these jobs.
