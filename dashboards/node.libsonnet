@@ -129,12 +129,8 @@ local gauge = promgrafonnet.gauge;
       local diskSpaceUsage = gauge.new(
         'Disk Space Usage',
         |||
-          (
-            sum(node_filesystem_size{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
-          - sum(node_filesystem_avail{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
-          ) * 100
-            /
-          sum(node_filesystem_size{%(nodeExporterSelector)s, device!="rootfs", instance="$instance"})
+          (1 - max (node_filesystem_avail{%(fstypeSelector)s, instance="$instance"}
+          / node_filesystem_size{%(fstypeSelector)s, instance="$instance"}) by (device,instance)) * 100
         ||| % $._config,
       ).withLowerBeingBetter();
 
