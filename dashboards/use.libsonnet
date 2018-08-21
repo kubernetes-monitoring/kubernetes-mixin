@@ -74,9 +74,13 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Storage')
         .addPanel(
           g.panel('Disk Capacity') +
-          g.queryPanel(|||
-            sum(max(node_filesystem_size{fstype=~"ext[24]"} - node_filesystem_avail{fstype=~"ext[24]"}) by (device,%(podLabel)s,namespace)) by (%(podLabel)s,namespace) / scalar(sum(max(node_filesystem_size{fstype=~"ext[24]"}) by (device,%(podLabel)s,namespace))) * on (namespace, %(podLabel)s) group_left(node) node_namespace_pod:kube_pod_info:
-          ||| % $._config, '{{node}}', legendLink) +
+          g.queryPanel(
+            |||
+              sum(max(node_filesystem_size{%(fstypeSelector)s} - node_filesystem_avail{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)) by (%(podLabel)s,namespace)
+              / scalar(sum(max(node_filesystem_size{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)))
+              * on (namespace, %(podLabel)s) group_left (node) node_namespace_pod:kube_pod_info:
+            ||| % $._config, '{{node}}', legendLink
+          ) +
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         ),
