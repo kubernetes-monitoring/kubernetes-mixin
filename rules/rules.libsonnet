@@ -11,6 +11,17 @@
             ||| % $._config,
           },
           {
+            // Reduces cardinality of this timeseries by #cores, which makes it
+            // more useable in dashboards.  Also, allows us to do things like
+            // quantile_over_time(...) which would otherwise not be possible.
+            record: 'namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate',
+            expr: |||
+              sum by (namespace, pod_name, container_name) (
+                rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!=""}[5m])
+              )
+            ||| % $._config,
+          },
+          {
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
               sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!=""}) by (namespace)
@@ -164,6 +175,20 @@
               1 -
               sum(node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
               /
+              sum(node_memory_MemTotal{%(nodeExporterSelector)s})
+            ||| % $._config,
+          },
+          // Add separate rules for Free & Total, so we can aggregate across clusters
+          // in dashboards.
+          {
+            record: ':node_memory_MemFreeCachedBuffers:sum',
+            expr: |||
+              sum(node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: ':node_memory_MemTotal:sum',
+            expr: |||
               sum(node_memory_MemTotal{%(nodeExporterSelector)s})
             ||| % $._config,
           },
