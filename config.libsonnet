@@ -43,5 +43,9 @@
     // For links between grafana dashboards, you need to tell us if your grafana
     // servers under some non-root path.
     grafanaPrefix: '',
+
+    // This list of filesystem is referenced in various expressions.
+    fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
+    fstypeSelector: 'fstype=~"%s"' % std.join('|', self.fstypes),
   },
 }

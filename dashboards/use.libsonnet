@@ -74,9 +74,13 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Storage')
         .addPanel(
           g.panel('Disk Capacity') +
-          g.queryPanel(|||
-            sum(max(node_filesystem_size{fstype=~"ext[24]"} - node_filesystem_avail{fstype=~"ext[24]"}) by (device,%(podLabel)s,namespace)) by (%(podLabel)s,namespace) / scalar(sum(max(node_filesystem_size{fstype=~"ext[24]"}) by (device,%(podLabel)s,namespace))) * on (namespace, %(podLabel)s) group_left(node) node_namespace_pod:kube_pod_info:
-          ||| % $._config, '{{node}}', legendLink) +
+          g.queryPanel(
+            |||
+              sum(max(node_filesystem_size{%(fstypeSelector)s} - node_filesystem_avail{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)) by (%(podLabel)s,namespace)
+              / scalar(sum(max(node_filesystem_size{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)))
+              * on (namespace, %(podLabel)s) group_left (node) node_namespace_pod:kube_pod_info:
+            ||| % $._config, '{{node}}', legendLink
+          ) +
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         ),
@@ -143,7 +147,14 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Disk')
         .addPanel(
           g.panel('Disk Utilisation') +
-          g.queryPanel('1 - sum(max by (device, node) (node_filesystem_avail{fstype=~"ext[24]"})) / sum(max by (device, node) (node_filesystem_size{fstype=~"ext[24]"}))', 'Disk') +
+          g.queryPanel(
+            |||
+              max ((node_filesystem_size{%(fstypeSelector)s} - node_filesystem_avail{%(fstypeSelector)s})
+              / node_filesystem_size{%(fstypeSelector)s}) by (namespace, %(podLabel)s, device)
+              * on (namespace, %(podLabel)s) group_left (node) node_namespace_pod:kube_pod_info:{node="$node"}
+            ||| % $._config,
+            '{{device}}',
+          ) +
           { yaxes: g.yaxes('percentunit') },
         ),
       ),
