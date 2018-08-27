@@ -72,7 +72,7 @@ local gauge = promgrafonnet.gauge;
       local cpuGraph = graphPanel.new(
         'CPU Utilizaion',
         datasource='$datasource',
-        span=6,
+        span=9,
         format='percent',
         max=100,
         min=0,
@@ -104,7 +104,7 @@ local gauge = promgrafonnet.gauge;
         graphPanel.new(
           'Disk I/O',
           datasource='$datasource',
-          span=9,
+          span=6,
         )
         .addTarget(prometheus.target('max(rate(node_disk_bytes_read{%(nodeExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
         .addTarget(prometheus.target('max(rate(node_disk_bytes_written{%(nodeExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
@@ -126,13 +126,18 @@ local gauge = promgrafonnet.gauge;
           ],
         };
 
-      local diskSpaceUsage = gauge.new(
+      local diskSpaceUsage = graphPanel.new(
         'Disk Space Usage',
+        datasource='$datasource',
+        span=6,
+        format='percentunit',
+      ).addTarget(prometheus.target(
         |||
-          (1 - max (node_filesystem_avail{%(fstypeSelector)s, instance="$instance"}
-          / node_filesystem_size{%(fstypeSelector)s, instance="$instance"}) by (device,instance)) * 100
-        ||| % $._config,
-      ).withLowerBeingBetter();
+          max ((node_filesystem_size{%(fstypeSelector)s,instance="$instance"}
+          - node_filesystem_avail{%(fstypeSelector)s,instance="$instance"})
+          / node_filesystem_size{%(fstypeSelector)s,instance="$instance"}) by (namespace, %(podLabel)s, device)
+        ||| % $._config, legendFormat='{{device}}',
+      ));
 
       local networkReceived =
         graphPanel.new(
