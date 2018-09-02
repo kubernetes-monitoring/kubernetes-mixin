@@ -76,7 +76,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Usage (w/o cache)') +
           // Not using container_memory_usage_bytes here because that includes page cache
-          g.queryPanel('sum(container_memory_rss) by (namespace)', '{{namespace}}') +
+          g.queryPanel('sum(container_memory_rss{container_name!=""}) by (namespace)', '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('decbytes') },
         )
@@ -87,11 +87,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Requests by Namespace') +
           g.tablePanel([
             // Not using container_memory_usage_bytes here because that includes page cache
-            'sum(container_memory_rss) by (namespace)',
+            'sum(container_memory_rss{container_name!=""}) by (namespace)',
             'sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)',
-            'sum(container_memory_rss) by (namespace) / sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)',
+            'sum(container_memory_rss{container_name!=""}) by (namespace) / sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)',
             'sum(kube_pod_container_resource_limits_memory_bytes) by (namespace)',
-            'sum(container_memory_rss) by (namespace) / sum(kube_pod_container_resource_limits_memory_bytes) by (namespace)',
+            'sum(container_memory_rss{container_name!=""}) by (namespace) / sum(kube_pod_container_resource_limits_memory_bytes) by (namespace)',
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
@@ -145,7 +145,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory Usage')
         .addPanel(
           g.panel('Memory Usage') +
-          g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace"}) by (pod_name)', '{{pod_name}}') +
+          g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace", container_name!=""}) by (pod_name)', '{{pod_name}}') +
           g.stack,
         )
       )
@@ -154,11 +154,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Quota') +
           g.tablePanel([
-            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace"}, "pod", "$1", "pod_name", "(.*)")) by (pod)',
+            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod)',
             'sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"}) by (pod)',
-            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace"}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"}) by (pod)',
+            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"}) by (pod)',
             'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)',
-            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace"}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)',
+            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)',
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
@@ -212,7 +212,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory Usage')
         .addPanel(
           g.panel('Memory Usage') +
-          g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!="POD"}) by (container_name)', '{{container_name}}') +
+          g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}) by (container_name)', '{{container_name}}') +
           g.stack,
         )
       )
@@ -221,11 +221,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Quota') +
           g.tablePanel([
-            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!="POD"}, "container", "$1", "container_name", "(.*)")) by (container)',
+            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container)',
             'sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
             'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
-            'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
-            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
+            'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod", container_name!=""}) by (container)',
+            'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
