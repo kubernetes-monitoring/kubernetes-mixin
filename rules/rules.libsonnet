@@ -309,6 +309,20 @@
             ||| % $._config,
           },
           {
+            record: 'node:node_filesystem_usage:',
+            expr: |||
+              max by (namespace, %(podLabel)s, device) ((node_filesystem_size{%(fstypeSelector)s}
+              - node_filesystem_avail{%(fstypeSelector)s})
+              / node_filesystem_size{%(fstypeSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: 'node:node_filesystem_avail:',
+            expr: |||
+              max by (namespace, %(podLabel)s, device) (node_filesystem_avail{%(fstypeSelector)s} / node_filesystem_size{%(fstypeSelector)s})
+            ||| % $._config,
+          },
+          {
             record: ':node_net_utilisation:sum_irate',
             expr: |||
               sum(irate(node_network_receive_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
