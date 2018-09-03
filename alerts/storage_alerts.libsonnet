@@ -43,7 +43,7 @@
             alert: 'KubePersistentVolumeErrors',
             expr: |||
               kube_persistentvolume_status_phase{phase=~"Failed|Pending"} > 0
-            |||
+            |||,
             'for': '1m',
             labels: {
               severity: 'critical',
