@@ -25,7 +25,7 @@
             expr: |||
               predict_linear(kubelet_volume_stats_available_bytes{%(kubeletSelector)s}[1h], 4 * 24 * 3600) < 0
             ||| % $._config,
-            'for': '5m',
+            'for': '1h',
             labels: {
               severity: 'critical',
             },
