@@ -133,9 +133,7 @@ local gauge = promgrafonnet.gauge;
         format='percentunit',
       ).addTarget(prometheus.target(
         |||
-          max ((node_filesystem_size{%(fstypeSelector)s,instance="$instance"}
-          - node_filesystem_avail{%(fstypeSelector)s,instance="$instance"})
-          / node_filesystem_size{%(fstypeSelector)s,instance="$instance"}) by (namespace, %(podLabel)s, device)
+          node:node_filesystem_usage:
         ||| % $._config, legendFormat='{{device}}',
       ));
 

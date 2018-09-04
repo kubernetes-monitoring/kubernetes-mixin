@@ -149,8 +149,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Disk Utilisation') +
           g.queryPanel(
             |||
-              max ((node_filesystem_size{%(fstypeSelector)s} - node_filesystem_avail{%(fstypeSelector)s})
-              / node_filesystem_size{%(fstypeSelector)s}) by (namespace, %(podLabel)s, device)
+              node:node_filesystem_usage:
               * on (namespace, %(podLabel)s) group_left (node) node_namespace_pod:kube_pod_info:{node="$node"}
             ||| % $._config,
             '{{device}}',
