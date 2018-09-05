@@ -23,14 +23,14 @@
           {
             alert: 'KubePersistentVolumeFullInFourDays',
             expr: |||
-              predict_linear(kubelet_volume_stats_available_bytes{%(kubeletSelector)s}[1h], 4 * 24 * 3600) < 0
+              kubelet_volume_stats_available_bytes{%(kubeletSelector)s} and predict_linear(kubelet_volume_stats_available_bytes{%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
             ||| % $._config,
             'for': '5m',
             labels: {
               severity: 'critical',
             },
             annotations: {
-              message: 'Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is expected to fill up within four days.',
+              message: 'Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ value }} bytes are available.',
             },
           },
         ],
