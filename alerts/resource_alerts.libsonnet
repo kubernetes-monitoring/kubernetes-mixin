@@ -43,7 +43,7 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(kube_resourcequota{%(kubeStateMetricsSelector)s, type="hard", resource="requests.cpu"})
+              sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="requests.cpu"})
                 /
               sum(node:node_num_cpu:sum)
                 > %(namespaceOvercommitFactor)s
@@ -59,7 +59,7 @@
           {
             alert: 'KubeMemOvercommit',
             expr: |||
-              sum(kube_resourcequota{%(kubeStateMetricsSelector)s, type="hard", resource="requests.memory"})
+              sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="requests.memory"})
                 /
               sum(node_memory_MemTotal{%(nodeExporterSelector)s})
                 > %(namespaceOvercommitFactor)s
@@ -75,9 +75,9 @@
           {
             alert: 'KubeQuotaExceeded',
             expr: |||
-              100 * kube_resourcequota{%(kubeStateMetricsSelector)s, type="used"}
+              100 * kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
                 / ignoring(instance, job, type)
-              kube_resourcequota{%(kubeStateMetricsSelector)s, type="hard"}
+              kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
                 > 90
             ||| % $._config,
             'for': '15m',

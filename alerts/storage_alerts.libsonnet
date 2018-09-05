@@ -7,9 +7,9 @@
           {
             alert: 'KubePersistentVolumeUsageCritical',
             expr: |||
-              100 * kubelet_volume_stats_available_bytes{%(kubeletSelector)s}
+              100 * kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                 /
-              kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s}
+              kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                 < 3
             ||| % $._config,
             'for': '1m',
@@ -23,7 +23,7 @@
           {
             alert: 'KubePersistentVolumeFullInFourDays',
             expr: |||
-              kubelet_volume_stats_available_bytes{%(kubeletSelector)s} and predict_linear(kubelet_volume_stats_available_bytes{%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
+              kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} and predict_linear(kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
             ||| % $._config,
             'for': '5m',
             labels: {
