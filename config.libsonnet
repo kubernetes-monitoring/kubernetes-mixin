@@ -16,10 +16,18 @@
 
     // We build alerts for the presence of all these jobs.
     jobs: {
-      Kubelet: $._config.kubeletSelector,
-      KubeScheduler: $._config.kubeSchedulerSelector,
-      KubeControllerManager: $._config.kubeControllerManagerSelector,
-      KubeAPI: $._config.kubeApiserverSelector,
+      Kubelet: {
+        selector: $._config.kubeletSelector,
+      },
+      KubeScheduler: {
+        selector: $._config.kubeSchedulerSelector,
+      },
+      KubeControllerManager: {
+        selector: $._config.kubeControllerManagerSelector,
+      },
+      KubeAPI: {
+        selector: $._config.kubeApiserverSelector,
+      },
     },
 
     // Grafana dashboard IDs are necessary for stable links for dashboards
