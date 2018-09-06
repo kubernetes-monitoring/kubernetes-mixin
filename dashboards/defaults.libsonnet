@@ -6,7 +6,7 @@
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
       uid: std.md5(filename),
-      timezone: 'default',
+      timezone: '',
     }
     for filename in std.objectFields(grafanaDashboards)
   },
