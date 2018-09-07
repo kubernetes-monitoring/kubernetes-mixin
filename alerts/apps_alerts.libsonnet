@@ -12,7 +12,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: '{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} / second',
+              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / second.',
             },
             'for': '1h',
             alert: 'KubePodCrashLooping',
@@ -25,7 +25,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: '{{ $labels.namespace }}/{{ $labels.pod }} is not ready.',
+              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than an hour.',
             },
             'for': '1h',
             alert: 'KubePodNotReady',
@@ -40,7 +40,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} generation mismatch',
+              message: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.',
             },
             'for': '15m',
             alert: 'KubeDeploymentGenerationMismatch',
@@ -55,7 +55,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica mismatch',
+              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than an hour.',
             },
             'for': '1h',
             alert: 'KubeDeploymentReplicasMismatch',
@@ -70,7 +70,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica mismatch',
+              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
             },
             'for': '15m',
             alert: 'KubeStatefulSetReplicasMismatch',
@@ -85,7 +85,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} generation mismatch',
+              message: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.',
             },
             'for': '15m',
             alert: 'KubeStatefulSetGenerationMismatch',
@@ -101,7 +101,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Only {{$value}}% of desired pods scheduled and ready for daemon set {{$labels.namespace}}/{{$labels.daemonset}}',
+              message: 'Only {{ $value }}% of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.',
             },
             'for': '15m',
           },
@@ -116,7 +116,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are not scheduled.',
+              message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.',
             },
             'for': '10m',
           },
@@ -129,7 +129,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are running where they are not supposed to run.',
+              message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.',
             },
             'for': '10m',
           },
@@ -156,7 +156,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than 1h to complete.',
+              message: 'Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than one hour to complete.',
             },
           },
           {

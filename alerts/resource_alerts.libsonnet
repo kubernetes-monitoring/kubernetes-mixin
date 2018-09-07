@@ -17,7 +17,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Overcommited CPU resource requests on Pods, cannot tolerate node failure.',
+              message: 'Cluster has overcommitted CPU resource requests for Pods and cannot tolerate node failure.',
             },
             'for': '5m',
           },
@@ -36,7 +36,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Overcommited Memory resource requests on Pods, cannot tolerate node failure.',
+              message: 'Cluster has overcommitted memory resource requests for Pods and cannot tolerate node failure.',
             },
             'for': '5m',
           },
@@ -52,7 +52,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Overcommited CPU resource request quota on Namespaces.',
+              message: 'Cluster has overcommitted CPU resource requests for Namespaces.',
             },
             'for': '5m',
           },
@@ -68,7 +68,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Overcommited Memory resource request quota on Namespaces.',
+              message: 'Cluster has overcommitted memory resource requests for Namespaces.',
             },
             'for': '5m',
           },
@@ -85,7 +85,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ printf "%0.0f" $value }}% usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.',
+              message: 'Namespace {{ $labels.namespace }} is using {{ printf "%0.0f" $value }}% of its {{ $labels.resource }} quota.',
             },
           },
         ],
