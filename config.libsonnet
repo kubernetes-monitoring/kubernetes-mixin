@@ -38,7 +38,7 @@
     // greater than the amount of the resources in the cluster.  We do however
     // allow you to overcommit if you wish.
     namespaceOvercommitFactor: 1.5,
-    kubeletTooManyPods: 100,
+    kubeletPodLimit: 110,
     certExpirationWarningSeconds: 7 * 24 * 3600,
     certExpirationCriticalSeconds: 1 * 24 * 3600,
 

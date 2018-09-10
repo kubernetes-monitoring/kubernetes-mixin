@@ -65,14 +65,14 @@
           {
             alert: 'KubeletTooManyPods',
             expr: |||
-              kubelet_running_pod_count{%(kubeletSelector)s} > %(kubeletTooManyPods)s
+              kubelet_running_pod_count{%(kubeletSelector)s} > %(kubeletPodLimit)s * 0.9
             ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110.',
+              message: 'Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of %d.' % $._config.kubeletPodLimit,
             },
           },
           {
