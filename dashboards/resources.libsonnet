@@ -224,7 +224,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container)',
             'sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
             'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
-            'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod", container_name!=""}) by (container)',
+            'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod", container!=""}) by (container)',
             'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
