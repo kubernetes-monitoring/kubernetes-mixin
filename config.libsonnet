@@ -54,5 +54,10 @@
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
     fstypeSelector: 'fstype=~"%s"' % std.join('|', self.fstypes),
+
+    // The % amount of cpu and/or memory usage for a given node at which point to fire a prom alert.
+    // e.g. "90" indicates 90%
+    maxNodeCpuUsagePercent: 90,
+    maxNodeMemoryUsagePercent: 90,
   },
 }
