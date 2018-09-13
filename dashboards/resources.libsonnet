@@ -6,13 +6,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-namespace.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, uid: $._config.grafanaDashboardIDs['k8s-resources-namespace.json'] },
         },
       };
 
       g.dashboard(
         'K8s / Compute Resources / Cluster',
-        uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
       ).addRow(
         (g.row('Headlines') +
          {
@@ -106,13 +105,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, uid: $._config.grafanaDashboardIDs['k8s-resources-pod.json'] },
         },
       };
 
       g.dashboard(
         'K8s / Compute Resources / Namespace',
-        uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addRow(
         g.row('CPU Usage')
@@ -178,7 +176,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
 
       g.dashboard(
         'K8s / Compute Resources / Pod',
-        uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
       ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addTemplate('pod', 'kube_pod_info{namespace="$namespace"}', 'pod')
       .addRow(

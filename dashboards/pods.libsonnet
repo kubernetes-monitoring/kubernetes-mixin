@@ -75,7 +75,6 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       dashboard.new(
         'Pods',
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['pods.json']),
       ).addTemplate(
         {
           current: {

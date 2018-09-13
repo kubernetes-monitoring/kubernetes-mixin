@@ -158,7 +158,6 @@ local gauge = promgrafonnet.gauge;
       dashboard.new(
         'Nodes',
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['nodes.json']),
       ).addTemplate(
         {
           current: {

@@ -104,7 +104,6 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       dashboard.new(
         'StatefulSets',
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['statefulset.json']),
       ).addTemplate(
         {
           current: {

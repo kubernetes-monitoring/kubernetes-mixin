@@ -5,7 +5,7 @@
   // of the file name and set the timezone to be 'default'.
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
-      uid: std.md5(filename),
+      uid: $._config.grafanaDashboardIDs[filename],
       timezone: '',
     }
     for filename in std.objectFields(grafanaDashboards)
