@@ -55,9 +55,16 @@
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
     fstypeSelector: 'fstype=~"%s"' % std.join('|', self.fstypes),
 
-    // The % amount of cpu and/or memory usage for a given node at which point to fire a prom alert.
+    // The % amount of cpu or memory usage for a given node at which point
+    // to fire a prom alert (after the following amount of time has passed).
     // e.g. "90" indicates 90%
     maxNodeCpuUsagePercent: 90,
     maxNodeMemoryUsagePercent: 90,
+    // The time duration (in format '[0-9]+(ms|s|m|h|d|w|y)') for which the cpu
+    // or memory usage must be in excess of the aforementioned % before firing
+    // the alert.
+    // e.g. '3h' indicates 3 hours
+    nodeCpuUsageTimeBeforeAlert: '3h',
+    nodeMemoryUsageTimeBeforeAlert: '3h',
   },
 }

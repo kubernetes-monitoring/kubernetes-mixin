@@ -80,7 +80,7 @@
             expr: |||
               (node:node_cpu_utilisation:avg1m * 100) > %(maxNodeCpuUsagePercent)s
             ||| % $._config,
-            'for': '5m',
+            'for': $._config.nodeCpuUsageTimeBeforeAlert,
             labels: {
               severity: 'critical',
             },
@@ -93,7 +93,7 @@
             expr: |||
               (node:node_memory_utilisation: * 100) > %(maxNodeMemoryUsagePercent)s
             ||| % $._config,
-            'for': '5m',
+            'for': $._config.nodeMemoryUsageTimeBeforeAlert,
             labels: {
               severity: 'critical',
             },
