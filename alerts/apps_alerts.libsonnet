@@ -85,7 +85,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'StatefulSet {{ $labels.namespace }}/{{ labels.statefulset }} generation mismatch',
+              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} generation mismatch',
             },
             'for': '15m',
             alert: 'KubeStatefulSetGenerationMismatch',
