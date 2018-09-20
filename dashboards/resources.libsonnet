@@ -146,7 +146,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Usage') +
           g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace", container_name!=""}) by (pod_name)', '{{pod_name}}') +
-          g.stack,
+          g.stack +
+          { yaxes: g.yaxes('decbytes') },
         )
       )
       .addRow(
