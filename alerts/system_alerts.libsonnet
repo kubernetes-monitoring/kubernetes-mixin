@@ -12,7 +12,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $labels.node }} has been unready for more than an hour',
+              message: '{{ $labels.node }} has been unready for more than an hour.',
             },
             'for': '1h',
             alert: 'KubeNodeNotReady',
@@ -59,7 +59,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'",
+              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / second.",
             },
           },
           {
@@ -72,7 +72,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of %d.' % $._config.kubeletPodLimit,
+              message: 'Kubelet {{ $labels.instance }} is running {{ $value }} Pods, close to the limit of %d.' % $._config.kubeletPodLimit,
             },
           },
           {
@@ -85,7 +85,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'The API server has a 99th percentile latency of {{ $value }} seconds for {{$labels.verb}} {{$labels.resource}}.',
+              message: 'The API server has a 99th percentile latency of {{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.',
             },
           },
           {
@@ -98,7 +98,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'The API server has a 99th percentile latency of {{ $value }} seconds for {{$labels.verb}} {{$labels.resource}}.',
+              message: 'The API server has a 99th percentile latency of {{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.',
             },
           },
           {
@@ -106,14 +106,14 @@
             expr: |||
               sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) without(instance, %(podLabel)s)
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) without(instance, pod) * 100 > 5
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) without(instance, pod) * 100 > 10
             ||| % $._config,
             'for': '10m',
             labels: {
               severity: 'critical',
             },
             annotations: {
-              message: 'API server is erroring for {{ $value }}% of requests.',
+              message: 'API server is returning errors for {{ $value }}% of requests.',
             },
           },
           {
@@ -128,7 +128,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'API server is erroring for {{ $value }}% of requests.',
+              message: 'API server is returning errors for {{ $value }}% of requests.',
             },
           },
           {
@@ -152,7 +152,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Kubernetes API certificate is expiring in less than %d day.' % ($._config.certExpirationCriticalSeconds / 3600 / 24),
+              message: 'Kubernetes API certificate is expiring in less than %d hours.' % ($._config.certExpirationCriticalSeconds / 3600),
             },
           },
         ],
