@@ -91,6 +91,29 @@
             alert: 'KubeStatefulSetGenerationMismatch',
           },
           {
+            expr: |||
+              max without (revision) (
+                kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                  unless
+                kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              )
+                *
+              (
+                kube_statefulset_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                  !=
+                kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              )
+            ||| % $._config,
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.',
+            },
+            'for': '15m',
+            alert: 'KubeStatefulSetUpdateNotRolledOut',
+          },
+          {
             alert: 'KubeDaemonSetRolloutStuck',
             expr: |||
               kube_daemonset_status_number_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
