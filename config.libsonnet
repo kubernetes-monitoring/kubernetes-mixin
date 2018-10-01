@@ -41,6 +41,7 @@
     kubeletPodLimit: 110,
     certExpirationWarningSeconds: 7 * 24 * 3600,
     certExpirationCriticalSeconds: 1 * 24 * 3600,
+    cpuThrottlingPercent: 25,
 
     // We alert when a disk is expected to fill up in four days. Depending on
     // the data-set it might be useful to change the sampling-time for the
