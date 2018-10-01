@@ -73,6 +73,32 @@
             'for': '5m',
           },
           {
+            alert: 'NodeCPUUsage',
+            annotations: {
+              message: 'Node {{ $labels.node }} has CPU usage {{ $value }} percent (which is above the configured threshold of %s percent).' % ($._config.maxNodeCpuUsagePercent),
+            },
+            expr: |||
+              (node:node_cpu_utilisation:avg1m * 100) > %(maxNodeCpuUsagePercent)s
+            ||| % $._config,
+            'for': $._config.nodeCpuUsageTimeBeforeAlert,
+            labels: {
+              severity: 'critical',
+            },
+          },
+          {
+            alert: 'NodeMemoryUsage',
+            annotations: {
+              message: 'Node {{ $labels.node }} has memory usage {{ $value }} percent (which is above the configured threshold of %s percent).' % ($._config.maxNodeMemoryUsagePercent),
+            },
+            expr: |||
+              (node:node_memory_utilisation: * 100) > %(maxNodeMemoryUsagePercent)s
+            ||| % $._config,
+            'for': $._config.nodeMemoryUsageTimeBeforeAlert,
+            labels: {
+              severity: 'critical',
+            },
+          },
+          {
             alert: 'KubeQuotaExceeded',
             expr: |||
               100 * kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
