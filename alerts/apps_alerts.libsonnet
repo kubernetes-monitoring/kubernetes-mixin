@@ -179,7 +179,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Job {{ $labels.namespace }}/{{ $labels.exported_job }} is taking more than 1h to complete.',
+              message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 1h to complete.',
             },
           },
           {
@@ -192,7 +192,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Job {{ $labels.namespace }}/{{ $labels.exported_job }} failed to complete.',
+              message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.',
             },
           },
         ],
