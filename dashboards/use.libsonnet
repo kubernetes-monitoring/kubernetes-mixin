@@ -12,7 +12,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU')
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.queryPanel('node:node_cpu_utilisation:avg1m * node:node_num_cpu:sum / scalar(sum(node:node_num_cpu:sum))', '{{node}}', legendLink) +
+          g.queryPanel('node:cluster_cpu_utilisation:ratio', '{{node}}', legendLink) +
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
@@ -27,7 +27,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory')
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.queryPanel('node:node_memory_utilisation:ratio', '{{node}}', legendLink) +
+          g.queryPanel('node:cluster_memory_utilisation:ratio', '{{node}}', legendLink) +
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )

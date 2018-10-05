@@ -146,6 +146,17 @@
             ||| % $._config,
           },
           {
+            // CPU utilisation per node, normalized by cluster-wide CPUs
+            record: 'node:cluster_cpu_utilisation:ratio',
+            expr: |||
+              node:node_cpu_utilisation:avg1m
+                *
+              node:node_num_cpu:sum
+                /
+              scalar(sum(node:node_num_cpu:sum))
+            ||| % $._config,
+          },
+          {
             // CPU saturation is 1min avg run queue length / number of CPUs.
             // Can go over 100%.  >100% is bad.
             record: ':node_cpu_saturation_load1:',
@@ -224,6 +235,15 @@
               (node:node_memory_bytes_total:sum - node:node_memory_bytes_available:sum)
               /
               node:node_memory_bytes_total:sum
+            |||,
+          },
+          {
+            // Memory utilisation per node, normalized by cluster-wide memory
+            record: 'node:cluster_memory_utilisation:ratio',
+            expr: |||
+              (node:node_memory_bytes_total:sum - node:node_memory_bytes_available:sum)
+              /
+              scalar(sum(node:node_memory_bytes_total:sum))
             |||,
           },
           {
