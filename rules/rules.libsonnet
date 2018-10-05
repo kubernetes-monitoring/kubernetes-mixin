@@ -223,7 +223,7 @@
             expr: |||
               (node:node_memory_bytes_total:sum - node:node_memory_bytes_available:sum)
               /
-              scalar(sum(node:node_memory_bytes_total:sum))
+              node:node_memory_bytes_total:sum
             |||,
           },
           {
