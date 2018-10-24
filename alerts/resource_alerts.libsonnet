@@ -101,7 +101,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ printf "%0.0f" $value }}% throttling of CPU in namespace {{ $labels.namespace }} for {{ $labels.container_name }}.',
+              message: '{{ printf "%0.0f" $value }}% throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container_name }} in pod {{ $labels.pod_name }}.',
             },
           },
         ],
