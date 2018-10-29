@@ -29,3 +29,22 @@ tests:
       exp_annotations:
         message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.56% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeusagecritical
+
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '10240 9216 8192 7168 6144 5120 4096 3072 2048 1024 0'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: KubePersistentVolumeFullInFourDays
+  - eval_time: 6m
+    alertname: KubePersistentVolumeFullInFourDays
+    exp_alerts:
+    - exp_labels:
+        job: kubelet
+        namespace: monitoring
+        persistentvolumeclaim: somepvc
+        severity: critical
+      exp_annotations:
+        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 4ki is available.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefullinfourdays
