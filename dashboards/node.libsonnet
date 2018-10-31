@@ -88,7 +88,7 @@ local gauge = promgrafonnet.gauge;
         legend_rightSide='true',
       ).addTarget(prometheus.target(
         |||
-          max (sum by (cpu) (irate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[2m])) ) * 10
+          max (sum by (cpu) (irate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[2m])) ) * 100
         ||| % $._config,
         legendFormat='{{ cpu }}',
         intervalFactor=10,
