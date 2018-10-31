@@ -41,7 +41,7 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica mismatch`
 + *Severity*: critical
 ##### Alert Name: "KubeStatefulSetGenerationMismatch"
-+ *Message*: `StatefulSet {{ $labels.namespace }}/{{ labels.statefulset }} generation mismatch`
++ *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} generation mismatch`
 + *Severity*: critical
 ##### Alert Name: "KubeDaemonSetRolloutStuck"
 + *Message*: `Only {{$value}}% of desired pods scheduled and ready for daemon set {{$labels.namespace}}/{{$labels.daemonset}}`
