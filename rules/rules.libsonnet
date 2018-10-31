@@ -122,7 +122,7 @@
             record: 'node:node_num_cpu:sum',
             expr: |||
               count by (node) (sum by (node, cpu) (
-                node_cpu{%(nodeExporterSelector)s}
+                node_cpu_seconds_total{%(nodeExporterSelector)s}
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               ))
@@ -132,7 +132,7 @@
             // CPU utilisation is % CPU is not idle.
             record: ':node_cpu_utilisation:avg1m',
             expr: |||
-              1 - avg(rate(node_cpu{%(nodeExporterSelector)s,mode="idle"}[1m]))
+              1 - avg(rate(node_cpu_seconds_total{%(nodeExporterSelector)s,mode="idle"}[1m]))
             ||| % $._config,
           },
           {
@@ -140,7 +140,7 @@
             record: 'node:node_cpu_utilisation:avg1m',
             expr: |||
               1 - avg by (node) (
-                rate(node_cpu{%(nodeExporterSelector)s,mode="idle"}[1m])
+                rate(node_cpu_seconds_total{%(nodeExporterSelector)s,mode="idle"}[1m])
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:)
             ||| % $._config,
@@ -173,23 +173,23 @@
             record: ':node_memory_utilisation:',
             expr: |||
               1 -
-              sum(node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
+              sum(node_memory_MemFree_bytes{%(nodeExporterSelector)s} + node_memory_Cached_bytes{%(nodeExporterSelector)s} + node_memory_Buffers_bytes{%(nodeExporterSelector)s})
               /
-              sum(node_memory_MemTotal{%(nodeExporterSelector)s})
+              sum(node_memory_MemTotal_bytes{%(nodeExporterSelector)s})
             ||| % $._config,
           },
           // Add separate rules for Free & Total, so we can aggregate across clusters
           // in dashboards.
           {
-            record: ':node_memory_MemFreeCachedBuffers:sum',
+            record: ':node_memory_MemFreeCachedBuffers_bytes:sum',
             expr: |||
-              sum(node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
+              sum(node_memory_MemFree_bytes{%(nodeExporterSelector)s} + node_memory_Cached_bytes{%(nodeExporterSelector)s} + node_memory_Buffers_bytes{%(nodeExporterSelector)s})
             ||| % $._config,
           },
           {
-            record: ':node_memory_MemTotal:sum',
+            record: ':node_memory_MemTotal_bytes:sum',
             expr: |||
-              sum(node_memory_MemTotal{%(nodeExporterSelector)s})
+              sum(node_memory_MemTotal_bytes{%(nodeExporterSelector)s})
             ||| % $._config,
           },
           {
@@ -198,7 +198,7 @@
             record: 'node:node_memory_bytes_available:sum',
             expr: |||
               sum by (node) (
-                (node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
+                (node_memory_MemFree_bytes{%(nodeExporterSelector)s} + node_memory_Cached_bytes{%(nodeExporterSelector)s} + node_memory_Buffers_bytes{%(nodeExporterSelector)s})
                 * on (namespace, %(podLabel)s) group_left(node)
                   node_namespace_pod:kube_pod_info:
               )
@@ -210,7 +210,7 @@
             record: 'node:node_memory_bytes_total:sum',
             expr: |||
               sum by (node) (
-                node_memory_MemTotal{%(nodeExporterSelector)s}
+                node_memory_MemTotal_bytes{%(nodeExporterSelector)s}
                 * on (namespace, %(podLabel)s) group_left(node)
                   node_namespace_pod:kube_pod_info:
               )
@@ -241,13 +241,13 @@
             expr: |||
               1 -
               sum by (node) (
-                (node_memory_MemFree{%(nodeExporterSelector)s} + node_memory_Cached{%(nodeExporterSelector)s} + node_memory_Buffers{%(nodeExporterSelector)s})
+                (node_memory_MemFree_bytes{%(nodeExporterSelector)s} + node_memory_Cached_bytes{%(nodeExporterSelector)s} + node_memory_Buffers_bytes{%(nodeExporterSelector)s})
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
               /
               sum by (node) (
-                node_memory_MemTotal{%(nodeExporterSelector)s}
+                node_memory_MemTotal_bytes{%(nodeExporterSelector)s}
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -276,7 +276,7 @@
             // Disk utilisation (ms spent, by rate() it's bound by 1 second)
             record: ':node_disk_utilisation:avg_irate',
             expr: |||
-              avg(irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
+              avg(irate(node_disk_io_time_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]))
             ||| % $._config,
           },
           {
@@ -284,7 +284,7 @@
             record: 'node:node_disk_utilisation:avg_irate',
             expr: |||
               avg by (node) (
-                irate(node_disk_io_time_ms{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
+                irate(node_disk_io_time_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m])
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -294,7 +294,7 @@
             // Disk saturation (ms spent, by rate() it's bound by 1 second)
             record: ':node_disk_saturation:avg_irate',
             expr: |||
-              avg(irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
+              avg(irate(node_disk_io_time_weighted_seconds_total_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
             ||| % $._config,
           },
           {
@@ -302,7 +302,7 @@
             record: 'node:node_disk_saturation:avg_irate',
             expr: |||
               avg by (node) (
-                irate(node_disk_io_time_weighted{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
+                irate(node_disk_io_time_weighted_seconds_total_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -325,16 +325,16 @@
           {
             record: ':node_net_utilisation:sum_irate',
             expr: |||
-              sum(irate(node_network_receive_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
-              sum(irate(node_network_transmit_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
+              sum(irate(node_network_receive_bytes_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
+              sum(irate(node_network_transmit_bytes_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
             ||| % $._config,
           },
           {
             record: 'node:node_net_utilisation:sum_irate',
             expr: |||
               sum by (node) (
-                (irate(node_network_receive_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]) +
-                irate(node_network_transmit_bytes{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
+                (irate(node_network_receive_bytes_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]) +
+                irate(node_network_transmit_bytes_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -343,16 +343,16 @@
           {
             record: ':node_net_saturation:sum_irate',
             expr: |||
-              sum(irate(node_network_receive_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
-              sum(irate(node_network_transmit_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
+              sum(irate(node_network_receive_drop_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m])) +
+              sum(irate(node_network_transmit_drop_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
             ||| % $._config,
           },
           {
             record: 'node:node_net_saturation:sum_irate',
             expr: |||
               sum by (node) (
-                (irate(node_network_receive_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]) +
-                irate(node_network_transmit_drop{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
+                (irate(node_network_receive_drop_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]) +
+                irate(node_network_transmit_drop_total{%(nodeExporterSelector)s,%(hostNetworkInterfaceSelector)s}[1m]))
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )

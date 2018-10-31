@@ -76,8 +76,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Disk Capacity') +
           g.queryPanel(
             |||
-              sum(max(node_filesystem_size{%(fstypeSelector)s} - node_filesystem_avail{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)) by (%(podLabel)s,namespace)
-              / scalar(sum(max(node_filesystem_size{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)))
+              sum(max(node_filesystem_size_bytes{%(fstypeSelector)s} - node_filesystem_avail_bytes{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)) by (%(podLabel)s,namespace)
+              / scalar(sum(max(node_filesystem_size_bytes{%(fstypeSelector)s}) by (device,%(podLabel)s,namespace)))
               * on (namespace, %(podLabel)s) group_left (node) node_namespace_pod:kube_pod_info:
             ||| % $._config, '{{node}}', legendLink
           ) +

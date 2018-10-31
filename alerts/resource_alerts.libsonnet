@@ -26,7 +26,7 @@
             expr: |||
               sum(namespace_name:kube_pod_container_resource_requests_memory_bytes:sum)
                 /
-              sum(node_memory_MemTotal)
+              sum(node_memory_MemTotal_bytes)
                 >
               (count(node:node_num_cpu:sum)-1)
                 /
@@ -61,7 +61,7 @@
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="requests.memory"})
                 /
-              sum(node_memory_MemTotal{%(nodeExporterSelector)s})
+              sum(node_memory_MemTotal_bytes{%(nodeExporterSelector)s})
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
