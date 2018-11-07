@@ -294,7 +294,7 @@
             // Disk saturation (ms spent, by rate() it's bound by 1 second)
             record: ':node_disk_saturation:avg_irate',
             expr: |||
-              avg(irate(node_disk_io_time_weighted_seconds_total_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
+              avg(irate(node_disk_io_time_weighted_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3)
             ||| % $._config,
           },
           {
@@ -302,7 +302,7 @@
             record: 'node:node_disk_saturation:avg_irate',
             expr: |||
               avg by (node) (
-                irate(node_disk_io_time_weighted_seconds_total_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
+                irate(node_disk_io_time_weighted_seconds_total{%(nodeExporterSelector)s,device=~"(sd|xvd|nvme).+"}[1m]) / 1e3
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
               )
@@ -311,15 +311,15 @@
           {
             record: 'node:node_filesystem_usage:',
             expr: |||
-              max by (namespace, %(podLabel)s, device) ((node_filesystem_size{%(fstypeSelector)s}
-              - node_filesystem_avail{%(fstypeSelector)s})
-              / node_filesystem_size{%(fstypeSelector)s})
+              max by (namespace, %(podLabel)s, device) ((node_filesystem_size_bytes{%(fstypeSelector)s}
+              - node_filesystem_avail_bytes{%(fstypeSelector)s})
+              / node_filesystem_size_bytes{%(fstypeSelector)s})
             ||| % $._config,
           },
           {
             record: 'node:node_filesystem_avail:',
             expr: |||
-              max by (namespace, %(podLabel)s, device) (node_filesystem_avail{%(fstypeSelector)s} / node_filesystem_size{%(fstypeSelector)s})
+              max by (namespace, %(podLabel)s, device) (node_filesystem_avail_bytes{%(fstypeSelector)s} / node_filesystem_size_bytes{%(fstypeSelector)s})
             ||| % $._config,
           },
           {
