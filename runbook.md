@@ -55,19 +55,19 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 
 ##### Alert Name: "KubeCronJobRunning"
-+ *Message*: `CronJob {{ $labels.namespaces }}/{{ $labels.cronjob }} is taking more than 1h to complete.`
++ *Message*: `CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is taking more than 1h to complete.`
 + *Severity*: warning
-+ *Action*: Check the cronjob using `kubectl decribe cronjob <cronjob>` and look at the pod logs using `kubectl logs <pod>` for further information.
++ *Action*: Check the cronjob using `kubectl describe cronjob <cronjob>` and look at the pod logs using `kubectl logs <pod>` for further information.
 
 ##### Alert Name: "KubeJobCompletion"
-+ *Message*: `Job {{ $labels.namespaces }}/{{ $labels.job }} is taking more than 1h to complete.`
++ *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 1h to complete.`
 + *Severity*: warning
-+ *Action*: Check the job using `kubectl decribe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
++ *Action*: Check the job using `kubectl describe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
 
 ##### Alert Name: "KubeJobFailed"
-+ *Message*: `Job {{ $labels.namespaces }}/{{ $labels.job }} failed to complete.`
++ *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.`
 + *Severity*: warning
-+ *Action*: Check the job using `kubectl decribe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
++ *Action*: Check the job using `kubectl describe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
 
 ### Group Name: "kubernetes-resources"
 ##### Alert Name: "KubeCPUOvercommit"
@@ -100,10 +100,10 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `There are {{ $value }} different versions of Kubernetes components running.`
 + *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
-+ *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'`
++ *Message*: `Kubernetes API server client '{{ $labels.job_name }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'`
 + *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
-+ *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'`
++ *Message*: `Kubernetes API server client '{{ $labels.job_name }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'`
 + *Severity*: warning
 ##### Alert Name: "KubeletTooManyPods"
 + *Message*: `Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110.`
