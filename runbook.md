@@ -100,10 +100,10 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `There are {{ $value }} different versions of Kubernetes components running.`
 + *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
-+ *Message*: `Kubernetes API server client '{{ $labels.job_name }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'`
++ *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'`
 + *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
-+ *Message*: `Kubernetes API server client '{{ $labels.job_name }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'`
++ *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'`
 + *Severity*: warning
 ##### Alert Name: "KubeletTooManyPods"
 + *Message*: `Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110.`

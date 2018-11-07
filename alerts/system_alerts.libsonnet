@@ -46,7 +46,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: "Kubernetes API server client '{{ $labels.job_name }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'",
+              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'",
             },
           },
           {
@@ -59,7 +59,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: "Kubernetes API server client '{{ $labels.job_name }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / second.",
+              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / second.",
             },
           },
           {
