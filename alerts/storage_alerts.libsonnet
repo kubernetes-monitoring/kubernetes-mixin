@@ -44,7 +44,7 @@
             expr: |||
               kube_persistentvolume_status_phase{phase=~"Failed|Pending"} > 0
             |||,
-            'for': '1m',
+            'for': '5m',
             labels: {
               severity: 'critical',
             },
