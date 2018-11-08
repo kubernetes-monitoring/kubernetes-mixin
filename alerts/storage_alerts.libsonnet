@@ -39,6 +39,19 @@
               message: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ printf "%0.2f" $value }}% is available.',
             },
           },
+          {
+            alert: 'KubePersistentVolumeErrors',
+            expr: |||
+              kube_persistentvolume_status_phase{phase=~"Failed|Pending",%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
+            ||| % $._config,
+            'for': '5m',
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.',
+            },
+          },
         ],
       },
     ],
