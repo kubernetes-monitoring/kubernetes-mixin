@@ -42,8 +42,8 @@
           {
             alert: 'KubePersistentVolumeErrors',
             expr: |||
-              kube_persistentvolume_status_phase{phase=~"Failed|Pending"} > 0
-            |||,
+              kube_persistentvolume_status_phase{phase=~"Failed|Pending",%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
+            ||| % $._config,
             'for': '5m',
             labels: {
               severity: 'critical',
