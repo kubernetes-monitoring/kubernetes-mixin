@@ -30,7 +30,7 @@ local gauge = promgrafonnet.gauge;
           span=6,
           format='percentunit',
         )
-        .addTarget(prometheus.target('avg by (cpu) (irate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[5m])) * 100' % $._config, legendFormat='{{cpu}}'));
+        .addTarget(prometheus.target('sum by (cpu) (irate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode!="idle", instance="$instance"}[5m]))' % $._config, legendFormat='{{cpu}}'));
 
       local memoryGraph =
         graphPanel.new(
