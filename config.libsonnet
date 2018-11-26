@@ -58,7 +58,7 @@
     fstypeSelector: 'fstype=~"%s"' % std.join('|', self.fstypes),
 
     // This list of disk device names is referenced in various expressions.
-    diskDevices: ['sd.+', 'xvd.+', 'nvme.+'],
+    diskDevices: ['nvme.+', 'rbd.+', 'sd.+', 'vd.+', 'xvd.+'],
     diskDeviceSelector: 'device=~"%s"' % std.join('|', self.diskDevices),
   },
 }
