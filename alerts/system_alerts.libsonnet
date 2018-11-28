@@ -36,7 +36,7 @@
             // this is normal and an expected error, therefore it should be
             // ignored in this alert.
             expr: |||
-              (sum(rate(rest_client_requests_total{code!~"2..|404"}[5m])) by (instance, job)
+              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job)
                 /
               sum(rate(rest_client_requests_total[5m])) by (instance, job))
               * 100 > 1
