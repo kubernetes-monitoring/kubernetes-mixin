@@ -359,7 +359,7 @@
             ||| % $._config,
           },
           {
-            record: 'node:disk_inodes_total:',
+            record: 'node:node_inodes_total:',
             expr: |||
               max(
                 max(
@@ -367,13 +367,13 @@
                 ) by (node, host_ip)
                 * on (host_ip) group_right (node)
                 label_replace(
-                  (max(node_filesystem_files{mountpoint="/"}) by (instance)), "host_ip", "$1", "instance", "(.*):.*"
+                  (max(node_filesystem_files{%(nodeExporterSelector)s, %(hostMountpointSelector)s}) by (instance)), "host_ip", "$1", "instance", "(.*):.*"
                 )
               ) by (node)
             ||| % $._config,
           },
           {
-              record: 'node:disk_inodes_free:',
+              record: 'node:node_inodes_free:',
               expr: |||
                 max(
                   max(
@@ -381,7 +381,7 @@
                   ) by (node, host_ip)
                   * on (host_ip) group_right (node)
                   label_replace(
-                    (max(node_filesystem_files_free{mountpoint="/"}) by (instance)), "host_ip", "$1", "instance", "(.*):.*"
+                    (max(node_filesystem_files_free{%(nodeExporterSelector)s, %(hostMountpointSelector)s}) by (instance)), "host_ip", "$1", "instance", "(.*):.*"
                   )
                 ) by (node)
               ||| % $._config,
