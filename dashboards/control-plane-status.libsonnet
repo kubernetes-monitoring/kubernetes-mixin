@@ -4,34 +4,37 @@ local graphPanel = grafana.graphPanel;
 local prometheus = grafana.prometheus;
 local promgrafonnet = import '../lib/promgrafonnet/promgrafonnet.libsonnet';
 local row = grafana.row;
-local gauge = promgrafonnet.gauge;
-
+local numbersinglestat = promgrafonnet.numbersinglestat;
 {
   grafanaDashboards+:: {
     'control-plane-status.json':
-      local apiserversGauge =
-        gauge.new(
+      local apiserversStat =
+        numbersinglestat.new(
           'API Servers UP',
-          '(sum(up{%(kubeApiserverSelector)s} == 1) / sum(up{%(kubeApiserverSelector)s})) * 100' % $._config,
-        );
+          '(sum(up{%(kubeApiserverSelector)s} == 1) / sum(up{%(kubeApiserverSelector)s}))' % $._config,
+        )
+        .withFormat('percentunit');
 
-      local controllerManagersGauge =
-        gauge.new(
+      local controllerManagersStat =
+        numbersinglestat.new(
           'Controller Mangers UP',
-          '(sum(up{%(kubeControllerManagerSelector)s} == 1) / sum(up{%(kubeControllerManagerSelector)s})) * 100' % $._config,
-        );
+          '(sum(up{%(kubeControllerManagerSelector)s} == 1) / sum(up{%(kubeControllerManagerSelector)s}))' % $._config,
+        )
+        .withFormat('percentunit');
 
-      local schedulersGauge =
-        gauge.new(
+      local schedulersStat =
+        numbersinglestat.new(
           'Schedulers UP',
-          '(sum(up{%(kubeSchedulerSelector)s} == 1) / sum(up{%(kubeSchedulerSelector)s})) * 100' % $._config,
-        );
+          '(sum(up{%(kubeSchedulerSelector)s} == 1) / sum(up{%(kubeSchedulerSelector)s}))' % $._config,
+        )
+        .withFormat('percentunit');
 
-      local apiErrorRateGauge =
-        gauge.new(
+      local apiErrorRateStat =
+        numbersinglestat.new(
           'API Request Error Rate',
-          'max(sum by(instance) (rate(apiserver_request_count{%(kubeApiserverSelector)s, code=~"5.."}[5m])) / sum by(instance) (rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m]))) * 100' % $._config,
-        );
+          'max(sum by(instance) (rate(apiserver_request_count{%(kubeApiserverSelector)s, code=~"5.."}[5m])) / sum by(instance) (rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])))' % $._config,
+        )
+        .withFormat('percentunit');
 
       local apiRequestLatency =
         graphPanel.new(
@@ -90,11 +93,11 @@ local gauge = promgrafonnet.gauge;
         },
       )
       .addRow(
-        row.new()
-        .addPanel(apiserversGauge)
-        .addPanel(controllerManagersGauge)
-        .addPanel(schedulersGauge)
-        .addPanel(apiErrorRateGauge)
+        row.new(height='100px')
+        .addPanel(apiserversStat)
+        .addPanel(controllerManagersStat)
+        .addPanel(schedulersStat)
+        .addPanel(apiErrorRateStat)
       )
       .addRow(
         row.new()
