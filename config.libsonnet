@@ -13,6 +13,7 @@
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
     hostNetworkInterfaceSelector: 'device="eth0"',
+    hostMountpointSelector: 'mountpoint="/"',
 
     // We build alerts for the presence of all these jobs.
     jobs: {

@@ -156,6 +156,36 @@ local gauge = promgrafonnet.gauge;
         )
         .addTarget(prometheus.target('max(rate(node_network_transmit_bytes_total{%(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
 
+      local inodesGraph =
+        graphPanel.new(
+          'Inodes Usage',
+          datasource='$datasource',
+          span=9,
+        )
+        .addTarget(prometheus.target(
+          |||
+            max(
+              node_filesystem_files{%(nodeExporterSelector)s, instance="$instance"}
+              - node_filesystem_files_free{%(nodeExporterSelector)s, instance="$instance"}
+            )
+          ||| % $._config, legendFormat='inodes used'
+        ))
+        .addTarget(prometheus.target('max(node_filesystem_files_free{%(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='inodes free'));
+
+      local inodesGauge = gauge.new(
+        'Inodes Usage',
+        |||
+          max(
+            (
+              (
+                node_filesystem_files{%(nodeExporterSelector)s, instance="$instance"}
+              - node_filesystem_files_free{%(nodeExporterSelector)s, instance="$instance"}
+              )
+              / node_filesystem_files{%(nodeExporterSelector)s, instance="$instance"}
+            ) * 100)
+        ||| % $._config,
+      ).withLowerBeingBetter();
+
       dashboard.new(
         'Nodes',
         time_from='now-1h',
@@ -208,6 +238,11 @@ local gauge = promgrafonnet.gauge;
         row.new()
         .addPanel(networkReceived)
         .addPanel(networkTransmitted)
+      )
+      .addRow(
+        row.new()
+        .addPanel(inodesGraph)
+        .addPanel(inodesGauge)
       ),
   },
 }
