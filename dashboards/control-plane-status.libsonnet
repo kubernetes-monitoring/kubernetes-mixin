@@ -13,6 +13,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'API Servers UP',
           '(sum(up{%(kubeApiserverSelector)s} == 1) / sum(up{%(kubeApiserverSelector)s}))' % $._config,
         )
+        .withTextNullValue('N/A')
         .withFormat('percentunit');
 
       local controllerManagersStat =
@@ -20,6 +21,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'Controller Mangers UP',
           '(sum(up{%(kubeControllerManagerSelector)s} == 1) / sum(up{%(kubeControllerManagerSelector)s}))' % $._config,
         )
+        .withTextNullValue('N/A')
         .withFormat('percentunit');
 
       local schedulersStat =
@@ -27,6 +29,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'Schedulers UP',
           '(sum(up{%(kubeSchedulerSelector)s} == 1) / sum(up{%(kubeSchedulerSelector)s}))' % $._config,
         )
+        .withTextNullValue('N/A')
         .withFormat('percentunit');
 
       local apiErrorRateStat =
@@ -34,6 +37,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'API Request Error Rate',
           'max(sum by(instance) (rate(apiserver_request_count{%(kubeApiserverSelector)s, code=~"5.."}[5m])) / sum by(instance) (rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])))' % $._config,
         )
+        .withTextNullValue('N/A')
         .withFormat('percentunit');
 
       local apiRequestLatency =
