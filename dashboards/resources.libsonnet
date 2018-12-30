@@ -9,7 +9,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
           link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-namespace.json') },
         },
       };
-
+       local headlinePanelArgs = {
+         span: 2,
+      };
+      local storagehHeadlinePanelArgs = {
+        span: 3,
+      };
       g.dashboard(
         'K8s / Compute Resources / Cluster',
         uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
@@ -18,30 +23,57 @@ local g = import 'grafana-builder/grafana.libsonnet';
          {
            height: '100px',
            showTitle: false,
+           panels: self._panels,
          })
          .addPanel(
            g.panel('CPU Utilisation') +
+           headlinePanelArgs+
            g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle"}[1m]))')
          )
         .addPanel(
           g.panel('CPU Requests Commitment') +
+          headlinePanelArgs+
           g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores) / sum(node:node_num_cpu:sum)')
         )
         .addPanel(
           g.panel('CPU Limits Commitment') +
+          headlinePanelArgs+
           g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores) / sum(node:node_num_cpu:sum)')
         )
         .addPanel(
           g.panel('Memory Utilisation') +
+          headlinePanelArgs+
           g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum) / sum(:node_memory_MemTotal_bytes:sum)')
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
+          headlinePanelArgs+
           g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes) / sum(:node_memory_MemTotal_bytes:sum)')
         )
         .addPanel(
           g.panel('Memory Limits Commitment') +
+          headlinePanelArgs+
           g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes) / sum(:node_memory_MemTotal_bytes:sum)')
+        )
+        .addPanel(
+          g.panel('Ephemeral Storage Utilization') +
+          storagehHeadlinePanelArgs+
+          g.statPanel('sum(max(container_fs_usage_bytes{namespace!= "", pod_name!= "",container_name!= ""}) by (instance, namespace, pod_name,container_name)) / sum(max (node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"}) by(instance, device))')
+        )
+        .addPanel(
+          g.panel('Ephemeral Storage Limit Commitment') +
+          storagehHeadlinePanelArgs+
+          g.statPanel('sum(kube_resourcequota{resource="limits.ephemeral-storage", type="used"}) / sum(kube_resourcequota{resource="limits.ephemeral-storage", type="hard"})')
+        )
+        .addPanel(
+          g.panel('Persistent Storage Utilization') +
+          storagehHeadlinePanelArgs+
+          g.statPanel('sum (kubelet_volume_stats_used_bytes) by (namespace) / sum (kubelet_volume_stats_capacity_bytes) by (namespace)')
+        )
+        .addPanel(
+          g.panel('Persistent Storage Requests Commitment') +
+          storagehHeadlinePanelArgs+
+          g.statPanel('sum(kube_resourcequota{resource="requests.storage", type="used"} )/ sum(kube_resourcequota{resource="requests.storage", type="hard"})')
         )
       )
       .addRow(
@@ -98,6 +130,46 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
             'Value #D': { alias: 'Memory Limits', unit: 'decbytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
+          })
+        )
+      )
+      .addRow(
+        g.row('Storage')
+        .addPanel(
+          g.panel('Ephemeral Storage Usage') +
+          g.queryPanel('sum (max(container_fs_usage_bytes{namespace!= "", pod_name!= "",container_name!= ""}) by (instance, namespace, pod_name,container_name)) by (namespace)', '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') }
+        )
+        .addPanel(
+          g.panel('Persistent Storage Usage') +
+          g.queryPanel('sum (kubelet_volume_stats_used_bytes) by (namespace)', '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') }
+        )
+      )
+      .addRow(
+        g.row('Storage Requests')
+        .addPanel(
+          g.panel('Storage Requests by Namespace') +
+          g.tablePanel([
+            'sum (kube_resourcequota{resource="requests.ephemeral-storage", type="used"}) by (namespace)',
+            'sum(kube_resourcequota{resource="limits.ephemeral-storage", type="hard"}) by (namespace) - (sum(kube_resourcequota{resource="limits.ephemeral-storage", type="used"}) by (namespace))',
+            'max(kube_resourcequota{resource="requests.storage", type="used"}) by (namespace)',
+            'max(kube_resourcequota{resource="requests.storage", type="hard"}) by (namespace)',
+            'max(kube_resourcequota{resource="requests.storage", type="used"}) by (namespace) / max(kube_resourcequota{resource="requests.storage", type="hard"}) by (namespace)',
+            'max(kube_resourcequota{resource="requests.storage", type="hard"}) by (namespace) - max(kube_resourcequota{resource="requests.storage", type="used"}) by (namespace)',
+            'max(kube_resourcequota{resource="persistentvolumeclaims", type="hard"}) by (namespace)',
+            'max(kube_resourcequota{resource="persistentvolumeclaims", type="hard"}) by (namespace) - max(kube_resourcequota{resource="persistentvolumeclaims", type="used"}) by (namespace)',
+          ], tableStyles {
+            'Value #A': { alias: 'Ephemeral Storage Requests Usage', unit: 'bytes'},
+            'Value #B': { alias: 'Ephemeral Storage Limit Available', unit: 'bytes'},
+            'Value #C': { alias: 'PVC Requests Usage', unit: 'bytes'},
+            'Value #D': { alias: 'Claim Requests', unit: 'bytes'},
+            'Value #E': { alias: 'Claim Requests %', unit: 'percentunit' },
+            'Value #F': { alias: 'Claim Requests Available', unit: 'bytes'},
+            'Value #G': { alias: 'PVC Limits', unit: 'none'},
+            'Value #H': { alias: 'PVC Availabe ', unit: 'none'},
           })
         )
       ),
