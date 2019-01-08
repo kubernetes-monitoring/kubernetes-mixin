@@ -65,14 +65,17 @@
           {
             alert: 'KubeletTooManyPods',
             expr: |||
-              kubelet_running_pod_count{%(kubeletSelector)s} > %(kubeletPodLimit)s * 0.9
+              100 - 100 * (max by (node) (label_join(kubelet_running_pod_count{%(kubeletSelector)s}, "node", "", "instance"))
+                /
+              max by (node) (kube_node_status_capacity_pods{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}))
+              > 95
             ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubelet {{ $labels.instance }} is running {{ $value }} Pods, close to the limit of %d.' % $._config.kubeletPodLimit,
+              message: 'Kubelet {{ $labels.node }} is running at {{ printf "%0.0f" $value }}% of Pods capacity.',
             },
           },
           {
