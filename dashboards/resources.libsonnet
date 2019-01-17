@@ -168,6 +168,33 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
+      ).addRow(
+        g.row('Storage Usage')
+        .addPanel(
+          g.panel('Ephemeral Storage Usage') +
+          g.queryPanel('max(container_fs_usage_bytes{namespace="$namespace", pod_name!= "",container_name!= ""}) by (pod_name)', '{{pod_name}}') +
+          g.stack +
+          { yaxes: g.yaxes('decbytes') },
+        )
+        .addPanel(
+          g.panel('Persistent Storage Usage (Claims)') +
+          g.queryPanel('sum((max(kubelet_volume_stats_used_bytes{namespace="$namespace"}) by (namespace, persistentvolumeclaim))* on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace"}) by (namespace, persistentvolumeclaim, pod))) by (pod)', '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('decbytes') },
+        )
+      )
+      .addRow(
+        g.row('Persistent Storage (Claims)')
+        .addPanel(
+          g.panel('Storage (Claims) by Pod') +
+          g.tablePanel([
+            'sum((max(kubelet_volume_stats_used_bytes{namespace="$namespace"}) by (namespace, persistentvolumeclaim))* on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace"}) by (namespace, persistentvolumeclaim, pod))) by (pod)',
+            'sum ((max(kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="$namespace"}) by (namespace, persistentvolumeclaim)) * on (namespace, persistentvolumeclaim) group_left (pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace"}) by (namespace, pod, persistentvolumeclaim)) ) by (pod)',
+          ], tableStyles {
+            'Value #A': { alias: 'PVC Usage', unit: 'bytes' },
+            'Value #B': { alias: 'Claim Requests', unit: 'bytes' }
+          })
+        )
       ),
 
     'k8s-resources-pod.json':
