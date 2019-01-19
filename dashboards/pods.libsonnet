@@ -49,7 +49,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
+          'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, namespace="$namespace", image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
           legendFormat='{{ container_name }}',
         ))
       );
@@ -67,7 +67,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, pod_name="$pod"}[1m])))' % $._config,
+          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
           legendFormat='{{ pod_name }}',
         ))
       );
