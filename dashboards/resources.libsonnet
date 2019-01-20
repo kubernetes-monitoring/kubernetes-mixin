@@ -174,13 +174,13 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Ephemeral Storage Usage') +
           g.queryPanel('max(container_fs_usage_bytes{namespace="$namespace", pod_name!= "",container_name!= ""}) by (pod_name)', '{{pod_name}}') +
           g.stack +
-          { yaxes: g.yaxes('decbytes') },
+          { yaxes: g.yaxes('bytes') },
         )
         .addPanel(
           g.panel('Persistent Storage Usage (Claims)') +
           g.queryPanel('sum((max(kubelet_volume_stats_used_bytes{namespace="$namespace"}) by (namespace, persistentvolumeclaim))* on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace"}) by (namespace, persistentvolumeclaim, pod))) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('decbytes') },
+          { yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
