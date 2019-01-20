@@ -235,6 +235,20 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
+      ).addRow(
+        g.row('Storage Usage')
+        .addPanel(
+          g.panel('Ephemeral Storage Usage (Container level)') +
+          g.queryPanel('max(container_fs_usage_bytes{namespace="$namespace", pod_name= "$pod"}) by (container_name)', 'Container: {{container_name}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+        .addPanel(
+          g.panel('Persistent Storage Usage (Pod)') +
+          g.queryPanel('(max(kubelet_volume_stats_used_bytes{namespace="$namespace"}) by (namespace, persistentvolumeclaim))* on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace", pod = "$pod"}) by (namespace, persistentvolumeclaim, pod))', 'Pod: {{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
       ),
   },
 }
