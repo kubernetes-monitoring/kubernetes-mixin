@@ -140,7 +140,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubernetes API certificate is expiring in less than %d days.' % ($._config.certExpirationWarningSeconds / 3600 / 24),
+              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %d days.' % ($._config.certExpirationWarningSeconds / 3600 / 24),
             },
           },
           {
@@ -152,7 +152,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Kubernetes API certificate is expiring in less than %d hours.' % ($._config.certExpirationCriticalSeconds / 3600),
+              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %d hours.' % ($._config.certExpirationCriticalSeconds / 3600),
             },
           },
         ],
