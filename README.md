@@ -103,6 +103,16 @@ $ ks apply default
 
 TODO
 
+## Multi-cluster support
+
+Kubernetes-mixin can support dashboards across multiple clusters. You need either a multi-cluster [Thanos](https://github.com/improbable-eng/thanos) installation with `external_labels` configured or a [Cortex](https://github.com/cortexproject/cortex)l system where a cluster label exists. To enable this feature you need to configure the following:
+
+```
+    //Opt-in to multiCluster dashboards by overriding this and the clusterLabel
+    showMultiCluster: true,
+    clusterLabel: '<your cluster label>',
+```
+
 ## Customising the mixin
 
 Kubernetes-mixin allows you to override the selectors used for various jobs,

@@ -17,6 +17,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'Memory Usage',
           datasource='$datasource',
           min=0,
+          span=12,
           format='bytes',
           legend_rightSide=true,
           legend_alignAsTable=true,
@@ -24,15 +25,15 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by(container_name) (container_memory_usage_bytes{%(cadvisorSelector)s, namespace="$namespace", pod_name="$pod", container_name=~"$container", container_name!="POD"})' % $._config,
+          'sum by(container_name) (container_memory_usage_bytes{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name=~"$container", container_name!="POD"})' % $._config,
           legendFormat='Current: {{ container_name }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s, namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Requested: {{ container }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(kubeStateMetricsSelector)s, namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Limit: {{ container }}',
         ))
       );
@@ -43,13 +44,14 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'CPU Usage',
           datasource='$datasource',
           min=0,
+          span=12,
           legend_rightSide=true,
           legend_alignAsTable=true,
           legend_current=true,
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, namespace="$namespace", image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
+          'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
           legendFormat='{{ container_name }}',
         ))
       );
@@ -61,13 +63,14 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           datasource='$datasource',
           format='bytes',
           min=0,
+          span=12,
           legend_rightSide=true,
           legend_alignAsTable=true,
           legend_current=true,
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
+          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
           legendFormat='{{ pod_name }}',
         ))
       );
@@ -94,9 +97,19 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       )
       .addTemplate(
         template.new(
+          'cluster',
+          '$datasource',
+          'label_values(kube_pod_info, %(clusterLabel)s)' % $._config,
+          label='cluster',
+          refresh='time',
+          hide=if $._config.showMultiCluster then '' else 'variable',
+        )
+      )
+      .addTemplate(
+        template.new(
           'namespace',
           '$datasource',
-          'label_values(kube_pod_info, namespace)',
+          'label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
         )
@@ -105,7 +118,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         template.new(
           'pod',
           '$datasource',
-          'label_values(kube_pod_info{namespace=~"$namespace"}, pod)',
+          'label_values(kube_pod_info{%(clusterLabel)s="$cluster", namespace=~"$namespace"}, pod)' % $._config,
           label='Pod',
           refresh='time',
         )
@@ -114,7 +127,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         template.new(
           'container',
           '$datasource',
-          'label_values(kube_pod_container_info{namespace="$namespace", pod="$pod"}, container)',
+          'label_values(kube_pod_container_info{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}, container)' % $._config,
           label='Container',
           refresh='time',
           includeAll=true,
