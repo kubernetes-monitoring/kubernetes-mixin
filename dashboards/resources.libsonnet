@@ -11,7 +11,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       };
 
       g.dashboard(
-        'K8s / Compute Resources / Cluster',
+        '%(grafanaDashboardNamePrefix)sCompute Resources / Cluster' % $._config,
         uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
       ).addRow(
         (g.row('Headlines') +
@@ -111,7 +111,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       };
 
       g.dashboard(
-        'K8s / Compute Resources / Namespace',
+        '%(grafanaDashboardNamePrefix)sCompute Resources / Namespace' % $._config,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addRow(
@@ -178,7 +178,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       };
 
       g.dashboard(
-        'K8s / Compute Resources / Pod',
+        '%(grafanaDashboardNamePrefix)sCompute Resources / Pod' % $._config,
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
       ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addTemplate('pod', 'kube_pod_info{namespace="$namespace"}', 'pod')
