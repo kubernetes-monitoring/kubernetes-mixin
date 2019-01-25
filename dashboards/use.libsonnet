@@ -13,12 +13,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU')
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.queryPanel('sum(node:node_cpu_utilisation:avg1m{%(clusterLabel)s=~".*"} * node:node_num_cpu:sum{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s) / sum(node:node_num_cpu:sum{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_cpu_utilisation:avg1m * node:node_num_cpu:sum) by (%(clusterLabel)s) / sum(node:node_num_cpu:sum) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
         .addPanel(
           g.panel('CPU Saturation (Load1)') +
-          g.queryPanel('sum(node:node_cpu_saturation_load1:{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s) / sum(min(kube_pod_info{%(clusterLabel)s=~".*"}) by (node, %(clusterLabel)s)) by(%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_cpu_saturation_load1:) by (%(clusterLabel)s) / sum(min(kube_pod_info) by (node, %(clusterLabel)s)) by(%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
       )
@@ -27,12 +27,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           // the metric `node:node_memory_utilisation:ratio` is each node's portion of the total cluster utilization; just sum them
           g.panel('Memory Utilisation') +
-          g.queryPanel('sum(node:node_memory_utilisation:ratio{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_memory_utilisation:ratio) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
         .addPanel(
           g.panel('Memory Saturation (Swap I/O)') +
-          g.queryPanel('sum(node:node_memory_swap_io_bytes:sum_rate{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_memory_swap_io_bytes:sum_rate) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes('Bps') },
         )
       )
@@ -42,12 +42,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Disk IO Utilisation') +
           // Full utilisation would be all disks on each node spending an average of
           // 1 sec per second doing I/O, normalize by node count for stacked charts
-          g.queryPanel('sum(node:node_disk_utilisation:avg_irate{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s) / sum(:kube_pod_info_node_count:{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_disk_utilisation:avg_irate) by (%(clusterLabel)s) / sum(:kube_pod_info_node_count:) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
         .addPanel(
           g.panel('Disk IO Saturation') +
-          g.queryPanel('sum(node:node_disk_saturation:avg_irate{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s) / sum(:kube_pod_info_node_count:{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s) ' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_disk_saturation:avg_irate) by (%(clusterLabel)s) / sum(:kube_pod_info_node_count:) by (%(clusterLabel)s) ' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
       )
@@ -55,12 +55,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Network')
         .addPanel(
           g.panel('Net Utilisation (Transmitted)') +
-          g.queryPanel('sum(node:node_net_utilisation:sum_irate{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_net_utilisation:sum_irate) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes('Bps') },
         )
         .addPanel(
           g.panel('Net Saturation (Dropped)') +
-          g.queryPanel('sum(node:node_net_saturation:sum_irate{%(clusterLabel)s=~".*"}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:node_net_saturation:sum_irate) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes('Bps') },
         )
       )
@@ -70,8 +70,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Disk Capacity') +
           g.queryPanel(
             |||
-              sum(node_filesystem_size_bytes{%(fstypeSelector)s, %(clusterLabel)s=~".*"} - node_filesystem_avail_bytes{%(fstypeSelector)s, %(clusterLabel)s=~".*"}) by (%(clusterLabel)s)
-              / sum(node_filesystem_size_bytes{%(fstypeSelector)s, %(clusterLabel)s=~".*"}) by (%(clusterLabel)s)
+              sum(node_filesystem_size_bytes{%(fstypeSelector)s} - node_filesystem_avail_bytes{%(fstypeSelector)s}) by (%(clusterLabel)s)
+              / sum(node_filesystem_size_bytes{%(fstypeSelector)s}) by (%(clusterLabel)s)
             ||| % $._config, '{{node}}', legendLink
           ) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
