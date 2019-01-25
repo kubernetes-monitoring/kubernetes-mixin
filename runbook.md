@@ -121,10 +121,10 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `API server is erroring for {{ $value }}% of requests.`
 + *Severity*: warning
 ##### Alert Name: "KubeClientCertificateExpiration"
-+ *Message*: `Kubernetes API certificate is expiring in less than 7 days.`
++ *Message*: `A client certificate used to authenticate to the apiserver is expiring in less than 7 days.`
 + *Severity*: warning
 ##### Alert Name: "KubeClientCertificateExpiration"
-+ *Message*: `Kubernetes API certificate is expiring in less than 1 day.`
++ *Message*: `A client certificate used to authenticate to the apiserver is expiring in less than 1 day.`
 + *Severity*: critical
 
 ## Other Kubernetes Runbooks and troubleshooting
