@@ -1,4 +1,32 @@
 {
+  local deploymentWorkloadAggregation(innerQuery) = |||
+    sum(
+      label_replace(
+        label_replace(
+          %(innerQuery)s
+            * on(pod_name) group_left(owner_name)
+            label_replace(kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"}, "pod_name", "$1", "pod", "(.*)"),
+          "replicaset", "$1", "owner_name", "(.*)"
+        ) * on(replicaset) group_left(owner_name) kube_replicaset_owner{%(kubeStateMetricsSelector)s},
+        "workload", "$1", "owner_name", "(.*)"
+      )
+    ) by (namespace, workload)
+  ||| % ($._config { innerQuery: innerQuery }),
+  local singleLevelWorkloadAggregation(innerQuery, kind) = |||
+    sum(
+      label_replace(
+        label_replace(
+          %(innerQuery)s
+            * on(pod_name) group_left(owner_name)
+            label_replace(kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="%(kind)s"}, "pod_name", "$1", "pod", "(.*)"),
+          "replicaset", "$1", "owner_name", "(.*)"
+        ),
+        "workload", "$1", "owner_name", "(.*)"
+      )
+    ) by (namespace, workload)
+  ||| % ($._config { innerQuery: innerQuery, kind: kind }),
+
+
   prometheusRules+:: {
     groups+: [
       {
@@ -67,6 +95,52 @@
               )
             ||| % $._config,
           },
+          // workload aggregation for deployments
+          {
+            record: 'namespace_workload:container_cpu_usage_seconds_total:sum_rate',
+            expr: deploymentWorkloadAggregation('namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate'),
+            labels: {
+              workload_type: 'deployment',
+            },
+          },
+          {
+            record: 'namespace_workload:container_memory_usage_bytes:sum_rate',
+            expr: deploymentWorkloadAggregation('sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container_name!=""}) by (pod_name, namespace)' % $._config),
+            labels: {
+              workload_type: 'deployment',
+            },
+          },
+          // workload aggregation for daemonsets
+          {
+            record: 'namespace_workload:container_cpu_usage_seconds_total:sum_rate',
+            expr: singleLevelWorkloadAggregation('namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate', 'DaemonSet'),
+            labels: {
+              workload_type: 'daemonset',
+            },
+          },
+          {
+            record: 'namespace_workload:container_memory_usage_bytes:sum_rate',
+            expr: singleLevelWorkloadAggregation('sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container_name!=""}) by (pod_name, namespace)' % $._config, 'DaemonSet'),
+            labels: {
+              workload_type: 'daemonset',
+            },
+          },
+          // workload aggregation for statefulsets
+          {
+            record: 'namespace_workload:container_cpu_usage_seconds_total:sum_rate',
+            expr: singleLevelWorkloadAggregation('namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate', 'StatefulSet'),
+            labels: {
+              workload_type: 'statefulset',
+            },
+          },
+          {
+            record: 'namespace_workload:container_memory_usage_bytes:sum_rate',
+            expr: singleLevelWorkloadAggregation('sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container_name!=""}) by (pod_name, namespace)' % $._config, 'StatefulSet'),
+            labels: {
+              workload_type: 'statefulset',
+            },
+          },
+
         ],
       },
       {
@@ -373,19 +447,19 @@
             ||| % $._config,
           },
           {
-              record: 'node:node_inodes_free:',
-              expr: |||
+            record: 'node:node_inodes_free:',
+            expr: |||
+              max(
                 max(
-                  max(
-                    kube_pod_info{%(kubeStateMetricsSelector)s, host_ip!=""}
-                  ) by (node, host_ip)
-                  * on (host_ip) group_right (node)
-                  label_replace(
-                    (max(node_filesystem_files_free{%(nodeExporterSelector)s, %(hostMountpointSelector)s}) by (instance)), "host_ip", "$1", "instance", "(.*):.*"
-                  )
-                ) by (node)
-              ||| % $._config,
-          },          
+                  kube_pod_info{%(kubeStateMetricsSelector)s, host_ip!=""}
+                ) by (node, host_ip)
+                * on (host_ip) group_right (node)
+                label_replace(
+                  (max(node_filesystem_files_free{%(nodeExporterSelector)s, %(hostMountpointSelector)s}) by (instance)), "host_ip", "$1", "instance", "(.*):.*"
+                )
+              ) by (node)
+            ||| % $._config,
+          },
         ],
       },
     ],
