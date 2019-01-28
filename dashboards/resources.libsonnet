@@ -177,6 +177,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
         },
       };
 
+      local podStoragePanelArgs = {
+        span: 6,
+      };
+
       g.dashboard(
         'K8s / Compute Resources / Pod',
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
@@ -236,18 +240,37 @@ local g = import 'grafana-builder/grafana.libsonnet';
           })
         )
       ).addRow(
-        g.row('Storage Usage')
+        (g.row('Sotrage Usage') +
+         {
+           panels: self._panels,
+         })
         .addPanel(
           g.panel('Ephemeral Storage Usage (Container level)') +
+          podStoragePanelArgs +
           g.queryPanel('max(container_fs_usage_bytes{namespace="$namespace", pod_name= "$pod"}) by (container_name)', 'Container: {{container_name}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
         )
         .addPanel(
           g.panel('Persistent Storage Usage (Pod)') +
+          podStoragePanelArgs +
           g.queryPanel('(max(kubelet_volume_stats_used_bytes{namespace="$namespace"}) by (namespace, persistentvolumeclaim))* on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace", pod = "$pod"}) by (namespace, persistentvolumeclaim, pod))', 'Pod: {{pod}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
+        )
+        .addPanel(
+          g.panel('PVC Space usage') +
+          podStoragePanelArgs +
+          g.queryPanel('(max (kubelet_volume_stats_used_bytes{namespace="$namespace"} / kubelet_volume_stats_capacity_bytes{namespace="$namespace"} ) by (namespace, persistentvolumeclaim)) * on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace", pod="$pod"}) by (namespace, persistentvolumeclaim, pod))', 'PVC : {{persistentvolumeclaim}}') +
+          g.stack +
+          { yaxes: g.yaxes('percentunit') },
+        )
+        .addPanel(
+          g.panel('PVC Inode usage') +
+          podStoragePanelArgs +
+          g.queryPanel('(max (kubelet_volume_stats_inodes_used{namespace="$namespace"} / kubelet_volume_stats_inodes{namespace="$namespace"} ) by (namespace, persistentvolumeclaim)) * on (namespace,persistentvolumeclaim) group_left(pod) (max(kube_pod_spec_volumes_persistentvolumeclaims_info{namespace="$namespace", pod="$pod"}) by (namespace, persistentvolumeclaim, pod))', 'PVC : {{persistentvolumeclaim}}') +
+          g.stack +
+          { yaxes: g.yaxes('percentunit') },
         )
       ),
   },
