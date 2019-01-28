@@ -84,7 +84,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(grafanaDashboardNamePrefix)s USE Method / Cluster' % $._config,
         uid=($._config.grafanaDashboardIDs['k8s-cluster-rsrc-use.json']),
-      ).addTemplate('cluster', 'kube_node_info', $._config.clusterLabel)
+      ).addTemplate('cluster', 'kube_node_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addRow(
         g.row('CPU')
         .addPanel(
@@ -167,7 +167,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(grafanaDashboardNamePrefix)s USE Method / Node' % $._config,
         uid=($._config.grafanaDashboardIDs['k8s-node-rsrc-use.json']),
-      ).addTemplate('cluster', 'kube_node_info', $._config.clusterLabel)
+      ).addTemplate('cluster', 'kube_node_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('node', 'kube_node_info{%(clusterLabel)s="$cluster"}'  % $._config, 'node')
       .addRow(
         g.row('CPU')
