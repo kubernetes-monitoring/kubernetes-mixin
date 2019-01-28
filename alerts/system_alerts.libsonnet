@@ -20,7 +20,7 @@
           {
             alert: 'KubeVersionMismatch',
             expr: |||
-              count(count by (gitVersion) (label_replace(kubernetes_build_info{%(notKubeDnsSelector)s},"gitVersion","$1","gitVersion","(.*)(-eks.*)"))) > 1
+              count(count by (gitVersion) (label_replace(kubernetes_build_info{%(notKubeDnsSelector)s},"gitVersion","$1","gitVersion","(.*)(-(.*))"))) > 1
             ||| % $._config,
             'for': '1h',
             labels: {
