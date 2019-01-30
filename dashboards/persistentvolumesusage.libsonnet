@@ -63,6 +63,7 @@ local gauge = promgrafonnet.gauge;
         '%(grafanaDashboardNamePrefix)sPersistent Volumes' % $._config,
         time_from='now-7d',
         uid=($._config.grafanaDashboardIDs['nodes.json']),
+        tags=($._config.grafanaDashboardTags),
       ).addTemplate(
         {
           current: {

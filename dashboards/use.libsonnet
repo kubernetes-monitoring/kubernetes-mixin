@@ -84,7 +84,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         ),
-      ),
+      )+{ tags: $._config.grafanaDashboardTags },
 
     'k8s-node-rsrc-use.json':
       g.dashboard(
@@ -156,6 +156,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
           ) +
           { yaxes: g.yaxes('percentunit') },
         ),
-      ),
+      )+{ tags: $._config.grafanaDashboardTags },
   },
 }

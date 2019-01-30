@@ -100,7 +100,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      ),
+      )+{ tags: $._config.grafanaDashboardTags },
 
     'k8s-resources-namespace.json':
       local tableStyles = {
@@ -168,7 +168,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      ),
+      )+{ tags: $._config.grafanaDashboardTags },
 
     'k8s-resources-pod.json':
       local tableStyles = {
@@ -235,6 +235,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      ),
+      )+{ tags: $._config.grafanaDashboardTags },
   },
 }

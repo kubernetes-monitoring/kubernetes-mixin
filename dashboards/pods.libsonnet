@@ -76,6 +76,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         '%(grafanaDashboardNamePrefix)sPods' % $._config,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['pods.json']),
+        tags=($._config.grafanaDashboardTags),
       ).addTemplate(
         {
           current: {

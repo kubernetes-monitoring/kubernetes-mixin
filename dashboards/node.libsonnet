@@ -190,6 +190,7 @@ local gauge = promgrafonnet.gauge;
         '%(grafanaDashboardNamePrefix)sNodes' % $._config,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['nodes.json']),
+        tags=($._config.grafanaDashboardTags),
       ).addTemplate(
         {
           current: {

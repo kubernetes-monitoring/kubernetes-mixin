@@ -35,6 +35,7 @@
       'statefulset.json': 'dPiBt0FRG5BNYo0XJ4L0Meoc7DWs9eL40c1CRc1g',
     },
     grafanaDashboardNamePrefix : "K8s / ",
+    grafanaDashboardTags: ["kubernetes-mixin"],
 
     // We alert when the aggregate (CPU, Memory) quota for all namespaces is
     // greater than the amount of the resources in the cluster.  We do however
