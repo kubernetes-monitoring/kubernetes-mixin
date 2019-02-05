@@ -12,7 +12,7 @@
     podLabel: 'pod',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
-    hostNetworkInterfaceSelector: 'device="eth0"',
+    hostNetworkInterfaceSelector: 'device!~"veth.+"',
     hostMountpointSelector: 'mountpoint="/"',
 
     // We build alerts for the presence of all these jobs.
