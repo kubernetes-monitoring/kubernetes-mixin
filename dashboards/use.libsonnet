@@ -3,10 +3,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
 {
   grafanaDashboards+:: {
     'k8s-cluster-rsrc-use.json':
-      local legendLink = '%(prefix)s/d/%(uid)s/k8s-node-rsrc-use' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-node-rsrc-use.json') };
+      local legendLink = '%(prefix)s/d/%(uid)s/k8s-node-rsrc-use' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-node-rsrc-use.json') };
 
       g.dashboard(
-        '%(grafanaDashboardNamePrefix)sUSE Method / Cluster' % $._config,
+        '%(dashboardNamePrefix)sUSE Method / Cluster' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-cluster-rsrc-use.json']),
       ).addRow(
         g.row('CPU')
@@ -84,11 +84,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         ),
-      )+{ tags: $._config.grafanaDashboardTags },
+      )+{ tags: $._config.grafanaK8s.dashboardTags },
 
     'k8s-node-rsrc-use.json':
       g.dashboard(
-        '%(grafanaDashboardNamePrefix)sUSE Method / Node' % $._config,
+        '%(dashboardNamePrefix)sUSE Method / Node' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-node-rsrc-use.json']),
       ).addTemplate('node', 'kube_node_info', 'node')
       .addRow(
@@ -156,6 +156,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
           ) +
           { yaxes: g.yaxes('percentunit') },
         ),
-      )+{ tags: $._config.grafanaDashboardTags },
+      )+{ tags: $._config.grafanaK8s.dashboardTags },
   },
 }

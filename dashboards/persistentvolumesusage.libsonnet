@@ -60,10 +60,10 @@ local gauge = promgrafonnet.gauge;
       ));
 
       dashboard.new(
-        '%(grafanaDashboardNamePrefix)sPersistent Volumes' % $._config,
+        '%(dashboardNamePrefix)sPersistent Volumes' % $._config.grafanaK8s,
         time_from='now-7d',
         uid=($._config.grafanaDashboardIDs['nodes.json']),
-        tags=($._config.grafanaDashboardTags),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {

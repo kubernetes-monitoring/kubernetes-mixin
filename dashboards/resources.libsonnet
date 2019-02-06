@@ -6,12 +6,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-namespace.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
         },
       };
 
       g.dashboard(
-        '%(grafanaDashboardNamePrefix)sCompute Resources / Cluster' % $._config,
+        '%(dashboardNamePrefix)sCompute Resources / Cluster' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
       ).addRow(
         (g.row('Headlines') +
@@ -100,18 +100,18 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      )+{ tags: $._config.grafanaDashboardTags },
+      )+{ tags: $._config.grafanaK8s.dashboardTags },
 
     'k8s-resources-namespace.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
         },
       };
 
       g.dashboard(
-        '%(grafanaDashboardNamePrefix)sCompute Resources / Namespace' % $._config,
+        '%(dashboardNamePrefix)sCompute Resources / Namespace' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addRow(
@@ -168,7 +168,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      )+{ tags: $._config.grafanaDashboardTags },
+      )+{ tags: $._config.grafanaK8s.dashboardTags },
 
     'k8s-resources-pod.json':
       local tableStyles = {
@@ -178,7 +178,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       };
 
       g.dashboard(
-        '%(grafanaDashboardNamePrefix)sCompute Resources / Pod' % $._config,
+        '%(dashboardNamePrefix)sCompute Resources / Pod' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
       ).addTemplate('namespace', 'kube_pod_info', 'namespace')
       .addTemplate('pod', 'kube_pod_info{namespace="$namespace"}', 'pod')
@@ -235,6 +235,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      )+{ tags: $._config.grafanaDashboardTags },
+      )+{ tags: $._config.grafanaK8s.dashboardTags },
   },
 }

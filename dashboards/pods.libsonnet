@@ -73,10 +73,10 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       );
 
       dashboard.new(
-        '%(grafanaDashboardNamePrefix)sPods' % $._config,
+        '%(dashboardNamePrefix)sPods' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['pods.json']),
-        tags=($._config.grafanaDashboardTags),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
