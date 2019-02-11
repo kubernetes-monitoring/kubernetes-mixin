@@ -36,6 +36,10 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'sum by(container) (kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="memory", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Limit: {{ container }}',
         ))
+        .addTarget(prometheus.target(
+          'sum by(container_name) (container_memory_cache{%(cadvisorSelector)s, namespace="$namespace", pod_name=~"$pod", container_name=~"$container", container_name!="POD"})' % $._config,
+          legendFormat='Cache: {{ container_name }}',
+        ))
       );
 
       local cpuRow = row.new()
@@ -79,7 +83,30 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         )
         .addTarget(prometheus.target(
           'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
-          legendFormat='{{ pod_name }}',
+          legendFormat='RX: pod = {{ pod_name }}',
+        ))
+        .addTarget(prometheus.target(
+          'sort_desc(sum by (pod_name) (rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
+          legendFormat='TX: pod = {{ pod_name }}',
+        ))
+      );
+
+      local restartsRow = row.new()
+                          .addPanel(
+        graphPanel.new(
+          'Total Restarts Per Container',
+          datasource='$datasource',
+          format='bytes',
+          min=0,
+          span=12,
+          legend_rightSide=true,
+          legend_alignAsTable=true,
+          legend_current=true,
+          legend_avg=true,
+        )
+        .addTarget(prometheus.target(
+          'max by (container) (kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          legendFormat='Restarts {{ container }}',
         ))
       );
 
@@ -144,6 +171,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       )
       .addRow(memoryRow)
       .addRow(cpuRow)
-      .addRow(networkRow),
+      .addRow(networkRow)
+      .addRow(restartsRow),
   },
 }
