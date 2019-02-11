@@ -78,7 +78,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           // Not using container_memory_usage_bytes here because that includes page cache
           g.queryPanel('sum(container_memory_rss{container_name!=""}) by (namespace)', '{{namespace}}') +
           g.stack +
-          { yaxes: g.yaxes('decbytes') },
+          { yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
@@ -93,10 +93,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(kube_pod_container_resource_limits_memory_bytes) by (namespace)',
             'sum(container_memory_rss{container_name!=""}) by (namespace) / sum(kube_pod_container_resource_limits_memory_bytes) by (namespace)',
           ], tableStyles {
-            'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
-            'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
+            'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #D': { alias: 'Memory Limits', unit: 'decbytes' },
+            'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
@@ -147,7 +147,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Memory Usage') +
           g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace", container_name!=""}) by (pod_name)', '{{pod_name}}') +
           g.stack +
-          { yaxes: g.yaxes('decbytes') },
+          { yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
@@ -161,10 +161,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)',
             'sum(label_replace(container_memory_usage_bytes{namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)',
           ], tableStyles {
-            'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
-            'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
+            'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #D': { alias: 'Memory Limits', unit: 'decbytes' },
+            'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
@@ -214,7 +214,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Usage') +
           g.queryPanel('sum(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}) by (container_name)', '{{container_name}}') +
-          g.stack,
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
@@ -228,10 +229,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod", container!=""}) by (container)',
             'sum(label_replace(container_memory_usage_bytes{namespace="$namespace", pod_name="$pod", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)',
           ], tableStyles {
-            'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
-            'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
+            'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #D': { alias: 'Memory Limits', unit: 'decbytes' },
+            'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
