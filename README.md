@@ -106,7 +106,8 @@ TODO
 ## Customising the mixin
 
 Kubernetes-mixin allows you to override the selectors used for various jobs,
-to match those used in your Prometheus set.
+to match those used in your Prometheus set. You can also customize the dashboard
+names and add grafana tags.
 
 In a new directory, add a file `mixin.libsonnet`:
 
@@ -119,6 +120,8 @@ kubernetes {
     cadvisorSelector: 'job="kubernetes-cadvisor"',
     nodeExporterSelector: 'job="kubernetes-node-exporter"',
     kubeletSelector: 'job="kubernetes-kubelet"',
+    grafanaK8s.dashboardNamePrefix: 'Mixin / ',
+    grafanaK8s.dashboardTags: ['kubernetes', 'infrastucture'],
   },
 }
 ```

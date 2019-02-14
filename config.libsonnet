@@ -35,6 +35,16 @@
       'statefulset.json': 'dPiBt0FRG5BNYo0XJ4L0Meoc7DWs9eL40c1CRc1g',
     },
 
+    // Config for the Grafana dashboards in the Kubernetes Mixin
+    grafanaK8s :{
+      dashboardNamePrefix : "Kubernetes / ",
+      dashboardTags: ["kubernetes-mixin"],
+
+      // For links between grafana dashboards, you need to tell us if your grafana
+      // servers under some non-root path.
+      linkPrefix: '',
+    },
+
     // We alert when the aggregate (CPU, Memory) quota for all namespaces is
     // greater than the amount of the resources in the cluster.  We do however
     // allow you to overcommit if you wish.
@@ -50,9 +60,6 @@
     // prediction
     volumeFullPredictionSampleTime: '6h',
 
-    // For links between grafana dashboards, you need to tell us if your grafana
-    // servers under some non-root path.
-    grafanaPrefix: '',
 
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],

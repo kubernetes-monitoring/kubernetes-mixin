@@ -102,9 +102,10 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         .addPanel(replicasGraph);
 
       dashboard.new(
-        'StatefulSets',
+        '%(dashboardNamePrefix)sStatefulSets' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['statefulset.json']),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
