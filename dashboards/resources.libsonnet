@@ -170,9 +170,9 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
             'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
-            'Value #F': { alias: 'Memory Limits (RSS)', unit: 'bytes' },
-            'Value #G': { alias: 'Memory Limits (Cache)', unit: 'bytes' },
-            'Value #H': { alias: 'Memory Limits (Swap', unit: 'bytes' },
+            'Value #F': { alias: 'Memory Usage (RSS)', unit: 'bytes' },
+            'Value #G': { alias: 'Memory Usage (Cache)', unit: 'bytes' },
+            'Value #H': { alias: 'Memory Usage (Swap', unit: 'bytes' },
           })
         )
       ),
@@ -252,9 +252,9 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
             'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
-            'Value #F': { alias: 'Memory Limits (RSS)', unit: 'bytes' },
-            'Value #G': { alias: 'Memory Limits (Cache)', unit: 'bytes' },
-            'Value #H': { alias: 'Memory Limits (Swap', unit: 'bytes' },
+            'Value #F': { alias: 'Memory Usage (RSS)', unit: 'bytes' },
+            'Value #G': { alias: 'Memory Usage (Cache)', unit: 'bytes' },
+            'Value #H': { alias: 'Memory Usage (Swap', unit: 'bytes' },
           })
         )
       ),
