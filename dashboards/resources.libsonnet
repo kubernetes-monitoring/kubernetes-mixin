@@ -144,16 +144,9 @@ local g = import 'grafana-builder/grafana.libsonnet';
       .addRow(
         g.row('Memory Usage')
         .addPanel(
-          g.panel('Memory Usage') +
-          g.queryPanel([
-            'sum(container_memory_rss{namespace="$namespace", container_name!=""}) by (pod_name)',
-            'sum(container_memory_cache{namespace="$namespace", container_name!=""}) by (pod_name)',
-            'sum(container_memory_swap{namespace="$namespace", container_name!=""}) by (pod_name)',
-          ], [
-            '{{pod_name}} (RSS)',
-            '{{pod_name}} (Cache)',
-            '{{pod_name}} (Swap)',
-          ]) +
+          g.panel('Memory Usage (w/o cache)') +
+          // Like abov, without page cache
+          g.queryPanel('sum(container_memory_rss{namespace="$namespace", container_name!=""}) by (pod_name)', '{{pod_name}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
         )
