@@ -134,7 +134,7 @@
           {
             alert: 'KubeClientCertificateExpiration',
             expr: |||
-              sum by(job) (apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}) > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
+              apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -146,7 +146,7 @@
           {
             alert: 'KubeClientCertificateExpiration',
             expr: |||
-              sum by(job) (apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}) > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
+              apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
             ||| % $._config,
             labels: {
               severity: 'critical',
