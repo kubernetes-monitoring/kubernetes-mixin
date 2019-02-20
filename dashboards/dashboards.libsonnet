@@ -4,4 +4,5 @@
 (import 'resources.libsonnet') +
 (import 'statefulset.libsonnet') +
 (import 'use.libsonnet') +
-(import 'defaults.libsonnet')
+(import 'defaults.libsonnet') +
+(import 'windows.libsonnet')
