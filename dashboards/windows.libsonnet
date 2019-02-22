@@ -11,307 +11,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
 
 {
   grafanaDashboards+:: {
-    'nodes.windows.json':
-
-      local cpuByCore =
-        graphPanel.new(
-          'Usage Per Core',
-          datasource='$datasource',
-          span=6,
-          format='percentunit',
-        )
-        .addTarget(prometheus.target('sum by (core) (irate(wmi_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[5m]))' % $._config, legendFormat='{{core}}'));
-
-      local memoryGraph =
-        graphPanel.new(
-          'Memory Usage',
-          datasource='$datasource',
-          span=9,
-          format='bytes',
-        )
-        .addTarget(prometheus.target(
-          |||
-            max(
-              wmi_os_visible_memory_bytes{%(wmiExporterSelector)s, instance="$instance"}
-              - wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"}
-              - wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"}
-            )
-          ||| % $._config, legendFormat='memory used'
-        ))
-        .addTarget(prometheus.target('max(wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
-        .addTarget(prometheus.target('max(wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'));
-
-      local memoryGauge = gauge.new(
-        'Memory Usage',
-        |||
-          max(
-            (
-              (
-                wmi_os_visible_memory_bytes{%(wmiExporterSelector)s, instance="$instance"}
-              - wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"}
-              - wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"}
-              )
-              / wmi_os_visible_memory_bytes{%(wmiExporterSelector)s, instance="$instance"}
-            ) * 100)
-        ||| % $._config,
-      ).withLowerBeingBetter();
-
-      // cpu
-      local cpuGraph = graphPanel.new(
-        'CPU Utilizaion',
-        datasource='$datasource',
-        span=9,
-        format='percent',
-        max=100,
-        min=0,
-        legend_show='true',
-        legend_values='true',
-        legend_min='false',
-        legend_max='false',
-        legend_current='true',
-        legend_total='false',
-        legend_avg='true',
-        legend_alignAsTable='true',
-        legend_rightSide='true',
-      ).addTarget(prometheus.target(
-        |||
-          max (sum by (core) (irate(wmi_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[2m])) ) * 100
-        ||| % $._config,
-        legendFormat='{{ core }}',
-        intervalFactor=10,
-      ));
-
-      local cpuGauge = gauge.new(
-        'CPU Usage',
-        |||
-          avg(sum by (core) (irate(wmi_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[2m]))) * 100
-        ||| % $._config,
-      ).withLowerBeingBetter();
-
-      local diskIO =
-        graphPanel.new(
-          'Disk I/O',
-          datasource='$datasource',
-          span=6,
-        )
-        .addTarget(prometheus.target('max(rate(wmi_logical_disk_read_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
-        .addTarget(prometheus.target('max(rate(wmi_logical_disk_write_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
-        .addTarget(prometheus.target('max(rate(wmi_logical_disk_read_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]) + rate(wmi_logical_disk_write_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]))' % $._config, legendFormat='io time')) +
-        {
-          seriesOverrides: [
-            {
-              alias: 'read',
-              yaxis: 1,
-            },
-            {
-              alias: 'io time',
-              yaxis: 2,
-            },
-          ],
-          yaxes: [
-            self.yaxe(format='bytes'),
-            self.yaxe(format='ms'),
-          ],
-        };
-
-      local diskSpaceUsage = graphPanel.new(
-        'Disk Space Usage',
-        datasource='$datasource',
-        span=6,
-        format='percentunit',
-      ).addTarget(prometheus.target(
-        |||
-          node:windows_node_filesystem_usage:{instance="$instance"}
-        ||| % $._config, legendFormat='{{volume}}',
-      ));
-
-      local networkReceived =
-        graphPanel.new(
-          'Network Received',
-          datasource='$datasource',
-          span=6,
-          format='bytes',
-        )
-        .addTarget(prometheus.target('max(rate(wmi_net_bytes_received_total{%(wmiExporterSelector)s, instance="$instance"}[5m]))' % $._config, legendFormat='{{nic}}'));
-
-      local networkTransmitted =
-        graphPanel.new(
-          'Network Transmitted',
-          datasource='$datasource',
-          span=6,
-          format='bytes',
-        )
-        .addTarget(prometheus.target('max(rate(wmi_net_bytes_sent_total{%(wmiExporterSelector)s, instance="$instance"}[5m]))' % $._config, legendFormat='{{nic}}'));
-
-      dashboard.new(
-        '%(dashboardNamePrefix)sNodes(Windows)' % $._config.grafanaK8s,
-        time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['nodes.Windows.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
-      ).addTemplate(
-        {
-          current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
-          },
-          hide: 0,
-          label: null,
-          name: 'datasource',
-          options: [],
-          query: 'prometheus',
-          refresh: 1,
-          regex: '',
-          type: 'datasource',
-        },
-      )
-      .addTemplate(
-        template.new(
-          'instance',
-          '$datasource',
-          'label_values(wmi_system_system_up_time{%(wmiExporterSelector)s}, instance)' % $._config,
-          refresh='time',
-        )
-      )
-      .addRow(
-        row.new()
-        .addPanel(cpuByCore)
-      )
-      .addRow(
-        row.new()
-        .addPanel(cpuGraph)
-        .addPanel(cpuGauge)
-      )
-      .addRow(
-        row.new()
-        .addPanel(memoryGraph)
-        .addPanel(memoryGauge)
-      )
-      .addRow(
-        row.new()
-        .addPanel(diskIO)
-        .addPanel(diskSpaceUsage)
-      )
-      .addRow(
-        row.new()
-        .addPanel(networkReceived)
-        .addPanel(networkTransmitted)
-      ),
-
-    'pods.windows.json':
-      local memoryRow = row.new()
-                        .addPanel(
-        graphPanel.new(
-          'Memory Usage',
-          datasource='$datasource',
-          min=0,
-          format='bytes',
-          legend_rightSide=true,
-          legend_alignAsTable=true,
-          legend_current=true,
-          legend_avg=true,
-        )
-        .addTarget(prometheus.target(
-          'sum by(container) (windows_container_memory_usage{namespace="$namespace", pod="$pod", container="$container"})' % $._config,
-          legendFormat='Current: {{ container }}',
-        ))
-        .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_windows_container_resource_memory_request{namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
-          legendFormat='Requested: {{ container }}',
-        ))
-        .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_windows_container_resource_memory_limit{namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
-          legendFormat='Limit: {{ container }}',
-        ))
-      );
-
-      local cpuRow = row.new()
-                     .addPanel(
-        graphPanel.new(
-          'CPU Usage',
-          datasource='$datasource',
-          min=0,
-          legend_rightSide=true,
-          legend_alignAsTable=true,
-          legend_current=true,
-          legend_avg=true,
-        )
-        .addTarget(prometheus.target(
-          'sum by (container) (rate(windows_container_total_runtime{namespace="$namespace", pod="$pod"}[1m]))' % $._config,
-          legendFormat='{{ container }}',
-        ))
-      );
-
-      local networkRow = row.new()
-                         .addPanel(
-        graphPanel.new(
-          'Network I/O',
-          datasource='$datasource',
-          format='bytes',
-          min=0,
-          legend_rightSide=true,
-          legend_alignAsTable=true,
-          legend_current=true,
-          legend_avg=true,
-        )
-        .addTarget(prometheus.target(
-          'sort_desc(sum by (pod) (rate(windows_container_network_receive_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
-          legendFormat='{{ pod }}',
-        ))
-      );
-
-      dashboard.new(
-        '%(dashboardNamePrefix)sPods(Windows)' % $._config.grafanaK8s,
-        time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['pods.windows.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
-      ).addTemplate(
-        {
-          current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
-          },
-          hide: 0,
-          label: null,
-          name: 'datasource',
-          options: [],
-          query: 'prometheus',
-          refresh: 1,
-          regex: '',
-          type: 'datasource',
-        },
-      )
-      .addTemplate(
-        template.new(
-          'namespace',
-          '$datasource',
-          'label_values(windows_container_available, namespace)',
-          label='Namespace',
-          refresh='time',
-        )
-      )
-      .addTemplate(
-        template.new(
-          'pod',
-          '$datasource',
-          'label_values(windows_container_available{namespace=~"$namespace"}, pod)',
-          label='Pod',
-          refresh='time',
-        )
-      )
-      .addTemplate(
-        template.new(
-          'container',
-          '$datasource',
-          'label_values(windows_container_available{namespace="$namespace", pod="$pod"}, container)',
-          label='Container',
-          refresh='time',
-          includeAll=false,
-        )
-      )
-      .addRow(memoryRow)
-      .addRow(cpuRow)
-      .addRow(networkRow),
-
     'k8s-resources-windows-cluster.json':
       local tableStyles = {
         namespace: {
@@ -620,6 +319,29 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
+      )
+      .addRow(
+        g.row('Network I/O')
+        .addPanel(
+          graphPanel.new(
+            'Network I/O',
+            datasource='$datasource',
+            format='bytes',
+            min=0,
+            legend_rightSide=true,
+            legend_alignAsTable=true,
+            legend_current=true,
+            legend_avg=true,
+          )
+          .addTarget(prometheus.target(
+            'sort_desc(sum by (container) (rate(windows_container_network_receive_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+            legendFormat='Received : {{ container }}',
+          ))
+          .addTarget(prometheus.target(
+            'sort_desc(sum by (container) (rate(windows_container_network_transmit_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+            legendFormat='Transmitted : {{ container }}',
+          ))
+        )
       ),
 
     'k8s-windows-cluster-rsrc-use.json':
@@ -746,13 +468,34 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.queryPanel('node:windows_node_cpu_utilisation:avg1m{instance="$instance"}', 'Utilisation') +
           { yaxes: g.yaxes('percentunit') },
         )
+        .addPanel(
+          g.panel('CPU Usage Per Core') +
+          g.queryPanel('sum by (core) (irate(wmi_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[5m]))' % $._config, '{{core}}') +
+          { yaxes: g.yaxes('percentunit') },
+        )
       )
       .addRow(
         g.row('Memory')
         .addPanel(
-          g.panel('Memory Utilisation') +
+          g.panel('Memory Utilisation %') +
           g.queryPanel('node:windows_node_memory_utilisation:{instance="$instance"}', 'Memory') +
           { yaxes: g.yaxes('percentunit') },
+        )
+        .addPanel(
+          graphPanel.new('Memory Usage',
+                         datasource='$datasource',
+                         format='bytes',)
+          .addTarget(prometheus.target(
+            |||
+              max(
+                wmi_os_visible_memory_bytes{%(wmiExporterSelector)s, instance="$instance"}
+                - wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"}
+                - wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"}
+              )
+            ||| % $._config, legendFormat='memory used'
+          ))
+          .addTarget(prometheus.target('max(wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
+          .addTarget(prometheus.target('max(wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'))
         )
         .addPanel(
           g.panel('Memory Saturation (Swap I/O)') +
@@ -766,6 +509,28 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Disk IO Utilisation') +
           g.queryPanel('node:windows_node_disk_utilisation:avg_irate{instance="$instance"}', 'Utilisation') +
           { yaxes: g.yaxes('percentunit') },
+        )
+        .addPanel(
+          graphPanel.new('Disk I/O',)
+          .addTarget(prometheus.target('max(rate(wmi_logical_disk_read_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
+          .addTarget(prometheus.target('max(rate(wmi_logical_disk_write_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
+          .addTarget(prometheus.target('max(rate(wmi_logical_disk_read_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]) + rate(wmi_logical_disk_write_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]))' % $._config, legendFormat='io time')) +
+          {
+            seriesOverrides: [
+              {
+                alias: 'read',
+                yaxis: 1,
+              },
+              {
+                alias: 'io time',
+                yaxis: 2,
+              },
+            ],
+            yaxes: [
+              self.yaxe(format='bytes'),
+              self.yaxe(format='ms'),
+            ],
+          }
         )
       )
       .addRow(
