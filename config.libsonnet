@@ -56,9 +56,9 @@
     // servers under some non-root path.
     grafanaPrefix: '',
 
-    //Opt-in to multiCluster dashboards by overriding this and the clusterLabel
+    // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
-    clusterLabel: 'clusterCHANGEME',
+    clusterLabel: 'cluster',
 
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
