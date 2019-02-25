@@ -39,8 +39,6 @@
       'k8s-resources-windows-pod.json': '40597a704a610e936dc6ed374a7ce023',
       'k8s-windows-cluster-rsrc-use.json': '53a43377ec9aaf2ff64dfc7a1f539334',
       'k8s-windows-node-rsrc-use.json': '96e7484b0bb53b74fbc2bcb7723cd40b',
-      'nodes.Windows.json': 'b9e967b479ef4ddcebd9f2fb33f19a2d',
-      'pods.windows.json': '4ed0cc4adef59f4cfc27465d73d30e15',
     },
 
     // Config for the Grafana dashboards in the Kubernetes Mixin
