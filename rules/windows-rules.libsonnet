@@ -90,25 +90,15 @@
             |||,
           },
           {
-            record: ':windows_node_memory_swap_io_bytes:sum_rate',
-            expr: |||
-              1e3 * sum(
-                (rate(wmi_memory_swap_page_operations_total{%(wmiExporterSelector)s}[1m]))
-              )
-            ||| % $._config,
-          },
-          {
             record: 'node:windows_node_memory_utilisation:',
             expr: |||
               1 - (node:windows_node_memory_bytes_available:sum / node:windows_node_memory_bytes_total:sum)
             ||| % $._config,
           },
           {
-            record: 'node:windows_node_memory_swap_io_bytes:sum_rate',
+            record: 'node:windows_node_memory_swap_io_pages:irate',
             expr: |||
-              1e3 * sum by (instance) (
-                (rate(wmi_memory_swap_page_operations_total{%(wmiExporterSelector)s}[1m]))
-              )
+              irate(wmi_memory_swap_page_operations_total{%(wmiExporterSelector)s}[5m])
             ||| % $._config,
           },
           {

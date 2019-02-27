@@ -385,10 +385,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
         .addPanel(
-          g.panel('Memory Saturation (Swap I/O)') +
-          g.queryPanel('node:windows_node_memory_swap_io_bytes:sum_rate', '{{instance}}', legendLink) +
+          g.panel('Memory Saturation (Swap I/O Pages)') +
+          g.queryPanel('node:windows_node_memory_swap_io_pages:irate', '{{instance}}', legendLink) +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('short') },
         )
       )
       .addRow(
@@ -498,9 +498,9 @@ local g = import 'grafana-builder/grafana.libsonnet';
           .addTarget(prometheus.target('max(wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'))
         )
         .addPanel(
-          g.panel('Memory Saturation (Swap I/O)') +
-          g.queryPanel('node:windows_node_memory_swap_io_bytes:sum_rate{instance="$instance"}', 'Swap IO') +
-          { yaxes: g.yaxes('Bps') },
+          g.panel('Memory Saturation (Swap I/O) Pages') +
+          g.queryPanel('node:windows_node_memory_swap_io_pages:irate{instance="$instance"}', 'Swap IO') +
+          { yaxes: g.yaxes('short') },
         )
       )
       .addRow(
