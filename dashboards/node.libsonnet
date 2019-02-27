@@ -1,4 +1,3 @@
-
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local row = grafana.row;
@@ -132,7 +131,8 @@ local gauge = promgrafonnet.gauge;
         datasource='$datasource',
         span=6,
         format='percentunit',
-      ).addTarget(prometheus.target('node:node_filesystem_usage:{%(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{device}}',
+      ).addTarget(prometheus.target(
+        'node:node_filesystem_usage:{%(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{device}}',
       ));
 
       local networkReceived =
