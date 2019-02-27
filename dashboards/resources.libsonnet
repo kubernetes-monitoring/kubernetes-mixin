@@ -268,7 +268,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         [$._config.clusterLabel]: {
           alias: 'Cluster',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-cluster?var-datasource=$datasource&var-cluster=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-cluster.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-cluster?var-datasource=$datasource&var-cluster=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-cluster.json') },
         },
       };
 

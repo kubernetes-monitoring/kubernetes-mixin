@@ -163,7 +163,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
 } + {
   grafanaDashboards+:: if $._config.showMultiCluster then {
     'k8s-multicluster-rsrc-use.json':
-      local legendLink = '%(prefix)s/d/%(uid)s/k8s-cluster-rsrc-use' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-multicluster-rsrc-use.json') };
+      local legendLink = '%(prefix)s/d/%(uid)s/k8s-cluster-rsrc-use' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-multicluster-rsrc-use.json') };
 
       g.dashboard(
         '%(dashboardNamePrefix)sUSE Method /  Multi-Cluster' % $._config.grafanaK8s,
