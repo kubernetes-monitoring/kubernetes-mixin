@@ -185,9 +185,9 @@ local g = import 'grafana-builder/grafana.libsonnet';
       .addRow(
         g.row('Memory')
         .addPanel(
-          // the metric `node:node_memory_utilisation:ratio` is each node's portion of the total cluster utilization; just sum them
+          // the metric `node:cluster_memory_utilisation:ratio` is each node's portion of the total cluster utilization; just sum them
           g.panel('Memory Utilisation') +
-          g.queryPanel('sum(node:node_memory_utilisation:ratio) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
+          g.queryPanel('sum(node:cluster_memory_utilisation:ratio) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         )
         .addPanel(
