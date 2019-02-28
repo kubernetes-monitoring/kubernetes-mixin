@@ -42,7 +42,7 @@
             record: ':windows_node_memory_utilisation:',
             expr: |||
               1 -
-              sum(wmi_memory_available_bytes{%(wmiExporterSelector)s} + wmi_memory_cache_bytes{%(wmiExporterSelector)s})
+              sum(wmi_memory_available_bytes{%(wmiExporterSelector)s})
               /
               sum(wmi_os_visible_memory_bytes{%(wmiExporterSelector)s})
             ||| % $._config,
@@ -53,6 +53,12 @@
             record: ':windows_node_memory_MemFreeCached_bytes:sum',
             expr: |||
               sum(wmi_memory_available_bytes{%(wmiExporterSelector)s} + wmi_memory_cache_bytes{%(wmiExporterSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: 'node:windows_node_memory_totalCached_bytes:sum',
+            expr: |||
+              (wmi_memory_cache_bytes{%(wmiExporterSelector)s} + wmi_memory_modified_page_list_bytes{%(wmiExporterSelector)s} + wmi_memory_standby_cache_core_bytes{%(wmiExporterSelector)s} + wmi_memory_standby_cache_normal_priority_bytes{%(wmiExporterSelector)s} + wmi_memory_standby_cache_reserve_bytes{%(wmiExporterSelector)s})
             ||| % $._config,
           },
           {
@@ -67,7 +73,7 @@
             record: 'node:windows_node_memory_bytes_available:sum',
             expr: |||
               sum by (instance) (
-                (wmi_memory_available_bytes{%(wmiExporterSelector)s} + wmi_memory_cache_bytes{%(wmiExporterSelector)s})
+                (wmi_memory_available_bytes{%(wmiExporterSelector)s})
               )
             ||| % $._config,
           },

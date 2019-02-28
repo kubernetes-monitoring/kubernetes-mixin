@@ -490,11 +490,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
               max(
                 wmi_os_visible_memory_bytes{%(wmiExporterSelector)s, instance="$instance"}
                 - wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"}
-                - wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"}
               )
             ||| % $._config, legendFormat='memory used'
           ))
-          .addTarget(prometheus.target('max(wmi_memory_cache_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
+          .addTarget(prometheus.target('max(node:windows_node_memory_totalCached_bytes:sum{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
           .addTarget(prometheus.target('max(wmi_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'))
         )
         .addPanel(
