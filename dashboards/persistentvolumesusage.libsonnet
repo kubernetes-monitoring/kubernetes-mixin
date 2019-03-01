@@ -29,7 +29,7 @@ local gauge = promgrafonnet.gauge;
         legend_rightSide=false,
       ).addTarget(prometheus.target(
         |||
-          (kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s, persistentvolumeclaim="$volume"} - kubelet_volume_stats_available_bytes{%(kubeletSelector)s, persistentvolumeclaim="$volume"}) / kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s, persistentvolumeclaim="$volume"} * 100
+          (kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} - kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}) / kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} * 100
         ||| % $._config,
         legendFormat='{{ Usage }}',
         intervalFactor=1,
@@ -53,7 +53,7 @@ local gauge = promgrafonnet.gauge;
         legend_rightSide=false,
       ).addTarget(prometheus.target(
         |||
-          kubelet_volume_stats_inodes_used{%(kubeletSelector)s, persistentvolumeclaim="$volume"} / kubelet_volume_stats_inodes{%(kubeletSelector)s, persistentvolumeclaim="$volume"} * 100
+          kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} / kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} * 100
         ||| % $._config,
         legendFormat='{{ Usage }}',
         intervalFactor=1,
@@ -82,9 +82,19 @@ local gauge = promgrafonnet.gauge;
       )
       .addTemplate(
         template.new(
+          'cluster',
+          '$datasource',
+          'label_values(kubelet_volume_stats_capacity_bytes, %s)' % $._config.clusterLabel,
+          label='cluster',
+          refresh='time',
+          hide=if $._config.showMultiCluster then '' else 'variable',
+        )
+      )
+      .addTemplate(
+        template.new(
           'namespace',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s}, exported_namespace)' % $._config,
+          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, exported_namespace)' % $._config,
           label='Namespace',
           refresh='time',
         )
@@ -93,7 +103,7 @@ local gauge = promgrafonnet.gauge;
         template.new(
           'volume',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s, exported_namespace="$namespace"}, persistentvolumeclaim)' % $._config,
+          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, exported_namespace="$namespace"}, persistentvolumeclaim)' % $._config,
           label='PersistentVolumeClaim',
           refresh='time',
         )

@@ -25,9 +25,11 @@
 
     // Grafana dashboard IDs are necessary for stable links for dashboards
     grafanaDashboardIDs: {
+      'k8s-resources-multicluster.json': '1gBgaexoVZ4TpBNAt2eGRsc4LNjNhdjcZd6cqU6S',
       'k8s-resources-cluster.json': 'ZnbvYbcXkob7GLqcDPLTj1ZL4MRX87tOh8xdr831',
       'k8s-resources-namespace.json': 'XaY4UCP3J51an4ikqtkUGBSjLpDW4pg39xe2FuxP',
       'k8s-resources-pod.json': 'wU56sdGSNYZTL3eO0db3pONtVmTvsyV7w8aadbYF',
+      'k8s-multicluster-rsrc-use.json': 'NJ9AlnsObVgj9uKiJMeAqfzMi1wihOMupcsDhlhR',
       'k8s-cluster-rsrc-use.json': 'uXQldxzqUNgIOUX6FyZNvqgP2vgYb78daNu4GiDc',
       'k8s-node-rsrc-use.json': 'E577CMUOwmPsxVVqM9lj40czM1ZPjclw7hGa7OT7',
       'nodes.json': 'kcb9C2QDe4IYcjiTOmYyfhsImuzxRcvwWC3YLJPS',
@@ -36,9 +38,9 @@
     },
 
     // Config for the Grafana dashboards in the Kubernetes Mixin
-    grafanaK8s :{
-      dashboardNamePrefix : "Kubernetes / ",
-      dashboardTags: ["kubernetes-mixin"],
+    grafanaK8s: {
+      dashboardNamePrefix: 'Kubernetes / ',
+      dashboardTags: ['kubernetes-mixin'],
 
       // For links between grafana dashboards, you need to tell us if your grafana
       // servers under some non-root path.
@@ -60,6 +62,10 @@
     // prediction
     volumeFullPredictionSampleTime: '6h',
 
+
+    // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
+    showMultiCluster: false,
+    clusterLabel: 'cluster',
 
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
