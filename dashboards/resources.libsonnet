@@ -183,7 +183,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         workload: {
           alias: 'Workload',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-workload.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
         },
         workload_type: {
           alias: 'Workload Type',
@@ -221,7 +221,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
 
       g.dashboard(
-        'K8s / Compute Resources / Workloads by Namespace',
+        '%(dashboardNamePrefix)sCompute Resources / Workloads by Namespace' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
       ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
@@ -260,7 +260,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Memory Usage') +
           g.queryPanel(memUsageQuery, '{{workload}}') +
           g.stack +
-          { yaxes: g.yaxes('decbytes') },
+          { yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
@@ -276,10 +276,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
             memUsageQuery + '/' + memLimitsQuery,
           ], tableStyles {
             'Value #A': { alias: 'Running Pods', decimals: 0 },
-            'Value #B': { alias: 'Memory Usage', unit: 'decbytes' },
-            'Value #C': { alias: 'Memory Requests', unit: 'decbytes' },
+            'Value #B': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #C': { alias: 'Memory Requests', unit: 'bytes' },
             'Value #D': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #E': { alias: 'Memory Limits', unit: 'decbytes' },
+            'Value #E': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #F': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
@@ -289,8 +289,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaPrefix, uid: std.md5('k8s-resources-pod.json') },
-        }
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
+        },
       };
 
       local cpuUsageQuery = |||
@@ -323,7 +323,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
 
       g.dashboard(
-        'K8s / Compute Resources / Workload',
+        '%(dashboardNamePrefix)sCompute Resources / Workload' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workload.json']),
       ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
@@ -361,7 +361,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Memory Usage') +
           g.queryPanel(memUsageQuery, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('decbytes') },
+          { yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
@@ -375,10 +375,10 @@ local g = import 'grafana-builder/grafana.libsonnet';
             memLimitsQuery,
             memUsageQuery + '/' + memLimitsQuery,
           ], tableStyles {
-            'Value #A': { alias: 'Memory Usage', unit: 'decbytes' },
-            'Value #B': { alias: 'Memory Requests', unit: 'decbytes' },
+            'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #D': { alias: 'Memory Limits', unit: 'decbytes' },
+            'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
@@ -544,7 +544,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           g.panel('Memory Usage (w/o cache)') +
           // Not using container_memory_usage_bytes here because that includes page cache
           g.queryPanel('sum(container_memory_rss{container_name!=""}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config) +
-          { fill: 0, linewidth: 2, yaxes: g.yaxes('decbytes') },
+          { fill: 0, linewidth: 2, yaxes: g.yaxes('bytes') },
         )
       )
       .addRow(
