@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: tomwilkie/kubernetes-mixin-build:dont-commit-binary
+      - image: csmarchbanks/kubernetes-mixin-build:jsonnet-0.12.1
 
     working_directory: /go/src/github.com/kubernetes-monitoring/kubernetes-mixin
     steps:
