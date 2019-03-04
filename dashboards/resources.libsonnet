@@ -183,7 +183,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local tableStyles = {
         workload: {
           alias: 'Workload',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$__cell_2' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
         },
         workload_type: {
           alias: 'Workload Type',
@@ -195,15 +195,15 @@ local g = import 'grafana-builder/grafana.libsonnet';
           label_replace(
             namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"},
             "pod", "$1", "pod_name", "(.*)"
-          ) * on(namespace,pod) group_left(workload) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
-        ) by (workload)
+          ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
+        ) by (workload, workload_type)
       ||| % $._config;
 
       local cpuRequestsQuery = |||
         sum(
           kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}
-          * on(namespace,pod) group_left(workload) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
-        ) by (workload)
+          * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
+        ) by (workload, workload_type)
       ||| % $._config;
 
       local podCountQuery = 'count(mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (workload, workload_type)' % $._config;
@@ -214,8 +214,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
           label_replace(
             container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container_name!=""},
             "pod", "$1", "pod_name", "(.*)"
-          ) * on(namespace,pod) group_left(workload) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
-          ) by (workload)
+          ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
+          ) by (workload, workload_type)
       ||| % $._config;
       local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
@@ -229,7 +229,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel(cpuUsageQuery, '{{workload}}') +
+          g.queryPanel(cpuUsageQuery, '{{workload}} - {{workload_type}}') +
           g.stack,
         )
       )
@@ -258,7 +258,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory Usage')
         .addPanel(
           g.panel('Memory Usage') +
-          g.queryPanel(memUsageQuery, '{{workload}}') +
+          g.queryPanel(memUsageQuery, '{{workload}} - {{workload_type}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
         )
@@ -298,14 +298,14 @@ local g = import 'grafana-builder/grafana.libsonnet';
           label_replace(
             namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"},
             "pod", "$1", "pod_name", "(.*)"
-          ) * on(namespace,pod) group_left(workload) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}
+          ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type="$type"}
         ) by (pod)
       ||| % $._config;
 
       local cpuRequestsQuery = |||
         sum(
           kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}
-          * on(namespace,pod) group_left(workload) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}
+          * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type="$type"}
         ) by (pod)
       ||| % $._config;
 
@@ -316,7 +316,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           label_replace(
             container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container_name!=""},
             "pod", "$1", "pod_name", "(.*)"
-          ) * on(namespace,pod) group_left(workload) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}
+          ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type="$type"}
           ) by (pod)
       ||| % $._config;
       local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
@@ -328,6 +328,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addTemplate('workload', 'mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}' % $._config, 'workload')
+      .addTemplate('type', 'mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}' % $._config, 'workload_type')
       .addRow(
         g.row('CPU Usage')
         .addPanel(
