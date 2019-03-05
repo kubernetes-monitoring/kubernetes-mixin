@@ -45,6 +45,25 @@ to your Prometheus server, and the files in `dashboards_out` need to be imported
 into you Grafana server.  The exact details will depending on how you deploy your
 monitoring stack to Kubernetes.
 
+### Dashboards for Windows Nodes
+There are separate dashboards for windows resources.
+1) Compute Resources / Cluster(Windows)
+2) Compute Resources / Namespace(Windows)
+3) Compute Resources / Pod(Windows)
+4) USE Method / Cluster(Windows)
+5) USE Method / Node(Windows)
+
+These dashboards are based on metrics populated by wmi_exporter(https://github.com/martinlindhe/wmi_exporter) from each Windows node.
+
+Steps to configure wmi_exporter
+1) Download the latest version of wmi_exporter from release page.(TODO: PR for fetching container metrics is not merge yet(https://github.com/martinlindhe/wmi_exporter/pull/320), Will Update the correct version here once new version is release with container metrics changes.)
+2) Install the wmi_exporter service.
+```
+  msiexec /i <path-to-msi-file> ENABLED_COLLECTORS=cpu,cs,logical_disk,net,os,system,container,memory LISTEN_PORT=<PORT>
+```
+3) Update the Prometheus server to scrap the metrics from wmi_exporter endpoint.
+
+
 ## Using with prometheus-ksonnet
 
 Alternatively you can also use the mixin with
