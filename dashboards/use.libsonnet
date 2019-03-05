@@ -232,7 +232,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             |||
               sum(node_filesystem_size_bytes{%(fstypeSelector)s} - node_filesystem_avail_bytes{%(fstypeSelector)s}) by (%(clusterLabel)s)
               / sum(node_filesystem_size_bytes{%(fstypeSelector)s}) by (%(clusterLabel)s)
-            ||| % $._config, '{{node}}', legendLink
+            ||| % $._config, '{{%(clusterLabel)s}}' % $._config, legendLink
           ) +
           { fill: 0, linewidth: 2, yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
         ),
