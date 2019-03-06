@@ -104,9 +104,9 @@
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) without(instance, %(podLabel)s)
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) without(instance, pod) * 100 > 10
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) * 100 > 3
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -119,9 +119,9 @@
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) without(instance, %(podLabel)s)
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) without(instance, pod) * 100 > 5
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) * 100 > 1
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -129,6 +129,36 @@
             },
             annotations: {
               message: 'API server is returning errors for {{ $value }}% of requests.',
+            },
+          },
+          {
+            alert: 'KubeAPIErrorsHigh',
+            expr: |||
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
+                /
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 10
+            ||| % $._config,
+            'for': '10m',
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'API server is returning errors for {{ $value }}% of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
+            },
+          },
+          {
+            alert: 'KubeAPIErrorsHigh',
+            expr: |||
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
+                /
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 5
+            ||| % $._config,
+            'for': '10m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'API server is returning errors for {{ $value }}% of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
             },
           },
           {
