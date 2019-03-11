@@ -54,6 +54,14 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'sum by (container_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", image!="",container_name!="POD",pod_name="$pod"}[1m]))' % $._config,
           legendFormat='{{ container_name }}',
         ))
+        .addTarget(prometheus.target(
+          'sum by(container) (kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          legendFormat='Requested: {{ container }}',
+        ))
+        .addTarget(prometheus.target(
+          'sum by(container) (kube_pod_container_resource_limits_cpu_cores{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          legendFormat='Limit: {{ container }}',
+        ))
       );
 
       local networkRow = row.new()
