@@ -1,3 +1,5 @@
+local utils = import 'utils.libsonnet';
+
 {
   prometheusAlerts+:: {
     groups+: [
@@ -170,7 +172,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %d days.' % ($._config.certExpirationWarningSeconds / 3600 / 24),
+              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
             },
           },
           {
@@ -182,7 +184,7 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %d hours.' % ($._config.certExpirationCriticalSeconds / 3600),
+              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
             },
           },
         ],
