@@ -56,7 +56,7 @@ There are separate dashboards for windows resources.
 These dashboards are based on metrics populated by wmi_exporter(https://github.com/martinlindhe/wmi_exporter) from each Windows node.
 
 Steps to configure wmi_exporter
-1) Download the latest version of wmi_exporter from release page(https://github.com/martinlindhe/wmi_exporter/releases/)
+1) Download the latest version(v0.7.0 or higher) of wmi_exporter from release page(https://github.com/martinlindhe/wmi_exporter/releases/)
 2) Install the wmi_exporter service.
 ```
   msiexec /i <path-to-msi-file> ENABLED_COLLECTORS=cpu,cs,logical_disk,net,os,system,container,memory LISTEN_PORT=<PORT>
