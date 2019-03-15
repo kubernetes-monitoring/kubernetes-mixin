@@ -70,7 +70,7 @@ local gauge = promgrafonnet.gauge;
 
       // cpu
       local cpuGraph = graphPanel.new(
-        'CPU Utilizaion',
+        'CPU Utilization',
         datasource='$datasource',
         span=9,
         format='percent',
