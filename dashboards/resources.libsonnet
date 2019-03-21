@@ -7,8 +7,26 @@ local g = import 'grafana-builder/grafana.libsonnet';
         namespace: {
           alias: 'Namespace',
           link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
+          linkTooltip: 'Drill down to pods',
+        },
+        'Value #A': {
+          alias: 'Pods',
+          linkTooltip: 'Drill down to pods',
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell_1' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
+          decimals: 0,
+        },
+        'Value #B': {
+          alias: 'Workloads',
+          linkTooltip: 'Drill down to workloads',
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workloads-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell_1' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workloads-namespace.json') },
+          decimals: 0,
         },
       };
+
+      local podWorkloadColumns = [
+        'count(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
+        'count(avg(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (workload, namespace)) by (namespace)' % $._config,
+      ];
 
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Cluster' % $._config.grafanaK8s,
@@ -57,18 +75,18 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU Quota')
         .addPanel(
           g.panel('CPU Quota') +
-          g.tablePanel([
+          g.tablePanel(podWorkloadColumns + [
             'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
           ], tableStyles {
-            'Value #A': { alias: 'CPU Usage' },
-            'Value #B': { alias: 'CPU Requests' },
-            'Value #C': { alias: 'CPU Requests %', unit: 'percentunit' },
-            'Value #D': { alias: 'CPU Limits' },
-            'Value #E': { alias: 'CPU Limits %', unit: 'percentunit' },
+            'Value #C': { alias: 'CPU Usage' },
+            'Value #D': { alias: 'CPU Requests' },
+            'Value #E': { alias: 'CPU Requests %', unit: 'percentunit' },
+            'Value #F': { alias: 'CPU Limits' },
+            'Value #G': { alias: 'CPU Limits %', unit: 'percentunit' },
           })
         )
       )
@@ -86,7 +104,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory Requests')
         .addPanel(
           g.panel('Requests by Namespace') +
-          g.tablePanel([
+          g.tablePanel(podWorkloadColumns + [
             // Not using container_memory_usage_bytes here because that includes page cache
             'sum(container_memory_rss{%(clusterLabel)s="$cluster", container_name!=""}) by (namespace)' % $._config,
             'sum(kube_pod_container_resource_requests_memory_bytes{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
@@ -94,11 +112,12 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(container_memory_rss{%(clusterLabel)s="$cluster", container_name!=""}) by (namespace) / sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
           ], tableStyles {
-            'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
-            'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
-            'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
-            'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
+            'Value #C': { alias: 'CPU Usage' },
+            'Value #D': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #E': { alias: 'Memory Requests', unit: 'bytes' },
+            'Value #F': { alias: 'Memory Requests %', unit: 'percentunit' },
+            'Value #G': { alias: 'Memory Limits', unit: 'bytes' },
+            'Value #H': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags },
@@ -112,7 +131,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       };
 
       g.dashboard(
-        '%(dashboardNamePrefix)sCompute Resources / Namespace' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
@@ -221,7 +240,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
 
       g.dashboard(
-        '%(dashboardNamePrefix)sCompute Resources / Workloads by Namespace' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
       ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
