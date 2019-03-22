@@ -29,11 +29,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legendFormat='Current: {{ container_name }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="memory", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Requested: {{ container }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_limits_memory_bytes{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="memory", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Limit: {{ container }}',
         ))
       );
@@ -55,11 +55,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legendFormat='Current: {{ container_name }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Requested: {{ container }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (kube_pod_container_resource_limits_cpu_cores{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
+          'sum by(container) (kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu", pod="$pod", container=~"$container"})' % $._config,
           legendFormat='Limit: {{ container }}',
         ))
       );
