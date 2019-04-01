@@ -62,7 +62,7 @@ local gauge = promgrafonnet.gauge;
       dashboard.new(
         '%(dashboardNamePrefix)sPersistent Volumes' % $._config.grafanaK8s,
         time_from='now-7d',
-        uid=($._config.grafanaDashboardIDs['nodes.json']),
+        uid=($._config.grafanaDashboardIDs['persistentvolumesusage.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
@@ -94,7 +94,7 @@ local gauge = promgrafonnet.gauge;
         template.new(
           'namespace',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, exported_namespace)' % $._config,
+          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
         )
@@ -103,7 +103,7 @@ local gauge = promgrafonnet.gauge;
         template.new(
           'volume',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, exported_namespace="$namespace"}, persistentvolumeclaim)' % $._config,
+          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace"}, persistentvolumeclaim)' % $._config,
           label='PersistentVolumeClaim',
           refresh='time',
         )
