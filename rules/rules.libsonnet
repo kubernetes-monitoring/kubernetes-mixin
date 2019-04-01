@@ -293,14 +293,14 @@
             ||| % $._config,
           },
           {
-            // Disk utilisation (ms spent, by rate() it's bound by 1 second)
+            // Disk utilisation (seconds spent, by rate() it's bound by 1 second)
             record: ':node_disk_utilisation:avg_irate',
             expr: |||
               avg(irate(node_disk_io_time_seconds_total{%(nodeExporterSelector)s,%(diskDeviceSelector)s}[1m]))
             ||| % $._config,
           },
           {
-            // Disk utilisation (ms spent, by rate() it's bound by 1 second)
+            // Disk utilisation (seconds spent, by rate() it's bound by 1 second)
             record: 'node:node_disk_utilisation:avg_irate',
             expr: |||
               avg by (node) (
@@ -311,14 +311,14 @@
             ||| % $._config,
           },
           {
-            // Disk saturation (ms spent, by rate() it's bound by 1 second)
+            // Disk saturation (seconds spent, by rate() it's bound by 1 second)
             record: ':node_disk_saturation:avg_irate',
             expr: |||
               avg(irate(node_disk_io_time_weighted_seconds_total{%(nodeExporterSelector)s,%(diskDeviceSelector)s}[1m]))
             ||| % $._config,
           },
           {
-            // Disk saturation (ms spent, by rate() it's bound by 1 second)
+            // Disk saturation (seconds spent, by rate() it's bound by 1 second)
             record: 'node:node_disk_saturation:avg_irate',
             expr: |||
               avg by (node) (
