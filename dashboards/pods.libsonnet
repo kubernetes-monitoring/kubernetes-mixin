@@ -79,7 +79,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
+          'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
           legendFormat='{{ pod_name }}',
         ))
       );
@@ -87,7 +87,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
       local restartAnnotation = annotation.datasource(
         'Restarts',
         '$datasource',
-        expr='time() == BOOL timestamp(deriv(kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[2m]) > 0)',
+        expr='time() == BOOL timestamp(rate(kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[2m]) > 0)',
         enable=true,
         hide=false,
         iconColor='rgba(215, 44, 44, 1)',
