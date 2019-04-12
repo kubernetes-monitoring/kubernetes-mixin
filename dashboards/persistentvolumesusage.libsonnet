@@ -30,16 +30,16 @@ local gauge = promgrafonnet.gauge;
       ).addTarget(prometheus.target(
         |||
           (
-            kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}
+            sum without(instance, node) (kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"})
             -
-            kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}
+            sum without(instance, node) (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"})
           )
         ||| % $._config,
         legendFormat='Used Space',
         intervalFactor=1,
       )).addTarget(prometheus.target(
         |||
-          kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}
+          sum without(instance, node) (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"})
         ||| % $._config,
         legendFormat='Free Space',
         intervalFactor=1,
@@ -78,16 +78,16 @@ local gauge = promgrafonnet.gauge;
         legend_rightSide=false,
       ).addTarget(prometheus.target(
         |||
-          kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}
+          sum without(instance, node) (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"})
         ||| % $._config,
         legendFormat='Used inodes',
         intervalFactor=1,
       )).addTarget(prometheus.target(
         |||
           (
-            kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}
+            sum without(instance, node) (kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"})
             -
-            kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}
+            sum without(instance, node) (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"})
           )
         ||| % $._config,
         legendFormat=' Free inodes',
