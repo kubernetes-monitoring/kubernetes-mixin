@@ -83,11 +83,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         )
         .addTarget(prometheus.target(
           'sort_desc(sum by (pod_name) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
-          legendFormat='RX: pod = {{ pod_name }}',
+          legendFormat='RX: {{ pod_name }}',
         ))
         .addTarget(prometheus.target(
           'sort_desc(sum by (pod_name) (rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}[1m])))' % $._config,
-          legendFormat='TX: pod = {{ pod_name }}',
+          legendFormat='TX: {{ pod_name }}',
         ))
       );
 
@@ -96,7 +96,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         graphPanel.new(
           'Total Restarts Per Container',
           datasource='$datasource',
-          format='bytes',
+          format='short',
           min=0,
           span=12,
           legend_rightSide=true,
@@ -106,7 +106,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         )
         .addTarget(prometheus.target(
           'max by (container) (kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container"})' % $._config,
-          legendFormat='Restarts {{ container }}',
+          legendFormat='Restarts: {{ container }}',
         ))
       );
 
