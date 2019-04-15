@@ -12,7 +12,7 @@
     podLabel: 'pod',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
-    hostNetworkInterfaceSelector: 'device!~"veth.+"',
+    hostNetworkInterfaceSelector: 'interface!~"veth.+|lo|docker0"',
     hostMountpointSelector: 'mountpoint="/"',
     wmiExporterSelector: 'job="wmi-exporter"',
 
