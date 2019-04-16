@@ -1,4 +1,5 @@
 local grafana = import 'grafonnet/grafana.libsonnet';
+local annotation = grafana.annotation;
 local dashboard = grafana.dashboard;
 local graphPanel = grafana.graphPanel;
 local prometheus = grafana.prometheus;
@@ -83,6 +84,18 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         ))
       );
 
+      local restartAnnotation = annotation.datasource(
+        'Restarts',
+        '$datasource',
+        expr='time() == BOOL timestamp(rate(kube_pod_container_status_restarts_total{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[2m]) > 0)',
+        enable=true,
+        hide=false,
+        iconColor='rgba(215, 44, 44, 1)',
+        tags=['restart'],
+        type='rows',
+        builtIn=1,
+      );
+
       dashboard.new(
         '%(dashboardNamePrefix)sPods' % $._config.grafanaK8s,
         time_from='now-1h',
@@ -142,6 +155,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           includeAll=true,
         )
       )
+      .addAnnotation(restartAnnotation)
       .addRow(memoryRow)
       .addRow(cpuRow)
       .addRow(networkRow),
