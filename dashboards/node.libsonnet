@@ -20,7 +20,8 @@ local gauge = promgrafonnet.gauge;
         )
         .addTarget(prometheus.target('max(node_load1{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 1m'))
         .addTarget(prometheus.target('max(node_load5{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 5m'))
-        .addTarget(prometheus.target('max(node_load15{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 15m'));
+        .addTarget(prometheus.target('max(node_load15{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance"})' % $._config, legendFormat='load 15m'))
+        .addTarget(prometheus.target('count(node_cpu_seconds_total{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance", mode="user"})' % $._config, legendFormat='logical cores'));
 
       local cpuByCore =
         graphPanel.new(
