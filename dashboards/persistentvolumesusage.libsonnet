@@ -14,10 +14,10 @@ local gauge = promgrafonnet.gauge;
       local sizeGraph = graphPanel.new(
         'Volume Space Usage',
         datasource='$datasource',
-        format='percent',
-        max=100,
+        format='bytes',
         min=0,
-        span=12,
+        span=9,
+        stack=true,
         legend_show=true,
         legend_values=true,
         legend_min=true,
@@ -25,23 +25,48 @@ local gauge = promgrafonnet.gauge;
         legend_current=true,
         legend_total=false,
         legend_avg=true,
-        legend_alignAsTable=false,
+        legend_alignAsTable=true,
         legend_rightSide=false,
       ).addTarget(prometheus.target(
         |||
-          (kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} - kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"}) / kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} * 100
+          (
+            sum without(instance, node) (kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
+            -
+            sum without(instance, node) (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
+          )
         ||| % $._config,
-        legendFormat='{{ Usage }}',
+        legendFormat='Used Space',
+        intervalFactor=1,
+      )).addTarget(prometheus.target(
+        |||
+          sum without(instance, node) (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
+        ||| % $._config,
+        legendFormat='Free Space',
         intervalFactor=1,
       ));
+
+      local sizeGauge = gauge.new(
+        'Volume Space Usage',
+        |||
+          (
+            kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
+            -
+            kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
+          )
+          /
+          kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
+          * 100
+        ||| % $._config,
+      ).withLowerBeingBetter();
+
 
       local inodesGraph = graphPanel.new(
         'Volume inodes Usage',
         datasource='$datasource',
-        format='percent',
-        max=100,
+        format='none',
         min=0,
-        span=12,
+        span=9,
+        stack=true,
         legend_show=true,
         legend_values=true,
         legend_min=true,
@@ -49,15 +74,36 @@ local gauge = promgrafonnet.gauge;
         legend_current=true,
         legend_total=false,
         legend_avg=true,
-        legend_alignAsTable=false,
+        legend_alignAsTable=true,
         legend_rightSide=false,
       ).addTarget(prometheus.target(
         |||
-          kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} / kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, persistentvolumeclaim="$volume"} * 100
+          sum without(instance, node) (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
         ||| % $._config,
-        legendFormat='{{ Usage }}',
+        legendFormat='Used inodes',
+        intervalFactor=1,
+      )).addTarget(prometheus.target(
+        |||
+          (
+            sum without(instance, node) (kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
+            -
+            sum without(instance, node) (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
+          )
+        ||| % $._config,
+        legendFormat=' Free inodes',
         intervalFactor=1,
       ));
+
+      local inodeGauge = gauge.new(
+        'Volume inodes Usage',
+        |||
+          kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
+          /
+          kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
+          * 100
+        ||| % $._config,
+      ).withLowerBeingBetter();
+
 
       dashboard.new(
         '%(dashboardNamePrefix)sPersistent Volumes' % $._config.grafanaK8s,
@@ -111,10 +157,12 @@ local gauge = promgrafonnet.gauge;
       .addRow(
         row.new()
         .addPanel(sizeGraph)
+        .addPanel(sizeGauge)
       )
       .addRow(
         row.new()
         .addPanel(inodesGraph)
+        .addPanel(inodeGauge)
       ),
   },
 }
