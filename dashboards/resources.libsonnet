@@ -112,12 +112,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(container_memory_rss{%(clusterLabel)s="$cluster", container_name!=""}) by (namespace) / sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
           ], tableStyles {
-            'Value #C': { alias: 'CPU Usage' },
-            'Value #D': { alias: 'Memory Usage', unit: 'bytes' },
-            'Value #E': { alias: 'Memory Requests', unit: 'bytes' },
-            'Value #F': { alias: 'Memory Requests %', unit: 'percentunit' },
-            'Value #G': { alias: 'Memory Limits', unit: 'bytes' },
-            'Value #H': { alias: 'Memory Limits %', unit: 'percentunit' },
+            'Value #C': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #D': { alias: 'Memory Requests', unit: 'bytes' },
+            'Value #E': { alias: 'Memory Requests %', unit: 'percentunit' },
+            'Value #F': { alias: 'Memory Limits', unit: 'bytes' },
+            'Value #G': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags },
