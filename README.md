@@ -1,8 +1,18 @@
 # Prometheus Monitoring Mixin for Kubernetes
 
-> NOTE: This project is *alpha* stage. Flags, configuration, behaviour and design may change significantly in following releases.
+> NOTE: This project is *pre-release* stage. Flags, configuration, behaviour and design may change significantly in following releases.
 
 A set of Grafana dashboards and Prometheus alerts for Kubernetes.
+
+## Releases
+
+| Release | Kubernetes Compatibility   |
+| ------- | -------------------------- |
+| master  | Kubernetes 1.14+           |
+| v0.1.x  | Kubernetes 1.13 and before |
+
+In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/blob/master/keps/sig-instrumentation/0031-kubernetes-metrics-overhaul.md) implemented.
+Therefore v0.1.x of this repository is the last release to support Kubernetes 1.13 and previous version on a best effort basis.
 
 ## How to use
 
