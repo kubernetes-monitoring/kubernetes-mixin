@@ -135,10 +135,10 @@ local gauge = promgrafonnet.gauge;
           format='percentunit',
         )
         .addTarget(prometheus.target(
-          'max by (namespace, pod, device) ((node_filesystem_size_bytes{%(clusterLabel)s="$cluster", fstype=~"ext[234]|btrfs|xfs|zfs", instance="$instance", %(nodeExporterSelector)s} - node_filesystem_avail_bytes{%(clusterLabel)s="$cluster", fstype=~"ext[234]|btrfs|xfs|zfs", instance="$instance", %(nodeExporterSelector)s}) / node_filesystem_size_bytes{%(clusterLabel)s="$cluster", fstype=~"ext[234]|btrfs|xfs|zfs", instance="$instance", %(nodeExporterSelector)s})' % $._config, legendFormat='disk used'
+          'node:node_filesystem_usage:{%(clusterLabel)s="$cluster", instance="$instance"}' % $._config, legendFormat='disk used'
         ))
         .addTarget(prometheus.target(
-          'max by (namespace, pod, device) (node_filesystem_avail_bytes{%(clusterLabel)s="$cluster", fstype=~"ext[234]|btrfs|xfs|zfs", instance="$instance", %(nodeExporterSelector)s} / node_filesystem_size_bytes{%(clusterLabel)s="$cluster", fstype=~"ext[234]|btrfs|xfs|zfs", instance="$instance", %(nodeExporterSelector)s})' % $._config, legendFormat='disk free'
+          'node:node_filesystem_usage:{%(clusterLabel)s="$cluster", instance="$instance"}' % $._config, legendFormat='disk free'
         ));
 
       local networkReceived =
