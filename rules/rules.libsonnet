@@ -377,7 +377,7 @@
           {
             record: 'node:node_filesystem_usage:',
             expr: |||
-              max by (namespace, %(podLabel)s, device) ((node_filesystem_size_bytes{%(fstypeSelector)s}
+              max by (instance, namespace, %(podLabel)s, device) ((node_filesystem_size_bytes{%(fstypeSelector)s}
               - node_filesystem_avail_bytes{%(fstypeSelector)s})
               / node_filesystem_size_bytes{%(fstypeSelector)s})
             ||| % $._config,
@@ -385,7 +385,7 @@
           {
             record: 'node:node_filesystem_avail:',
             expr: |||
-              max by (namespace, %(podLabel)s, device) (node_filesystem_avail_bytes{%(fstypeSelector)s} / node_filesystem_size_bytes{%(fstypeSelector)s})
+              max by (instance, namespace, %(podLabel)s, device) (node_filesystem_avail_bytes{%(fstypeSelector)s} / node_filesystem_size_bytes{%(fstypeSelector)s})
             ||| % $._config,
           },
           {
