@@ -121,14 +121,14 @@
           {
             record: 'cluster_quantile:%s:histogram_quantile' % metric,
             expr: |||
-              histogram_quantile(%(quantile)s, sum(rate(%(metric)s_microseconds_bucket{%(kubeSchedulerSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
+              histogram_quantile(%(quantile)s, sum(rate(%(metric)s_bucket{%(kubeSchedulerSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
             ||| % ({ quantile: quantile, metric: metric } + $._config),
             labels: {
               quantile: quantile,
             },
           }
           for quantile in ['0.99', '0.9', '0.5']
-          for metric in ['scheduler_e2e_scheduling_latency', 'scheduler_scheduling_algorithm_latency', 'scheduler_binding_latency']
+          for metric in ['scheduler_e2e_scheduling_duration', 'scheduler_scheduling_algorithm_duration', 'scheduler_binding_duration']
         ],
       },
       {
