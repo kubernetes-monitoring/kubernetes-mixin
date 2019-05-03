@@ -135,9 +135,9 @@
         name: 'kube-apiserver.rules',
         rules: [
           {
-            record: 'cluster_quantile:apiserver_request_latencies:histogram_quantile',
+            record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
             expr: |||
-              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_latencies_bucket{%(kubeApiserverSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
+              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
             ||| % ({ quantile: quantile } + $._config),
             labels: {
               quantile: quantile,
