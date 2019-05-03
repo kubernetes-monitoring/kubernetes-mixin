@@ -91,9 +91,9 @@
           {
             alert: 'CPUThrottlingHigh',
             expr: |||
-              100 * sum(increase(container_cpu_cfs_throttled_periods_total{container_name!="", %(cpuThrottlingSelector)s}[5m])) by (container_name, pod_name, namespace)
+              100 * sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
                 /
-              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container_name, pod_name, namespace)
+              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
                 > %(cpuThrottlingPercent)s 
             ||| % $._config,
             'for': '15m',
@@ -101,7 +101,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ printf "%0.0f" $value }}% throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container_name }} in pod {{ $labels.pod_name }}.',
+              message: '{{ printf "%0.0f" $value }}% throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
             },
           },
         ],

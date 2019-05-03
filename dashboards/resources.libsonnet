@@ -67,7 +67,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel('sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config, '{{namespace}}') +
+          g.queryPanel('sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config, '{{namespace}}') +
           g.stack
         )
       )
@@ -76,11 +76,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('CPU Quota') +
           g.tablePanel(podWorkloadColumns + [
-            'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
+            'sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
-            'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
+            'sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
             'sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
-            'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
+            'sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster"}) by (namespace) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
           ], tableStyles {
             'Value #C': { alias: 'CPU Usage' },
             'Value #D': { alias: 'CPU Requests' },
@@ -138,7 +138,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel('sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod_name)' % $._config, '{{pod_name}}') +
+          g.queryPanel('sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config, '{{pod}}') +
           g.stack,
         )
       )
@@ -147,11 +147,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('CPU Quota') +
           g.tablePanel([
-            'sum(label_replace(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}, "pod", "$1", "pod_name", "(.*)")) by (pod)' % $._config,
+            'sum(label_replace(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}, "pod", "$1", "pod", "(.*)")) by (pod)' % $._config,
             'sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
-            'sum(label_replace(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
+            'sum(label_replace(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}, "pod", "$1", "pod", "(.*)")) by (pod) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
             'sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
-            'sum(label_replace(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
+            'sum(label_replace(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}, "pod", "$1", "pod", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
           ], tableStyles {
             'Value #A': { alias: 'CPU Usage' },
             'Value #B': { alias: 'CPU Requests' },
@@ -166,7 +166,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Usage (w/o cache)') +
           // Like abov, without page cache
-          g.queryPanel('sum(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container_name!=""}) by (pod_name)' % $._config, '{{pod_name}}') +
+          g.queryPanel('sum(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container_name!=""}) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
         )
@@ -176,14 +176,14 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Quota') +
           g.tablePanel([
-            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod)' % $._config,
+            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod", "(.*)")) by (pod)' % $._config,
             'sum(kube_pod_container_resource_requests_memory_bytes{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
-            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"}) by (pod)' % $._config,
+            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod", "(.*)")) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"}) by (pod)' % $._config,
             'sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
-            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)' % $._config,
-            'sum(label_replace(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod)' % $._config,
-            'sum(label_replace(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod)' % $._config,
-            'sum(label_replace(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod)' % $._config,
+            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod", "(.*)")) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"}) by (pod)' % $._config,
+            'sum(label_replace(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod", "(.*)")) by (pod)' % $._config,
+            'sum(label_replace(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod", "(.*)")) by (pod)' % $._config,
+            'sum(label_replace(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace",container_name!=""}, "pod", "$1", "pod", "(.*)")) by (pod)' % $._config,
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
@@ -211,8 +211,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local cpuUsageQuery = |||
         sum(
           label_replace(
-            namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"},
-            "pod", "$1", "pod_name", "(.*)"
+            namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"},
+            "pod", "$1", "pod", "(.*)"
           ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
         ) by (workload, workload_type)
       ||| % $._config;
@@ -231,7 +231,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         sum(
           label_replace(
             container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container_name!=""},
-            "pod", "$1", "pod_name", "(.*)"
+            "pod", "$1", "pod", "(.*)"
           ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}
           ) by (workload, workload_type)
       ||| % $._config;
@@ -314,8 +314,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       local cpuUsageQuery = |||
         sum(
           label_replace(
-            namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"},
-            "pod", "$1", "pod_name", "(.*)"
+            namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"},
+            "pod", "$1", "pod", "(.*)"
           ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type="$type"}
         ) by (pod)
       ||| % $._config;
@@ -333,7 +333,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         sum(
           label_replace(
             container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container_name!=""},
-            "pod", "$1", "pod_name", "(.*)"
+            "pod", "$1", "pod", "(.*)"
           ) * on(namespace,pod) group_left(workload, workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type="$type"}
           ) by (pod)
       ||| % $._config;
@@ -420,7 +420,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel('sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{namespace="$namespace", pod_name="$pod", container_name!="POD", %(clusterLabel)s="$cluster"}) by (container_name)' % $._config, '{{container_name}}') +
+          g.queryPanel('sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{namespace="$namespace", pod="$pod", container_name!="POD", %(clusterLabel)s="$cluster"}) by (container_name)' % $._config, '{{container_name}}') +
           g.stack,
         )
       )
@@ -429,11 +429,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('CPU Quota') +
           g.tablePanel([
-            'sum(label_replace(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name!="POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
+            'sum(label_replace(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name!="POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
             'sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
-            'sum(label_replace(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
+            'sum(label_replace(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
             'sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
-            'sum(label_replace(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
+            'sum(label_replace(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
           ], tableStyles {
             'Value #A': { alias: 'CPU Usage' },
             'Value #B': { alias: 'CPU Requests' },
@@ -448,9 +448,9 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Usage') +
           g.queryPanel([
-            'sum(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}) by (container_name)' % $._config,
-            'sum(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}) by (container_name)' % $._config,
-            'sum(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}) by (container_name)' % $._config,
+            'sum(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name!="POD", container_name!=""}) by (container_name)' % $._config,
+            'sum(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name!="POD", container_name!=""}) by (container_name)' % $._config,
+            'sum(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name!="POD", container_name!=""}) by (container_name)' % $._config,
           ], [
             '{{container_name}} (RSS)',
             '{{container_name}} (Cache)',
@@ -465,14 +465,14 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Quota') +
           g.tablePanel([
-            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name!="POD", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
+            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name!="POD", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
             'sum(kube_pod_container_resource_requests_memory_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}) by (container)' % $._config,
-            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)' % $._config,
+            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)' % $._config,
             'sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!=""}) by (container)' % $._config,
-            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)' % $._config,
-            'sum(label_replace(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name != "", container_name != "POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
-            'sum(label_replace(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name != "", container_name != "POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
-            'sum(label_replace(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace", pod_name="$pod", container_name != "", container_name != "POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
+            'sum(label_replace(container_memory_usage_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name!=""}, "container", "$1", "container_name", "(.*)")) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace", pod="$pod"}) by (container)' % $._config,
+            'sum(label_replace(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name != "", container_name != "POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
+            'sum(label_replace(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name != "", container_name != "POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
+            'sum(label_replace(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container_name != "", container_name != "POD"}, "container", "$1", "container_name", "(.*)")) by (container)' % $._config,
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
@@ -534,7 +534,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('CPU')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel('sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config)
+          g.queryPanel('sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config)
           + { fill: 0, linewidth: 2 },
         )
       )
@@ -543,11 +543,11 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('CPU Quota') +
           g.tablePanel([
-            'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s)' % $._config,
+            'sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s)' % $._config,
             'sum(kube_pod_container_resource_requests_cpu_cores) by (%(clusterLabel)s)' % $._config,
-            'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests_cpu_cores) by (%(clusterLabel)s)' % $._config,
+            'sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests_cpu_cores) by (%(clusterLabel)s)' % $._config,
             'sum(kube_pod_container_resource_limits_cpu_cores) by (%(clusterLabel)s)' % $._config,
-            'sum(namespace_pod_name_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits_cpu_cores) by (%(clusterLabel)s)' % $._config,
+            'sum(namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits_cpu_cores) by (%(clusterLabel)s)' % $._config,
           ], tableStyles {
             'Value #A': { alias: 'CPU Usage' },
             'Value #B': { alias: 'CPU Requests' },
