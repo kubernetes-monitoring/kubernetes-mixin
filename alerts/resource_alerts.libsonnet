@@ -7,7 +7,7 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace_name:kube_pod_container_resource_requests_cpu_cores:sum)
+              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum)
                 /
               sum(node:node_num_cpu:sum)
                 >
@@ -24,7 +24,7 @@
           {
             alert: 'KubeMemOvercommit',
             expr: |||
-              sum(namespace_name:kube_pod_container_resource_requests_memory_bytes:sum)
+              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum)
                 /
               sum(node_memory_MemTotal_bytes)
                 >
