@@ -7,31 +7,31 @@
           {
             record: 'namespace:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
-              sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container_name!=""}[5m])) by (namespace)
+              sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!=""}[5m])) by (namespace)
             ||| % $._config,
           },
           {
             // Reduces cardinality of this timeseries by #cores, which makes it
             // more useable in dashboards.  Also, allows us to do things like
             // quantile_over_time(...) which would otherwise not be possible.
-            record: 'namespace_pod_container_name:container_cpu_usage_seconds_total:sum_rate',
+            record: 'namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
-              sum by (namespace, pod, container_name) (
-                rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container_name!=""}[5m])
+              sum by (namespace, pod, container) (
+                rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!=""}[5m])
               )
             ||| % $._config,
           },
           {
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
-              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container_name!=""}) by (namespace)
+              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container!=""}) by (namespace)
             ||| % $._config,
           },
           {
             record: 'namespace_name:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
               sum by (namespace, label_name) (
-                 sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container_name!=""}[5m])) by (namespace, pod)
+                 sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!=""}[5m])) by (namespace, pod)
                * on (namespace, pod) group_left(label_name)
                  label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
               )
@@ -41,7 +41,7 @@
             record: 'namespace_name:container_memory_usage_bytes:sum',
             expr: |||
               sum by (namespace, label_name) (
-                sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container_name!=""}) by (pod, namespace)
+                sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container!=""}) by (pod, namespace)
               * on (namespace, pod) group_left(label_name)
                 label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
               )
