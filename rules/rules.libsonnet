@@ -7,7 +7,7 @@
           {
             record: 'namespace:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
-              sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!=""}[5m])) by (namespace)
+              sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (namespace)
             ||| % $._config,
           },
           {
@@ -17,21 +17,21 @@
             record: 'namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
               sum by (namespace, pod, container) (
-                rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!=""}[5m])
+                rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])
               )
             ||| % $._config,
           },
           {
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
-              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container!=""}) by (namespace)
+              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container!="POD"}) by (namespace)
             ||| % $._config,
           },
           {
             record: 'namespace:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
               sum by (namespace, label_name) (
-                 sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!=""}[5m])) by (namespace, pod)
+                 sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (namespace, pod)
                * on (namespace, pod) group_left(label_name)
                  label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
               )
@@ -41,7 +41,7 @@
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
               sum by (namespace, label_name) (
-                sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container!=""}) by (pod, namespace)
+                sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container!="POD"}) by (pod, namespace)
               * on (namespace, pod) group_left(label_name)
                 label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
               )
