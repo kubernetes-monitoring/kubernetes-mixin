@@ -106,9 +106,9 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) * 100 > 3
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) * 100 > 3
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -121,9 +121,9 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) * 100 > 1
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) * 100 > 1
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -136,9 +136,9 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 10
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 10
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -151,9 +151,9 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
                 /
-              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 5
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 5
             ||| % $._config,
             'for': '10m',
             labels: {
