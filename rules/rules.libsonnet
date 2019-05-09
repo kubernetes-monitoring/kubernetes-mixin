@@ -31,9 +31,9 @@
             record: 'namespace:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
               sum by (namespace, label_name) (
-                 sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (namespace, pod)
-               * on (namespace, pod) group_left(label_name)
-                 label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
+                  sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (namespace, pod)
+                * on (namespace, pod)
+                  group_left(label_name) kube_pod_labels{%(kubeStateMetricsSelector)s}
               )
             ||| % $._config,
           },
@@ -41,9 +41,9 @@
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
               sum by (namespace, label_name) (
-                sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container!="POD"}) by (pod, namespace)
-              * on (namespace, pod) group_left(label_name)
-                label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
+                  sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container!="POD"}) by (pod, namespace)
+                * on (namespace, pod)
+                  group_left(label_name) kube_pod_labels{%(kubeStateMetricsSelector)s}
               )
             ||| % $._config,
           },
@@ -51,9 +51,9 @@
             record: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum',
             expr: |||
               sum by (namespace, label_name) (
-                sum(kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)) by (namespace, pod)
-              * on (namespace, pod) group_left(label_name)
-                label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
+                  sum(kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)) by (namespace, pod)
+                * on (namespace, pod)
+                  group_left(label_name) kube_pod_labels{%(kubeStateMetricsSelector)s}
               )
             ||| % $._config,
           },
@@ -61,9 +61,9 @@
             record: 'namespace:kube_pod_container_resource_requests_cpu_cores:sum',
             expr: |||
               sum by (namespace, label_name) (
-                sum(kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)) by (namespace, pod)
-              * on (namespace, pod) group_left(label_name)
-                label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod", "$1", "pod", "(.*)")
+                  sum(kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)) by (namespace, pod)
+                * on (namespace, pod)
+                  group_left(label_name) kube_pod_labels{%(kubeStateMetricsSelector)s}
               )
             ||| % $._config,
           },
@@ -160,7 +160,7 @@
             // it is used to calculate per-node metrics, given namespace & instance.
             record: 'node_namespace_pod:kube_pod_info:',
             expr: |||
-              max(label_replace(kube_pod_info{%(kubeStateMetricsSelector)s}, "%(podLabel)s", "$1", "pod", "(.*)")) by (node, namespace, %(podLabel)s)
+              max(kube_pod_info{%(kubeStateMetricsSelector)s}) by (node, namespace, %(podLabel)s)
             ||| % $._config,
           },
           {
