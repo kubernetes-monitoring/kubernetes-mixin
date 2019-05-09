@@ -121,7 +121,7 @@
           {
             record: 'cluster_quantile:%s:histogram_quantile' % metric,
             expr: |||
-              histogram_quantile(%(quantile)s, sum(rate(%(metric)s_bucket{%(kubeSchedulerSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
+              histogram_quantile(%(quantile)s, sum(rate(%(metric)s_bucket{%(kubeSchedulerSelector)s}[5m])) without(instance, %(podLabel)s))
             ||| % ({ quantile: quantile, metric: metric } + $._config),
             labels: {
               quantile: quantile,
@@ -137,7 +137,7 @@
           {
             record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
             expr: |||
-              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s}[5m])) without(instance, %(podLabel)s)) / 1e+06
+              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s}[5m])) without(instance, %(podLabel)s))
             ||| % ({ quantile: quantile } + $._config),
             labels: {
               quantile: quantile,
