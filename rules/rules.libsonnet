@@ -128,7 +128,11 @@
             },
           }
           for quantile in ['0.99', '0.9', '0.5']
-          for metric in ['scheduler_e2e_scheduling_duration', 'scheduler_scheduling_algorithm_duration', 'scheduler_binding_duration']
+          for metric in [
+            'scheduler_e2e_scheduling_duration_seconds',
+            'scheduler_scheduling_algorithm_duration_seconds',
+            'scheduler_binding_duration_seconds',
+          ]
         ],
       },
       {
