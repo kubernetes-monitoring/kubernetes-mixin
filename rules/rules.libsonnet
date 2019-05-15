@@ -11,6 +11,12 @@
             ||| % $._config,
           },
           {
+            record: 'namespace:container_memory_usage_bytes:sum',
+            expr: |||
+              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container_name!=""}) by (namespace)
+            ||| % $._config,
+          },
+          {
             // Reduces cardinality of this timeseries by #cores, which makes it
             // more useable in dashboards.  Also, allows us to do things like
             // quantile_over_time(...) which would otherwise not be possible.
@@ -18,36 +24,6 @@
             expr: |||
               sum by (namespace, pod_name, container_name) (
                 rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container_name!=""}[5m])
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'namespace:container_memory_usage_bytes:sum',
-            expr: |||
-              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container_name!=""}) by (namespace)
-            ||| % $._config,
-          },
-          {
-            record: 'namespace_name:container_cpu_usage_seconds_total:sum_rate',
-            expr: |||
-              sum by (namespace) (
-                  sum by (namespace, pod_name) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container_name!=""}[5m]))
-                * on (namespace, pod_name) group_left(label_name)
-                  max by (namespace, pod_name, label_name) (
-                    label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod_name", "$1", "pod", "(.*)")
-                  )
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'namespace_name:container_memory_usage_bytes:sum',
-            expr: |||
-              sum by (namespace) (
-                sum by (namespace, pod_name) (container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container_name!=""})
-              * on (namespace, pod_name) group_left(label_name)
-                max by (namespace, pod_name, label_name) (
-                  label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod_name", "$1", "pod", "(.*)")
-                )
               )
             ||| % $._config,
           },
