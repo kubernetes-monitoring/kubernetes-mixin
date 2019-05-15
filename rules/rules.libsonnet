@@ -44,7 +44,6 @@
                   kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
                 * on (endpoint, instance, job, namespace, pod, service)
                   group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)
-                )
               )
             ||| % $._config,
           },
