@@ -101,9 +101,10 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        'Kube Scheduler',
+        '%(dashboardNamePrefix)sKube Scheduler' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['kube-scheduler.json']),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {

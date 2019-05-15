@@ -109,9 +109,10 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        'Kube Proxy',
+        '%(dashboardNamePrefix)sKube Proxy' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['kube-proxy.json']),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {

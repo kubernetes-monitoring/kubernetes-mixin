@@ -295,9 +295,10 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        'Kubelet',
+        '%(dashboardNamePrefix)sKubelet' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['kubelet.json']),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {

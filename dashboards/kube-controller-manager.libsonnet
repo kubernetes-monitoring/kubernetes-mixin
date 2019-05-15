@@ -140,9 +140,10 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        'Kube Controller Manager',
+        '%(dashboardNamePrefix)sKube Controller Manager' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['kube-controller-manager.json']),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {

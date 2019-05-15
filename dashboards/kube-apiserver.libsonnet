@@ -138,9 +138,10 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        'Kube api server',
+        '%(dashboardNamePrefix)sKube API server' % $._config.grafanaK8s,
         time_from='now-1h',
         uid=($._config.grafanaDashboardIDs['kube-apiserver.json']),
+        tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
