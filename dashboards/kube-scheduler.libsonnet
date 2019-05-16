@@ -23,16 +23,17 @@ local singlestat = grafana.singlestat;
           'Scheduling latency 99th quantile',
           datasource='$datasource',
           span=10,
-          format='µs',
+          format='s',
           legend_show='true',
           legend_values='true',
           legend_current='true',
           legend_alignAsTable='true',
           legend_rightSide='true',
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_latency_microseconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[10h])) by (le))' % $._config, legendFormat='e2e'))
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_binding_latency_microseconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[10h])) by (le))' % $._config, legendFormat='binding'))
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_latency_microseconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[10h])) by (le))' % $._config, legendFormat='scheduling algorithm'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (le))' % $._config, legendFormat='e2e'))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (le))' % $._config, legendFormat='binding'))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (le))' % $._config, legendFormat='scheduling algorithm'))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{%(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (le))' % $._config, legendFormat='volume'));
 
       local rpcRate =
         graphPanel.new(
