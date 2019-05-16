@@ -11,6 +11,12 @@
             ||| % $._config,
           },
           {
+            record: 'namespace:container_memory_usage_bytes:sum',
+            expr: |||
+              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container_name!=""}) by (namespace)
+            ||| % $._config,
+          },
+          {
             // Reduces cardinality of this timeseries by #cores, which makes it
             // more useable in dashboards.  Also, allows us to do things like
             // quantile_over_time(...) which would otherwise not be possible.
@@ -22,48 +28,22 @@
             ||| % $._config,
           },
           {
-            record: 'namespace:container_memory_usage_bytes:sum',
-            expr: |||
-              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container_name!=""}) by (namespace)
-            ||| % $._config,
-          },
-          {
-            record: 'namespace_name:container_cpu_usage_seconds_total:sum_rate',
-            expr: |||
-              sum by (namespace, label_name) (
-                 sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container_name!=""}[5m])) by (namespace, pod_name)
-               * on (namespace, pod_name) group_left(label_name)
-                 label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod_name", "$1", "pod", "(.*)")
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'namespace_name:container_memory_usage_bytes:sum',
-            expr: |||
-              sum by (namespace, label_name) (
-                sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container_name!=""}) by (pod_name, namespace)
-              * on (namespace, pod_name) group_left(label_name)
-                label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod_name", "$1", "pod", "(.*)")
-              )
-            ||| % $._config,
-          },
-          {
             record: 'namespace_name:kube_pod_container_resource_requests_memory_bytes:sum',
             expr: |||
-              sum by (namespace, label_name) (
-                sum(kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)) by (namespace, pod)
-              * on (namespace, pod) group_left(label_name)
-                label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod_name", "$1", "pod", "(.*)")
+              sum by(namespace) (
+                  kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s}
+                * on (endpoint, instance, job, namespace, pod, service)
+                  group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)
               )
             ||| % $._config,
           },
           {
             record: 'namespace_name:kube_pod_container_resource_requests_cpu_cores:sum',
             expr: |||
-              sum by (namespace, label_name) (
-                sum(kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)) by (namespace, pod)
-              * on (namespace, pod) group_left(label_name)
-                label_replace(kube_pod_labels{%(kubeStateMetricsSelector)s}, "pod_name", "$1", "pod", "(.*)")
+              sum by (namespace) (
+                  kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
+                * on (endpoint, instance, job, namespace, pod, service)
+                  group_left(phase) (kube_pod_status_phase{phase=~"^(Pending|Running)$"} == 1)
               )
             ||| % $._config,
           },
