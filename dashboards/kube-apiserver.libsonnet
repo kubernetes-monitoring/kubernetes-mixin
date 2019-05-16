@@ -99,14 +99,14 @@ local singlestat = grafana.singlestat;
 
       local etcdCacheLatency =
         graphPanel.new(
-          'ETCD Cache Latency 99th quantile',
+          'ETCD Cache Duration 99th quantile',
           datasource='$datasource',
           span=4,
           format='s',
           min=0,
         )
-        .addTarget(prometheus.target('etcd_request_cache_get_latencies_summary{%(kubeApiserverSelector)s,quantile="0.99",instance=~"$instance"}' % $._config, legendFormat='get {{instance}}'))
-        .addTarget(prometheus.target('etcd_request_cache_add_latencies_summary{%(kubeApiserverSelector)s,quantile="0.99",instance=~"$instance"}' % $._config, legendFormat='add {{instance}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance))' % $._config, legendFormat='get {{instance}}'))
+        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance))' % $._config, legendFormat='add {{instance}}'));
 
       local memory =
         graphPanel.new(
