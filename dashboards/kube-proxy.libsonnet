@@ -22,25 +22,51 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Rules sync rate',
           datasource='$datasource',
-          span=10,
+          span=5,
+          min=0,
           format='ops',
         )
-        .addTarget(prometheus.target('sum(rate(kubeproxy_sync_proxy_rules_latency_microseconds_count{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='rate'));
+        .addTarget(prometheus.target('sum(rate(kubeproxy_sync_proxy_rules_duration_seconds_count{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='rate'));
 
       local rulesSyncLatency =
         graphPanel.new(
           'Rule Sync Latency',
           datasource='$datasource',
-          span=12,
+          span=5,
           min=0,
-          format='µs',
+          format='s',
           legend_show='true',
           legend_values='true',
           legend_current='true',
           legend_alignAsTable='true',
           legend_rightSide='true',
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99,rate(kubeproxy_sync_proxy_rules_latency_microseconds_bucket{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99,rate(kubeproxy_sync_proxy_rules_duration_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='{{instance}}'));
+
+      local networkProgrammingRate =
+        graphPanel.new(
+          'Network Programming rate',
+          datasource='$datasource',
+          span=6,
+          min=0,
+          format='ops',
+        )
+        .addTarget(prometheus.target('sum(rate(kubeproxy_network_programming_duration_seconds_count{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='rate'));
+
+      local networkProgrammingLatency =
+        graphPanel.new(
+          'Network Programming Latency',
+          datasource='$datasource',
+          span=6,
+          min=0,
+          format='s',
+          legend_show='true',
+          legend_values='true',
+          legend_current='true',
+          legend_alignAsTable='true',
+          legend_rightSide='true',
+        )
+        .addTarget(prometheus.target('histogram_quantile(0.99,rate(kubeproxy_network_programming_duration_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='{{instance}}'));
 
       local rpcRate =
         graphPanel.new(
@@ -133,7 +159,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(process_cpu_seconds_total{%(kubeProxySelector)s}, instance)' % $._config,
+          'label_values(kubeproxy_network_programming_duration_seconds_bucket{%(kubeProxySelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
         )
@@ -142,9 +168,11 @@ local singlestat = grafana.singlestat;
         row.new()
         .addPanel(upCount)
         .addPanel(rulesSyncRate)
+        .addPanel(rulesSyncLatency)
       ).addRow(
         row.new()
-        .addPanel(rulesSyncLatency)
+        .addPanel(networkProgrammingRate)
+        .addPanel(networkProgrammingLatency)
       ).addRow(
         row.new()
         .addPanel(rpcRate)
