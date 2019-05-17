@@ -20,7 +20,7 @@ local singlestat = grafana.singlestat;
 
       local rulesSyncRate =
         graphPanel.new(
-          'Rules sync rate',
+          'Rules Sync Rate',
           datasource='$datasource',
           span=5,
           min=0,
@@ -30,7 +30,7 @@ local singlestat = grafana.singlestat;
 
       local rulesSyncLatency =
         graphPanel.new(
-          'Rule Sync Latency',
+          'Rule Sync Latency 99th Quantile',
           datasource='$datasource',
           span=5,
           min=0,
@@ -45,7 +45,7 @@ local singlestat = grafana.singlestat;
 
       local networkProgrammingRate =
         graphPanel.new(
-          'Network Programming rate',
+          'Network Programming Rate',
           datasource='$datasource',
           span=6,
           min=0,
@@ -55,7 +55,7 @@ local singlestat = grafana.singlestat;
 
       local networkProgrammingLatency =
         graphPanel.new(
-          'Network Programming Latency',
+          'Network Programming Latency 99th Quantile',
           datasource='$datasource',
           span=6,
           min=0,
@@ -82,7 +82,7 @@ local singlestat = grafana.singlestat;
 
       local postRequestLatency =
         graphPanel.new(
-          'Post Request Latency 99th quantile',
+          'Post Request Latency 99th Quantile',
           datasource='$datasource',
           span=8,
           format='s',
@@ -92,7 +92,7 @@ local singlestat = grafana.singlestat;
 
       local getRequestLatency =
         graphPanel.new(
-          'Get Request Latency 99th quantile',
+          'Get Request Latency 99th Quantile',
           datasource='$datasource',
           span=12,
           format='s',
