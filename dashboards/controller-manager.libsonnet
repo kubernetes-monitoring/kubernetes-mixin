@@ -30,11 +30,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable='true',
           legend_rightSide='true',
         )
-        .addTarget(prometheus.target('sum(rate(daemonset_adds{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='daemonset'))
-        .addTarget(prometheus.target('sum(rate(deployment_adds{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='deployment'))
-        .addTarget(prometheus.target('sum(rate(job_adds{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='job'))
-        .addTarget(prometheus.target('sum(rate(replicaset_adds{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='replicaset'))
-        .addTarget(prometheus.target('sum(rate(statefulset_adds{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='statefulset'));
+        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local objectQueueDepth =
         graphPanel.new(
@@ -49,29 +45,21 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable='true',
           legend_rightSide='true',
         )
-        .addTarget(prometheus.target('sum(rate(daemonset_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='daemonset'))
-        .addTarget(prometheus.target('sum(rate(deployment_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='deployment'))
-        .addTarget(prometheus.target('sum(rate(job_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='job'))
-        .addTarget(prometheus.target('sum(rate(replicaset_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='replicaset'))
-        .addTarget(prometheus.target('sum(rate(statefulset_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='statefulset'));
+        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local objectQueueLatency =
         graphPanel.new(
-          'Object Queue depth',
+          'Object Queue Latency',
           datasource='$datasource',
           span=12,
-          format='µs',
+          format='s',
           legend_show='true',
           legend_values='true',
           legend_current='true',
           legend_alignAsTable='true',
           legend_rightSide='true',
         )
-        .addTarget(prometheus.target('daemonset_queue_latency{%(kubeControllerManagerSelector)s, instance=~"$instance",quantile="0.99"}' % $._config, legendFormat='daemonset {{instance}}'))
-        .addTarget(prometheus.target('deployment_queue_latency{%(kubeControllerManagerSelector)s, instance=~"$instance",quantile="0.99"}' % $._config, legendFormat='deployment {{instance}}'))
-        .addTarget(prometheus.target('statefulset_queue_latency{%(kubeControllerManagerSelector)s, instance=~"$instance",quantile="0.99"}' % $._config, legendFormat='statefulset {{instance}}'))
-        .addTarget(prometheus.target('replicaset_queue_latency{%(kubeControllerManagerSelector)s, instance=~"$instance",quantile="0.99"}' % $._config, legendFormat='replicaset {{instance}}'))
-        .addTarget(prometheus.target('job_queue_latency{%(kubeControllerManagerSelector)s, instance=~"$instance",quantile="0.99"}' % $._config, legendFormat='job {{instance}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local rpcRate =
         graphPanel.new(
