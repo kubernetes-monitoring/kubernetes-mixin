@@ -127,7 +127,7 @@ local gauge = promgrafonnet.gauge;
           ],
         };
 
-      local diskSpaceUsage = 
+      local diskSpaceUsage =
         graphPanel.new(
           'Disk Space Usage',
           datasource='$datasource',
