@@ -147,8 +147,9 @@ local gauge = promgrafonnet.gauge;
           datasource='$datasource',
           span=6,
           format='bytes',
+          stack=true,
         )
-        .addTarget(prometheus.target('max(rate(node_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
+        .addTarget(prometheus.target('rate(node_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m])' % $._config, legendFormat='{{device}}'));
 
       local networkTransmitted =
         graphPanel.new(
@@ -156,8 +157,9 @@ local gauge = promgrafonnet.gauge;
           datasource='$datasource',
           span=6,
           format='bytes',
+          stack=true,
         )
-        .addTarget(prometheus.target('max(rate(node_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m]))' % $._config, legendFormat='{{device}}'));
+        .addTarget(prometheus.target('rate(node_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(nodeExporterSelector)s, instance="$instance", device!~"lo"}[5m])' % $._config, legendFormat='{{device}}'));
 
       local inodesGraph =
         graphPanel.new(
