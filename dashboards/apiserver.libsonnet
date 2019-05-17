@@ -105,8 +105,8 @@ local singlestat = grafana.singlestat;
           format='s',
           min=0,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance))' % $._config, legendFormat='get {{instance}}'))
-        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance))' % $._config, legendFormat='add {{instance}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance, le))' % $._config, legendFormat='get {{instance}}'))
+        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance, le))' % $._config, legendFormat='add {{instance}}'));
 
       local memory =
         graphPanel.new(
@@ -122,7 +122,7 @@ local singlestat = grafana.singlestat;
           'CPU usage',
           datasource='$datasource',
           span=4,
-          format='bytes',
+          format='short',
           min=0,
         )
         .addTarget(prometheus.target('rate(process_cpu_seconds_total{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])' % $._config, legendFormat='{{instance}}'));
