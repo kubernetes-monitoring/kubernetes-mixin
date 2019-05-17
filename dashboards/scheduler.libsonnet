@@ -8,7 +8,7 @@ local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
-    'kube-scheduler.json':
+    'scheduler.json':
       local upCount =
         singlestat.new(
           'Up',
@@ -102,9 +102,9 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        '%(dashboardNamePrefix)sKube Scheduler' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sScheduler' % $._config.grafanaK8s,
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['kube-scheduler.json']),
+        uid=($._config.grafanaDashboardIDs['scheduler.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {

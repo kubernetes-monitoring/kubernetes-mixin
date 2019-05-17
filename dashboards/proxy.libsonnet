@@ -8,7 +8,7 @@ local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
-    'kube-proxy.json':
+    'proxy.json':
       local upCount =
         singlestat.new(
           'Up',
@@ -135,9 +135,9 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        '%(dashboardNamePrefix)sKube Proxy' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sProxy' % $._config.grafanaK8s,
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['kube-proxy.json']),
+        uid=($._config.grafanaDashboardIDs['proxy.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {

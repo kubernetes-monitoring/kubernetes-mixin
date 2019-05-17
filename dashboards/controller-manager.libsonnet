@@ -8,7 +8,7 @@ local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
-    'kube-controller-manager.json':
+    'controller-manager.json':
       local upCount =
         singlestat.new(
           'Up',
@@ -140,9 +140,9 @@ local singlestat = grafana.singlestat;
 
 
       dashboard.new(
-        '%(dashboardNamePrefix)sKube Controller Manager' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sController Manager' % $._config.grafanaK8s,
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['kube-controller-manager.json']),
+        uid=($._config.grafanaDashboardIDs['controller-manager.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
