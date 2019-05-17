@@ -18,9 +18,9 @@ local singlestat = grafana.singlestat;
         )
         .addTarget(prometheus.target('sum(up{%(kubeControllerManagerSelector)s})' % $._config));
 
-      local objectQueueRate =
+      local workQueueAddRate =
         graphPanel.new(
-          'Object Queue add rate',
+          'Work Queue Add Rate',
           datasource='$datasource',
           span=10,
           format='ops',
@@ -32,9 +32,9 @@ local singlestat = grafana.singlestat;
         )
         .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
-      local objectQueueDepth =
+      local workQueueDepth =
         graphPanel.new(
-          'Object Queue depth',
+          'Work Queue Depth',
           datasource='$datasource',
           span=12,
           min=0,
@@ -47,9 +47,9 @@ local singlestat = grafana.singlestat;
         )
         .addTarget(prometheus.target('sum(rate(workqueue_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
-      local objectQueueLatency =
+      local workQueueLatency =
         graphPanel.new(
-          'Object Queue Latency',
+          'Work Queue Latency',
           datasource='$datasource',
           span=12,
           format='s',
@@ -75,7 +75,7 @@ local singlestat = grafana.singlestat;
 
       local postRequestLatency =
         graphPanel.new(
-          'Post Request Latency 99th quantile',
+          'Post Request Latency 99th Quantile',
           datasource='$datasource',
           span=8,
           format='s',
@@ -85,7 +85,7 @@ local singlestat = grafana.singlestat;
 
       local getRequestLatency =
         graphPanel.new(
-          'Get Request Latency 99th quantile',
+          'Get Request Latency 99th Quantile',
           datasource='$datasource',
           span=12,
           format='s',
@@ -160,13 +160,13 @@ local singlestat = grafana.singlestat;
       .addRow(
         row.new()
         .addPanel(upCount)
-        .addPanel(objectQueueRate)
+        .addPanel(workQueueAddRate)
       ).addRow(
         row.new()
-        .addPanel(objectQueueDepth)
+        .addPanel(workQueueDepth)
       ).addRow(
         row.new()
-        .addPanel(objectQueueLatency)
+        .addPanel(workQueueLatency)
       ).addRow(
         row.new()
         .addPanel(rpcRate)
