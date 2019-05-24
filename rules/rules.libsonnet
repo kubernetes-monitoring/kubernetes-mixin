@@ -164,7 +164,7 @@
             // it is used to calculate per-node metrics, given namespace & instance.
             record: 'node_namespace_pod:kube_pod_info:',
             expr: |||
-              max(kube_pod_info{%(kubeStateMetricsSelector)s}) by (node, namespace, %(podLabel)s)
+              max(label_replace(kube_pod_info{%(kubeStateMetricsSelector)s}, "%(podLabel)s", "$1", "pod", "(.*)")) by (node, namespace, %(podLabel)s)
             ||| % $._config,
           },
           {
