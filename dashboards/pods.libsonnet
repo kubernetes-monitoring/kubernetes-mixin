@@ -56,7 +56,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by (container) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", image!="", pod="$pod", container=~"$container", container!="POD"}[1m]))' % $._config,
+          'sum by (container) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", image!="", pod="$pod", container=~"$container", container!="POD"}[$interval]))' % $._config,
           legendFormat='Current: {{ container }}',
         ))
         .addTarget(prometheus.target(
@@ -83,11 +83,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+          'sort_desc(sum by (pod) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[$interval])))' % $._config,
           legendFormat='RX: {{ pod }}',
         ))
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod) (rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+          'sort_desc(sum by (pod) (rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[$interval])))' % $._config,
           legendFormat='TX: {{ pod }}',
         ))
       );
@@ -180,6 +180,15 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           label='Container',
           refresh='time',
           includeAll=true,
+        )
+      )
+      .addTemplate(
+        template.new(
+          'interval',
+          '$datasource',
+          '1m,2m,5m,10m',
+          label='Interval',
+          refresh='time',
         )
       )
       .addAnnotation(restartAnnotation)
