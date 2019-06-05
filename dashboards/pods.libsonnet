@@ -56,7 +56,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by (container) (rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", image!="", pod="$pod", container=~"$container", container!="POD"}[4m]))' % $._config,
+          'sum by (container) (irate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", image!="", pod="$pod", container=~"$container", container!="POD"}[4m]))' % $._config,
           legendFormat='Current: {{ container }}',
         ))
         .addTarget(prometheus.target(
@@ -83,11 +83,11 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod) (rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[4m])))' % $._config,
+          'sort_desc(sum by (pod) (irate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[4m])))' % $._config,
           legendFormat='RX: {{ pod }}',
         ))
         .addTarget(prometheus.target(
-          'sort_desc(sum by (pod) (rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[4m])))' % $._config,
+          'sort_desc(sum by (pod) (irate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[4m])))' % $._config,
           legendFormat='TX: {{ pod }}',
         ))
       );
