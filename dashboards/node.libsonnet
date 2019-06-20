@@ -135,10 +135,10 @@ local gauge = promgrafonnet.gauge;
           format='percentunit',
         )
         .addTarget(prometheus.target(
-          'node:node_filesystem_usage:{%(clusterLabel)s="$cluster", instance="$instance"}' % $._config, legendFormat='disk used'
+          'node:node_filesystem_usage:{%(clusterLabel)s="$cluster", instance="$instance"}' % $._config, legendFormat='{{device}} disk used'
         ))
         .addTarget(prometheus.target(
-          'node:node_filesystem_usage:{%(clusterLabel)s="$cluster", instance="$instance"}' % $._config, legendFormat='disk free'
+          'node:node_filesystem_usage:{%(clusterLabel)s="$cluster", instance="$instance"}' % $._config, legendFormat='{{device}} disk free'
         ));
 
       local networkReceived =
