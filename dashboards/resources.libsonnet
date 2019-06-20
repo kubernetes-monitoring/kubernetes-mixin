@@ -44,23 +44,23 @@ local g = import 'grafana-builder/grafana.libsonnet';
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) / sum(node:node_num_cpu:sum{%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_cpu_cores{%(clusterLabel)s="$cluster"})' % $._config)
         )
         .addPanel(
           g.panel('CPU Limits Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) / sum(node:node_num_cpu:sum{%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_cpu_cores{%(clusterLabel)s="$cluster"})' % $._config)
         )
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum{%(clusterLabel)s="$cluster"}) / sum(:node_memory_MemTotal_bytes:sum{%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_memory_bytes{%(clusterLabel)s="$cluster"})' % $._config)
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes{%(clusterLabel)s="$cluster"}) / sum(:node_memory_MemTotal_bytes:sum{%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_memory_bytes{%(clusterLabel)s="$cluster"})' % $._config)
         )
         .addPanel(
           g.panel('Memory Limits Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster"}) / sum(:node_memory_MemTotal_bytes:sum{%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_memory_bytes{%(clusterLabel)s="$cluster"})' % $._config)
         )
       )
       .addRow(
@@ -509,23 +509,23 @@ local g = import 'grafana-builder/grafana.libsonnet';
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores) / sum(node:node_num_cpu:sum)' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores) / sum(kube_node_status_allocatable_cpu_cores)' % $._config)
         )
         .addPanel(
           g.panel('CPU Limits Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores) / sum(node:node_num_cpu:sum)' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores) / sum(kube_node_status_allocatable_cpu_cores)' % $._config)
         )
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum) / sum(:node_memory_MemTotal_bytes:sum)' % $._config)
+          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum) / sum(kube_node_status_allocatable_memory_bytes)' % $._config)
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes) / sum(:node_memory_MemTotal_bytes:sum)' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes) / sum(kube_node_status_allocatable_memory_bytes)' % $._config)
         )
         .addPanel(
           g.panel('Memory Limits Commitment') +
-          g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes) / sum(:node_memory_MemTotal_bytes:sum)' % $._config)
+          g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes) / sum(kube_node_status_allocatable_memory_bytes)' % $._config)
         )
       )
       .addRow(
