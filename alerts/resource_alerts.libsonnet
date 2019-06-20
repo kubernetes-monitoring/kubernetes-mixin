@@ -9,9 +9,9 @@
             expr: |||
               sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum)
                 /
-              sum(node:node_num_cpu:sum)
+              sum(kube_node_status_allocatable_cpu_cores)
                 >
-              (count(node:node_num_cpu:sum)-1) / count(node:node_num_cpu:sum)
+              (count(kube_node_status_allocatable_cpu_cores)-1) / count(kube_node_status_allocatable_cpu_cores)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -26,11 +26,11 @@
             expr: |||
               sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum)
                 /
-              sum(node_memory_MemTotal_bytes)
+              sum(kube_node_status_allocatable_memory_bytes)
                 >
-              (count(node:node_num_cpu:sum)-1)
+              (count(kube_node_status_allocatable_memory_bytes)-1)
                 /
-              count(node:node_num_cpu:sum)
+              count(kube_node_status_allocatable_memory_bytes)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -45,7 +45,7 @@
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="cpu"})
                 /
-              sum(node:node_num_cpu:sum)
+              sum(kube_node_status_allocatable_cpu_cores)
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
@@ -61,7 +61,7 @@
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="memory"})
                 /
-              sum(node_memory_MemTotal_bytes{%(nodeExporterSelector)s})
+              sum(kube_node_status_allocatable_memory_bytes{%(nodeExporterSelector)s})
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
