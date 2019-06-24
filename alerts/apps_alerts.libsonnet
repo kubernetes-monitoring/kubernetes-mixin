@@ -14,7 +14,7 @@
             annotations: {
               message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.',
             },
-            'for': '1h',
+            'for': $._config.podCrashLoopingTime,
             alert: 'KubePodCrashLooping',
           },
           {
@@ -27,7 +27,7 @@
             annotations: {
               message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than an hour.',
             },
-            'for': '1h',
+            'for': $._config.podNotReadyTime,
             alert: 'KubePodNotReady',
           },
           {
@@ -42,7 +42,7 @@
             annotations: {
               message: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.',
             },
-            'for': '15m',
+            'for': $._config.deploymentGenerationMismatchTime,
             alert: 'KubeDeploymentGenerationMismatch',
           },
           {
@@ -55,9 +55,9 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than an hour.',
+              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas.',
             },
-            'for': '1h',
+            'for': $._config.deploymentReplicasMismatchTime,
             alert: 'KubeDeploymentReplicasMismatch',
           },
           {
@@ -70,9 +70,9 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
+              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas.',
             },
-            'for': '15m',
+            'for': $._config.statefulSetReplicasMismatchTime,
             alert: 'KubeStatefulSetReplicasMismatch',
           },
           {
@@ -87,7 +87,7 @@
             annotations: {
               message: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.',
             },
-            'for': '15m',
+            'for': $._config.statefulSetGenerationMismatchTime,
             alert: 'KubeStatefulSetGenerationMismatch',
           },
           {
@@ -110,7 +110,7 @@
             annotations: {
               message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.',
             },
-            'for': '15m',
+            'for': $._config.statefulSetUpdateNotRolledOutTime,
             alert: 'KubeStatefulSetUpdateNotRolledOut',
           },
           {
@@ -126,7 +126,7 @@
             annotations: {
               message: 'Only {{ $value }}% of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.',
             },
-            'for': '15m',
+            'for': $._config.daemonSetRolledOutStuckTime,
           },
           {
             alert: 'KubeDaemonSetNotScheduled',
@@ -141,7 +141,7 @@
             annotations: {
               message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.',
             },
-            'for': '10m',
+            'for': $._config.daemonSetNotScheduledTime,
           },
           {
             alert: 'KubeDaemonSetMisScheduled',
@@ -154,14 +154,14 @@
             annotations: {
               message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.',
             },
-            'for': '10m',
+            'for': $._config.daemonSetMisScheduledTime,
           },
           {
             alert: 'KubeCronJobRunning',
             expr: |||
               time() - kube_cronjob_next_schedule_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 3600
             ||| % $._config,
-            'for': '1h',
+            'for': $._config.jobRunningTime,
             labels: {
               severity: 'warning',
             },
@@ -174,7 +174,7 @@
             expr: |||
               kube_job_spec_completions{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
             ||| % $._config,
-            'for': '1h',
+            'for': $._config.jobCompletionTime,
             labels: {
               severity: 'warning',
             },
@@ -187,7 +187,7 @@
             expr: |||
               kube_job_status_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
             ||| % $._config,
-            'for': '1h',
+            'for': $._config.jobFailedTime,
             labels: {
               severity: 'warning',
             },

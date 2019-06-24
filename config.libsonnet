@@ -57,8 +57,7 @@
       dashboardNamePrefix: 'Kubernetes / ',
       dashboardTags: ['kubernetes-mixin'],
 
-      // For links between grafana dashboards, you need to tell us if your grafana
-      // servers under some non-root path.
+      // For links between grafana dashboards, you need to tell us if your grafana servers under some non-root path.
       linkPrefix: '',
     },
 
@@ -73,6 +72,21 @@
     cpuThrottlingSelector: '',
     kubeAPILatencyWarningSeconds: 1,
     kubeAPILatencyCriticalSeconds: 4,
+
+    // Duration to raise various Alerts
+    podCrashLoopingTime: '1h',
+    podNotReadyTime: '1h',
+    deploymentGenerationMismatchTime: '15m',
+    deploymentReplicasMismatchTime: '1h',
+    statefulSetReplicasMismatchTime: '15m',
+    statefulSetGenerationMismatchTime: '15m',
+    statefulSetUpdateNotRolledOutTime: '15m',
+    daemonSetRolledOutStuckTime: '15m',
+    daemonSetNotScheduledTime: '10m',
+    daemonSetMisScheduledTime: '10m',
+    jobRunningTime: '1h',
+    jobCompletionTime: '1h',
+    jobFailedTime: '1h',
 
     // We alert when a disk is expected to fill up in four days. Depending on
     // the data-set it might be useful to change the sampling-time for the
