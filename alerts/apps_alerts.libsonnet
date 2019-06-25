@@ -19,7 +19,7 @@
           },
           {
             expr: |||
-              sum by (namespace, pod) (kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}) > 0
+              sum by (namespace, pod) (kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Failed|Pending|Unknown"}) > 0
             ||| % $._config,
             labels: {
               severity: 'critical',
