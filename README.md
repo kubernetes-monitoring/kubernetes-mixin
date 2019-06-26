@@ -160,8 +160,10 @@ kubernetes {
     cadvisorSelector: 'job="kubernetes-cadvisor"',
     nodeExporterSelector: 'job="kubernetes-node-exporter"',
     kubeletSelector: 'job="kubernetes-kubelet"',
-    grafanaK8s.dashboardNamePrefix: 'Mixin / ',
-    grafanaK8s.dashboardTags: ['kubernetes', 'infrastucture'],
+    grafanaK8s+:: {
+      dashboardNamePrefix: 'Mixin / ',
+      dashboardTags: ['kubernetes', 'infrastucture'],
+    },
   },
 }
 ```
