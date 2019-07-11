@@ -148,6 +148,37 @@
             },
           }
           for quantile in ['0.99', '0.9', '0.5']
+        ] + [
+          {
+            record: 'code:apiserver_request_count:rate:sum',
+            expr: |||
+              sum(
+                rate(
+                  apiserver_request_count{%(kubeApiserverSelector)s}[5m]
+                )
+              ) by (code)
+            ||| % $._config,
+          },
+          {
+            record: 'code_ratio:apiserver_request_count',
+            expr: |||
+              (
+                (
+                  sum_over_time(
+                    (sum(code:apiserver_request_count:rate:sum))[%(lookbackPeriod)s:1s]
+                  ) -
+                  sum_over_time(
+                    (sum(code:apiserver_request_count:rate:sum{code=~'5.*'}))[%(lookbackPeriod)s:1s]
+                  )
+                ) /
+                sum_over_time(
+                  (sum(code:apiserver_request_count:rate:sum))[%(lookbackPeriod)s:1s]
+                )
+              ) OR (
+                absent(code:apiserver_request_count:rate:sum{code=~'5.*'} == 0)
+              )
+            ||| % $._config,
+          },
         ],
       },
       {

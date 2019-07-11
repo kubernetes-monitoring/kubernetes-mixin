@@ -79,6 +79,9 @@
     // prediction
     volumeFullPredictionSampleTime: '6h',
 
+    // The lookback period controls recording rules that aggregate data over time,
+    // such as code_ratio:apiserver_request_count
+    lookbackPeriod: '3d',
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
