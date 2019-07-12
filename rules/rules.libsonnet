@@ -155,26 +155,28 @@
               sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) by (code)
             ||| % $._config,
           },
+        ] + [
           {
-            record: 'code_ratio:apiserver_request_count',
+            record: 'code_ratio:apiserver_request_count:%s' % duration,
             expr: |||
               (
                 (
                   sum_over_time(
-                    (sum(code:apiserver_request_count:rate:sum))[%(lookbackPeriod)s:1s]
+                    (sum(code:apiserver_request_count:rate:sum))[%(duration)s:1s]
                   ) -
                   sum_over_time(
-                    (sum(code:apiserver_request_count:rate:sum{code=~'5.*'}))[%(lookbackPeriod)s:1s]
+                    (sum(code:apiserver_request_count:rate:sum{code=~'5.*'}))[%(duration)s:1s]
                   )
                 ) /
                 sum_over_time(
-                  (sum(code:apiserver_request_count:rate:sum))[%(lookbackPeriod)s:1s]
+                  (sum(code:apiserver_request_count:rate:sum))[%(duration)s:1s]
                 )
               ) OR (
                 absent(code:apiserver_request_count:rate:sum{code=~'5.*'})
               )
-            ||| % $._config,
-          },
+            ||| % ({ duration: duration } + $._config),
+          }
+          for duration in [ '1d', '3d', '7d', '14d']
         ],
       },
       {
