@@ -152,11 +152,7 @@
           {
             record: 'code:apiserver_request_count:rate:sum',
             expr: |||
-              sum(
-                rate(
-                  apiserver_request_count{%(kubeApiserverSelector)s}[5m]
-                )
-              ) by (code)
+              sum(rate(apiserver_request_count{%(kubeApiserverSelector)s}[5m])) by (code)
             ||| % $._config,
           },
           {
