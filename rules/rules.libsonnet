@@ -161,18 +161,12 @@
             expr: |||
               (
                 (
-                  sum_over_time(
-                    (sum(code:apiserver_request_count:rate:sum))[%(duration)s:1s]
-                  ) -
-                  sum_over_time(
-                    (sum(code:apiserver_request_count:rate:sum{code=~'5.*'}))[%(duration)s:1s]
-                  )
+                  sum(sum_over_time(code:apiserver_request_count:rate:sum[%(duration)s])) -
+                  sum(sum_over_time(code:apiserver_request_count:rate:sum{code=~'5.*'}[%(duration)s]))
                 ) /
-                sum_over_time(
-                  (sum(code:apiserver_request_count:rate:sum))[%(duration)s:1s]
-                )
+                sum(sum_over_time(code:apiserver_request_count:rate:sum[%(duration)s]))
               ) OR (
-                absent(code:apiserver_request_count:rate:sum{code=~'5.*'})
+                absent(code:apiserver_request_count:rate:sum{code=~'5.*'} == 0)
               )
             ||| % ({ duration: duration } + $._config),
           }
