@@ -171,7 +171,7 @@
                   (sum(code:apiserver_request_count:rate:sum))[%(lookbackPeriod)s:1s]
                 )
               ) OR (
-                absent(code:apiserver_request_count:rate:sum{code=~'5.*'} == 0)
+                absent(code:apiserver_request_count:rate:sum{code=~'5.*'})
               )
             ||| % $._config,
           },
