@@ -6,15 +6,18 @@
         rules: [
           {
             expr: |||
-              round(increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[60m])) >= 5
+              (increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[20m]) > 5)
+              * on (container, pod, namespace)
+              (kube_pod_container_status_last_terminated_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, reason!="Completed"} == 1)
+              > 0
             ||| % $._config,
             labels: {
               severity: 'critical',
             },
             annotations: {
-              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) has been restarting {{ printf "%.2f" $value }} times in less than 60 minutes',
+              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) has been restarting {{ printf "%.2f" $value }} times in less than 20 minutes',
             },
-            'for': '30m',
+            'for': '20m',
             alert: 'KubePodCrashLooping',
           },
           {
