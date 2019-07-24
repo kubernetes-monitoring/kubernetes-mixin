@@ -52,6 +52,18 @@
               message: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.',
             },
           },
+          {
+            alert: 'KubePodIsUsingTooMuchEphemeralStorage',
+            expr: |||
+              container_fs_usage_bytes{%(cadvisorSelector)s,pod!=""} / container_fs_limit_bytes{%(cadvisorSelector)s,pod!=""} > 0.2
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'A pod {{ $labels.pod }} is using 20% of node ephemeral storage.',
+            },
+          },
         ],
       },
     ],
