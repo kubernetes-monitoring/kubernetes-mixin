@@ -44,5 +44,8 @@ local prometheus = grafana.prometheus;
           fillColor: 'rgba(31, 118, 189, 0.18)',
         },
       },
+      withFormat(format):: self {
+        format: format,
+      },
     },
 }

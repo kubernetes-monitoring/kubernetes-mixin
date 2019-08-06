@@ -1,3 +1,4 @@
+(import 'control-plane-status.libsonnet') +
 (import 'node.libsonnet') +
 (import 'persistentvolumesusage.libsonnet') +
 (import 'pods.libsonnet') +
