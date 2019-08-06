@@ -5,7 +5,7 @@
     kubeletSelector: 'job="kubelet"',
     kubeStateMetricsSelector: 'job="kube-state-metrics"',
     nodeExporterSelector: 'job="node-exporter"',
-    notKubeDnsSelector: 'job!="kube-dns"',
+    notKubeDnsCoreDnsSelector: 'job!~"kube-dns|coredns"',
     kubeSchedulerSelector: 'job="kube-scheduler"',
     kubeControllerManagerSelector: 'job="kube-controller-manager"',
     kubeApiserverSelector: 'job="kube-apiserver"',
