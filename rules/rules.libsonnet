@@ -28,16 +28,6 @@
             ||| % $._config,
           },
           {
-            record: 'namespace:container_cpu_usage_seconds_total:sum_rate',
-            expr: |||
-              sum by (namespace, label_name) (
-                  sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (namespace, pod)
-                * on (namespace, pod)
-                  group_left(label_name) kube_pod_labels{%(kubeStateMetricsSelector)s}
-              )
-            ||| % $._config,
-          },
-          {
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
               sum by (namespace, label_name) (
