@@ -123,7 +123,7 @@ local gauge = promgrafonnet.gauge;
           ],
           yaxes: [
             self.yaxe(format='bytes'),
-            self.yaxe(format='ms'),
+            self.yaxe(format='s'),
           ],
         };
 
