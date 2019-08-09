@@ -14,7 +14,7 @@
             annotations: {
               message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.',
             },
-            'for': '1h',
+            'for': '15m',
             alert: 'KubePodCrashLooping',
           },
           {
@@ -25,9 +25,9 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than an hour.',
+              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes.',
             },
-            'for': '1h',
+            'for': '15m',
             alert: 'KubePodNotReady',
           },
           {
@@ -55,9 +55,9 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than an hour.',
+              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 15 minutes.',
             },
-            'for': '1h',
+            'for': '15m',
             alert: 'KubeDeploymentReplicasMismatch',
           },
           {
@@ -187,7 +187,7 @@
             expr: |||
               kube_job_status_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
             ||| % $._config,
-            'for': '1h',
+            'for': '15m',
             labels: {
               severity: 'warning',
             },
