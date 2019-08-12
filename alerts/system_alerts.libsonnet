@@ -16,7 +16,7 @@ local utils = import 'utils.libsonnet';
             annotations: {
               message: '{{ $labels.node }} has been unready for more than an hour.',
             },
-            'for': '1h',
+            'for': '15m',
             alert: 'KubeNodeNotReady',
           },
           {
@@ -24,7 +24,7 @@ local utils = import 'utils.libsonnet';
             expr: |||
               count(count by (gitVersion) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"gitVersion","$1","gitVersion","(v[0-9]*.[0-9]*.[0-9]*).*"))) > 1
             ||| % $._config,
-            'for': '1h',
+            'for': '15m',
             labels: {
               severity: 'warning',
             },
