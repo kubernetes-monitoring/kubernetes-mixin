@@ -195,6 +195,21 @@
               message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.',
             },
           },
+          {
+            expr: |||
+              kube_hpa_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                ==
+              kube_hpa_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'Hpa {{ $labels.namespace }}/{{ $labels.hpa }} has been running at max replicas for longer than 15 minutes.',
+            },
+            'for': '15m',
+            alert: 'KubeHpaMaxedOut',
+          },
         ],
       },
     ],
