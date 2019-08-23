@@ -30,8 +30,8 @@ local gauge = promgrafonnet.gauge;
           datasource='prometheus',  // TODO why doesn't $datasource work?
           format='time_series',
           height=9,
-          span=5,
-          min_span=5,
+          span=12,
+          min_span=12,
           decimals=0,
           valueName='current'
         ).addTarget(target) + {
@@ -238,14 +238,14 @@ local gauge = promgrafonnet.gauge;
           gaugeTitle='Current Rate of Bytes Received',
           gaugeQuery='sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution]))'
         ),
-        gridPos={ h: 9, w: 5, x: 3, y: 1 }
+        gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Transmitted',
           gaugeQuery='sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution]))'
         ),
-        gridPos={ h: 9, w: 5, x: 16, y: 1 }
+        gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
       .addPanel(bandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 10 })
       .addPanel(
