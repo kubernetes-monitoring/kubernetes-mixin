@@ -85,6 +85,7 @@ local gauge = promgrafonnet.gauge;
           legend_avg=true,
           legend_alignAsTable=true,
           legend_rightSide=true,
+          nullPointMode='connected'
         ).addTarget(target) + {
           legend+: {
             hideEmpty: true,

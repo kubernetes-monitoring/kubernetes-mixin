@@ -97,7 +97,8 @@ local gauge = promgrafonnet.gauge;
           x_axis_values='total',
           lines=true,
           stack=true,
-          legend_show=true
+          legend_show=true,
+          nullPointMode='connected'
         ).addTarget(target) + {
           legend+: {
             hideEmpty: true,
