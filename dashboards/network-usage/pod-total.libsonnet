@@ -30,8 +30,8 @@ local gauge = promgrafonnet.gauge;
           datasource='prometheus',  // TODO why doesn't $datasource work?
           format='time_series',
           height=9,
-          span=5,
-          min_span=5,
+          span=12,
+          min_span=12,
           decimals=0,
           valueName='current'
         ).addTarget(target) + {
@@ -46,7 +46,7 @@ local gauge = promgrafonnet.gauge;
               defaults: {
                 max: 10000000000,  // 10GBs
                 min: 0,
-                title: '$namespace',
+                title: '$namespace: $pod',
                 unit: 'Bps',
               },
               mappings: [],
@@ -125,6 +125,25 @@ local gauge = promgrafonnet.gauge;
           auto_count: 30,
           auto_min: '10s',
           definition: 'label_values(container_network_receive_packets_total, namespace)',
+          skipUrlSync: false,
+        };
+
+      local podTemplate =
+        template.new(
+          name='pod',
+          datasource='prometheus',
+          query='label_values(container_network_receive_packets_total{namespace=~"$namespace"}, pod)',
+          allValues='.+',
+          current='',
+          hide='',
+          refresh=1,
+          includeAll=false,
+          sort=1
+        ) + {
+          auto: false,
+          auto_count: 30,
+          auto_min: '10s',
+          definition: 'label_values(container_network_receive_packets_total{namespace=~"$namespace"}, pod)',
           skipUrlSync: false,
         };
 
@@ -227,7 +246,8 @@ local gauge = promgrafonnet.gauge;
         time_from='now-1h',
         time_to='now',
       )
-      #.addTemplate(namespaceTemplate)
+      .addTemplate(namespaceTemplate)
+      .addTemplate(podTemplate)
       .addTemplate(resolutionTemplate)
       .addTemplate(intervalTemplate)
       .addAnnotation(annotation.default)
@@ -235,29 +255,29 @@ local gauge = promgrafonnet.gauge;
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Received',
-          gaugeQuery='sum(irate(container_network_receive_bytes_total[$interval:$resolution]))'
+          gaugeQuery='sum(irate(container_network_receive_bytes_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution]))'
         ),
-        gridPos={ h: 9, w: 5, x: 3, y: 1 }
+        gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Transmitted',
-          gaugeQuery='sum(irate(container_network_transmit_bytes_total[$interval:$resolution]))'
+          gaugeQuery='sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution]))'
         ),
-        gridPos={ h: 9, w: 5, x: 16, y: 1 }
+        gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
       .addPanel(bandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 10 })
       .addPanel(
         newGraphPanel(
           graphTitle='Receive Bandwidth',
-          graphQuery='sum(irate(container_network_receive_bytes_total[$interval:$resolution])) by (pod)'
+          graphQuery='sum(irate(container_network_receive_bytes_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution])) by (pod)'
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 11 }
       )
       .addPanel(
         newGraphPanel(
           graphTitle='Transmit Bandwidth',
-          graphQuery='sum(irate(container_network_transmit_bytes_total[$interval:$resolution])) by (pod)'
+          graphQuery='sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution])) by (pod)'
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 11 }
       )
@@ -266,7 +286,7 @@ local gauge = promgrafonnet.gauge;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Received Packets',
-            graphQuery='sum(irate(container_network_receive_packets_total[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_receive_packets_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 0, y: 21 }
@@ -274,7 +294,7 @@ local gauge = promgrafonnet.gauge;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets',
-            graphQuery='sum(irate(container_network_transmit_packets_total[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_transmit_packets_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 12, y: 21 }
@@ -286,7 +306,7 @@ local gauge = promgrafonnet.gauge;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Received Packets Dropped',
-            graphQuery='sum(irate(container_network_receive_packets_dropped_total[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 0, y: 32 }
@@ -294,7 +314,7 @@ local gauge = promgrafonnet.gauge;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets Dropped',
-            graphQuery='sum(irate(container_network_transmit_packets_dropped_total[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace", pod=~"$pod"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 12, y: 32 }
