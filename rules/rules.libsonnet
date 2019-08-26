@@ -28,16 +28,6 @@
             ||| % $._config,
           },
           {
-            record: 'namespace:container_memory_usage_bytes:sum',
-            expr: |||
-              sum by (namespace, label_name) (
-                  sum(container_memory_usage_bytes{%(cadvisorSelector)s,image!="", container!="POD"}) by (pod, namespace)
-                * on (namespace, pod)
-                  group_left(label_name) kube_pod_labels{%(kubeStateMetricsSelector)s}
-              )
-            ||| % $._config,
-          },
-          {
             record: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum',
             expr: |||
               sum by (namespace, label_name) (
