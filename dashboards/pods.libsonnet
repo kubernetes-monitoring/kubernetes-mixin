@@ -38,7 +38,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legendFormat='Limit: {{ container }}',
         ))
         .addTarget(prometheus.target(
-          'sum by(container) (container_memory_cache{%(cadvisorSelector)s, namespace="$namespace", pod=~"$pod", container=~"$container", container!="POD"})' % $._config,
+          'sum by(container) (container_memory_cache{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod", container=~"$container", container!="POD"})' % $._config,
           legendFormat='Cache: {{ container }}',
         ))
       );
