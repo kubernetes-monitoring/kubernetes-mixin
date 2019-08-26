@@ -79,7 +79,6 @@
     // prediction
     volumeFullPredictionSampleTime: '6h',
 
-
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
     clusterLabel: 'cluster',
