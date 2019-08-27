@@ -208,7 +208,7 @@
               message: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has not matched the desired number of replicas for longer than 15 minutes.',
             },
             'for': '15m',
-            alert: 'KubeHpaMaxedOut',
+            alert: 'KubeHpaReplicasMismatch',
           },
           {
             expr: |||
