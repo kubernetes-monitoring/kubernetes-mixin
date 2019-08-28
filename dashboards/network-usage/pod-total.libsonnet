@@ -27,7 +27,7 @@ local gauge = promgrafonnet.gauge;
 
         singlestat.new(
           title=gaugeTitle,
-          datasource='prometheus',  // TODO why doesn't $datasource work?
+          datasource='prometheus',
           format='time_series',
           height=9,
           span=12,
@@ -86,7 +86,7 @@ local gauge = promgrafonnet.gauge;
         graphPanel.new(
           title=graphTitle,
           span=12,
-          datasource='prometheus',  // TODO why doesn't $datasource work?
+          datasource='prometheus',
           fill=2,
           linewidth=2,
           min_span=12,

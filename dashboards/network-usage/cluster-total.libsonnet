@@ -28,7 +28,7 @@ local gauge = promgrafonnet.gauge;
 
         piechart.new(
           title=pieChartTitle,
-          datasource='prometheus',  // TODO why doesn't $datasource work?
+          datasource='prometheus',
           pieType='donut',
         ).addTarget(target) + {
           breakpoint: '50%',
@@ -66,7 +66,7 @@ local gauge = promgrafonnet.gauge;
         graphPanel.new(
           title=graphTitle,
           span=24,
-          datasource='prometheus',  // TODO why doesn't $datasource work?
+          datasource='prometheus',
           fill=2,
           linewidth=2,
           min_span=24,
