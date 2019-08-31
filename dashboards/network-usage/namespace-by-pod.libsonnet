@@ -236,7 +236,7 @@ local gauge = promgrafonnet.gauge;
           spaceLength: 10,
           sort: {
             col: 0,
-            desc: true,
+            desc: false,
           },
           targets: targets,
         };

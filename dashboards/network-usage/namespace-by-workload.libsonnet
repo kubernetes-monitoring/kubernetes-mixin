@@ -221,7 +221,7 @@ local gauge = promgrafonnet.gauge;
         ) + {
 
           fill: 1,
-          fontSize: '100%',
+          fontSize: '90%',
           lines: true,
           linewidth: 1,
           nullPointMode: 'null as zero',
@@ -231,7 +231,7 @@ local gauge = promgrafonnet.gauge;
           spaceLength: 10,
           sort: {
             col: 0,
-            desc: true,
+            desc: false,
           },
           targets: targets,
         };
@@ -422,6 +422,11 @@ local gauge = promgrafonnet.gauge;
             |||,
             |||
               sort_desc(avg(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
+              * on (namespace,pod)
+              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+            |||,
+            |||
+              sort_desc(avg(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
             |||,
