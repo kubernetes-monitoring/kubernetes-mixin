@@ -4,6 +4,7 @@ local row = grafana.row;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 local graphPanel = grafana.graphPanel;
+local tablePanel = grafana.tablePanel;
 local annotation = grafana.annotation;
 local singlestat = grafana.singlestat;
 local piechart = grafana.pieChartPanel;
@@ -15,6 +16,34 @@ local gauge = promgrafonnet.gauge;
   grafanaDashboards+:: {
 
     'cluster-total.json':
+
+      local newStyle(
+        alias,
+        colorMode=null,
+        colors=[],
+        dateFormat='YYYY-MM-DD HH:mm:ss',
+        decimals=2,
+        link=false,
+        linkTooltip='Drill down',
+        linkUrl='',
+        pattern='',
+        thresholds=[],
+        type='number',
+        unit='short'
+            ) = {
+        alias: alias,
+        colorMode: colorMode,
+        colors: colors,
+        dateFormat: dateFormat,
+        decimals: decimals,
+        link: link,
+        linkTooltip: linkTooltip,
+        linkUrl: linkUrl,
+        pattern: pattern,
+        thresholds: thresholds,
+        type: type,
+        unit: unit,
+      };
 
       local newPieChartPanel(pieChartTitle, pieChartQuery) =
         local target =
@@ -95,6 +124,124 @@ local gauge = promgrafonnet.gauge;
           tooltip+: {
             sort: 2,
           },
+        };
+
+      local newTablePanel(tableTitle, colQueries) =
+        local buildTarget(index, colQuery) =
+          prometheus.target(
+            colQuery,
+            format='table',
+            instant=true,
+          ) + {
+            legendFormat: '',
+            step: 10,
+            refId: std.char(65 + index),
+          };
+
+        local targets = std.mapWithIndex(buildTarget, colQueries);
+
+        tablePanel.new(
+          title=tableTitle,
+          span=24,
+          min_span=24,
+          datasource='prometheus',
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Time',
+            type='hidden',
+            pattern='Time',
+          )
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Current Bandwidth Received',
+            pattern='Value #A',
+            unit='Bps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Current Bandwidth Transmitted',
+            pattern='Value #B',
+            unit='Bps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Average Bandwidth Received',
+            pattern='Value #C',
+            unit='Bps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Average Bandwidth Transmitted',
+            pattern='Value #D',
+            unit='Bps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Received Packets',
+            pattern='Value #E',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Transmitted Packets',
+            pattern='Value #F',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Received Packets Dropped',
+            pattern='Value #G',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Transmitted Packets Dropped',
+            pattern='Value #H',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Namespace',
+            pattern='namespace',
+            link=true,
+            linkUrl='d/8b7a8b326d7a6f1f04244066368c67af/kubernetes-networking-namespace-pods?orgId=1&refresh=30s&var-namespace=$__cell',
+          ),
+        ) + {
+
+          fill: 1,
+          fontSize: '90%',
+          lines: true,
+          linewidth: 1,
+          nullPointMode: 'null as zero',
+          renderer: 'flot',
+          scroll: true,
+          showHeader: true,
+          spaceLength: 10,
+          sort: {
+            col: 0,
+            desc: false,
+          },
+          targets: targets,
         };
 
       local resolutionTemplate =
@@ -196,7 +343,6 @@ local gauge = promgrafonnet.gauge;
 
       dashboard.new(
         title='%(dashboardNamePrefix)sNetworking / Cluster' % $._config.grafanaK8s,
-        //title='cluster-total',
         editable=true,
         schemaVersion=18,
         refresh='30s',
@@ -222,6 +368,22 @@ local gauge = promgrafonnet.gauge;
           pieChartQuery='sort_desc(sum(irate(container_network_transmit_bytes_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
+      )
+      .addPanel(
+        newTablePanel(
+          tableTitle='Current Status',
+          colQueries=[
+            'sort_desc(sum(irate(container_network_receive_bytes_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(sum(irate(container_network_transmit_bytes_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(avg(irate(container_network_receive_bytes_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(avg(irate(container_network_transmit_bytes_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(sum(irate(container_network_receive_packets_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(sum(irate(container_network_transmit_packets_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(sum(irate(container_network_receive_packets_dropped_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+            'sort_desc(sum(irate(container_network_transmit_packets_dropped_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
+          ]
+        ),
+        gridPos={ h: 9, w: 24, x: 0, y: 10 }
       )
       .addPanel(
         averageBandwidthRow
