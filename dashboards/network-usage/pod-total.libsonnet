@@ -240,7 +240,6 @@ local gauge = promgrafonnet.gauge;
 
       dashboard.new(
         title='%(dashboardNamePrefix)sNetworking / Pod' % $._config.grafanaK8s,
-        //title='pod-total',
         editable=true,
         schemaVersion=18,
         refresh='30s',

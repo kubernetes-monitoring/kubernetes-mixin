@@ -352,7 +352,7 @@ local gauge = promgrafonnet.gauge;
         );
 
       dashboard.new(
-        '%(dashboardNamePrefix)sNetworking / Namespace (Pods)' % $._config.grafanaK8s,
+        title='%(dashboardNamePrefix)sNetworking / Namespace (Pods)' % $._config.grafanaK8s,
         editable=true,
         schemaVersion=18,
         refresh='30s',
