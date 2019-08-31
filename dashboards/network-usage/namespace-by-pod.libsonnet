@@ -4,6 +4,7 @@ local row = grafana.row;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 local graphPanel = grafana.graphPanel;
+local tablePanel = grafana.tablePanel;
 local annotation = grafana.annotation;
 local singlestat = grafana.singlestat;
 local piechart = grafana.pieChartPanel;
@@ -16,10 +17,38 @@ local gauge = promgrafonnet.gauge;
 
     'namespace-by-pod.json':
 
+      local newStyle(
+        alias,
+        colorMode=null,
+        colors=[],
+        dateFormat='YYYY-MM-DD HH:mm:ss',
+        decimals=2,
+        link=false,
+        linkTooltip='Drill down',
+        linkUrl='',
+        pattern='',
+        thresholds=[],
+        type='number',
+        unit='short'
+            ) = {
+        alias: alias,
+        colorMode: colorMode,
+        colors: colors,
+        dateFormat: dateFormat,
+        decimals: decimals,
+        link: link,
+        linkTooltip: linkTooltip,
+        linkUrl: linkUrl,
+        pattern: pattern,
+        thresholds: thresholds,
+        type: type,
+        unit: unit,
+      };
+
       local newGaugePanel(gaugeTitle, gaugeQuery) =
         local target =
           prometheus.target(
-            gaugeQuery
+            gaugeQuery,
           ) + {
             instant: null,
             intervalFactor: 1,
@@ -109,6 +138,109 @@ local gauge = promgrafonnet.gauge;
             sort: 2,
           },
         };
+
+      local newTablePanel(tableTitle, colQueries) =
+        local buildTarget(index, colQuery) =
+          prometheus.target(
+            colQuery,
+            format='table',
+            instant=true,
+          ) + {
+            legendFormat: '',
+            step: 10,
+            refId: std.char(65 + index),
+          };
+
+        local targets = std.mapWithIndex(buildTarget, colQueries);
+
+        tablePanel.new(
+          title=tableTitle,
+          span=24,
+          min_span=24,
+          datasource='prometheus',
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Time',
+            type='hidden',
+            pattern='Time',
+          )
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Bandwidth Received',
+            pattern='Value #A',
+            unit='Bps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Bandwidth Transmitted',
+            pattern='Value #B',
+            unit='Bps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Received Packets',
+            pattern='Value #C',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Transmitted Packets',
+            pattern='Value #D',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Received Packets Dropped',
+            pattern='Value #E',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Rate of Transmitted Packets Dropped',
+            pattern='Value #F',
+            unit='pps',
+          ),
+        )
+        .addColumn(
+          field='',
+          style=newStyle(
+            alias='Pod',
+            pattern='pod',
+            link=true,
+            linkUrl='d/7a18067ce943a40ae25454675c19ff5c/kubernetes-networking-pod?orgId=1&refresh=30s&var-namespace=$namespace&var-pod=$__cell'
+          ),
+        ) + {
+
+          fill: 1,
+          fontSize: '100%',
+          lines: true,
+          linewidth: 1,
+          nullPointMode: 'null as zero',
+          renderer: 'flot',
+          scroll: true,
+          showHeader: true,
+          spaceLength: 10,
+          sort: {
+            col: 0,
+            desc: true,
+          },
+          targets: targets,
+        };
+
 
       local namespaceTemplate =
         template.new(
@@ -247,20 +379,34 @@ local gauge = promgrafonnet.gauge;
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
-      .addPanel(bandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 10 })
+      .addPanel(
+        newTablePanel(
+          tableTitle='Current Status',
+          colQueries=[
+            'sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            'sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            'sum(irate(container_network_receive_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            'sum(irate(container_network_transmit_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            'sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            'sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+          ]
+        ),
+        gridPos={ h: 9, w: 24, x: 0, y: 10 }
+      )
+      .addPanel(bandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 19 })
       .addPanel(
         newGraphPanel(
           graphTitle='Receive Bandwidth',
           graphQuery='sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)'
         ),
-        gridPos={ h: 9, w: 12, x: 0, y: 11 }
+        gridPos={ h: 9, w: 12, x: 0, y: 20 }
       )
       .addPanel(
         newGraphPanel(
           graphTitle='Transmit Bandwidth',
           graphQuery='sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)'
         ),
-        gridPos={ h: 9, w: 12, x: 12, y: 11 }
+        gridPos={ h: 9, w: 12, x: 12, y: 20 }
       )
       .addPanel(
         packetRow
@@ -270,7 +416,7 @@ local gauge = promgrafonnet.gauge;
             graphQuery='sum(irate(container_network_receive_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
-          gridPos={ h: 10, w: 12, x: 0, y: 21 }
+          gridPos={ h: 10, w: 12, x: 0, y: 30 }
         )
         .addPanel(
           newGraphPanel(
@@ -278,9 +424,9 @@ local gauge = promgrafonnet.gauge;
             graphQuery='sum(irate(container_network_transmit_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
-          gridPos={ h: 10, w: 12, x: 12, y: 21 }
+          gridPos={ h: 10, w: 12, x: 12, y: 30 }
         ),
-        gridPos={ h: 1, w: 24, x: 0, y: 20 }
+        gridPos={ h: 1, w: 24, x: 0, y: 29 }
       )
       .addPanel(
         errorRow
@@ -290,7 +436,7 @@ local gauge = promgrafonnet.gauge;
             graphQuery='sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
-          gridPos={ h: 10, w: 12, x: 0, y: 32 }
+          gridPos={ h: 10, w: 12, x: 0, y: 40 }
         )
         .addPanel(
           newGraphPanel(
@@ -298,9 +444,9 @@ local gauge = promgrafonnet.gauge;
             graphQuery='sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
             graphFormat='pps'
           ),
-          gridPos={ h: 10, w: 12, x: 12, y: 32 }
+          gridPos={ h: 10, w: 12, x: 12, y: 40 }
         ),
-        gridPos={ h: 1, w: 24, x: 0, y: 21 }
+        gridPos={ h: 1, w: 24, x: 0, y: 30 }
       ),
   },
 }
