@@ -479,7 +479,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
             'Value #F': { alias: 'Memory Usage (RSS)', unit: 'bytes' },
             'Value #G': { alias: 'Memory Usage (Cache)', unit: 'bytes' },
-            'Value #H': { alias: 'Memory Usage (Swap', unit: 'bytes' },
+            'Value #H': { alias: 'Memory Usage (Swap)', unit: 'bytes' },
           })
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags },
