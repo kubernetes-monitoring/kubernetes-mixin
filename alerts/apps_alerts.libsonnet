@@ -195,6 +195,38 @@
               message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.',
             },
           },
+          {
+            expr: |||
+              (kube_hpa_status_desired_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                !=
+              kube_hpa_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s})
+                and
+              changes(kube_hpa_status_current_replicas[15m]) == 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has not matched the desired number of replicas for longer than 15 minutes.',
+            },
+            'for': '15m',
+            alert: 'KubeHpaReplicasMismatch',
+          },
+          {
+            expr: |||
+              kube_hpa_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                ==
+              kube_hpa_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has been running at max replicas for longer than 15 minutes.',
+            },
+            'for': '15m',
+            alert: 'KubeHpaMaxedOut',
+          },
         ],
       },
     ],
