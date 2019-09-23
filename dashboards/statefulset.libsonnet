@@ -136,7 +136,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         template.new(
           'namespace',
           '$datasource',
-          'label_values(kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s}, %(clusterLabel)s="$cluster", namespace)' % $._config,
+          'label_values(kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster"}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
         )
