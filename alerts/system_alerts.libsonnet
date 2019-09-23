@@ -14,7 +14,7 @@ local utils = import 'utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $labels.node }} has been unready for more than an hour.',
+              message: '{{ $labels.node }} has been unready for more than 15 minutes.',
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
