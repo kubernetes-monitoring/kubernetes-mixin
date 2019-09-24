@@ -4,6 +4,32 @@ local template = grafana.template;
 
 {
   grafanaDashboards+:: {
+
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='prometheus',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
+
     'k8s-resources-cluster.json':
       local tableStyles = {
         namespace: {
@@ -80,31 +106,6 @@ local template = grafana.template;
           unit: 'pps',
         },
       };
-
-      local intervalTemplate =
-        template.new(
-          name='interval',
-          datasource='prometheus',
-          query='4h',
-          current='5m',
-          hide=2,
-          refresh=2,
-          includeAll=false,
-          sort=1
-        ) + {
-          auto: false,
-          auto_count: 30,
-          auto_min: '10s',
-          skipUrlSync: false,
-          type: 'interval',
-          options: [
-            {
-              selected: true,
-              text: '4h',
-              value: '4h',
-            },
-          ],
-        };
 
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Cluster' % $._config.grafanaK8s,
@@ -289,6 +290,42 @@ local template = grafana.template;
         },
       };
 
+      local networkColumns = [
+        'sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config,
+        'sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config,
+        'sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config,
+        'sum(irate(container_network_transmit_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config,
+        'sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config,
+        'sum(irate(container_network_transmit_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config,
+      ];
+
+      local networkTableStyles = {
+        'Value #A': {
+          alias: 'Current Bandwidth Received',
+          unit: 'Bps',
+        },
+        'Value #B': {
+          alias: 'Current Bandwidth Transmitted',
+          unit: 'Bps',
+        },
+        'Value #C': {
+          alias: 'Rate of Received Packets',
+          unit: 'pps',
+        },
+        'Value #D': {
+          alias: 'Rate of Transmitted Packets',
+          unit: 'pps',
+        },
+        'Value #E': {
+          alias: 'Rate of Received Packets Dropped',
+          unit: 'pps',
+        },
+        'Value #F': {
+          alias: 'Rate of Transmitted Packets Dropped',
+          unit: 'pps',
+        },
+      };
+
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
@@ -355,7 +392,71 @@ local template = grafana.template;
             'Value #H': { alias: 'Memory Usage (Swap)', unit: 'bytes' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags },
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Current Network Usage') +
+          g.tablePanel(
+            networkColumns,
+            networkTableStyles
+          ),
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Receive Bandwidth') +
+          g.queryPanel('sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Transmit Bandwidth') +
+          g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Received Packets') +
+          g.queryPanel('sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Transmitted Packets') +
+          g.queryPanel('sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Received Packets Dropped') +
+          g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Transmitted Packets Dropped') +
+          g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])) by (pod)' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
 
     'k8s-resources-workloads-namespace.json':
       local tableStyles = {
