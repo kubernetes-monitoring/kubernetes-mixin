@@ -1,4 +1,6 @@
 local g = import 'grafana-builder/grafana.libsonnet';
+local grafana = import 'grafonnet/grafana.libsonnet';
+local template = grafana.template;
 
 {
   grafanaDashboards+:: {
@@ -27,6 +29,82 @@ local g = import 'grafana-builder/grafana.libsonnet';
         'count(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
         'count(avg(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (workload, namespace)) by (namespace)' % $._config,
       ];
+
+      local networkColumns = [
+        'sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'avg(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'avg(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'sum(irate(container_network_transmit_packets_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+        'sum(irate(container_network_transmit_packets_dropped_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
+      ];
+
+      local networkTableStyles = {
+        namespace: {
+          alias: 'Namespace',
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
+          linkTooltip: 'Drill down to pods',
+        },
+        'Value #A': {
+          alias: 'Current Bandwidth Received',
+          unit: 'Bps',
+        },
+        'Value #B': {
+          alias: 'Current Bandwidth Transmitted',
+          unit: 'Bps',
+        },
+        'Value #C': {
+          alias: 'Average Bandwidth Received',
+          unit: 'Bps',
+        },
+        'Value #D': {
+          alias: 'Average Bandwidth Transmitted',
+          unit: 'Bps',
+        },
+        'Value #E': {
+          alias: 'Rate of Received Packets',
+          unit: 'pps',
+        },
+        'Value #F': {
+          alias: 'Rate of Transmitted Packets',
+          unit: 'pps',
+        },
+        'Value #G': {
+          alias: 'Rate of Received Packets Dropped',
+          unit: 'pps',
+        },
+        'Value #H': {
+          alias: 'Rate of Transmitted Packets Dropped',
+          unit: 'pps',
+        },
+      };
+
+      local intervalTemplate =
+        template.new(
+          name='interval',
+          datasource='prometheus',
+          query='4h',
+          current='5m',
+          hide=2,
+          refresh=2,
+          includeAll=false,
+          sort=1
+        ) + {
+          auto: false,
+          auto_count: 30,
+          auto_min: '10s',
+          skipUrlSync: false,
+          type: 'interval',
+          options: [
+            {
+              selected: true,
+              text: '4h',
+              value: '4h',
+            },
+          ],
+        };
 
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Cluster' % $._config.grafanaK8s,
@@ -119,7 +197,89 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'Value #G': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags },
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Current Network Usage') +
+          g.tablePanel(
+            networkColumns,
+            networkTableStyles
+          ),
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Average Rate of Bytes Received') +
+          g.queryPanel('avg(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Average Rate of Bytes Transmitted') +
+          g.queryPanel('avg(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Receive Bandwidth') +
+          g.queryPanel('sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Transmit Bandwidth') +
+          g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Received Packets') +
+          g.queryPanel('sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Transmitted Packets') +
+          g.queryPanel('sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Received Packets Dropped') +
+          g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Transmitted Packets Dropped') +
+          g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
 
     'k8s-resources-namespace.json':
       local tableStyles = {
