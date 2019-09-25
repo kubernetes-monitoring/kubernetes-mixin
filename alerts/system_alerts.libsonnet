@@ -67,14 +67,14 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeletTooManyPods',
             expr: |||
-              kubelet_running_pod_count{%(kubeletSelector)s} > %(kubeletPodLimit)s * 0.9
+              100 * max(max(kubelet_running_pod_count{%(kubeletSelector)s}) by(instance) * on(instance) group_left(node) kubelet_node_name{%(kubeletSelector)s}) by(node) / max(kube_node_status_capacity_pods{%(kubeStateMetricsSelector)s}) by(node) > 95
             ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubelet {{ $labels.instance }} is running {{ $value }} Pods, close to the limit of %d.' % $._config.kubeletPodLimit,
+              message: "Kubelet '{{ $labels.node }}' is running at {{ printf \"%.4g\" $value }}% of its Pod capacity.",
             },
           },
           {
