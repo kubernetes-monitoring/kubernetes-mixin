@@ -31,7 +31,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Cluster' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
-      ).addTemplate('cluster', 'node_cpu_seconds_total', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      ).addTemplate('cluster', ':kube_pod_info_node_count:', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addRow(
         (g.row('Headlines') +
          {
@@ -132,7 +132,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      ).addTemplate('cluster', ':kube_pod_info_node_count:', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addRow(
         g.row('CPU Usage')
@@ -241,7 +241,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      ).addTemplate('cluster', ':kube_pod_info_node_count:', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addRow(
         g.row('CPU Usage')
@@ -343,7 +343,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Workload' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workload.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      ).addTemplate('cluster', ':kube_pod_info_node_count:', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addTemplate('workload', 'mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}' % $._config, 'workload')
       .addTemplate('type', 'mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}' % $._config, 'workload_type')
@@ -413,7 +413,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Pod' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      ).addTemplate('cluster', ':kube_pod_info_node_count:', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addTemplate('pod', 'kube_pod_info{%(clusterLabel)s="$cluster", namespace="$namespace"}' % $._config, 'pod')
       .addRow(
