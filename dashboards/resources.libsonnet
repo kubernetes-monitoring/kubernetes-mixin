@@ -30,6 +30,24 @@ local template = grafana.template;
         ],
       },
 
+    local typeTemplate =
+      template.new(
+        name='type',
+        datasource='prometheus',
+        query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        current='deployment',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=0
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        definition: 'label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        skipUrlSync: false,
+      },
+
     'k8s-resources-cluster.json':
       local tableStyles = {
         namespace: {
@@ -59,8 +77,6 @@ local template = grafana.template;
       local networkColumns = [
         'sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
         'sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
-        'avg(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
-        'avg(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
         'sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
         'sum(irate(container_network_transmit_packets_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
         'sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config,
@@ -82,26 +98,18 @@ local template = grafana.template;
           unit: 'Bps',
         },
         'Value #C': {
-          alias: 'Average Bandwidth Received',
-          unit: 'Bps',
-        },
-        'Value #D': {
-          alias: 'Average Bandwidth Transmitted',
-          unit: 'Bps',
-        },
-        'Value #E': {
           alias: 'Rate of Received Packets',
           unit: 'pps',
         },
-        'Value #F': {
+        'Value #D': {
           alias: 'Rate of Transmitted Packets',
           unit: 'pps',
         },
-        'Value #G': {
+        'Value #E': {
           alias: 'Rate of Received Packets Dropped',
           unit: 'pps',
         },
-        'Value #H': {
+        'Value #F': {
           alias: 'Rate of Transmitted Packets Dropped',
           unit: 'pps',
         },
@@ -300,6 +308,11 @@ local template = grafana.template;
       ];
 
       local networkTableStyles = {
+        pod: {
+          alias: 'Pod',
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
+          linkTooltip: 'Drill down to pods',
+        },
         'Value #A': {
           alias: 'Current Bandwidth Received',
           unit: 'Bps',
@@ -469,6 +482,74 @@ local template = grafana.template;
         },
       };
 
+      local networkColumns = [
+        |||
+          (sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          * on (namespace,pod)
+          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+        ||| % $._config,
+        |||
+          (sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          * on (namespace,pod)
+          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+        ||| % $._config,
+        |||
+          (sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          * on (namespace,pod)
+          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+        ||| % $._config,
+        |||
+          (sum(irate(container_network_transmit_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          * on (namespace,pod)
+          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+        ||| % $._config,
+        |||
+          (sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          * on (namespace,pod)
+          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+        ||| % $._config,
+        |||
+          (sum(irate(container_network_transmit_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          * on (namespace,pod)
+          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+        ||| % $._config,
+      ];
+
+      local networkTableStyles = {
+        workload: {
+          alias: 'Workload',
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$type' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
+          linkTooltip: 'Drill down to pods',
+        },
+        workload_type: {
+          alias: 'Workload Type',
+        },
+        'Value #A': {
+          alias: 'Current Bandwidth Received',
+          unit: 'Bps',
+        },
+        'Value #B': {
+          alias: 'Current Bandwidth Transmitted',
+          unit: 'Bps',
+        },
+        'Value #C': {
+          alias: 'Rate of Received Packets',
+          unit: 'pps',
+        },
+        'Value #D': {
+          alias: 'Rate of Transmitted Packets',
+          unit: 'pps',
+        },
+        'Value #E': {
+          alias: 'Rate of Received Packets Dropped',
+          unit: 'pps',
+        },
+        'Value #F': {
+          alias: 'Rate of Transmitted Packets Dropped',
+          unit: 'pps',
+        },
+      };
+
       local cpuUsageQuery = |||
         sum(
           namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}
@@ -561,7 +642,121 @@ local template = grafana.template;
             'Value #F': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags },
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Current Network Usage') +
+          g.tablePanel(
+            networkColumns,
+            networkTableStyles
+          ),
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Average Rate of Bytes Received') +
+          g.queryPanel(|||
+            (avg(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Average Rate of Bytes Transmitted') +
+          g.queryPanel(|||
+            (avg(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Receive Bandwidth') +
+          g.queryPanel(|||
+            (sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Transmit Bandwidth') +
+          g.queryPanel(|||
+            (sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Received Packets') +
+          g.queryPanel(|||
+            (sum(irate(container_network_receive_packets_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Transmitted Packets') +
+          g.queryPanel(|||
+            (sum(irate(container_network_transmit_packets_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Received Packets Dropped') +
+          g.queryPanel(|||
+            (sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod)
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      )
+      .addRow(
+        g.row('Network')
+        .addPanel(
+          g.panel('Rate of Transmitted Packets Dropped') +
+          g.queryPanel(|||
+            (sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace"}[$interval])
+            * on (namespace,pod) 
+            group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
+          ||| % $._config, '{{workload}}') +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, typeTemplate] } },
 
     'k8s-resources-workload.json':
       local tableStyles = {
