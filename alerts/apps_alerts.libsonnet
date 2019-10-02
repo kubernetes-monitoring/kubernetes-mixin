@@ -118,13 +118,13 @@
             expr: |||
               kube_daemonset_status_number_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 /
-              kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} * 100 < 100
+              kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} < 1.00
             ||| % $._config,
             labels: {
               severity: 'critical',
             },
             annotations: {
-              message: 'Only {{ $value }}% of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.',
+              message: 'Only {{ $value | humanizePercentage }} of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.',
             },
             'for': '15m',
           },
