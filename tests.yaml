@@ -27,7 +27,7 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.56% free.'
+        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.562% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeusagecritical
 
 - interval: 1m
@@ -48,7 +48,7 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 0.20% is available.'
+        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 0.1953% is available.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefullinfourdays
 
 - interval: 1m
