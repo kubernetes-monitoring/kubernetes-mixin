@@ -7,13 +7,15 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 
 ## Releases
 
-| Release | Kubernetes Compatibility   |
-| ------- | -------------------------- |
-| master  | Kubernetes 1.14+           |
-| v0.1.x  | Kubernetes 1.13 and before |
+| Release | Kubernetes Compatibility   | Prometheus Compatibility |
+| ------- | -------------------------- | ------------------------ |
+| master  | Kubernetes 1.14+           | Prometheus 2.11.0+       |
+| v0.1.x  | Kubernetes 1.13 and before |                          |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/blob/master/keps/sig-instrumentation/0031-kubernetes-metrics-overhaul.md) implemented.
 Therefore v0.1.x of this repository is the last release to support Kubernetes 1.13 and previous version on a best effort basis.
+
+Some alerts now use Prometheus filters made available in Prometheus 2.11.0, which makes this version of Prometheus a dependency.
 
 ## How to use
 
