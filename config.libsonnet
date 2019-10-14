@@ -59,7 +59,7 @@
 
       // For links between grafana dashboards, you need to tell us if your grafana
       // servers under some non-root path.
-      linkPrefix: '',
+      linkPrefix: '.',
     },
 
     // We alert when the aggregate (CPU, Memory) quota for all namespaces is
