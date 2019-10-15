@@ -14,11 +14,11 @@
             // Reduces cardinality of this timeseries by #cores, which makes it
             // more useable in dashboards.  Also, allows us to do things like
             // quantile_over_time(...) which would otherwise not be possible.
-            record: 'namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
+            record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
               sum by (namespace, pod, container) (
                 rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])
-              )
+              ) * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
             ||| % $._config,
           },
           {
