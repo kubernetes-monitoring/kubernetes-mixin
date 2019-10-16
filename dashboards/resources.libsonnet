@@ -165,7 +165,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory Usage')
         .addPanel(
           g.panel('Memory Usage (w/o cache)') +
-          // Like abov, without page cache
+          // Like above, without page cache
           g.queryPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!=""}) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
@@ -240,7 +240,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         g.row('Memory Usage')
         .addPanel(
           g.panel('Memory Usage (w/o cache)') +
-          // Like abov, without page cache
+          // Like above, without page cache
           g.queryPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node", container!=""}) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
@@ -256,7 +256,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
             'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{node="$node"}) by (pod)' % $._config,
             'sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster", node="$node"}) by (pod)' % $._config,
             'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{node="$node"}) by (pod)' % $._config,
-            'sum(container_memory_rss{%(clusterLabel)s="$cluster", node="$node"",container!=""}) by (pod)' % $._config,
+            'sum(container_memory_rss{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
             'sum(container_memory_cache{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
             'sum(container_memory_swap{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
           ], tableStyles {
