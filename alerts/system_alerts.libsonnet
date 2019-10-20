@@ -20,6 +20,18 @@ local utils = import 'utils.libsonnet';
             alert: 'KubeNodeNotReady',
           },
           {
+            expr: |||
+              kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} == 1
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: '{{ $labels.node }} is unreachable and some workloads may be rescheduled.',
+            },
+            alert: 'KubeNodeUnreachable',
+          },
+          {
             alert: 'KubeVersionMismatch',
             expr: |||
               count(count by (gitVersion) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"gitVersion","$1","gitVersion","(v[0-9]*.[0-9]*.[0-9]*).*"))) > 1
