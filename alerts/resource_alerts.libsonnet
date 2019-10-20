@@ -89,6 +89,19 @@
             },
           },
           {
+            alert: 'KubeNodeEvictedPods',
+            expr: |||
+              increase(kubelet_evictions{%(kubeStateMetricsSelector)s}[5m]) > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: '{{ $labels.node }} has evicted {{ $value }} pods.',
+            },
+            'for': '5m',
+          },
+          {
             alert: 'CPUThrottlingHigh',
             expr: |||
               sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
