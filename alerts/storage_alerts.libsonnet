@@ -5,6 +5,22 @@
         name: 'kubernetes-storage',
         rules: [
           {
+            alert: 'KubePersistentVolumeUsageWarning',
+            expr: |||
+              kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+                /
+              kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+                < 0.35
+            ||| % $._config,
+            'for': '1m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is only {{ $value | humanizePercentage }} free.',
+            },
+          },
+          {
             alert: 'KubePersistentVolumeUsageCritical',
             expr: |||
               kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
