@@ -197,7 +197,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags },
 
-  'k8s-resources-node.json':
+    'k8s-resources-node.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',
