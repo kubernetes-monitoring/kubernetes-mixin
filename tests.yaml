@@ -27,7 +27,7 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.56% free.'
+        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.562% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeusagecritical
 
 - interval: 1m
@@ -48,5 +48,26 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 0.20% is available.'
+        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 0.1953% is available.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefullinfourdays
+
+- interval: 1m
+  input_series:
+  - series: 'kubelet_running_pod_count{endpoint="https-metrics",instance="10.0.2.15:10250",job="kubelet",namespace="kube-system",node="minikube",service="kubelet"}'
+    values: '110 110 110 110 110 110 110 110 110 110 110 110 110 110 108 108'
+  - series: 'kubelet_node_name{endpoint="https-metrics",instance="10.0.2.15:10250",job="kubelet",namespace="kube-system",node="minikube",service="kubelet"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'kube_node_status_capacity_pods{instance="172.17.0.5:8443",node="minikube", job="kube-state-metrics"}'
+    values: '110 110 110 110 110 110 110 110 110 110 110 110 110 110 110 110'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeletTooManyPods
+  - eval_time: 15m
+    alertname: KubeletTooManyPods
+    exp_alerts:
+    - exp_labels:
+        node: minikube
+        severity: warning
+      exp_annotations:
+        message: "Kubelet 'minikube' is running at 98.18% of its Pod capacity."
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods

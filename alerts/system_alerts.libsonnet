@@ -14,7 +14,7 @@ local utils = import 'utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $labels.node }} has been unready for more than an hour.',
+              message: '{{ $labels.node }} has been unready for more than 15 minutes.',
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
@@ -41,40 +41,27 @@ local utils = import 'utils.libsonnet';
               (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job)
                 /
               sum(rate(rest_client_requests_total[5m])) by (instance, job))
-              * 100 > 1
+              > 0.01
             |||,
             'for': '15m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }}% errors.'",
-            },
-          },
-          {
-            alert: 'KubeClientErrors',
-            expr: |||
-              sum(rate(ksm_scrape_error_total{%(kubeStateMetricsSelector)s}[5m])) by (instance, job) > 0.1
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / second.",
+              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors.'",
             },
           },
           {
             alert: 'KubeletTooManyPods',
             expr: |||
-              kubelet_running_pod_count{%(kubeletSelector)s} > %(kubeletPodLimit)s * 0.9
+              max(max(kubelet_running_pod_count{%(kubeletSelector)s}) by(instance) * on(instance) group_left(node) kubelet_node_name{%(kubeletSelector)s}) by(node) / max(kube_node_status_capacity_pods{%(kubeStateMetricsSelector)s}) by(node) > 0.95
             ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubelet {{ $labels.instance }} is running {{ $value }} Pods, close to the limit of %d.' % $._config.kubeletPodLimit,
+              message: "Kubelet '{{ $labels.node }}' is running at {{ $value | humanizePercentage }} of its Pod capacity.",
             },
           },
           {
@@ -108,14 +95,14 @@ local utils = import 'utils.libsonnet';
             expr: |||
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
                 /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) * 100 > 3
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) > 0.03
             ||| % $._config,
             'for': '10m',
             labels: {
               severity: 'critical',
             },
             annotations: {
-              message: 'API server is returning errors for {{ $value }}% of requests.',
+              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests.',
             },
           },
           {
@@ -123,14 +110,14 @@ local utils = import 'utils.libsonnet';
             expr: |||
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
                 /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) * 100 > 1
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) > 0.01
             ||| % $._config,
             'for': '10m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'API server is returning errors for {{ $value }}% of requests.',
+              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests.',
             },
           },
           {
@@ -138,14 +125,14 @@ local utils = import 'utils.libsonnet';
             expr: |||
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
                 /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 10
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.10
             ||| % $._config,
             'for': '10m',
             labels: {
               severity: 'critical',
             },
             annotations: {
-              message: 'API server is returning errors for {{ $value }}% of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
+              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
             },
           },
           {
@@ -153,14 +140,14 @@ local utils = import 'utils.libsonnet';
             expr: |||
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
                 /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) * 100 > 5
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.05
             ||| % $._config,
             'for': '10m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'API server is returning errors for {{ $value }}% of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
+              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
             },
           },
           {
