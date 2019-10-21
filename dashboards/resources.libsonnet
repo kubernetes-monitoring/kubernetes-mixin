@@ -251,14 +251,14 @@ local g = import 'grafana-builder/grafana.libsonnet';
         .addPanel(
           g.panel('Memory Quota') +
           g.tablePanel([
-            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
             'sum(kube_pod_container_resource_requests_memory_bytes{%(clusterLabel)s="$cluster", node="$node"}) by (pod)' % $._config,
-            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{node="$node"}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod) / sum(kube_pod_container_resource_requests_memory_bytes{node="$node"}) by (pod)' % $._config,
             'sum(kube_pod_container_resource_limits_memory_bytes{%(clusterLabel)s="$cluster", node="$node"}) by (pod)' % $._config,
-            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{node="$node"}) by (pod)' % $._config,
-            'sum(container_memory_rss{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
-            'sum(container_memory_cache{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
-            'sum(container_memory_swap{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes{node="$node"}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_memory_rss{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_memory_cache{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_memory_swap{%(clusterLabel)s="$cluster", node="$node",container!=""}) by (pod)' % $._config,
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
