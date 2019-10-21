@@ -22,6 +22,34 @@
             ||| % $._config,
           },
           {
+            record: 'node_namespace_pod_container:container_memory_working_set_bytes',
+            expr: |||
+              container_memory_working_set_bytes{%(cadvisorSelector)s, image!=""}
+              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+            ||| % $._config,
+          },
+          {
+            record: 'node_namespace_pod_container:container_memory_rss',
+            expr: |||
+              container_memory_rss{%(cadvisorSelector)s, image!=""}
+              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+            ||| % $._config,
+          },
+          {
+            record: 'node_namespace_pod_container:container_memory_cache',
+            expr: |||
+              container_memory_cache{%(cadvisorSelector)s, image!=""}
+              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+            ||| % $._config,
+          },
+          {
+            record: 'node_namespace_pod_container:container_memory_swap',
+            expr: |||
+              container_memory_swap{%(cadvisorSelector)s, image!=""}
+              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+            ||| % $._config,
+          },
+          {
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
               sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container!="POD"}) by (namespace)
