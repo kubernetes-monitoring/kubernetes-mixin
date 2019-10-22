@@ -129,6 +129,19 @@
             'for': '15m',
           },
           {
+            expr: |||
+              sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} * on(namespace, pod) group_left(owner_kind) kube_pod_owner)  > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
+            },
+            'for': '1h',
+            alert: 'KubeContainerWaiting',
+          },
+          {
             alert: 'KubeDaemonSetNotScheduled',
             expr: |||
               kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
