@@ -84,6 +84,8 @@
     showMultiCluster: false,
     clusterLabel: 'cluster',
 
+    namespaceLabel: 'namespace',
+
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
     fstypeSelector: 'fstype=~"%s"' % std.join('|', self.fstypes),
