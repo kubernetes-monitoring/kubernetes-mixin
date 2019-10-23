@@ -46,6 +46,9 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeDaemonSetRolloutStuck"
 + *Message*: `Only {{$value | humanizePercentage }} of desired pods scheduled and ready for daemon set {{$labels.namespace}}/{{$labels.daemonset}}`
 + *Severity*: critical
+##### Alert Name: "KubeContainerWaiting"
++ *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is in waiting state.`
++ *Severity*: warning
 ##### Alert Name: "KubeDaemonSetNotScheduled"
 + *Message*: `A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are not scheduled.`
 + *Severity*: warning
