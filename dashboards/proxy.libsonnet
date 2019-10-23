@@ -162,6 +162,7 @@ local singlestat = grafana.singlestat;
           'label_values(kubeproxy_network_programming_duration_seconds_bucket{%(kubeProxySelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
+          sort=1,
         )
       )
       .addRow(

@@ -150,6 +150,7 @@ local singlestat = grafana.singlestat;
           'label_values(process_cpu_seconds_total{%(kubeSchedulerSelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
+          sort=1,
         )
       )
       .addRow(

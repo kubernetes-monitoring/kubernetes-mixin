@@ -170,6 +170,7 @@ local singlestat = grafana.singlestat;
           'label_values(apiserver_request_total{%(kubeApiserverSelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
+          sort=1,
         )
       )
       .addRow(

@@ -471,7 +471,7 @@ local template = grafana.template;
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
 
-  'k8s-resources-node.json':
+    'k8s-resources-node.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',

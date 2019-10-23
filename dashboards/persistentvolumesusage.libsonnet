@@ -134,6 +134,7 @@ local gauge = promgrafonnet.gauge;
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
         )
       )
       .addTemplate(
@@ -143,6 +144,7 @@ local gauge = promgrafonnet.gauge;
           'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
+          sort=1,
         )
       )
       .addTemplate(
@@ -152,6 +154,7 @@ local gauge = promgrafonnet.gauge;
           'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace"}, persistentvolumeclaim)' % $._config,
           label='PersistentVolumeClaim',
           refresh='time',
+          sort=1,
         )
       )
       .addRow(

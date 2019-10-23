@@ -352,6 +352,7 @@ local singlestat = grafana.singlestat;
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
         )
       )
       .addTemplate(
@@ -361,6 +362,7 @@ local singlestat = grafana.singlestat;
           'label_values(kubelet_runtime_operations{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
+          sort=1,
         )
       )
       .addRow(
