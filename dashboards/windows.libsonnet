@@ -163,6 +163,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           'label_values(windows_container_available, namespace)',
           label='Namespace',
           refresh='time',
+          sort=1,
         )
       )
       .addRow(
@@ -255,6 +256,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           'label_values(windows_container_available, namespace)',
           label='Namespace',
           refresh='time',
+          sort=1,
         )
       )
       .addTemplate(
@@ -264,6 +266,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           'label_values(windows_container_available{namespace="$namespace"}, pod)',
           label='Pod',
           refresh='time',
+          sort=1,
         )
       )
       .addRow(
@@ -459,6 +462,7 @@ local g = import 'grafana-builder/grafana.libsonnet';
           'label_values(wmi_system_system_up_time, instance)',
           label='Instance',
           refresh='time',
+          sort=1,
         )
       )
       .addRow(

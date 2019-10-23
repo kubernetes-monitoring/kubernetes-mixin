@@ -130,6 +130,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
         )
       )
       .addTemplate(
@@ -139,6 +140,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'label_values(kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster"}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
+          sort=1,
         )
       )
       .addTemplate(
@@ -148,6 +150,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'label_values(kube_statefulset_metadata_generation{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}, statefulset)' % $._config,
           label='Name',
           refresh='time',
+          sort=1,
         )
       )
       .addRow(overviewRow)

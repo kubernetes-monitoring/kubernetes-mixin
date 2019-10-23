@@ -152,6 +152,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
         )
       )
       .addTemplate(
@@ -161,6 +162,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
+          sort=1,
         )
       )
       .addTemplate(
@@ -170,6 +172,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           'label_values(kube_pod_info{%(clusterLabel)s="$cluster", namespace=~"$namespace"}, pod)' % $._config,
           label='Pod',
           refresh='time',
+          sort=1,
         )
       )
       .addTemplate(
@@ -180,6 +183,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           label='Container',
           refresh='time',
           includeAll=true,
+          sort=1,
         )
       )
       .addAnnotation(restartAnnotation)
