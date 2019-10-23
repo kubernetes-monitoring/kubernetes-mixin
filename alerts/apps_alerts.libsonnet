@@ -130,7 +130,7 @@
           },
           {
             expr: |||
-              sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} * on(namespace, pod) group_left(owner_kind) kube_pod_owner)  > 0
+              sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
