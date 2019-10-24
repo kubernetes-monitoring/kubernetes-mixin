@@ -1,4 +1,4 @@
-(import 'rules-apiserver.libsonnet') +
-(import 'rules-apps.libsonnet') +
-(import 'rules-kube-scheduler.libsonnet') +
-(import 'rules-node.libsonnet')
+(import 'kube_apiserver.libsonnet') +
+(import 'apps.libsonnet') +
+(import 'kube_scheduler.libsonnet') +
+(import 'node.libsonnet')
