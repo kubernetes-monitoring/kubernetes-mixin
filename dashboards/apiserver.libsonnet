@@ -7,6 +7,10 @@ local graphPanel = grafana.graphPanel;
 local singlestat = grafana.singlestat;
 
 {
+  _config+:: {
+    kubeApiserverSelector: 'job="kube-apiserver"',
+  },
+
   grafanaDashboards+:: {
     'apiserver.json':
       local upCount =
