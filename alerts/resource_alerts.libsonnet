@@ -1,4 +1,18 @@
 {
+  _config+:: {
+    kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
+    nodeExporterSelector: error 'must provide selector for node-exporter',
+    namespaceSelector: null,
+    prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
+
+    // We alert when the aggregate (CPU, Memory) quota for all namespaces is
+    // greater than the amount of the resources in the cluster.  We do however
+    // allow you to overcommit if you wish.
+    namespaceOvercommitFactor: 1.5,
+    cpuThrottlingPercent: 25,
+    cpuThrottlingSelector: '',
+  },
+
   prometheusAlerts+:: {
     groups+: [
       {

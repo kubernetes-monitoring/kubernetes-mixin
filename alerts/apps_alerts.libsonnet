@@ -1,4 +1,10 @@
 {
+  _config+:: {
+    kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
+    namespaceSelector: null,
+    prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
+  },
+
   prometheusAlerts+:: {
     groups+: [
       {
