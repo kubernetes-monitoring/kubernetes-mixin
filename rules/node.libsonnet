@@ -35,12 +35,19 @@
               ))
             ||| % $._config,
           },
-          // Add separate rules for Free, so we can aggregate across clusters in dashboards.
-          // TODO: adjust recording rule name to match best practices
+          // Add separate rules for Available memory, so we can aggregate across clusters in dashboards.
           {
-            record: ':node_memory_MemFreeCachedBuffers_bytes:sum',
+            record: ':node_memory_MemAvailable_bytes:sum',
             expr: |||
-              sum(node_memory_MemFree_bytes{%(nodeExporterSelector)s} + node_memory_Cached_bytes{%(nodeExporterSelector)s} + node_memory_Buffers_bytes{%(nodeExporterSelector)s})
+              sum(
+                node_memory_MemAvailable_bytes{%(nodeExporterSelector)s} or
+                (
+                  node_memory_Buffers_bytes{%(nodeExporterSelector)s} +
+                  node_memory_Cached_bytes{%(nodeExporterSelector)s} +
+                  node_memory_MemFree_bytes{%(nodeExporterSelector)s} +
+                  node_memory_Slab_bytes{%(nodeExporterSelector)s}
+                )
+              )
             ||| % $._config,
           },
         ],
