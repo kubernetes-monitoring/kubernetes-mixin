@@ -19,7 +19,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPILatencyHigh',
             expr: |||
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"^(?:LIST|WATCH|WATCHLIST|PROXY|CONNECT)$"} > %(kubeAPILatencyWarningSeconds)s
+              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"} > %(kubeAPILatencyWarningSeconds)s
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -32,7 +32,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPILatencyHigh',
             expr: |||
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"^(?:LIST|WATCH|WATCHLIST|PROXY|CONNECT)$"} > %(kubeAPILatencyCriticalSeconds)s
+              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"} > %(kubeAPILatencyCriticalSeconds)s
             ||| % $._config,
             'for': '10m',
             labels: {
@@ -45,7 +45,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m]))
                 /
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) > 0.03
             ||| % $._config,
@@ -60,7 +60,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m]))
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m]))
                 /
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) > 0.01
             ||| % $._config,
@@ -75,7 +75,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (resource,subresource,verb)
                 /
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.10
             ||| % $._config,
@@ -90,7 +90,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"^(?:5..)$"}[5m])) by (resource,subresource,verb)
+              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (resource,subresource,verb)
                 /
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.05
             ||| % $._config,
