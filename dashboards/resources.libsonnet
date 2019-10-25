@@ -139,7 +139,7 @@ local template = grafana.template;
         )
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_memory_bytes{%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('1 - sum(:node_memory_MemAvailable_bytes:sum{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable_memory_bytes{%(clusterLabel)s="$cluster"})' % $._config)
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
@@ -1281,7 +1281,7 @@ local template = grafana.template;
         )
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.statPanel('1 - sum(:node_memory_MemFreeCachedBuffers_bytes:sum) / sum(kube_node_status_allocatable_memory_bytes)' % $._config)
+          g.statPanel('1 - sum(:node_memory_MemAvailable_bytes:sum) / sum(kube_node_status_allocatable_memory_bytes)' % $._config)
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
