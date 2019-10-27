@@ -843,34 +843,34 @@ local template = grafana.template;
 
       local networkColumns = [
         |||
-          (sum(irate(container_network_receive_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          (sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[$interval])
           * on (namespace,pod)
-          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+          group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
         ||| % $._config,
         |||
-          (sum(irate(container_network_transmit_bytes_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          (sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[$interval])
           * on (namespace,pod)
-          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+          group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
         ||| % $._config,
         |||
-          (sum(irate(container_network_receive_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          (sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[$interval])
           * on (namespace,pod)
-          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+          group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
         ||| % $._config,
         |||
-          (sum(irate(container_network_transmit_packets_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          (sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[$interval])
           * on (namespace,pod)
-          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+          group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
         ||| % $._config,
         |||
-          (sum(irate(container_network_receive_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          (sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[$interval])
           * on (namespace,pod)
-          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+          group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
         ||| % $._config,
         |||
-          (sum(irate(container_network_transmit_packets_dropped_total{%(namespaceLabel)s=~"$namespace"}[$interval])
+          (sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[$interval])
           * on (namespace,pod)
-          group_left(workload,workload_type) mixin_pod_workload{%(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+          group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
         ||| % $._config,
       ];
 
