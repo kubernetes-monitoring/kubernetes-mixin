@@ -33,13 +33,13 @@ tests:
 - interval: 1m
   input_series:
   - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
-    values: '128 64 32 16 8 4 2 1'
+    values: '1024-10x61'
   - series: 'kubelet_volume_stats_capacity_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
-    values: '1024 1024 1024 1024 1024 1024 1024 1024'
+    values: '32768+0x61'
   alert_rule_test:
-  - eval_time: 5m
+  - eval_time: 1h
     alertname: KubePersistentVolumeFullInFourDays
-  - eval_time: 6m
+  - eval_time: 61m
     alertname: KubePersistentVolumeFullInFourDays
     exp_alerts:
     - exp_labels:
@@ -48,7 +48,7 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 0.1953% is available.'
+        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 1.263% is available.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefullinfourdays
 
 - interval: 1m

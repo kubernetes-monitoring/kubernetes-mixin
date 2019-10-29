@@ -76,6 +76,13 @@ Steps to configure wmi_exporter
 ```
 3) Update the Prometheus server to scrap the metrics from wmi_exporter endpoint.
 
+## Running the tests
+
+Build the mixins, run the tests:
+
+```
+$ docker run -v $(pwd):/tmp --entrypoint "/bin/promtool" prom/prometheus:latest test rules /tmp/tests.yaml
+```
 
 ## Using with prometheus-ksonnet
 
