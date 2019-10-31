@@ -9,19 +9,6 @@
         name: 'kubernetes-system',
         rules: [
           {
-            alert: 'KubeVersionMismatch',
-            expr: |||
-              count(count by (gitVersion) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"gitVersion","$1","gitVersion","(v[0-9]*.[0-9]*.[0-9]*).*"))) > 1
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: 'There are {{ $value }} different semantic versions of Kubernetes components running.',
-            },
-          },
-          {
             alert: 'KubeClientErrors',
             // Many clients use get requests to check the existence of objects,
             // this is normal and an expected error, therefore it should be

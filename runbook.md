@@ -99,9 +99,6 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeNodeNotReady"
 + *Message*: `{{ $labels.node }} has been unready for more than an 15 minutes"`
 + *Severity*: warning
-##### Alert Name: "KubeVersionMismatch"
-+ *Message*: `There are {{ $value }} different versions of Kubernetes components running.`
-+ *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
 + *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors.'`
 + *Severity*: warning
