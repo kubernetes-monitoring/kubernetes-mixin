@@ -26,7 +26,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
           legend_avg=true,
         )
         .addTarget(prometheus.target(
-          'sum by(container) (container_memory_usage_bytes{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
+          'sum by(container) (container_memory_working_set_bytes{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container=~"$container", container!="POD"})' % $._config,
           legendFormat='Current: {{ container }}',
         ))
         .addTarget(prometheus.target(
