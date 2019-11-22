@@ -46,7 +46,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable='true',
           legend_rightSide='true',
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", verb!="WATCH"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
 
       local workQueueAddRate =
         graphPanel.new(
