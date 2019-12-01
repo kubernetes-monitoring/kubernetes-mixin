@@ -57,7 +57,7 @@ local gauge = promgrafonnet.gauge;
 
         piechart.new(
           title=pieChartTitle,
-          datasource='prometheus',
+          datasource='$datasource',
           pieType='donut',
         ).addTarget(target) + {
           breakpoint: '50%',
@@ -95,7 +95,7 @@ local gauge = promgrafonnet.gauge;
         graphPanel.new(
           title=graphTitle,
           span=24,
-          datasource='prometheus',
+          datasource='$datasource',
           fill=2,
           linewidth=2,
           min_span=24,
@@ -144,7 +144,7 @@ local gauge = promgrafonnet.gauge;
           title=tableTitle,
           span=24,
           min_span=24,
-          datasource='prometheus',
+          datasource='$datasource',
         )
         .addColumn(
           field='',
@@ -247,7 +247,7 @@ local gauge = promgrafonnet.gauge;
       local resolutionTemplate =
         template.new(
           name='resolution',
-          datasource='prometheus',
+          datasource='$datasource',
           query='30s,5m,1h',
           current='5m',
           hide='',
@@ -282,7 +282,7 @@ local gauge = promgrafonnet.gauge;
       local intervalTemplate =
         template.new(
           name='interval',
-          datasource='prometheus',
+          datasource='$datasource',
           query='4h',
           current='5m',
           hide=2,

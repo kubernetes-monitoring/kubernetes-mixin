@@ -56,7 +56,7 @@ local gauge = promgrafonnet.gauge;
 
         singlestat.new(
           title=gaugeTitle,
-          datasource='prometheus',
+          datasource='$datasource',
           format='time_series',
           height=9,
           span=12,
@@ -115,7 +115,7 @@ local gauge = promgrafonnet.gauge;
         graphPanel.new(
           title=graphTitle,
           span=12,
-          datasource='prometheus',
+          datasource='$datasource',
           fill=2,
           linewidth=2,
           min_span=12,
@@ -157,7 +157,7 @@ local gauge = promgrafonnet.gauge;
           title=tableTitle,
           span=24,
           min_span=24,
-          datasource='prometheus',
+          datasource='$datasource',
         )
         .addColumn(
           field='',
@@ -245,7 +245,7 @@ local gauge = promgrafonnet.gauge;
       local namespaceTemplate =
         template.new(
           name='namespace',
-          datasource='prometheus',
+          datasource='$datasource',
           query='label_values(container_network_receive_packets_total, namespace)',
           allValues='.+',
           current='kube-system',
@@ -264,7 +264,7 @@ local gauge = promgrafonnet.gauge;
       local resolutionTemplate =
         template.new(
           name='resolution',
-          datasource='prometheus',
+          datasource='$datasource',
           query='30s,5m,1h',
           current='5m',
           hide='',
@@ -299,7 +299,7 @@ local gauge = promgrafonnet.gauge;
       local intervalTemplate =
         template.new(
           name='interval',
-          datasource='prometheus',
+          datasource='$datasource',
           query='4h',
           current='5m',
           hide=2,
