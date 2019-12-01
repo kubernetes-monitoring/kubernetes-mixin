@@ -247,6 +247,22 @@ local gauge = promgrafonnet.gauge;
         time_from='now-1h',
         time_to='now',
       )
+      .addTemplate(
+        {
+          current: {
+            text: 'Prometheus',
+            value: 'Prometheus',
+          },
+          hide: 0,
+          label: null,
+          name: 'datasource',
+          options: [],
+          query: 'prometheus',
+          refresh: 1,
+          regex: '',
+          type: 'datasource',
+        },
+      )
       .addTemplate(namespaceTemplate)
       .addTemplate(podTemplate)
       .addTemplate(resolutionTemplate)

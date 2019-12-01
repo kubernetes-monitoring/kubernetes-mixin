@@ -356,6 +356,22 @@ local gauge = promgrafonnet.gauge;
       .addPanel(
         currentBandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 0 }
       )
+      .addTemplate(
+        {
+          current: {
+            text: 'Prometheus',
+            value: 'Prometheus',
+          },
+          hide: 0,
+          label: null,
+          name: 'datasource',
+          options: [],
+          query: 'prometheus',
+          refresh: 1,
+          regex: '',
+          type: 'datasource',
+        },
+      )
       .addPanel(
         newPieChartPanel(
           pieChartTitle='Current Rate of Bytes Received',
