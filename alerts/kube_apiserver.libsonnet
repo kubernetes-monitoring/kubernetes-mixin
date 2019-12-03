@@ -20,18 +20,18 @@ local utils = import 'utils.libsonnet';
             alert: 'KubeAPILatencyHigh',
             expr: |||
               (
-                cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}
+                cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s}
                 >
                 on (verb) group_left()
                 (
-                  avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"} >= 0)
+                  avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
                   +
-                  2*stddev by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"} >= 0)
+                  2*stddev by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
                 )
               ) > on (verb) group_left()
-              1.2 * avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"} >= 0)
+              1.2 * avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
               and on (verb,resource)
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}
+              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99"}
               >
               %(kubeAPILatencyWarningSeconds)s
             ||| % $._config,
@@ -46,7 +46,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPILatencyHigh',
             expr: |||
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99",subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"} > %(kubeAPILatencyCriticalSeconds)s
+              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99"} > %(kubeAPILatencyCriticalSeconds)s
             ||| % $._config,
             'for': '10m',
             labels: {
