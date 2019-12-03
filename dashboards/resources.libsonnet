@@ -8,7 +8,7 @@ local template = grafana.template;
     local intervalTemplate =
       template.new(
         name='interval',
-        datasource='prometheus',
+        datasource='$datasource',
         query='4h',
         current='5m',
         hide=2,

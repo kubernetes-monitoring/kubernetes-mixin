@@ -57,7 +57,7 @@ local gauge = promgrafonnet.gauge;
 
         piechart.new(
           title=pieChartTitle,
-          datasource='prometheus',
+          datasource='$datasource',
           pieType='donut',
         ).addTarget(target) + {
           breakpoint: '50%',
@@ -94,7 +94,7 @@ local gauge = promgrafonnet.gauge;
         graphPanel.new(
           title=graphTitle,
           span=12,
-          datasource='prometheus',
+          datasource='$datasource',
           fill=2,
           linewidth=2,
           min_span=12,
@@ -136,7 +136,7 @@ local gauge = promgrafonnet.gauge;
           title=tableTitle,
           span=24,
           min_span=24,
-          datasource='prometheus',
+          datasource='$datasource',
         )
         .addColumn(
           field='',
@@ -239,7 +239,7 @@ local gauge = promgrafonnet.gauge;
       local namespaceTemplate =
         template.new(
           name='namespace',
-          datasource='prometheus',
+          datasource='$datasource',
           query='label_values(container_network_receive_packets_total, namespace)',
           current='kube-system',
           hide='',
@@ -257,7 +257,7 @@ local gauge = promgrafonnet.gauge;
       local typeTemplate =
         template.new(
           name='type',
-          datasource='prometheus',
+          datasource='$datasource',
           query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
           current='deployment',
           hide='',
@@ -275,7 +275,7 @@ local gauge = promgrafonnet.gauge;
       local resolutionTemplate =
         template.new(
           name='resolution',
-          datasource='prometheus',
+          datasource='$datasource',
           query='30s,5m,1h',
           current='5m',
           hide='',
@@ -310,7 +310,7 @@ local gauge = promgrafonnet.gauge;
       local intervalTemplate =
         template.new(
           name='interval',
-          datasource='prometheus',
+          datasource='$datasource',
           query='4h',
           current='5m',
           hide=2,
@@ -378,6 +378,22 @@ local gauge = promgrafonnet.gauge;
         refresh='30s',
         time_from='now-1h',
         time_to='now',
+      )
+      .addTemplate(
+        {
+          current: {
+            text: 'Prometheus',
+            value: 'Prometheus',
+          },
+          hide: 0,
+          label: null,
+          name: 'datasource',
+          options: [],
+          query: 'prometheus',
+          refresh: 1,
+          regex: '',
+          type: 'datasource',
+        },
       )
       .addTemplate(namespaceTemplate)
       .addTemplate(typeTemplate)
