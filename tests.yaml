@@ -76,15 +76,36 @@ tests:
   input_series:
   - series: 'kube_pod_container_resource_requests_cpu_cores{container="kube-apiserver-67",endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",namespace="kube-apiserver",node="ip-10-0-141-66.us-east-2.compute.internal",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
     values: '0.15+0x10'
+  - series: 'kube_pod_container_resource_requests_memory_bytes{container="kube-apiserver-67",endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",namespace="kube-apiserver",node="ip-10-0-141-66.us-east-2.compute.internal",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
+    values: '1E9+0x10'
+  # Duplicate kube_pod_status_phase timeseries for the same pod.
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",namespace="kube-apiserver",phase="Running",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
+    values: '1 stale'
+  - series: 'kube_pod_status_phase{endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",namespace="kube-apiserver",phase="Pending",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
     values: '1+0x10'
+  # Duplicate kube_pod_labels timeseries for the same pod.
+  - series: 'kube_pod_labels{endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",label_apiserver="true",label_app="kube-apiserver",label_revision="66",namespace="kube-apiserver",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",pod_name="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
+    values: '1 stale'
   - series: 'kube_pod_labels{endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",label_apiserver="true",label_app="kube-apiserver",label_revision="67",namespace="kube-apiserver",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",pod_name="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
     values: '1+0x10'
-  - series: 'kube_pod_labels{endpoint="https-main",instance="10.131.2.78:8443",job="kube-state-metrics",label_apiserver="true",label_app="kube-apiserver",label_revision="68",namespace="kube-apiserver",pod="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",pod_name="kube-apiserver-ip-10-0-141-66.us-east-2.compute.internal",service="kube-state-metrics"}'
-    values: '1+0x10'
   promql_expr_test:
+  - eval_time: 0m
+    expr: namespace:kube_pod_container_resource_requests_cpu_cores:sum
+    exp_samples:
+    - value: 0.15
+      labels: 'namespace:kube_pod_container_resource_requests_cpu_cores:sum{namespace="kube-apiserver"}'
+  - eval_time: 0m
+    expr: namespace:kube_pod_container_resource_requests_memory_bytes:sum
+    exp_samples:
+    - value: 1.0e+9
+      labels: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum{namespace="kube-apiserver"}'
   - eval_time: 1m
     expr: namespace:kube_pod_container_resource_requests_cpu_cores:sum
     exp_samples:
     - value: 0.15
       labels: 'namespace:kube_pod_container_resource_requests_cpu_cores:sum{namespace="kube-apiserver"}'
+  - eval_time: 1m
+    expr: namespace:kube_pod_container_resource_requests_memory_bytes:sum
+    exp_samples:
+    - value: 1.0e+9
+      labels: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum{namespace="kube-apiserver"}'

@@ -64,8 +64,12 @@
             record: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum',
             expr: |||
               sum by (namespace) (
-                  sum(kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"Pending|Running"} == 1)) by (namespace, pod)
-                * max by(namespace, pod) (kube_pod_labels{%(kubeStateMetricsSelector)s})
+                  sum by (namespace, pod) (
+                      kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s}
+                      * on (endpoint, instance, job, namespace, pod, service) max by (endpoint, instance, job, namespace, pod, service) (
+                          kube_pod_status_phase{phase=~"Pending|Running"} == 1
+                      )
+                  ) * max by(namespace, pod) (kube_pod_labels{%(kubeStateMetricsSelector)s})
               )
             ||| % $._config,
           },
@@ -73,8 +77,12 @@
             record: 'namespace:kube_pod_container_resource_requests_cpu_cores:sum',
             expr: |||
               sum by (namespace) (
-                  sum(kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s} * on (endpoint, instance, job, namespace, pod, service) group_left(phase) (kube_pod_status_phase{phase=~"Pending|Running"} == 1)) by (namespace, pod)
-                * max by(namespace, pod) (kube_pod_labels{%(kubeStateMetricsSelector)s})
+                  sum by (namespace, pod) (
+                        kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
+                        * on (endpoint, instance, job, namespace, pod, service) group_left(phase) max by(endpoint, instance, job, namespace, pod, service) (
+                            kube_pod_status_phase{phase=~"Pending|Running"} == 1
+                        )
+                  ) * max by(namespace,pod) (kube_pod_labels{%(kubeStateMetricsSelector)s})
               )
             ||| % $._config,
           },
