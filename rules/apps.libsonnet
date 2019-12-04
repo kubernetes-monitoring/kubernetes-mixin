@@ -65,11 +65,12 @@
             expr: |||
               sum by (namespace) (
                   sum by (namespace, pod) (
-                      kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s}
-                      * on (endpoint, instance, job, namespace, pod, service) max by (endpoint, instance, job, namespace, pod, service) (
+                      max by (namespace, pod, container) (
+                          kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s}
+                      ) * on(namespace, pod) group_left() max by (namespace, pod) (
                           kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
-                  ) * max by(namespace, pod) (kube_pod_labels{%(kubeStateMetricsSelector)s})
+                  )
               )
             ||| % $._config,
           },
@@ -78,11 +79,12 @@
             expr: |||
               sum by (namespace) (
                   sum by (namespace, pod) (
-                        kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
-                        * on (endpoint, instance, job, namespace, pod, service) group_left(phase) max by(endpoint, instance, job, namespace, pod, service) (
-                            kube_pod_status_phase{phase=~"Pending|Running"} == 1
-                        )
-                  ) * max by(namespace,pod) (kube_pod_labels{%(kubeStateMetricsSelector)s})
+                      max by (namespace, pod, container) (
+                          kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
+                      ) * on(namespace, pod) group_left() max by (namespace, pod) (
+                        kube_pod_status_phase{phase=~"Pending|Running"} == 1
+                      )
+                  )
               )
             ||| % $._config,
           },
