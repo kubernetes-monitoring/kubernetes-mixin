@@ -17,7 +17,8 @@ local singlestat = grafana.singlestat;
         singlestat.new(
           'Up',
           datasource='$datasource',
-          span=2,
+          span=12,
+          height=2,
           valueName='min',
         )
         .addTarget(prometheus.target('sum(up{%(kubeApiserverSelector)s})' % $._config));
@@ -26,8 +27,9 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'RPC Rate',
           datasource='$datasource',
-          span=5,
+          span=6,
           format='ops',
+          min=0
         )
         .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"2.."}[5m]))' % $._config, legendFormat='2xx'))
         .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"3.."}[5m]))' % $._config, legendFormat='3xx'))
@@ -38,13 +40,14 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Request duration 99th quantile',
           datasource='$datasource',
-          span=5,
+          span=6,
           format='s',
           legend_show='true',
           legend_values='true',
           legend_current='true',
           legend_alignAsTable='true',
           legend_rightSide='true',
+          min=0
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", verb!="WATCH"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
 
@@ -82,6 +85,7 @@ local singlestat = grafana.singlestat;
           legend_current='true',
           legend_alignAsTable='true',
           legend_rightSide='true',
+          min=0
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 
@@ -123,6 +127,7 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=4,
           format='bytes',
+          min=0
         )
         .addTarget(prometheus.target('process_resident_memory_bytes{%(kubeApiserverSelector)s,instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
 
@@ -142,6 +147,7 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=4,
           format='short',
+          min=0
         )
         .addTarget(prometheus.target('go_goroutines{%(kubeApiserverSelector)s,instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
 
