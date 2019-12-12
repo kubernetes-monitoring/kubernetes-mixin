@@ -1,5 +1,20 @@
+local slo = import 'slo-libsonnet/slo.libsonnet';
+
 {
   _config+:: {
+    SLOs: {
+      apiserver: {
+        // This is templating a Multiple Burn Rate Alerts for Kubernetes Apiservers.
+        // We will alert on burning too much error budget over 30 days.
+        // By default we have 99% availability (1% unavailability = 7h12m in 30d).
+        errors: slo.errorburn({
+          metric: 'apiserver_request_total',
+          selectors: [$._config.kubeApiserverSelector],
+          errorBudget: 1 - 0.99,
+        }),
+      },
+    },
+
     // Selectors are inserted between {} in Prometheus queries.
     cadvisorSelector: 'job="cadvisor"',
     kubeletSelector: 'job="kubelet"',
