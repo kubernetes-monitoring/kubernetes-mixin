@@ -24,11 +24,11 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=10,
           format='ops',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
@@ -39,11 +39,11 @@ local singlestat = grafana.singlestat;
           span=12,
           min=0,
           format='short',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('sum(rate(workqueue_depth{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
@@ -53,11 +53,11 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=12,
           format='s',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 
@@ -90,11 +90,11 @@ local singlestat = grafana.singlestat;
           span=12,
           format='s',
           min=0,
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_latency_seconds_bucket{%(kubeControllerManagerSelector)s, instance=~"$instance", verb="GET"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
 
