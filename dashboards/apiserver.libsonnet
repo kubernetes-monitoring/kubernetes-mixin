@@ -40,11 +40,11 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=5,
           format='s',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", verb!="WATCH"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
 
@@ -77,11 +77,11 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=12,
           format='s',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 

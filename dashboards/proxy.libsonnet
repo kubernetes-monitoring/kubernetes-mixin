@@ -35,11 +35,11 @@ local singlestat = grafana.singlestat;
           span=5,
           min=0,
           format='s',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99,rate(kubeproxy_sync_proxy_rules_duration_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance"}[5m]))' % $._config, legendFormat='{{instance}}'));
 
@@ -60,11 +60,11 @@ local singlestat = grafana.singlestat;
           span=6,
           min=0,
           format='s',
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(kubeproxy_network_programming_duration_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}}'));
 
@@ -97,11 +97,11 @@ local singlestat = grafana.singlestat;
           span=12,
           format='s',
           min=0,
-          legend_show='true',
-          legend_values='true',
-          legend_current='true',
-          legend_alignAsTable='true',
-          legend_rightSide='true',
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_latency_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance", verb="GET"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
 
