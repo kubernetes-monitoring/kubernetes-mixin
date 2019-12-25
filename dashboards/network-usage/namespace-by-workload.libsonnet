@@ -26,7 +26,6 @@ local gauge = promgrafonnet.gauge;
         link=false,
         linkTooltip='Drill down',
         linkUrl='',
-        pattern='',
         thresholds=[],
         type='number',
         unit='short'
@@ -39,7 +38,6 @@ local gauge = promgrafonnet.gauge;
         link: link,
         linkTooltip: linkTooltip,
         linkUrl: linkUrl,
-        pattern: pattern,
         thresholds: thresholds,
         type: type,
         unit: unit,
@@ -139,82 +137,72 @@ local gauge = promgrafonnet.gauge;
           datasource='$datasource',
         )
         .addColumn(
-          field='',
+          field='Time',
           style=newStyle(
             alias='Time',
-            type='hidden',
-            pattern='Time',
+            type='hidden'
           )
         )
         .addColumn(
-          field='',
+          field='Value #A',
           style=newStyle(
             alias='Current Bandwidth Received',
-            pattern='Value #A',
             unit='Bps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #B',
           style=newStyle(
             alias='Current Bandwidth Transmitted',
-            pattern='Value #B',
             unit='Bps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #C',
           style=newStyle(
             alias='Average Bandwidth Received',
-            pattern='Value #C',
             unit='Bps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #D',
           style=newStyle(
             alias='Average Bandwidth Transmitted',
-            pattern='Value #D',
             unit='Bps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #E',
           style=newStyle(
             alias='Rate of Received Packets',
-            pattern='Value #E',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #F',
           style=newStyle(
             alias='Rate of Transmitted Packets',
-            pattern='Value #F',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #G',
           style=newStyle(
             alias='Rate of Received Packets Dropped',
-            pattern='Value #G',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #H',
           style=newStyle(
             alias='Rate of Transmitted Packets Dropped',
-            pattern='Value #H',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='workload',
           style=newStyle(
             alias='Workload',
-            pattern='workload',
             link=true,
             linkUrl='d/728bf77cc1166d2f3133bf25846876cc/kubernetes-networking-workload?orgId=1&refresh=30s&var-namespace=$namespace&var-type=$type&var-workload=$__cell'
           ),

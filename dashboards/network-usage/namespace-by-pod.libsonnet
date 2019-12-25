@@ -26,7 +26,6 @@ local gauge = promgrafonnet.gauge;
         link=false,
         linkTooltip='Drill down',
         linkUrl='',
-        pattern='',
         thresholds=[],
         type='number',
         unit='short'
@@ -39,7 +38,6 @@ local gauge = promgrafonnet.gauge;
         link: link,
         linkTooltip: linkTooltip,
         linkUrl: linkUrl,
-        pattern: pattern,
         thresholds: thresholds,
         type: type,
         unit: unit,
@@ -160,66 +158,58 @@ local gauge = promgrafonnet.gauge;
           datasource='$datasource',
         )
         .addColumn(
-          field='',
+          field='Time',
           style=newStyle(
             alias='Time',
             type='hidden',
-            pattern='Time',
           )
         )
         .addColumn(
-          field='',
+          field='Value #A',
           style=newStyle(
             alias='Bandwidth Received',
-            pattern='Value #A',
             unit='Bps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #B',
           style=newStyle(
             alias='Bandwidth Transmitted',
-            pattern='Value #B',
             unit='Bps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #C',
           style=newStyle(
             alias='Rate of Received Packets',
-            pattern='Value #C',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #D',
           style=newStyle(
             alias='Rate of Transmitted Packets',
-            pattern='Value #D',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #E',
           style=newStyle(
             alias='Rate of Received Packets Dropped',
-            pattern='Value #E',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='Value #F',
           style=newStyle(
             alias='Rate of Transmitted Packets Dropped',
-            pattern='Value #F',
             unit='pps',
           ),
         )
         .addColumn(
-          field='',
+          field='pod',
           style=newStyle(
             alias='Pod',
-            pattern='pod',
             link=true,
             linkUrl='d/7a18067ce943a40ae25454675c19ff5c/kubernetes-networking-pod?orgId=1&refresh=30s&var-namespace=$namespace&var-pod=$__cell'
           ),
