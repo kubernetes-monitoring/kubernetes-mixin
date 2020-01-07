@@ -75,7 +75,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'The Kubelet Pod Liecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.',
+              message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.',
             },
           },
           (import '../lib/absent_alert.libsonnet') {
