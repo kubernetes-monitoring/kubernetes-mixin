@@ -2,11 +2,6 @@
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeletSelector: error 'must provide selector for kubelet',
-
-    // The upper bound for the `kubelet_pleg_relist_duration_seconds` histogram
-    // buckets is set to `10` seconds. Therefore the max value returned from
-    // the  `histogram_quantile` function of the PLEG duration alert is capped at 10.
-    kubeletPlegDurationWarningSeconds: 10,
   },
 
   prometheusAlerts+:: {
@@ -55,9 +50,9 @@
           {
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
-              sum(changes(kube_node_status_condition{status='true',condition='Ready'}[15m])) by (node) > 2
+              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (node) > 2
             ||| % $._config,
-            'for': '1m',
+            'for': '15m',
             labels: {
               severity: 'warning',
             },
@@ -68,7 +63,7 @@
           {
             alert: 'KubeletPlegDurationHigh',
             expr: |||
-              histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket[5m])) by (node, le)) >= %(kubeletPlegDurationWarningSeconds)s
+              histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket[5m])) by (node, le)) >= 10
             ||| % $._config,
             'for': '5m',
             labels: {

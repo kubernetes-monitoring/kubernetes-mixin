@@ -152,20 +152,20 @@ tests:
         node: ip-10-1-2-3.us-east-1.compute.internal
         severity: warning
       exp_annotations:
-        message: 'The Kubelet Pod Liecycle Event Generator has a 99th percentile duration of 10 seconds on node ip-10-1-2-3.us-east-1.compute.internal.'
+        message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of 10 seconds on node ip-10-1-2-3.us-east-1.compute.internal.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletplegdurationhigh'
 
 - interval: 1m
   input_series:
   - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",instance="100.110.41.47:8443",job="kube-state-metrics",namespace="monitoring",node="ip-10-1-2-3.us-east-1.compute.internal",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
-    values: '1 1 1 0 0 0 1 1 1 1 1 1 1 0 0'
+    values: '1 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1'
   alert_rule_test:
-  - eval_time: 15m
+  - eval_time: 18m
     alertname: KubeNodeReadinessFlapping
     exp_alerts:
     - exp_labels:
         node: ip-10-1-2-3.us-east-1.compute.internal
         severity: warning
       exp_annotations:
-        message: 'The readiness status of node ip-10-1-2-3.us-east-1.compute.internal has changed 3 times in the last 15 minutes.'
+        message: 'The readiness status of node ip-10-1-2-3.us-east-1.compute.internal has changed 10 times in the last 15 minutes.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodereadinessflapping'
