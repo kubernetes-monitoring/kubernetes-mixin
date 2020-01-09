@@ -80,13 +80,13 @@ local gauge = promgrafonnet.gauge;
         };
 
 
-      local newGraphPanel(graphTitle, graphQuery, graphFormat='Bps') =
+      local newGraphPanel(graphTitle, graphQuery, graphFormat='Bps', legendFormat='{{namespace}}') =
         local target =
           prometheus.target(
             graphQuery
           ) + {
             intervalFactor: 1,
-            legendFormat: '{{namespace}}',
+            legendFormat: legendFormat,
             step: 10,
           };
 
@@ -461,6 +461,35 @@ local gauge = promgrafonnet.gauge;
             graphQuery='sort_desc(sum(irate(container_network_transmit_packets_dropped_total{namespace=~".+"}[$interval:$resolution])) by (namespace))',
             graphFormat='pps'
           ),
+          gridPos={ h: 9, w: 24, x: 0, y: 59 }
+        )
+        .addPanel(
+          newGraphPanel(
+            graphTitle='Rate of TCP Retransimts out of all sent segments',
+            graphQuery='sort_desc(sum(rate(node_netstat_Tcp_RetransSegs[$interval:$resolution]) / rate(node_netstat_Tcp_OutSegs[$interval:$resolution])) by (instance))',
+            graphFormat='percentunit',
+            legendFormat='{{instance}}'
+          ) + { links: [
+            {
+              url: 'https://accedian.com/enterprises/blog/network-packet-loss-retransmissions-and-duplicate-acknowledgements/',
+              title: 'What is TCP Retransmit?',
+              targetBlank: true,
+            },
+          ] },
+          gridPos={ h: 9, w: 24, x: 0, y: 59 }
+        ).addPanel(
+          newGraphPanel(
+            graphTitle='Rate of TCP SYN Retransimts out of all retransmits',
+            graphQuery='sort_desc(sum(rate(node_netstat_TcpExt_TCPSynRetrans[$interval:$resolution]) / rate(node_netstat_Tcp_RetransSegs[$interval:$resolution])) by (instance))',
+            graphFormat='percentunit',
+            legendFormat='{{instance}}'
+          ) + { links: [
+            {
+              url: 'https://github.com/prometheus/node_exporter/issues/1023#issuecomment-408128365',
+              title: 'Why monitor SYN retransmits?',
+              targetBlank: true,
+            },
+          ] },
           gridPos={ h: 9, w: 24, x: 0, y: 59 }
         ),
         gridPos={ h: 1, w: 24, x: 0, y: 31 }
