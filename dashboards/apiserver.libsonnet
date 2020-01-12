@@ -20,7 +20,7 @@ local singlestat = grafana.singlestat;
           span=2,
           valueName='min',
         )
-        .addTarget(prometheus.target('sum(up{%(kubeApiserverSelector)s})' % $._config));
+        .addTarget(prometheus.target('sum(up{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"})' % $._config));
 
       local rpcRate =
         graphPanel.new(
@@ -29,10 +29,10 @@ local singlestat = grafana.singlestat;
           span=5,
           format='ops',
         )
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"2.."}[5m]))' % $._config, legendFormat='2xx'))
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"3.."}[5m]))' % $._config, legendFormat='3xx'))
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"4.."}[5m]))' % $._config, legendFormat='4xx'))
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"5.."}[5m]))' % $._config, legendFormat='5xx'));
+        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"2..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='2xx'))
+        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"3..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='3xx'))
+        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"4..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='4xx'))
+        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"5..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='5xx'));
 
       local requestDuration =
         graphPanel.new(
@@ -46,7 +46,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", verb!="WATCH"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", verb!="WATCH", %(clusterLabel)s="$cluster"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
 
       local workQueueAddRate =
         graphPanel.new(
@@ -57,7 +57,7 @@ local singlestat = grafana.singlestat;
           legend_show=false,
           min=0,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(kubeApiserverSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
+        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local workQueueDepth =
         graphPanel.new(
@@ -68,7 +68,7 @@ local singlestat = grafana.singlestat;
           legend_show=false,
           min=0,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(kubeApiserverSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
+        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
 
       local workQueueLatency =
@@ -83,7 +83,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local etcdCacheEntryTotal =
         graphPanel.new(
@@ -93,7 +93,7 @@ local singlestat = grafana.singlestat;
           format='short',
           min=0,
         )
-        .addTarget(prometheus.target('etcd_helper_cache_entry_total{%(kubeApiserverSelector)s, instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('etcd_helper_cache_entry_total{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{instance}}'));
 
       local etcdCacheEntryRate =
         graphPanel.new(
@@ -103,8 +103,8 @@ local singlestat = grafana.singlestat;
           format='ops',
           min=0,
         )
-        .addTarget(prometheus.target('sum(rate(etcd_helper_cache_hit_total{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (intance)' % $._config, legendFormat='{{instance}} hit'))
-        .addTarget(prometheus.target('sum(rate(etcd_helper_cache_miss_total{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance)' % $._config, legendFormat='{{instance}} miss'));
+        .addTarget(prometheus.target('sum(rate(etcd_helper_cache_hit_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (intance)' % $._config, legendFormat='{{instance}} hit'))
+        .addTarget(prometheus.target('sum(rate(etcd_helper_cache_miss_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance)' % $._config, legendFormat='{{instance}} miss'));
 
       local etcdCacheLatency =
         graphPanel.new(
@@ -114,8 +114,8 @@ local singlestat = grafana.singlestat;
           format='s',
           min=0,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}} get'))
-        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}} miss'));
+        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}} get'))
+        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}} miss'));
 
       local memory =
         graphPanel.new(
@@ -124,7 +124,7 @@ local singlestat = grafana.singlestat;
           span=4,
           format='bytes',
         )
-        .addTarget(prometheus.target('process_resident_memory_bytes{%(kubeApiserverSelector)s,instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('process_resident_memory_bytes{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{instance}}'));
 
       local cpu =
         graphPanel.new(
@@ -134,7 +134,7 @@ local singlestat = grafana.singlestat;
           format='short',
           min=0,
         )
-        .addTarget(prometheus.target('rate(process_cpu_seconds_total{%(kubeApiserverSelector)s,instance=~"$instance"}[5m])' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('rate(process_cpu_seconds_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])' % $._config, legendFormat='{{instance}}'));
 
       local goroutines =
         graphPanel.new(
@@ -143,8 +143,7 @@ local singlestat = grafana.singlestat;
           span=4,
           format='short',
         )
-        .addTarget(prometheus.target('go_goroutines{%(kubeApiserverSelector)s,instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
-
+        .addTarget(prometheus.target('go_goroutines{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{instance}}'));
 
       dashboard.new(
         '%(dashboardNamePrefix)sAPI server' % $._config.grafanaK8s,
@@ -169,9 +168,21 @@ local singlestat = grafana.singlestat;
       )
       .addTemplate(
         template.new(
+          name='cluster',
+          datasource='$datasource',
+          query='label_values(apiserver_request_total, %(clusterLabel)s)' % $._config,
+          current='prod',
+          hide=if $._config.showMultiCluster then '' else 'variable',
+          refresh=1,
+          includeAll=false,
+          sort=1
+        )
+      )
+      .addTemplate(
+        template.new(
           'instance',
           '$datasource',
-          'label_values(apiserver_request_total{%(kubeApiserverSelector)s}, instance)' % $._config,
+          'label_values(apiserver_request_total{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"}, instance)' % $._config,
           refresh='time',
           includeAll=true,
           sort=1,
