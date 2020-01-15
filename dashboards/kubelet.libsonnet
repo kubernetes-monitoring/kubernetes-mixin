@@ -359,7 +359,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(kubelet_runtime_operations{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, instance)' % $._config,
+          'label_values(kubelet_runtime_operations_total{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
           sort=1,
