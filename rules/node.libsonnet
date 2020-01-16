@@ -14,7 +14,7 @@
             // Number of nodes in the cluster
             // SINCE 2018-02-08
             record: ':kube_pod_info_node_count:',
-            expr: 'sum(min(kube_pod_info) by (node))',
+            expr: 'sum(min(kube_pod_info) by (cluster, node))',
           },
           {
             // This rule results in the tuples (node, namespace, instance) => 1;
