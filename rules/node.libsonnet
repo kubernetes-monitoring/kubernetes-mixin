@@ -47,7 +47,7 @@
                   node_memory_MemFree_bytes{%(nodeExporterSelector)s} +
                   node_memory_Slab_bytes{%(nodeExporterSelector)s}
                 )
-              )
+              ) by (cluster)
             ||| % $._config,
           },
         ],
