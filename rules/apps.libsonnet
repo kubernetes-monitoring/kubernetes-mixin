@@ -21,9 +21,9 @@
             // quantile_over_time(...) which would otherwise not be possible.
             record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
-              sum by (cluster, namespace, pod, container) (
+              sum by (%(clusterLabel)s, namespace, pod, container) (
                 rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])
-              ) * on (cluster, namespace, pod) group_left(node) max by(cluster, namespace, pod, node) (kube_pod_info)
+              ) * on (%(clusterLabel)s, namespace, pod) group_left(node) max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info)
             ||| % $._config,
           },
           {
@@ -100,7 +100,7 @@
                   ) * on(replicaset, namespace) group_left(owner_name) kube_replicaset_owner{%(kubeStateMetricsSelector)s},
                   "workload", "$1", "owner_name", "(.*)"
                 )
-              ) by (cluster, namespace, workload, pod)
+              ) by (%(clusterLabel)s, namespace, workload, pod)
             ||| % $._config,
             labels: {
               workload_type: 'deployment',
@@ -114,7 +114,7 @@
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="DaemonSet"},
                   "workload", "$1", "owner_name", "(.*)"
                 )
-              ) by (cluster, namespace, workload, pod)
+              ) by (%(clusterLabel)s, namespace, workload, pod)
             ||| % $._config,
             labels: {
               workload_type: 'daemonset',
@@ -128,7 +128,7 @@
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="StatefulSet"},
                   "workload", "$1", "owner_name", "(.*)"
                 )
-              ) by (cluster, namespace, workload, pod)
+              ) by (%(clusterLabel)s, namespace, workload, pod)
             ||| % $._config,
             labels: {
               workload_type: 'statefulset',
