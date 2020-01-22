@@ -142,8 +142,8 @@ local singlestat = grafana.singlestat;
       ).addTemplate(
         {
           current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
+            text: 'default',
+            value: 'default',
           },
           hide: 0,
           label: null,

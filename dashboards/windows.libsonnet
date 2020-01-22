@@ -26,8 +26,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       ).addTemplate(
         {
           current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
+            text: 'default',
+            value: 'default',
           },
           hide: 0,
           label: null,
@@ -143,8 +143,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       ).addTemplate(
         {
           current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
+            text: 'default',
+            value: 'default',
           },
           hide: 0,
           label: null,
@@ -236,8 +236,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       ).addTemplate(
         {
           current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
+            text: 'default',
+            value: 'default',
           },
           hide: 0,
           label: null,
@@ -357,8 +357,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       ).addTemplate(
         {
           current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
+            text: 'default',
+            value: 'default',
           },
           hide: 0,
           label: null,
@@ -442,8 +442,8 @@ local g = import 'grafana-builder/grafana.libsonnet';
       ).addTemplate(
         {
           current: {
-            text: 'Prometheus',
-            value: 'Prometheus',
+            text: 'default',
+            value: 'default',
           },
           hide: 0,
           label: null,
