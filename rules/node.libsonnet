@@ -14,7 +14,9 @@
             // Number of nodes in the cluster
             // SINCE 2018-02-08
             record: ':kube_pod_info_node_count:',
-            expr: 'sum(min(kube_pod_info) by (node))',
+            expr: |||
+                sum(min(kube_pod_info) by (%(clusterLabel)s, node))
+             ||| % $._config,
           },
           {
             // This rule results in the tuples (node, namespace, instance) => 1;
@@ -28,7 +30,7 @@
             // This rule gives the number of CPUs per node.
             record: 'node:node_num_cpu:sum',
             expr: |||
-              count by (node) (sum by (node, cpu) (
+              count by (%(clusterLabel)s, node) (sum by (node, cpu) (
                 node_cpu_seconds_total{%(nodeExporterSelector)s}
               * on (namespace, %(podLabel)s) group_left(node)
                 node_namespace_pod:kube_pod_info:
@@ -47,7 +49,7 @@
                   node_memory_MemFree_bytes{%(nodeExporterSelector)s} +
                   node_memory_Slab_bytes{%(nodeExporterSelector)s}
                 )
-              )
+              ) by (%(clusterLabel)s)
             ||| % $._config,
           },
         ],
