@@ -7,7 +7,6 @@ local graphPanel = grafana.graphPanel;
 local tablePanel = grafana.tablePanel;
 local annotation = grafana.annotation;
 local singlestat = grafana.singlestat;
-local piechart = grafana.pieChartPanel;
 local promgrafonnet = import '../lib/promgrafonnet/promgrafonnet.libsonnet';
 local numbersinglestat = promgrafonnet.numbersinglestat;
 local gauge = promgrafonnet.gauge;
