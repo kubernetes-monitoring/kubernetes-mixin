@@ -407,6 +407,7 @@ local gauge = promgrafonnet.gauge;
             * on (namespace,pod)
             group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
           |||,
+          legendFormat='{{ workload }}',
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
@@ -418,6 +419,7 @@ local gauge = promgrafonnet.gauge;
             * on (namespace,pod)
             group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
           |||,
+          legendFormat='{{ workload }}',
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
@@ -479,6 +481,7 @@ local gauge = promgrafonnet.gauge;
               * on (namespace,pod)
               group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
             |||,
+            legendFormat='{{ workload }}',
           ),
           gridPos={ h: 9, w: 12, x: 0, y: 20 }
         )
@@ -490,6 +493,7 @@ local gauge = promgrafonnet.gauge;
               * on (namespace,pod)
               group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
             |||,
+            legendFormat='{{ workload }}',
           ),
           gridPos={ h: 9, w: 12, x: 12, y: 20 }
         ),
