@@ -11,7 +11,7 @@
     namespaceOvercommitFactor: 1.5,
     cpuThrottlingPercent: 25,
     cpuThrottlingSelector: '',
-    placeholdersNamespaceSelector: null,
+    placeholdersNamespaceSelector: '',
   },
 
   prometheusAlerts+:: {
