@@ -11,6 +11,7 @@
     namespaceOvercommitFactor: 1.5,
     cpuThrottlingPercent: 25,
     cpuThrottlingSelector: '',
+    placeholdersNamespaceSelector: null,
   },
 
   prometheusAlerts+:: {
@@ -21,7 +22,7 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum)
+              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(placeholdersNamespaceSelector)s},)
                 /
               sum(kube_node_status_allocatable_cpu_cores)
                 >
@@ -38,7 +39,7 @@
           {
             alert: 'KubeMemOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum)
+              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum{%(placeholdersNamespaceSelector)s})
                 /
               sum(kube_node_status_allocatable_memory_bytes)
                 >
