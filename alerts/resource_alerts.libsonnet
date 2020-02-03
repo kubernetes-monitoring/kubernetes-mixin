@@ -22,7 +22,7 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(placeholdersNamespaceSelector)s},)
+              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(placeholdersNamespaceSelector)s})
                 /
               sum(kube_node_status_allocatable_cpu_cores)
                 >
