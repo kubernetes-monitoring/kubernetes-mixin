@@ -125,7 +125,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeClientCertificateExpiration',
             expr: |||
-              apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
+              apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -137,7 +137,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeClientCertificateExpiration',
             expr: |||
-              apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
+              apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
             ||| % $._config,
             labels: {
               severity: 'critical',
