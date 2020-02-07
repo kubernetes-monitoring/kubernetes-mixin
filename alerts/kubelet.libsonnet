@@ -26,6 +26,7 @@
             expr: |||
               kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} == 1
             ||| % $._config,
+            'for': '2m',
             labels: {
               severity: 'warning',
             },
