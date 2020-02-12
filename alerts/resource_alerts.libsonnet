@@ -11,6 +11,10 @@
     namespaceOvercommitFactor: 1.5,
     cpuThrottlingPercent: 25,
     cpuThrottlingSelector: '',
+    // Set this selector for seleting namespaces that contains resources used for overprovision
+    // See https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-can-i-configure-overprovisioning-with-cluster-autoscaler
+    // for more details.
+    ignoringOverprovisionedWorkloadSelector: '',
   },
 
   prometheusAlerts+:: {
@@ -21,7 +25,7 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum)
+              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(ignoringOverprovisionedWorkloadSelector)s})
                 /
               sum(kube_node_status_allocatable_cpu_cores)
                 >
@@ -38,7 +42,7 @@
           {
             alert: 'KubeMemOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum)
+              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s})
                 /
               sum(kube_node_status_allocatable_memory_bytes)
                 >
