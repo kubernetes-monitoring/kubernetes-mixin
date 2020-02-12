@@ -7,6 +7,11 @@
   prometheusRules+:: {
     groups+: [
       {
+        name: 'kube-apiserver-error',
+        rules:
+          $._config.SLOs.apiserver.errors.recordingrules,
+      },
+      {
         name: 'kube-apiserver.rules',
         rules: [
           {

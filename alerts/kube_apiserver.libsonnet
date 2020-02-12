@@ -16,8 +16,7 @@ local utils = import 'utils.libsonnet';
       {
         name: 'kube-apiserver-error',
         rules:
-          $._config.SLOs.apiserver.errors.alerts +
-          $._config.SLOs.apiserver.errors.recordingrules,
+          $._config.SLOs.apiserver.errors.alerts,
       },
       {
         name: 'kubernetes-system-apiserver',
