@@ -14,7 +14,7 @@ local utils = import 'utils.libsonnet';
   prometheusAlerts+:: {
     groups+: [
       {
-        name: 'kube-apiserver-error',
+        name: 'kube-apiserver-error-alerts',
         rules:
           $._config.SLOs.apiserver.errors.alerts,
       },
