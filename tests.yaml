@@ -116,3 +116,60 @@ tests:
     exp_samples:
     - value: 1.0e+9
       labels: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum{namespace="kube-apiserver"}'
+
+- interval: 1m
+  input_series:
+  # Create a histogram where all of the last 10 samples are in the +Inf (> 10 seconds) bucket.
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.005", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.01", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.025", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.05", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.1", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.25", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.5", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="1", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="2.5", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="5", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="10", instance="10.0.2.15:10250"}'
+    values: '1+0x10'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="+Inf", instance="10.0.2.15:10250"}'
+    values: '30+1x10'
+  - series: 'kubelet_node_name{endpoint="https-metrics",instance="10.0.2.15:10250",job="kubelet",namespace="kube-system",node="minikube",service="kubelet"}'
+    values: '1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeletPlegDurationHigh
+    exp_alerts:
+    - exp_labels:
+        instance: 10.0.2.15:10250
+        node: minikube
+        quantile: 0.99
+        severity: warning
+      exp_annotations:
+        message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of 10 seconds on node minikube.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletplegdurationhigh'
+
+- interval: 1m
+  input_series:
+  - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
+    values: '1 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1'
+  alert_rule_test:
+  - eval_time: 18m
+    alertname: KubeNodeReadinessFlapping
+    exp_alerts:
+    - exp_labels:
+        node: minikube
+        severity: warning
+      exp_annotations:
+        message: 'The readiness status of node minikube has changed 10 times in the last 15 minutes.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodereadinessflapping'

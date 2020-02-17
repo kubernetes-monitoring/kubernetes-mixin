@@ -48,6 +48,32 @@
               message: "Kubelet '{{ $labels.node }}' is running at {{ $value | humanizePercentage }} of its Pod capacity.",
             },
           },
+          {
+            alert: 'KubeNodeReadinessFlapping',
+            expr: |||
+              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (node) > 2
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.',
+            },
+          },
+          {
+            alert: 'KubeletPlegDurationHigh',
+            expr: |||
+              node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
+            ||| % $._config,
+            'for': '5m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.',
+            },
+          },
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'Kubelet',
             selector:: $._config.kubeletSelector,
