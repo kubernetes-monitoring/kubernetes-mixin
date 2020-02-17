@@ -63,7 +63,7 @@
           {
             alert: 'KubeletPlegDurationHigh',
             expr: |||
-              histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket[5m])) by (instance, le) * on(instance) group_left(node) kubelet_node_name{%(kubeletSelector)s}) >= 10
+              node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
             ||| % $._config,
             'for': '5m',
             labels: {

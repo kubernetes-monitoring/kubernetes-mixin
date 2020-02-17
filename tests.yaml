@@ -153,6 +153,7 @@ tests:
     - exp_labels:
         instance: 10.0.2.15:10250
         node: minikube
+        quantile: 0.99
         severity: warning
       exp_annotations:
         message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of 10 seconds on node minikube.'
