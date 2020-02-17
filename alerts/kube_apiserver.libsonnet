@@ -146,6 +146,31 @@ local utils = import 'utils.libsonnet';
               message: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
             },
           },
+          {
+            alert: 'AggregatedAPIErrors',
+            expr: |||
+              sum by(name, namespace)(increase(aggregator_unavailable_apiservice_count[5m])) > 2
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. The number of errors have increased for it in the past five minutes. High values indicate that the availability of the service changes too often.',
+            },
+          },
+          {
+            alert: 'AggregatedAPIDown',
+            expr: |||
+              sum by(name, namespace)(sum_over_time(aggregator_unavailable_apiservice[5m])) > 0
+            ||| % $._config,
+            'for': '5m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} is down. It has not been available at least for the past five minutes.',
+            },
+          },
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeAPI',
             selector:: $._config.kubeApiserverSelector,
