@@ -155,6 +155,11 @@ local template = grafana.template;
       local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
 
+      local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config;
+      local cpuQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.cpu');
+      local memoryQuotaRequestsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'requests.memory');
+      local memoryQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.memory');
+
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
@@ -164,8 +169,31 @@ local template = grafana.template;
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel(cpuUsageQuery, '{{workload}} - {{workload_type}}') +
-          g.stack,
+          g.queryPanel([cpuUsageQuery, cpuQuotaRequestsQuery, cpuQuotaLimitsQuery], ['{{workload}} - {{workload_type}}', 'quota - requests', 'quota - limits']) +
+          g.stack+ {
+                seriesOverrides: [
+                    {
+                        "alias": "quota - requests",
+                        "color": "#F2495C",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                    {
+                        "alias": "quota - limits",
+                        "color": "#FF9830",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                ]
+          },
         )
       )
       .addRow(
@@ -193,9 +221,31 @@ local template = grafana.template;
         g.row('Memory Usage')
         .addPanel(
           g.panel('Memory Usage') +
-          g.queryPanel(memUsageQuery, '{{workload}} - {{workload_type}}') +
+          g.queryPanel([memUsageQuery, memoryQuotaRequestsQuery, memoryQuotaLimitsQuery], ['{{workload}} - {{workload_type}}', 'quota - requests', 'quota - limits']) +
           g.stack +
-          { yaxes: g.yaxes('bytes') },
+          { yaxes: g.yaxes('bytes'),
+                seriesOverrides: [
+                    {
+                        "alias": "quota - requests",
+                        "color": "#F2495C",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                    {
+                        "alias": "quota - limits",
+                        "color": "#FF9830",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                ] },
         )
       )
       .addRow(

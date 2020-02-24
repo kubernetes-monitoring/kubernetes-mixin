@@ -78,17 +78,74 @@ local template = grafana.template;
         },
       };
 
+      local cpuUsageQuery = 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config;
+
+      local memoryUsageQuery = 'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!=""}) by (pod)' % $._config;
+
+      local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config;
+      local cpuQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.cpu');
+      local memoryQuotaRequestsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'requests.memory');
+      local memoryQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.memory');
+
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
       .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addRow(
+            (g.row('Headlines') +
+            {
+            height: '100px',
+            showTitle: false,
+            })
+            .addPanel(
+            g.panel('CPU Utilisation (from requests)') +
+            g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"})' % $._config)
+            )
+            .addPanel(
+            g.panel('CPU Utilisation (from limits)') +
+            g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"})' % $._config)
+            )
+            .addPanel(
+            g.panel('Memory Utilization (from requests)') +
+            g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"})' % $._config)
+            )
+            .addPanel(
+            g.panel('Memory Utilisation (from limits)') +
+            g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"})' % $._config)
+            )
+        )
+      .addRow(
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config, '{{pod}}') +
-          g.stack,
+          g.queryPanel([
+            cpuUsageQuery,
+            cpuQuotaRequestsQuery, cpuQuotaLimitsQuery], ['{{pod}}', 'quota - requests', 'quota - limits']) +
+          g.stack + {
+                seriesOverrides: [
+                    {
+                        "alias": "quota - requests",
+                        "color": "#F2495C",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                    {
+                        "alias": "quota - limits",
+                        "color": "#FF9830",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                ]
+          },
         )
       )
       .addRow(
@@ -115,9 +172,34 @@ local template = grafana.template;
         .addPanel(
           g.panel('Memory Usage (w/o cache)') +
           // Like above, without page cache
-          g.queryPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!=""}) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel([
+            memoryUsageQuery,
+            memoryQuotaRequestsQuery, memoryQuotaLimitsQuery], ['{{pod}}', 'quota - requests', 'quota - limits']) +
           g.stack +
-          { yaxes: g.yaxes('bytes') },
+          { yaxes: g.yaxes('bytes'),
+                seriesOverrides: [
+                    {
+                        "alias": "quota - requests",
+                        "color": "#F2495C",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                    {
+                        "alias": "quota - limits",
+                        "color": "#FF9830",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                ]
+          },
         )
       )
       .addRow(
@@ -208,6 +290,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } }
     }
 }
