@@ -4,4 +4,4 @@
 (import 'resources/node.libsonnet') +
 (import 'resources/pod.libsonnet') +
 (import 'resources/workload-namespace.libsonnet') +
-(import 'resources/workload.libsonnet') 
+(import 'resources/workload.libsonnet')
