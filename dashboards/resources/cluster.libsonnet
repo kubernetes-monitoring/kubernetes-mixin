@@ -29,6 +29,18 @@ local template = grafana.template;
             ],
         },
 
+        local clusterTemplate =
+            template.new(
+                name='cluster',
+                datasource='$datasource',
+                query='label_values(node_cpu_seconds_total, %s)' % $._config.clusterLabel,
+                current='',
+                hide=if $._config.showMultiCluster then '' else '2',
+                refresh=2,
+                includeAll=false,
+                sort=1
+            ),
+
         'k8s-resources-cluster.json':
         local tableStyles = {
             namespace: {
@@ -96,10 +108,12 @@ local template = grafana.template;
             },
         };
 
+        
+
         g.dashboard(
             '%(dashboardNamePrefix)sCompute Resources / Cluster' % $._config.grafanaK8s,
             uid=($._config.grafanaDashboardIDs['k8s-resources-cluster.json']),
-        ).addTemplate('cluster', 'node_cpu_seconds_total', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+        )
         .addRow(
             (g.row('Headlines') +
             {
@@ -271,7 +285,7 @@ local template = grafana.template;
             )
         ) + { 
             tags: $._config.grafanaK8s.dashboardTags, 
-            templating+: { list+: [intervalTemplate] },
+            templating+: { list+: [intervalTemplate, clusterTemplate] },
             refresh: $._config.grafanaK8s.refresh },
     }
 }

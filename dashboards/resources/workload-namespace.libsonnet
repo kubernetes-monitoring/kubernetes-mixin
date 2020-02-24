@@ -47,6 +47,30 @@ local template = grafana.template;
             skipUrlSync: false,
         },
 
+                local clusterTemplate =
+            template.new(
+                name='cluster',
+                datasource='$datasource',
+                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+                current='',
+                hide=if $._config.showMultiCluster then '' else '2',
+                refresh=1,
+                includeAll=false,
+                sort=1
+            ),
+
+        local namespaceTemplate =
+            template.new(
+                name='namespace',
+                datasource='$datasource',
+                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+                current='',
+                hide='',
+                refresh=1,
+                includeAll=false,
+                sort=1
+            ),
+
         'k8s-resources-workloads-namespace.json':
       local tableStyles = {
         workload: {
@@ -163,8 +187,7 @@ local template = grafana.template;
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
-      .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
+      )
       .addRow(
         g.row('CPU Usage')
         .addPanel(
@@ -382,7 +405,7 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, typeTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, typeTemplate, clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
 
     }
 }

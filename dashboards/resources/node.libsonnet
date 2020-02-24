@@ -29,6 +29,30 @@ local template = grafana.template;
             ],
         },
 
+        local clusterTemplate =
+            template.new(
+                name='cluster',
+                datasource='$datasource',
+                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+                current='',
+                hide=if $._config.showMultiCluster then '' else '2',
+                refresh=1,
+                includeAll=false,
+                sort=1
+            ),
+
+          local nodeTemplate =
+            template.new(
+                name='node',
+                datasource='$datasource',
+                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, node)' % $._config.clusterLabel,
+                current='',
+                hide='',
+                refresh=1,
+                includeAll=false,
+                sort=1
+            ),
+
         'k8s-resources-node.json':
       local tableStyles = {
         pod: {
@@ -39,8 +63,7 @@ local template = grafana.template;
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Node (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-node.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
-      .addTemplate('node', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'node')
+      )
       .addRow(
         g.row('CPU Usage')
         .addPanel(
@@ -102,6 +125,6 @@ local template = grafana.template;
             'Value #H': { alias: 'Memory Usage (Swap)', unit: 'bytes' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, refresh: $._config.grafanaK8s.refresh },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, refresh: $._config.grafanaK8s.refresh, templating+: { list+: [intervalTemplate, clusterTemplate, nodeTemplate] } },
     }
 }
