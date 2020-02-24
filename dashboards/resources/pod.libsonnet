@@ -250,6 +250,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] }, refresh: $._config.grafanaK8s.refresh },
     }
 }

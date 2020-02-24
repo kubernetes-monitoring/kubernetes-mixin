@@ -102,6 +102,6 @@ local template = grafana.template;
             'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, refresh: $._config.grafanaK8s.refresh },
   } else {},
 }

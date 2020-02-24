@@ -561,6 +561,6 @@ local g = import 'grafana-builder/grafana.libsonnet';
           ) +
           { yaxes: g.yaxes('percentunit') },
         ),
-      ),
+      )+ {refresh: $._config.grafanaK8s.refresh},
   },
 }

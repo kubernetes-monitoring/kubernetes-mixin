@@ -102,6 +102,6 @@ local template = grafana.template;
             'Value #H': { alias: 'Memory Usage (Swap)', unit: 'bytes' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, refresh: $._config.grafanaK8s.refresh },
     }
 }
