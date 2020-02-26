@@ -3,32 +3,32 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local template = grafana.template;
 
 {
-    grafanaDashboards+:: {   
-         local intervalTemplate =
-        template.new(
-            name='interval',
-            datasource='$datasource',
-            query='4h',
-            current='5m',
-            hide=2,
-            refresh=2,
-            includeAll=false,
-            sort=1
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            skipUrlSync: false,
-            type: 'interval',
-            options: [
-            {
-                selected: true,
-                text: '4h',
-                value: '4h',
-            },
-            ],
-        },
- 
+  grafanaDashboards+:: {
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='$datasource',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
+
     'k8s-resources-workload.json':
       local tableStyles = {
         pod: {
@@ -306,5 +306,5 @@ local template = grafana.template;
           { yaxes: g.yaxes('Bps') },
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
-    }
+  },
 }
