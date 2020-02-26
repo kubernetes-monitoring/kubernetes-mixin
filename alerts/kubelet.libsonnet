@@ -74,6 +74,19 @@
               message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.',
             },
           },
+          {
+            alert: 'KubeletPodStartUpLatencyHigh',
+            expr: |||
+              histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])) by (instance, le)) * on(instance) group_left(node) kubelet_node_name  > 5
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'Kubelet Pod startup 99th percentile latency is {{ $value }} seconds on node {{ $labels.node }}.',
+            },
+          },
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'Kubelet',
             selector:: $._config.kubeletSelector,
