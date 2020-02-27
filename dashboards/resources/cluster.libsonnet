@@ -281,19 +281,9 @@ local template = grafana.template;
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
-        )
-        .addRow(
-            g.row('Network')
-            .addPanel(
-            g.panel('Rate of Transmitted Packets Dropped') +
-            g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
-            g.stack +
-            { yaxes: g.yaxes('Bps') },
-            )
-        ) + { 
+        ))+ { 
             tags: $._config.grafanaK8s.dashboardTags, 
             templating+: { list+: [intervalTemplate, clusterTemplate] },
             refresh: $._config.grafanaK8s.refresh },
-    }
 }
 
