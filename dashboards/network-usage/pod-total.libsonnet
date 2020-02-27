@@ -242,7 +242,7 @@ local gauge = promgrafonnet.gauge;
         tags=($._config.grafanaK8s.dashboardTags),
         editable=true,
         schemaVersion=18,
-        refresh='30s',
+        refresh=($._config.grafanaK8s.refresh),
         time_from='now-1h',
         time_to='now',
       )

@@ -29,26 +29,39 @@ local template = grafana.template;
         ],
       },
 
-    'k8s-resources-cluster.json':
-      local tableStyles = {
-        namespace: {
-          alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
-          linkTooltip: 'Drill down to pods',
-        },
-        'Value #A': {
-          alias: 'Pods',
-          linkTooltip: 'Drill down to pods',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell_1' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
-          decimals: 0,
-        },
-        'Value #B': {
-          alias: 'Workloads',
-          linkTooltip: 'Drill down to workloads',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workloads-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell_1' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workloads-namespace.json') },
-          decimals: 0,
-        },
-      };
+        local clusterTemplate =
+            template.new(
+                name='cluster',
+                datasource='$datasource',
+                query='label_values(node_cpu_seconds_total, %s)' % $._config.clusterLabel,
+                current='',
+                hide=if $._config.showMultiCluster then '' else '2',
+                refresh=2,
+                includeAll=false,
+                sort=1
+            ),
+
+        'k8s-resources-cluster.json':
+        local tableStyles = {
+            namespace: {
+            alias: 'Namespace',
+            link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
+            linkTooltip: 'Drill down to pods',
+            },
+            'Value #A': {
+            alias: 'Pods',
+            linkTooltip: 'Drill down to pods',
+            link: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell_1' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-namespace.json') },
+            decimals: 0,
+            },
+            'Value #B': {
+            alias: 'Workloads',
+            linkTooltip: 'Drill down to workloads',
+            link: '%(prefix)s/d/%(uid)s/k8s-resources-workloads-namespace?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$__cell_1' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workloads-namespace.json') },
+            decimals: 0,
+            },
+        };
+
 
       local podWorkloadColumns = [
         'count(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
@@ -268,7 +281,9 @@ local template = grafana.template;
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[$interval])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
-        )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
-  },
+        ))+ { 
+            tags: $._config.grafanaK8s.dashboardTags, 
+            templating+: { list+: [intervalTemplate, clusterTemplate] },
+            refresh: $._config.grafanaK8s.refresh }
+  }
 }
