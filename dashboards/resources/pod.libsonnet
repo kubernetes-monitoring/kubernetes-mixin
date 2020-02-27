@@ -29,6 +29,42 @@ local template = grafana.template;
             ],
         },
 
+        local clusterTemplate =
+            template.new(
+                name='cluster',
+                datasource='$datasource',
+                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+                current='',
+                hide=if $._config.showMultiCluster then '' else '2',
+                refresh=1,
+                includeAll=false,
+                sort=1
+            ),
+
+          local namespaceTemplate =
+            template.new(
+                name='namespace',
+                datasource='$datasource',
+                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+                current='',
+                hide='',
+                refresh=1,
+                includeAll=false,
+                sort=1
+            ),
+
+          local podTemplate =
+            template.new(
+                name='pod',
+                datasource='$datasource',
+                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster", namespace="$namespace"}, pod)' % $._config.clusterLabel,
+                current='',
+                hide='',
+                refresh=2,
+                includeAll=false,
+                sort=1
+            ),
+
         'k8s-resources-pod.json':
       local tableStyles = {
         container: {
@@ -36,18 +72,78 @@ local template = grafana.template;
         },
       };
 
+      local cpuRequestsQuery = |||
+        sum(
+            kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"})
+      ||| % $._config;
+
+      local cpuLimitsQuery = std.strReplace(cpuRequestsQuery, 'requests', 'limits');
+      local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
+      local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
+
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Pod' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
-      ).addTemplate('cluster', 'kube_pod_info', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
-      .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
-      .addTemplate('pod', 'kube_pod_info{%(clusterLabel)s="$cluster", namespace="$namespace"}' % $._config, 'pod')
+      )
       .addRow(
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}) by (container)' % $._config, '{{container}}') +
-          g.stack,
+          g.queryPanel([
+              'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}) by (container)' % $._config,
+              cpuRequestsQuery,
+              cpuLimitsQuery], [
+                   '{{container}}',
+                   'requests',
+                   'limits'],
+            ) +
+          g.stack + {
+                seriesOverrides: [
+                    {
+                        "alias": "requests",
+                        "color": "#F2495C",
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": true,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                    {
+                        "alias": "limits",
+                        "color": "#FF9830",
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": true,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                ]
+          },
+        )
+      )
+      .addRow(
+        g.row('CPU Throttling')
+        .addPanel(
+          g.panel('CPU Throttling') +
+          g.queryPanel('sum(increase(container_cpu_cfs_throttled_periods_total{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}[5m])) by (container) /sum(increase(container_cpu_cfs_periods_total{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}[5m])) by (container)' % $._config, '{{container}}') +
+          g.stack
+        + { 
+            yaxes: g.yaxes({ format: 'percentunit', max: 1 }),
+            legend+: {
+                current: true,
+                max: true
+            },
+            thresholds: [
+                {
+                    value: $._config.cpuThrottlingPercent / 100,
+                    colorMode: "critical",
+                    op: "gt",
+                    fill: true,
+                    line: true,
+                    yaxis: "left"
+                }
+            ]
+            },
         )
       )
       .addRow(
@@ -74,16 +170,40 @@ local template = grafana.template;
         .addPanel(
           g.panel('Memory Usage') +
           g.queryPanel([
-            'sum(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="POD", container!=""}) by (container)' % $._config,
-            'sum(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="POD", container!=""}) by (container)' % $._config,
-            'sum(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="POD", container!=""}) by (container)' % $._config,
+            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="POD", container!=""}) by (container)' % $._config,
+            memRequestsQuery,
+            memLimitsQuery
           ], [
-            '{{container}} (RSS)',
-            '{{container}} (Cache)',
-            '{{container}} (Swap)',
+            '{{container}}',
+            'requests',
+            'limits',
           ]) +
           g.stack +
-          { yaxes: g.yaxes('bytes') },
+          { 
+              yaxes: g.yaxes('bytes'),
+              seriesOverrides: [
+                    {
+                        "alias": "requests",
+                        "color": "#F2495C",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                    {
+                        "alias": "limits",
+                        "color": "#FF9830",
+                        "dashes": true,
+                        "fill": 0,
+                        "hideTooltip": true,
+                        "legend": false,
+                        "linewidth": 2,
+                        "stack": false
+                    },
+                ]
+          }
         )
       )
       .addRow(
@@ -164,6 +284,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
     }
 }

@@ -191,6 +191,6 @@ local singlestat = grafana.singlestat;
         .addPanel(memory)
         .addPanel(cpu)
         .addPanel(goroutines)
-      ),
+      ) + {refresh: $._config.grafanaK8s.refresh},
   },
 }
