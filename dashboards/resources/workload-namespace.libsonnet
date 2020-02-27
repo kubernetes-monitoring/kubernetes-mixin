@@ -3,49 +3,49 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local template = grafana.template;
 
 {
-    grafanaDashboards+:: {
-       local intervalTemplate =
-        template.new(
-            name='interval',
-            datasource='$datasource',
-            query='4h',
-            current='5m',
-            hide=2,
-            refresh=2,
-            includeAll=false,
-            sort=1
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            skipUrlSync: false,
-            type: 'interval',
-            options: [
-            {
-                selected: true,
-                text: '4h',
-                value: '4h',
-            },
-            ],
-        },
+  grafanaDashboards+:: {
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='$datasource',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
 
-         local typeTemplate =
-        template.new(
-            name='type',
-            datasource='$datasource',
-            query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
-            current='deployment',
-            hide='',
-            refresh=1,
-            includeAll=false,
-            sort=0
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            definition: 'label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
-            skipUrlSync: false,
-        },
+    local typeTemplate =
+      template.new(
+        name='type',
+        datasource='$datasource',
+        query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        current='deployment',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=0
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        definition: 'label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        skipUrlSync: false,
+      },
 
                 local clusterTemplate =
             template.new(
@@ -407,5 +407,5 @@ local template = grafana.template;
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, typeTemplate, clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
 
-    }
+  },
 }

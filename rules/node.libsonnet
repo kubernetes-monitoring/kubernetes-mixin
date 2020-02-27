@@ -15,15 +15,23 @@
             // SINCE 2018-02-08
             record: ':kube_pod_info_node_count:',
             expr: |||
-                sum(min(kube_pod_info) by (%(clusterLabel)s, node))
-             ||| % $._config,
+              sum(min(kube_pod_info) by (%(clusterLabel)s, node))
+            ||| % $._config,
           },
           {
-            // This rule results in the tuples (node, namespace, instance) => 1;
-            // it is used to calculate per-node metrics, given namespace & instance.
+            // This rule results in the tuples (node, namespace, instance) => 1.
+            // It is used to calculate per-node metrics, given namespace & instance.
+            // We use the topk() aggregator to ensure that each (namespace,
+            // instance) tuple is only associated to one node and thus avoid
+            // "many-to-many matching not allowed" errors when joining with
+            // other timeseries on (namespace, instance). See node:node_num_cpu:sum
+            // below for instance.
             record: 'node_namespace_pod:kube_pod_info:',
             expr: |||
-              max(label_replace(kube_pod_info{%(kubeStateMetricsSelector)s}, "%(podLabel)s", "$1", "pod", "(.*)")) by (node, namespace, %(podLabel)s)
+              topk by(namespace, %(podLabel)s) (1,
+                max by (node, namespace, %(podLabel)s) (
+                  label_replace(kube_pod_info{%(kubeStateMetricsSelector)s}, "%(podLabel)s", "$1", "pod", "(.*)")
+              ))
             ||| % $._config,
           },
           {

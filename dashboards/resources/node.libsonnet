@@ -3,31 +3,31 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local template = grafana.template;
 
 {
-    grafanaDashboards+:: {
-         local intervalTemplate =
-        template.new(
-            name='interval',
-            datasource='$datasource',
-            query='4h',
-            current='5m',
-            hide=2,
-            refresh=2,
-            includeAll=false,
-            sort=1
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            skipUrlSync: false,
-            type: 'interval',
-            options: [
-            {
-                selected: true,
-                text: '4h',
-                value: '4h',
-            },
-            ],
-        },
+  grafanaDashboards+:: {
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='$datasource',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
 
         local clusterTemplate =
             template.new(
@@ -53,7 +53,7 @@ local template = grafana.template;
                 sort=1
             ),
 
-        'k8s-resources-node.json':
+    'k8s-resources-node.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',

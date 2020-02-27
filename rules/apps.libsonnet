@@ -23,35 +23,45 @@
             expr: |||
               sum by (%(clusterLabel)s, namespace, pod, container) (
                 rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])
-              ) * on (%(clusterLabel)s, namespace, pod) group_left(node) max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info)
+              ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
+                1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info)
+              )
             ||| % $._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_working_set_bytes',
             expr: |||
               container_memory_working_set_bytes{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
+                max by(namespace, pod, node) (kube_pod_info)
+              )
             ||| % $._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_rss',
             expr: |||
               container_memory_rss{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
+                max by(namespace, pod, node) (kube_pod_info)
+              )
             ||| % $._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_cache',
             expr: |||
               container_memory_cache{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
+                max by(namespace, pod, node) (kube_pod_info)
+              )
             ||| % $._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_swap',
             expr: |||
               container_memory_swap{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) max by(namespace, pod, node) (kube_pod_info)
+              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
+                max by(namespace, pod, node) (kube_pod_info)
+              )
             ||| % $._config,
           },
           {
@@ -92,15 +102,19 @@
           {
             record: 'mixin_pod_workload',
             expr: |||
-              sum(
+              max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   label_replace(
                     kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
                     "replicaset", "$1", "owner_name", "(.*)"
-                  ) * on(replicaset, namespace) group_left(owner_name) kube_replicaset_owner{%(kubeStateMetricsSelector)s},
+                  ) * on(replicaset, namespace) group_left(owner_name) topk by(replicaset, namespace) (
+                    1, max by (replicaset, namespace, owner_name) (
+                      kube_replicaset_owner{%(kubeStateMetricsSelector)s}
+                    )
+                  ),
                   "workload", "$1", "owner_name", "(.*)"
                 )
-              ) by (%(clusterLabel)s, namespace, workload, pod)
+              )
             ||| % $._config,
             labels: {
               workload_type: 'deployment',
@@ -109,12 +123,12 @@
           {
             record: 'mixin_pod_workload',
             expr: |||
-              sum(
+              max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="DaemonSet"},
                   "workload", "$1", "owner_name", "(.*)"
                 )
-              ) by (%(clusterLabel)s, namespace, workload, pod)
+              )
             ||| % $._config,
             labels: {
               workload_type: 'daemonset',
@@ -123,12 +137,12 @@
           {
             record: 'mixin_pod_workload',
             expr: |||
-              sum(
+              max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="StatefulSet"},
                   "workload", "$1", "owner_name", "(.*)"
                 )
-              ) by (%(clusterLabel)s, namespace, workload, pod)
+              )
             ||| % $._config,
             labels: {
               workload_type: 'statefulset',
