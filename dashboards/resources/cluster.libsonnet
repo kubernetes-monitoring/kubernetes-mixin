@@ -284,6 +284,6 @@ local template = grafana.template;
         ))+ { 
             tags: $._config.grafanaK8s.dashboardTags, 
             templating+: { list+: [intervalTemplate, clusterTemplate] },
-            refresh: $._config.grafanaK8s.refresh },
+            refresh: $._config.grafanaK8s.refresh }
+  }
 }
-
