@@ -29,30 +29,30 @@ local template = grafana.template;
         ],
       },
 
-        local clusterTemplate =
-            template.new(
-                name='cluster',
-                datasource='$datasource',
-                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local clusterTemplate =
+      template.new(
+        name='cluster',
+        datasource='$datasource',
+        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        current='',
+        hide=if $._config.showMultiCluster then '' else '2',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-        local namespaceTemplate =
-            template.new(
-                name='namespace',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-        'k8s-resources-namespace.json':
+    local namespaceTemplate =
+      template.new(
+        name='namespace',
+        datasource='$datasource',
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+        current='',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
+    'k8s-resources-namespace.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',
@@ -115,58 +115,60 @@ local template = grafana.template;
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       )
       .addRow(
-            (g.row('Headlines') +
-            {
-            height: '100px',
-            showTitle: false,
-            })
-            .addPanel(
-            g.panel('CPU Utilisation (from requests)') +
-            g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"})' % $._config)
-            )
-            .addPanel(
-            g.panel('CPU Utilisation (from limits)') +
-            g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"})' % $._config)
-            )
-            .addPanel(
-            g.panel('Memory Utilization (from requests)') +
-            g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"})' % $._config)
-            )
-            .addPanel(
-            g.panel('Memory Utilisation (from limits)') +
-            g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"})' % $._config)
-            )
+        (g.row('Headlines') +
+         {
+           height: '100px',
+           showTitle: false,
+         })
+        .addPanel(
+          g.panel('CPU Utilisation (from requests)') +
+          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"})' % $._config)
         )
+        .addPanel(
+          g.panel('CPU Utilisation (from limits)') +
+          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"})' % $._config)
+        )
+        .addPanel(
+          g.panel('Memory Utilization (from requests)') +
+          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) / sum(kube_pod_container_resource_requests_memory_bytes{namespace="$namespace"})' % $._config)
+        )
+        .addPanel(
+          g.panel('Memory Utilisation (from limits)') +
+          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) / sum(kube_pod_container_resource_limits_memory_bytes{namespace="$namespace"})' % $._config)
+        )
+      )
       .addRow(
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
           g.queryPanel([
             cpuUsageQuery,
-            cpuQuotaRequestsQuery, cpuQuotaLimitsQuery], ['{{pod}}', 'quota - requests', 'quota - limits']) +
+            cpuQuotaRequestsQuery,
+            cpuQuotaLimitsQuery,
+          ], ['{{pod}}', 'quota - requests', 'quota - limits']) +
           g.stack + {
-                seriesOverrides: [
-                    {
-                        "alias": "quota - requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "quota - limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ]
+            seriesOverrides: [
+              {
+                alias: 'quota - requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'quota - limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
           },
         )
       )
@@ -196,31 +198,34 @@ local template = grafana.template;
           // Like above, without page cache
           g.queryPanel([
             memoryUsageQuery,
-            memoryQuotaRequestsQuery, memoryQuotaLimitsQuery], ['{{pod}}', 'quota - requests', 'quota - limits']) +
+            memoryQuotaRequestsQuery,
+            memoryQuotaLimitsQuery,
+          ], ['{{pod}}', 'quota - requests', 'quota - limits']) +
           g.stack +
-          { yaxes: g.yaxes('bytes'),
-                seriesOverrides: [
-                    {
-                        "alias": "quota - requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "quota - limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ]
+          {
+            yaxes: g.yaxes('bytes'),
+            seriesOverrides: [
+              {
+                alias: 'quota - requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'quota - limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
           },
         )
       )
@@ -312,6 +317,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate] },refresh: $._config.grafanaK8s.refresh }
-    }
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
+  },
 }

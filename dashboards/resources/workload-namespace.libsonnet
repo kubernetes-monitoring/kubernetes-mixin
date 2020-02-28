@@ -47,31 +47,31 @@ local template = grafana.template;
         skipUrlSync: false,
       },
 
-                local clusterTemplate =
-            template.new(
-                name='cluster',
-                datasource='$datasource',
-                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local clusterTemplate =
+      template.new(
+        name='cluster',
+        datasource='$datasource',
+        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        current='',
+        hide=if $._config.showMultiCluster then '' else '2',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-        local namespaceTemplate =
-            template.new(
-                name='namespace',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local namespaceTemplate =
+      template.new(
+        name='namespace',
+        datasource='$datasource',
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+        current='',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-        'k8s-resources-workloads-namespace.json':
+    'k8s-resources-workloads-namespace.json':
       local tableStyles = {
         workload: {
           alias: 'Workload',
@@ -193,29 +193,29 @@ local template = grafana.template;
         .addPanel(
           g.panel('CPU Usage') +
           g.queryPanel([cpuUsageQuery, cpuQuotaRequestsQuery, cpuQuotaLimitsQuery], ['{{workload}} - {{workload_type}}', 'quota - requests', 'quota - limits']) +
-          g.stack+ {
-                seriesOverrides: [
-                    {
-                        "alias": "quota - requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "quota - limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ]
+          g.stack + {
+            seriesOverrides: [
+              {
+                alias: 'quota - requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'quota - limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
           },
         )
       )
@@ -246,29 +246,31 @@ local template = grafana.template;
           g.panel('Memory Usage') +
           g.queryPanel([memUsageQuery, memoryQuotaRequestsQuery, memoryQuotaLimitsQuery], ['{{workload}} - {{workload_type}}', 'quota - requests', 'quota - limits']) +
           g.stack +
-          { yaxes: g.yaxes('bytes'),
-                seriesOverrides: [
-                    {
-                        "alias": "quota - requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "quota - limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ] },
+          {
+            yaxes: g.yaxes('bytes'),
+            seriesOverrides: [
+              {
+                alias: 'quota - requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'quota - limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
+          },
         )
       )
       .addRow(
