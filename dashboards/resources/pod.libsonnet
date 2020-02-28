@@ -29,43 +29,43 @@ local template = grafana.template;
         ],
       },
 
-        local clusterTemplate =
-            template.new(
-                name='cluster',
-                datasource='$datasource',
-                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local clusterTemplate =
+      template.new(
+        name='cluster',
+        datasource='$datasource',
+        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        current='',
+        hide=if $._config.showMultiCluster then '' else '2',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-          local namespaceTemplate =
-            template.new(
-                name='namespace',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local namespaceTemplate =
+      template.new(
+        name='namespace',
+        datasource='$datasource',
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+        current='',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-          local podTemplate =
-            template.new(
-                name='pod',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster", namespace="$namespace"}, pod)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=2,
-                includeAll=false,
-                sort=1
-            ),
+    local podTemplate =
+      template.new(
+        name='pod',
+        datasource='$datasource',
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster", namespace="$namespace"}, pod)' % $._config.clusterLabel,
+        current='',
+        hide='',
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ),
 
-        'k8s-resources-pod.json':
+    'k8s-resources-pod.json':
       local tableStyles = {
         container: {
           alias: 'Container',
@@ -89,35 +89,38 @@ local template = grafana.template;
         g.row('CPU Usage')
         .addPanel(
           g.panel('CPU Usage') +
-          g.queryPanel([
+          g.queryPanel(
+            [
               'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}) by (container)' % $._config,
               cpuRequestsQuery,
-              cpuLimitsQuery], [
-                   '{{container}}',
-                   'requests',
-                   'limits'],
-            ) +
+              cpuLimitsQuery,
+            ], [
+              '{{container}}',
+              'requests',
+              'limits',
+            ],
+          ) +
           g.stack + {
-                seriesOverrides: [
-                    {
-                        "alias": "requests",
-                        "color": "#F2495C",
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": true,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "limits",
-                        "color": "#FF9830",
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": true,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ]
+            seriesOverrides: [
+              {
+                alias: 'requests',
+                color: '#F2495C',
+                fill: 0,
+                hideTooltip: true,
+                legend: true,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'limits',
+                color: '#FF9830',
+                fill: 0,
+                hideTooltip: true,
+                legend: true,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
           },
         )
       )
@@ -127,23 +130,23 @@ local template = grafana.template;
           g.panel('CPU Throttling') +
           g.queryPanel('sum(increase(container_cpu_cfs_throttled_periods_total{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}[5m])) by (container) /sum(increase(container_cpu_cfs_periods_total{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}[5m])) by (container)' % $._config, '{{container}}') +
           g.stack
-        + { 
+          + {
             yaxes: g.yaxes({ format: 'percentunit', max: 1 }),
             legend+: {
-                current: true,
-                max: true
+              current: true,
+              max: true,
             },
             thresholds: [
-                {
-                    value: $._config.cpuThrottlingPercent / 100,
-                    colorMode: "critical",
-                    op: "gt",
-                    fill: true,
-                    line: true,
-                    yaxis: "left"
-                }
-            ]
-            },
+              {
+                value: $._config.cpuThrottlingPercent / 100,
+                colorMode: 'critical',
+                op: 'gt',
+                fill: true,
+                line: true,
+                yaxis: 'left',
+              },
+            ],
+          },
         )
       )
       .addRow(
@@ -172,37 +175,37 @@ local template = grafana.template;
           g.queryPanel([
             'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="POD", container!=""}) by (container)' % $._config,
             memRequestsQuery,
-            memLimitsQuery
+            memLimitsQuery,
           ], [
             '{{container}}',
             'requests',
             'limits',
           ]) +
           g.stack +
-          { 
-              yaxes: g.yaxes('bytes'),
-              seriesOverrides: [
-                    {
-                        "alias": "requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ]
+          {
+            yaxes: g.yaxes('bytes'),
+            seriesOverrides: [
+              {
+                alias: 'requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
           }
         )
       )
@@ -285,5 +288,5 @@ local template = grafana.template;
           { yaxes: g.yaxes('Bps') },
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
-    }
+  },
 }
