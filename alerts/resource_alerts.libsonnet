@@ -107,6 +107,18 @@
             },
           },
           {
+            alert: 'KubeHighNumberConntrackEntriesUsed',
+            expr: |||
+              (node_nf_conntrack_entries / on (pod) node_nf_conntrack_entries_limit / on (pod) group_right  kube_pod_info) > 0.75
+            ||| % $._config,
+            annotations: {
+              message: '{{ $value | humanizePercentage }} of conntrack entries are used',
+            },
+            labels: {
+              severity: 'warning',
+            },
+          },
+          {
             alert: 'CPUThrottlingHigh',
             expr: |||
               sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
