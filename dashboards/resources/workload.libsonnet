@@ -8,7 +8,7 @@ local template = grafana.template;
       template.new(
         name='interval',
         datasource='$datasource',
-        query='4h',
+        query='$__interval',
         current='5m',
         hide=2,
         refresh=2,
@@ -23,8 +23,8 @@ local template = grafana.template;
         options: [
           {
             selected: true,
-            text: '4h',
-            value: '4h',
+            text: '$__interval',
+            value: '$__interval',
           },
         ],
       },

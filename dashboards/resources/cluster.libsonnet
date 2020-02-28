@@ -8,7 +8,7 @@ local template = grafana.template;
       template.new(
         name='interval',
         datasource='$datasource',
-        query='4h',
+        query='$__interval',
         current='5m',
         hide=2,
         refresh=2,
@@ -23,8 +23,8 @@ local template = grafana.template;
         options: [
           {
             selected: true,
-            text: '4h',
-            value: '4h',
+            text: '$__interval',
+            value: '$__interval',
           },
         ],
       },
@@ -121,7 +121,7 @@ local template = grafana.template;
          })
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle", %(clusterLabel)s="$cluster"}[1m]))' % $._config)
+          g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle", %(clusterLabel)s="$cluster"}[$interval]))' % $._config)
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
