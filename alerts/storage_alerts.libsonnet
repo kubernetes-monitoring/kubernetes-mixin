@@ -17,7 +17,7 @@
         name: 'kubernetes-storage',
         rules: [
           {
-            alert: 'KubePersistentVolumeUsageCritical',
+            alert: 'KubePersistentVolumeFillingUp',
             expr: |||
               kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                 /
