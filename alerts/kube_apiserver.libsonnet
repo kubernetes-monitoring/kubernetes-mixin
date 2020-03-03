@@ -64,36 +64,6 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPIErrorsHigh',
             expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m]))
-                /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) > 0.03
-            ||| % $._config,
-            'for': '10m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests.',
-            },
-          },
-          {
-            alert: 'KubeAPIErrorsHigh',
-            expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m]))
-                /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) > 0.01
-            ||| % $._config,
-            'for': '10m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests.',
-            },
-          },
-          {
-            alert: 'KubeAPIErrorsHigh',
-            expr: |||
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (resource,subresource,verb)
                 /
               sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.10
