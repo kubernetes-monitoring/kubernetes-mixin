@@ -15,7 +15,7 @@ local lower(x) =
 
   prometheusAlerts+::
     local addRunbookURL(rule) = rule {
-      [if 'alert' in rule then 'annotations']+: {
+      [if 'alert' in rule && !('runbook_url' in rule.annotations) then 'annotations']+: {
         runbook_url: $._config.runbookURLPattern % lower(rule.alert),
       },
     };
