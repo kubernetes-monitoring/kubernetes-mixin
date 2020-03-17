@@ -59,7 +59,7 @@ local template = grafana.template;
         datasource='$datasource',
         query='label_values(mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}, workload)' % $._config.clusterLabel,
         current='',
-        hide=if $._config.showMultiCluster then '' else '2',
+        hide='',
         refresh=1,
         includeAll=false,
         sort=1
@@ -343,7 +343,7 @@ local template = grafana.template;
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel(|||
             (sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[$__interval])
-            * on (namespace,pod) 
+            * on (namespace,pod)
             group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           ||| % $._config, '{{pod}}') +
           g.stack +
