@@ -13,6 +13,100 @@ local singlestat = grafana.singlestat;
 
   grafanaDashboards+:: {
     'apiserver.json':
+      local availability1d =
+        singlestat.new(
+          'Availability (%dd) > %.3f' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
+          datasource='$datasource',
+          span=4,
+          format='percentunit',
+          decimals=3,
+        )
+        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="all"}' % $._config.SLOs.apiserver.days));
+
+      local errorBudget =
+        graphPanel.new(
+          'ErrorBudget (%dd) > %.3f' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
+          datasource='$datasource',
+          span=8,
+          format='percentunit',
+          decimals=3,
+        )
+        .addTarget(prometheus.target('100 * (apiserver_request:availability%dd{verb="all"} - %f)' % [$._config.SLOs.apiserver.days, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
+
+      local readAvailability =
+        singlestat.new(
+          'Read Availability (%dd)' % $._config.SLOs.apiserver.days,
+          datasource='$datasource',
+          span=3,
+          format='percentunit',
+          decimals=3,
+        )
+        .addTarget(prometheus.target('apiserver_request:availability7d{verb="read"}'));
+
+      local readRequests =
+        graphPanel.new(
+          'Read SLI - Requests',
+          datasource='$datasource',
+          span=3,
+          format='reqps',
+        )
+        .addTarget(prometheus.target('sum(code_resource:apiserver_request_total:rate5m{verb="read"})'));
+
+      local readErrors =
+        graphPanel.new(
+          'Read SLI - Errors',
+          datasource='$datasource',
+          span=3,
+          format='percentunit',
+        )
+        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read",code=~"5.."}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read"})', legendFormat='{{ resource }}'));
+
+      local readDuration =
+        graphPanel.new(
+          'Read SLI - Duration',
+          datasource='$datasource',
+          span=3,
+          format='s',
+        )
+        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="read"}', legendFormat='{{ resource }}'));
+
+      local writeAvailability =
+        singlestat.new(
+          'Write Availability (%dd)' % $._config.SLOs.apiserver.days,
+          datasource='$datasource',
+          span=3,
+          format='percentunit',
+          decimals=3,
+        )
+        .addTarget(prometheus.target('apiserver_request:availability7d{verb="write"}'));
+
+      local writeRequests =
+        graphPanel.new(
+          'Write SLI - Requests',
+          datasource='$datasource',
+          span=3,
+          format='reqps',
+        )
+        .addTarget(prometheus.target('sum(code_resource:apiserver_request_total:rate5m{verb="write"})'));
+
+      local writeErrors =
+        graphPanel.new(
+          'Write SLI - Errors',
+          datasource='$datasource',
+          span=3,
+          format='percentunit',
+        )
+        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write",code=~"5.."}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write"})', legendFormat='{{ resource }}'));
+
+      local writeDuration =
+        graphPanel.new(
+          'Write SLI - Duration',
+          datasource='$datasource',
+          span=3,
+          format='s',
+        )
+        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="write"}', legendFormat='{{ resource }}'));
+
       local upCount =
         singlestat.new(
           'Up',
@@ -187,6 +281,25 @@ local singlestat = grafana.singlestat;
           includeAll=true,
           sort=1,
         )
+      )
+      .addRow(
+        row.new()
+        .addPanel(availability1d)
+        .addPanel(errorBudget)
+      )
+      .addRow(
+        row.new()
+        .addPanel(readAvailability)
+        .addPanel(readRequests)
+        .addPanel(readErrors)
+        .addPanel(readDuration)
+      )
+      .addRow(
+        row.new()
+        .addPanel(writeAvailability)
+        .addPanel(writeRequests)
+        .addPanel(writeErrors)
+        .addPanel(writeDuration)
       )
       .addRow(
         row.new()

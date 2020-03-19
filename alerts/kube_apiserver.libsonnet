@@ -14,6 +14,32 @@ local utils = import 'utils.libsonnet';
   prometheusAlerts+:: {
     groups+: [
       {
+        name: 'kube-apiserver-slos',
+        rules: [
+          {
+            alert: 'KubeAPIErrorBudgetBurn',
+            expr: |||
+              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+              and
+              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+            ||| % [
+              w.long,
+              w.factor,
+              (1 - $._config.SLOs.apiserver.target),
+              w.short,
+              w.factor,
+              (1 - $._config.SLOs.apiserver.target),
+            ],
+            labels: {
+              severity: w.severity,
+            },
+            annotations: {
+              message: 'The API server is burning too much error budget',
+            },
+            'for': '%(for)s' % w,
+          }
+          for w in $._config.SLOs.apiserver.windows
+        ],
       },
       {
         name: 'kubernetes-system-apiserver',
