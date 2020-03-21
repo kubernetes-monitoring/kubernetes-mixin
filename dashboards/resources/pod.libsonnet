@@ -4,31 +4,6 @@ local template = grafana.template;
 
 {
   grafanaDashboards+:: {
-    local intervalTemplate =
-      template.new(
-        name='interval',
-        datasource='$datasource',
-        query='$__interval',
-        current='5m',
-        hide=2,
-        refresh=2,
-        includeAll=false,
-        sort=1
-      ) + {
-        auto: false,
-        auto_count: 30,
-        auto_min: '10s',
-        skipUrlSync: false,
-        type: 'interval',
-        options: [
-          {
-            selected: true,
-            text: '$__interval',
-            value: '$__interval',
-          },
-        ],
-      },
-
     local clusterTemplate =
       template.new(
         name='cluster',
@@ -287,6 +262,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
   },
 }
