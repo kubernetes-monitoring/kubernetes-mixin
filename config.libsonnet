@@ -4,16 +4,17 @@ local slo = import 'slo-libsonnet/slo.libsonnet';
   _config+:: {
     SLOs: {
       apiserver: {
-        days: 7,  // The number of days we alert on burning too much error budget for.
-        target: 0.99, // The target percentage of availability between 0-1. (0.99 = 99%, 0.999 = 99.9%)
+        days: 30,  // The number of days we alert on burning too much error budget for.
+        target: 0.99,  // The target percentage of availability between 0-1. (0.99 = 99%, 0.999 = 99.9%)
 
         // Only change these windows when you really understand multi burn rate errors.
-        // Otherwise change days and target above to make high-level changes.
+        // Even though you can change the days above (which will change availability calculations)
+        // these windows will alert on a 30 days sliding window. We're looking into basing these windows on the given days too.
         windows: [
-          { severity: 'critical', 'for': '2m', long: '1h', short: '5m', factor: 2 * (24 * $._config.SLOs.apiserver.days) / 100 },
-          { severity: 'critical', 'for': '15m', long: '6h', short: '30m', factor: 1 * (24 * $._config.SLOs.apiserver.days) / 100 },
-          { severity: 'warning', 'for': '1h', long: '1d', short: '2h', factor: 0.5 * (24 * $._config.SLOs.apiserver.days) / 100 },
-          { severity: 'warning', 'for': '3h', long: '3d', short: '6h', factor: 0.1 * (24 * $._config.SLOs.apiserver.days) / 100 },
+          { severity: 'critical', 'for': '2m', long: '1h', short: '5m', factor: 14.4 },
+          { severity: 'critical', 'for': '15m', long: '6h', short: '30m', factor: 6 },
+          { severity: 'warning', 'for': '1h', long: '1d', short: '2h', factor: 3 },
+          { severity: 'warning', 'for': '3h', long: '3d', short: '6h', factor: 1 },
         ],
       },
     },
