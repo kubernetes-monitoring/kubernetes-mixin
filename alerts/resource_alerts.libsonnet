@@ -40,7 +40,7 @@
             'for': '5m',
           },
           {
-            alert: 'KubeMemOvercommit',
+            alert: 'KubeMemoryOvercommit',
             expr: |||
               sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s})
                 /
@@ -59,7 +59,7 @@
             'for': '5m',
           },
           {
-            alert: 'KubeCPUOvercommit',
+            alert: 'KubeCPUQuotaOvercommit',
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="cpu"})
                 /
@@ -75,7 +75,7 @@
             'for': '5m',
           },
           {
-            alert: 'KubeMemOvercommit',
+            alert: 'KubeMemoryQuotaOvercommit',
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="memory"})
                 /
