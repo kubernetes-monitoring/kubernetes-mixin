@@ -4,14 +4,18 @@ local slo = import 'slo-libsonnet/slo.libsonnet';
   _config+:: {
     SLOs: {
       apiserver: {
-        // This is templating a Multiple Burn Rate Alerts for Kubernetes Apiservers.
-        // We will alert on burning too much error budget over 30 days.
-        // By default we have 99% availability (1% unavailability = 7h12m in 30d).
-        errors: slo.errorburn({
-          metric: 'apiserver_request_total',
-          selectors: [$._config.kubeApiserverSelector],
-          errorBudget: 1 - 0.99,
-        }),
+        days: 30,  // The number of days we alert on burning too much error budget for.
+        target: 0.99,  // The target percentage of availability between 0-1. (0.99 = 99%, 0.999 = 99.9%)
+
+        // Only change these windows when you really understand multi burn rate errors.
+        // Even though you can change the days above (which will change availability calculations)
+        // these windows will alert on a 30 days sliding window. We're looking into basing these windows on the given days too.
+        windows: [
+          { severity: 'critical', 'for': '2m', long: '1h', short: '5m', factor: 14.4 },
+          { severity: 'critical', 'for': '15m', long: '6h', short: '30m', factor: 6 },
+          { severity: 'warning', 'for': '1h', long: '1d', short: '2h', factor: 3 },
+          { severity: 'warning', 'for': '3h', long: '3d', short: '6h', factor: 1 },
+        ],
       },
     },
 
