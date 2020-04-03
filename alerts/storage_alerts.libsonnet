@@ -17,7 +17,7 @@
         name: 'kubernetes-storage',
         rules: [
           {
-            alert: 'KubePersistentVolumeUsageCritical',
+            alert: 'KubePersistentVolumeFillingUp',
             expr: |||
               kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                 /
@@ -33,7 +33,7 @@
             },
           },
           {
-            alert: 'KubePersistentVolumeFullInFourDays',
+            alert: 'KubePersistentVolumeFillingUp',
             expr: |||
               (
                 kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
@@ -45,7 +45,7 @@
             ||| % $._config,
             'for': '1h',
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.',

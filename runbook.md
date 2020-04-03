@@ -89,12 +89,12 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `{{ $value | humanizePercentage }} usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.`
 + *Severity*: warning
 ### Group Name: "kubernetes-storage"
-##### Alert Name: "KubePersistentVolumeUsageCritical"
+##### Alert Name: "KubePersistentVolumeFillingUp"
 + *Message*: `The persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has {{ $value | humanizePercentage }} free.`
 + *Severity*: critical
-##### Alert Name: "KubePersistentVolumeFullInFourDays"
+##### Alert Name: "KubePersistentVolumeFillingUp"
 + *Message*: `Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is expected to fill up within four days.`
-+ *Severity*: critical
++ *Severity*: warning
 ### Group Name: "kubernetes-system"
 ##### Alert Name: "KubeNodeNotReady"
 + *Message*: `{{ $labels.node }} has been unready for more than an 15 minutes"`
