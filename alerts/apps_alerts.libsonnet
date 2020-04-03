@@ -185,7 +185,7 @@
             annotations: {
               message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.',
             },
-            'for': '10m',
+            'for': '15m',
           },
           {
             alert: 'KubeCronJobRunning',
