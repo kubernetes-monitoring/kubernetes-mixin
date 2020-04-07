@@ -5,7 +5,6 @@ local utils = import 'utils.libsonnet';
     kubeApiserverSelector: error 'must provide selector for kube-apiserver',
 
     kubeAPILatencyWarningSeconds: 1,
-    kubeAPILatencyCriticalSeconds: 4,
 
     certExpirationWarningSeconds: 7 * 24 * 3600,
     certExpirationCriticalSeconds: 1 * 24 * 3600,
@@ -69,34 +68,6 @@ local utils = import 'utils.libsonnet';
             },
             annotations: {
               message: 'The API server has an abnormal latency of {{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.',
-            },
-          },
-          {
-            alert: 'KubeAPILatencyHigh',
-            expr: |||
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99"} > %(kubeAPILatencyCriticalSeconds)s
-            ||| % $._config,
-            'for': '10m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              message: 'The API server has a 99th percentile latency of {{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.',
-            },
-          },
-          {
-            alert: 'KubeAPIErrorsHigh',
-            expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (resource,subresource,verb)
-                /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.10
-            ||| % $._config,
-            'for': '10m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
             },
           },
           {
