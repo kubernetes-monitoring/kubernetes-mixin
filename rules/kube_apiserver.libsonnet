@@ -161,12 +161,18 @@
               verb: 'write',
             },
           },
+          {
+            record: 'code_verb:apiserver_request_total:increase%s' % SLODays,
+            expr: |||
+              sum by (code, verb) (increase(apiserver_request_total{%s}[%s]))
+            ||| % [$._config.kubeApiserverSelector, SLODays],
+          },
         ] + [
           {
             record: 'code:apiserver_request_total:increase%s' % SLODays,
             expr: |||
-              sum by (code) (increase(apiserver_request_total{%s}[%s]))
-            ||| % [std.join(',', [$._config.kubeApiserverSelector, verb.selector]), SLODays],
+              sum by (code) (code_verb:apiserver_request_total:increase%s{%s})
+            ||| % [SLODays, verb.selector],
             labels: {
               verb: verb.type,
             },
