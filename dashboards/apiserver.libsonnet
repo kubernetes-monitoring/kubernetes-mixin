@@ -41,7 +41,7 @@ local singlestat = grafana.singlestat;
           format='percentunit',
           decimals=3,
         )
-        .addTarget(prometheus.target('apiserver_request:availability7d{verb="read"}'));
+        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="read"}' % $._config.SLOs.apiserver.days));
 
       local readRequests =
         graphPanel.new(
@@ -78,7 +78,7 @@ local singlestat = grafana.singlestat;
           format='percentunit',
           decimals=3,
         )
-        .addTarget(prometheus.target('apiserver_request:availability7d{verb="write"}'));
+        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="write"}' % $._config.SLOs.apiserver.days));
 
       local writeRequests =
         graphPanel.new(
