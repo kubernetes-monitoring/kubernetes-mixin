@@ -24,7 +24,7 @@
           },
           {
             expr: |||
-              kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} == 1
+              kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} - kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="ToBeDeletedByClusterAutoscaler",effect="NoSchedule"} == 1
             ||| % $._config,
             'for': '2m',
             labels: {
