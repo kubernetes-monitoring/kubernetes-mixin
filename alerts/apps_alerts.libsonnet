@@ -15,7 +15,7 @@
               rate(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[15m]) * 60 * 5 > 0
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.',
@@ -28,7 +28,7 @@
               sum by (namespace, pod) (max by(namespace, pod) (kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}) * on(namespace, pod) group_left(owner_kind) max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})) > 0
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes.',
@@ -43,7 +43,7 @@
               kube_deployment_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.',
@@ -64,7 +64,7 @@
               )
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 15 minutes.',
@@ -85,7 +85,7 @@
               )
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
@@ -100,7 +100,7 @@
               kube_statefulset_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.',
@@ -123,7 +123,7 @@
               )
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.',
@@ -139,7 +139,7 @@
               kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} < 1.00
             ||| % $._config,
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               message: 'Only {{ $value | humanizePercentage }} of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.',
