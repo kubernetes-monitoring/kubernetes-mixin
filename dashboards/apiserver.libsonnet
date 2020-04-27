@@ -132,41 +132,6 @@ local singlestat = grafana.singlestat;
         )
         .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="write"}', legendFormat='{{ resource }}'));
 
-      local upCount =
-        singlestat.new(
-          'Up',
-          datasource='$datasource',
-          span=2,
-          valueName='min',
-        )
-        .addTarget(prometheus.target('sum(up{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"})' % $._config));
-
-      local rpcRate =
-        graphPanel.new(
-          'RPC Rate',
-          datasource='$datasource',
-          span=5,
-          format='ops',
-        )
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"2..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='2xx'))
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"3..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='3xx'))
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"4..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='4xx'))
-        .addTarget(prometheus.target('sum(rate(apiserver_request_total{%(kubeApiserverSelector)s, instance=~"$instance",code=~"5..", %(clusterLabel)s="$cluster"}[5m]))' % $._config, legendFormat='5xx'));
-
-      local requestDuration =
-        graphPanel.new(
-          'Request duration 99th quantile',
-          datasource='$datasource',
-          span=5,
-          format='s',
-          legend_show=true,
-          legend_values=true,
-          legend_current=true,
-          legend_alignAsTable=true,
-          legend_rightSide=true,
-        )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", verb!="WATCH", %(clusterLabel)s="$cluster"}[5m])) by (verb, le))' % $._config, legendFormat='{{verb}}'));
-
       local workQueueAddRate =
         graphPanel.new(
           'Work Queue Add Rate',
@@ -325,12 +290,6 @@ local singlestat = grafana.singlestat;
         .addPanel(writeRequests)
         .addPanel(writeErrors)
         .addPanel(writeDuration)
-      )
-      .addRow(
-        row.new()
-        .addPanel(upCount)
-        .addPanel(rpcRate)
-        .addPanel(requestDuration)
       ).addRow(
         row.new()
         .addPanel(workQueueAddRate)
