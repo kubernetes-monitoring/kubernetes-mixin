@@ -15,21 +15,24 @@ local singlestat = grafana.singlestat;
     'apiserver.json':
       local availability1d =
         singlestat.new(
-          'Availability (%dd) > %.3f' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
+          'Availability (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
           datasource='$datasource',
           span=4,
           format='percentunit',
           decimals=3,
+          description='How many percent of requests (both read and write) in %d days have been answered successfully and fast enough?' % 100 * $._config.SLOs.apiserver.days,
         )
         .addTarget(prometheus.target('apiserver_request:availability%dd{verb="all"}' % $._config.SLOs.apiserver.days));
 
       local errorBudget =
         graphPanel.new(
-          'ErrorBudget (%dd) > %.3f' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
+          'ErrorBudget (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
           datasource='$datasource',
           span=8,
           format='percentunit',
           decimals=3,
+          fill=10,
+          description='How much error budget is left looking at our %.3f%% availability gurantees?' % $._config.SLOs.apiserver.target,
         )
         .addTarget(prometheus.target('100 * (apiserver_request:availability%dd{verb="all"} - %f)' % [$._config.SLOs.apiserver.days, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
 
@@ -40,6 +43,7 @@ local singlestat = grafana.singlestat;
           span=3,
           format='percentunit',
           decimals=3,
+          description='How many percent of read requests (LIST,GET) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
         )
         .addTarget(prometheus.target('apiserver_request:availability%dd{verb="read"}' % $._config.SLOs.apiserver.days));
 
@@ -49,15 +53,24 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=3,
           format='reqps',
+          stack=true,
+          fill=10,
+          description='How many read requests (LIST,GET) per second do the apiservers get by code?',
         )
-        .addTarget(prometheus.target('sum(code_resource:apiserver_request_total:rate5m{verb="read"})'));
+        .addSeriesOverride({ alias: '/2../i', color: '#56A64B' })
+        .addSeriesOverride({ alias: '/3../i', color: '#F2CC0C' })
+        .addSeriesOverride({ alias: '/4../i', color: '#3274D9' })
+        .addSeriesOverride({ alias: '/5../i', color: '#E02F44' })
+        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="read"})', legendFormat='{{ code }}'));
 
       local readErrors =
         graphPanel.new(
           'Read SLI - Errors',
           datasource='$datasource',
+          min=0,
           span=3,
           format='percentunit',
+          description='How many percent of read requests (LIST,GET) per second are returned with errors (5xx)?',
         )
         .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read",code=~"5.."}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read"})', legendFormat='{{ resource }}'));
 
@@ -67,6 +80,7 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=3,
           format='s',
+          description='How many seconds is the 99th percentile for reading (LIST|GET) a given resource?',
         )
         .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="read"}', legendFormat='{{ resource }}'));
 
@@ -77,6 +91,7 @@ local singlestat = grafana.singlestat;
           span=3,
           format='percentunit',
           decimals=3,
+          description='How many percent of write requests (POST|PUT|PATCH|DELETE) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
         )
         .addTarget(prometheus.target('apiserver_request:availability%dd{verb="write"}' % $._config.SLOs.apiserver.days));
 
@@ -86,15 +101,24 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=3,
           format='reqps',
+          stack=true,
+          fill=10,
+          description='How many write requests (POST|PUT|PATCH|DELETE) per second do the apiservers get by code?',
         )
-        .addTarget(prometheus.target('sum(code_resource:apiserver_request_total:rate5m{verb="write"})'));
+        .addSeriesOverride({ alias: '/2../i', color: '#56A64B' })
+        .addSeriesOverride({ alias: '/3../i', color: '#F2CC0C' })
+        .addSeriesOverride({ alias: '/4../i', color: '#3274D9' })
+        .addSeriesOverride({ alias: '/5../i', color: '#E02F44' })
+        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="write"})', legendFormat='{{ code }}'));
 
       local writeErrors =
         graphPanel.new(
           'Write SLI - Errors',
           datasource='$datasource',
+          min=0,
           span=3,
           format='percentunit',
+          description='How many percent of write requests (POST|PUT|PATCH|DELETE) per second are returned with errors (5xx)?',
         )
         .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write",code=~"5.."}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write"})', legendFormat='{{ resource }}'));
 
@@ -104,6 +128,7 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           span=3,
           format='s',
+          description='How many seconds is the 99th percentile for writing (POST|PUT|PATCH|DELETE) a given resource?',
         )
         .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="write"}', legendFormat='{{ resource }}'));
 
@@ -146,7 +171,7 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Work Queue Add Rate',
           datasource='$datasource',
-          span=6,
+          span=4,
           format='ops',
           legend_show=false,
           min=0,
@@ -157,7 +182,7 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Work Queue Depth',
           datasource='$datasource',
-          span=6,
+          span=4,
           format='short',
           legend_show=false,
           min=0,
@@ -169,7 +194,7 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Work Queue Latency',
           datasource='$datasource',
-          span=12,
+          span=4,
           format='s',
           legend_show=true,
           legend_values=true,
