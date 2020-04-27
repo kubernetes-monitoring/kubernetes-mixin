@@ -20,7 +20,7 @@ local singlestat = grafana.singlestat;
           span=4,
           format='percentunit',
           decimals=3,
-          description='How many percent of requests (both read and write) in %d days have been answered successfully and fast enough?' % 100 * $._config.SLOs.apiserver.days,
+          description='How many percent of requests (both read and write) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
         )
         .addTarget(prometheus.target('apiserver_request:availability%dd{verb="all"}' % $._config.SLOs.apiserver.days));
 
