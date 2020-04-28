@@ -1,5 +1,3 @@
-local slo = import 'slo-libsonnet/slo.libsonnet';
-
 {
   _config+:: {
     SLOs: {
