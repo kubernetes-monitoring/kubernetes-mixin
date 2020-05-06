@@ -24,7 +24,7 @@
               sum by (%(clusterLabel)s, namespace, pod, container) (
                 rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])
               ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
-                1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info)
+                1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -33,7 +33,7 @@
             expr: |||
               container_memory_working_set_bytes{%(cadvisorSelector)s, image!=""}
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info)
+                max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -42,7 +42,7 @@
             expr: |||
               container_memory_rss{%(cadvisorSelector)s, image!=""}
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info)
+                max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -51,7 +51,7 @@
             expr: |||
               container_memory_cache{%(cadvisorSelector)s, image!=""}
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info)
+                max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -60,7 +60,7 @@
             expr: |||
               container_memory_swap{%(cadvisorSelector)s, image!=""}
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info)
+                max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },

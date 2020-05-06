@@ -15,7 +15,7 @@
             // SINCE 2018-02-08
             record: ':kube_pod_info_node_count:',
             expr: |||
-              sum(min(kube_pod_info) by (%(clusterLabel)s, node))
+              sum(min(kube_pod_info{node!=""}) by (%(clusterLabel)s, node))
             ||| % $._config,
           },
           {
@@ -30,7 +30,7 @@
             expr: |||
               topk by(namespace, %(podLabel)s) (1,
                 max by (node, namespace, %(podLabel)s) (
-                  label_replace(kube_pod_info{%(kubeStateMetricsSelector)s}, "%(podLabel)s", "$1", "pod", "(.*)")
+                  label_replace(kube_pod_info{%(kubeStateMetricsSelector)s,node!=""}, "%(podLabel)s", "$1", "pod", "(.*)")
               ))
             ||| % $._config,
           },
