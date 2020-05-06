@@ -244,3 +244,128 @@ tests:
     exp_samples:
     - value: 1
       labels: 'mixin_pod_workload{namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
+
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",namespace="ns1",phase="Pending",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",namespace="ns1",owner_is_controller="false",owner_kind="<None>",owner_name="ds-7cc77d965f",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
+    values: '1+0x20'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubePodNotReady
+    exp_alerts:
+    - exp_labels:
+        namespace: ns1
+        pod: pod-ds-7cc77d965f-cgsdv
+        severity: critical
+      exp_annotations:
+        message: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready"
+
+- interval: 1m
+  input_series:
+  - series: 'container_cpu_usage_seconds_total{container="alertmanager",cpu="total",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-0",service="kubelet"}'
+    values: '0+3x5'
+  - series: 'container_cpu_usage_seconds_total{container="alertmanager",cpu="total",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-1",service="kubelet"}'
+    values: '0+3x5'
+  # Duplicate timeseries from different instances.
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance2"}'
+    values: '1+0x5'
+  # Missing node label.
+  - series: 'kube_pod_info{namespace="monitoring",pod="alertmanager-main-1",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate
+    exp_samples:
+    - value: 5.0e-2
+      labels: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace="monitoring", pod="alertmanager-main-0", container="alertmanager", node="node1"}'
+
+- interval: 1m
+  input_series:
+  - series: 'container_memory_working_set_bytes{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-0",service="kubelet"}'
+    values: '1000+0x5'
+  - series: 'container_memory_working_set_bytes{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-1",service="kubelet"}'
+    values: '1000+0x5'
+  # Duplicate timeseries from different instances.
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance2"}'
+    values: '1+0x5'
+  # Missing node label.
+  - series: 'kube_pod_info{namespace="monitoring",pod="alertmanager-main-1",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: node_namespace_pod_container:container_memory_working_set_bytes
+    exp_samples:
+    - value: 1.0e+3
+      labels: 'node_namespace_pod_container:container_memory_working_set_bytes{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",node="node1",pod="alertmanager-main-0",service="kubelet"}'
+
+- interval: 1m
+  input_series:
+  - series: 'container_memory_rss{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-0",service="kubelet"}'
+    values: '1000+0x5'
+  - series: 'container_memory_rss{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-1",service="kubelet"}'
+    values: '1000+0x5'
+  # Duplicate timeseries from different instances.
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance2"}'
+    values: '1+0x5'
+  # Missing node label.
+  - series: 'kube_pod_info{namespace="monitoring",pod="alertmanager-main-1",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: node_namespace_pod_container:container_memory_rss
+    exp_samples:
+    - value: 1.0e+3
+      labels: 'node_namespace_pod_container:container_memory_rss{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",node="node1",pod="alertmanager-main-0",service="kubelet"}'
+
+- interval: 1m
+  input_series:
+  - series: 'container_memory_cache{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-0",service="kubelet"}'
+    values: '1000+0x5'
+  - series: 'container_memory_cache{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-1",service="kubelet"}'
+    values: '1000+0x5'
+  # Duplicate timeseries from different instances.
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance2"}'
+    values: '1+0x5'
+  # Missing node label.
+  - series: 'kube_pod_info{namespace="monitoring",pod="alertmanager-main-1",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: node_namespace_pod_container:container_memory_cache
+    exp_samples:
+    - value: 1.0e+3
+      labels: 'node_namespace_pod_container:container_memory_cache{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",node="node1",pod="alertmanager-main-0",service="kubelet"}'
+
+- interval: 1m
+  input_series:
+  - series: 'container_memory_swap{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-0",service="kubelet"}'
+    values: '1000+0x5'
+  - series: 'container_memory_swap{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-1",service="kubelet"}'
+    values: '1000+0x5'
+  # Duplicate timeseries from different instances.
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  - series: 'kube_pod_info{namespace="monitoring",node="node1",pod="alertmanager-main-0",job="kube-state-metrics",instance="instance2"}'
+    values: '1+0x5'
+  # Missing node label.
+  - series: 'kube_pod_info{namespace="monitoring",pod="alertmanager-main-1",job="kube-state-metrics",instance="instance1"}'
+    values: '1+0x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: node_namespace_pod_container:container_memory_swap
+    exp_samples:
+    - value: 1.0e+3
+      labels: 'node_namespace_pod_container:container_memory_swap{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",node="node1",pod="alertmanager-main-0",service="kubelet"}'
