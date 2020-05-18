@@ -31,6 +31,8 @@ local utils = import 'utils.libsonnet';
             ],
             labels: {
               severity: w.severity,
+              short: '%(short)s' % w,
+              long: '%(long)s' % w,
             },
             annotations: {
               message: 'The API server is burning too much error budget',
