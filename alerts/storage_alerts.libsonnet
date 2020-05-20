@@ -52,6 +52,41 @@
             },
           },
           {
+            alert: 'KubePersistentVolumeRunningOutOfInodes',
+            expr: |||
+              kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+                /
+              kubelet_volume_stats_inodes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+                < 0.03
+            ||| % $._config,
+            'for': '1m',
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              message: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} only has {{ $value | humanizePercentage }} free inodes.',
+            },
+          },
+          {
+            alert: 'KubePersistentVolumeRunningOutOfInodes',
+            expr: |||
+              (
+                kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+                  /
+                kubelet_volume_stats_inodes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+              ) < 0.15
+              and
+              predict_linear(kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
+            ||| % $._config,
+            'for': '1h',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              message: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to run out of inodes within four days. Currently {{ $value | humanizePercentage }} of its inodes are free.',
+            },
+          },
+          {
             alert: 'KubePersistentVolumeErrors',
             expr: |||
               kube_persistentvolume_status_phase{phase=~"Failed|Pending",%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
