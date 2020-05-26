@@ -192,6 +192,34 @@ $ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "mixin.libsonnet").promet
 $ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDashboards'
 ```
 
+### Adding custom annotations to alerts
+
+Create a new file like: my_custom_mixin.libsonnet with the following:
+
+```
+local utils = import 'lib/utils.libsonnet';
+(import 'mixin.libsonnet') +
+(
+  {
+    prometheusAlerts+::
+      local addExtraAnnotations(rule) = rule {
+        [if 'alert' in rule then 'annotations']+: {
+          slack: 'foo',
+          dashboard: 'https://foo.bar.co',
+        },
+      };
+      utils.mapRuleGroups(addExtraAnnotations),
+  }
+)
+```
+Create new file like: lib/my_custom_alerts.jsonnet with the following:
+
+```
+std.manifestYamlDoc((import '../my_custom_mixin.libsonnet').prometheusAlerts)
+```
+
+Same result can be achieved modyfying the existing config.libsonnet with the content of my_custom_mixin.libsonnet
+
 ## Background
 
 * For more motivation, see
