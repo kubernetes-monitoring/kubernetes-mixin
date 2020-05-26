@@ -194,7 +194,7 @@ $ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDa
 
 ### Adding custom annotations to alerts
 
-Create a new file like: my_custom_mixin.libsonnet with the following:
+Create a new file: my_custom_mixin.libsonnet with the following:
 
 ```
 local utils = import 'lib/utils.libsonnet';
@@ -212,7 +212,7 @@ local utils = import 'lib/utils.libsonnet';
   }
 )
 ```
-Create new file like: lib/my_custom_alerts.jsonnet with the following:
+Create new file: lib/my_custom_alerts.jsonnet with the following:
 
 ```
 std.manifestYamlDoc((import '../my_custom_mixin.libsonnet').prometheusAlerts)
