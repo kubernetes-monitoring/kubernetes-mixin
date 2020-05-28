@@ -202,10 +202,17 @@ local utils = import 'lib/utils.libsonnet';
 (
   {
     prometheusAlerts+::
+      // The specialAlerts can be in any other config file
+      local slack = 'observability';
+      local specialAlerts = {
+        KubePodCrashLooping: { slack_channel: slack },
+        KubePodNotReady: { slack_channel: slack },
+      };
+
       local addExtraAnnotations(rule) = rule {
         [if 'alert' in rule then 'annotations']+: {
-          slack: 'foo',
           dashboard: 'https://foo.bar.co',
+          [if rule.alert in specialAlerts then 'slack_channel']: specialAlerts[rule.alert].slack_channel,
         },
       };
       utils.mapRuleGroups(addExtraAnnotations),
