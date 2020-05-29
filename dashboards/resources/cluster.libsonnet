@@ -39,7 +39,7 @@ local template = grafana.template;
 
 
       local podWorkloadColumns = [
-        'count(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
+        'sum(kube_pod_owner{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
         'count(avg(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (workload, namespace)) by (namespace)' % $._config,
       ];
 
