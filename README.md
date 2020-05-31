@@ -192,9 +192,11 @@ $ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "mixin.libsonnet").promet
 $ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDashboards'
 ```
 
-### Adding custom annotations to alerts
+### Customising alert annotations
 
-Create a new file: my_custom_mixin.libsonnet with the following:
+The steps described bellow extend on the existing mixin library without modifying the original git repository. This is to make consuming updates to your extended alert definitions easier. These definitions can reside outside of this repository and added to your own custom location, where you can define your alert dependencies in your `jsonnetfile.json` and add customisations to the existing definitions.
+
+In your working directory, create a new file `kubernetes_mixin_override.libsonnet` with the following:
 
 ```
 local utils = import 'lib/utils.libsonnet';
@@ -219,13 +221,14 @@ local utils = import 'lib/utils.libsonnet';
   }
 )
 ```
-Create new file: lib/my_custom_alerts.jsonnet with the following:
+Create new file: `lib/kubernetes_customised_alerts.jsonnet` with the following:
 
 ```
-std.manifestYamlDoc((import '../my_custom_mixin.libsonnet').prometheusAlerts)
+std.manifestYamlDoc((import '../kubernetes_mixin_override.libsonnet').prometheusAlerts)
 ```
+Running `jsonnet -S lib/kubernetes_customised_alerts.jsonnet` will build the alerts with your customisations.
 
-Same result can be achieved modyfying the existing config.libsonnet with the content of my_custom_mixin.libsonnet
+Same result can be achieved by modyfying the existing `config.libsonnet` with the content of `kubernetes_mixin_override.libsonnet`.
 
 ## Background
 
