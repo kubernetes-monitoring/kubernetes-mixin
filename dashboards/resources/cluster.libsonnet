@@ -40,7 +40,7 @@ local template = grafana.template;
 
       local podWorkloadColumns = [
         'sum(kube_pod_owner{%(clusterLabel)s="$cluster"}) by (namespace)' % $._config,
-        'count(avg(mixin_pod_workload{%(clusterLabel)s="$cluster"}) by (workload, namespace)) by (namespace)' % $._config,
+        'count(avg(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster"}) by (workload, namespace)) by (namespace)' % $._config,
       ];
 
       local networkColumns = [

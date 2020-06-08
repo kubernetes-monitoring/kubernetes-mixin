@@ -119,7 +119,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='workload',
           datasource='$datasource',
-          query='label_values(mixin_pod_workload{namespace=~"$namespace"}, workload)',
+          query='label_values(namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace"}, workload)',
           current='',
           hide='',
           refresh=1,
@@ -129,7 +129,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(mixin_pod_workload{namespace=~"$namespace"}, workload)',
+          definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace"}, workload)',
           skipUrlSync: false,
         };
 
@@ -137,7 +137,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='type',
           datasource='$datasource',
-          query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~"$workload"}, workload_type)',
+          query='label_values(namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload"}, workload_type)',
           current='deployment',
           hide='',
           refresh=1,
@@ -147,7 +147,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(mixin_pod_workload{namespace=~"$namespace", workload=~"$workload"}, workload_type)',
+          definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload"}, workload_type)',
           skipUrlSync: false,
         };
 
@@ -287,7 +287,7 @@ local singlestat = grafana.singlestat;
           graphQuery=|||
             sort_desc(sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
-            group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+            group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           |||,
           legendFormat='{{ pod }}',
         ),
@@ -299,7 +299,7 @@ local singlestat = grafana.singlestat;
           graphQuery=|||
             sort_desc(sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
-            group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+            group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           |||,
           legendFormat='{{ pod }}',
         ),
@@ -313,7 +313,7 @@ local singlestat = grafana.singlestat;
             graphQuery=|||
               sort_desc(avg(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
-              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             |||,
             legendFormat='{{ pod }}',
           ),
@@ -325,7 +325,7 @@ local singlestat = grafana.singlestat;
             graphQuery=|||
               sort_desc(avg(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
-              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             |||,
             legendFormat='{{ pod }}',
           ),
@@ -342,7 +342,7 @@ local singlestat = grafana.singlestat;
           graphQuery=|||
             sort_desc(sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
-            group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+            group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           |||,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 12 }
@@ -353,7 +353,7 @@ local singlestat = grafana.singlestat;
           graphQuery=|||
             sort_desc(sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
-            group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+            group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           |||,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 12 }
@@ -366,7 +366,7 @@ local singlestat = grafana.singlestat;
             graphQuery=|||
               sort_desc(sum(irate(container_network_receive_packets_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
-              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             |||,
             graphFormat='pps'
           ),
@@ -378,7 +378,7 @@ local singlestat = grafana.singlestat;
             graphQuery=|||
               sort_desc(sum(irate(container_network_transmit_packets_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
-              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             |||,
             graphFormat='pps'
           ),
@@ -394,7 +394,7 @@ local singlestat = grafana.singlestat;
             graphQuery=|||
               sort_desc(sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
-              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             |||,
             graphFormat='pps'
           ),
@@ -406,7 +406,7 @@ local singlestat = grafana.singlestat;
             graphQuery=|||
               sort_desc(sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
-              group_left(workload,workload_type) mixin_pod_workload{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
+              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             |||,
             graphFormat='pps'
           ),

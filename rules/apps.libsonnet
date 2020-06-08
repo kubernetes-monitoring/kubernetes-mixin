@@ -100,7 +100,7 @@
           },
           // workload aggregation for deployments
           {
-            record: 'mixin_pod_workload',
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
               max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
@@ -121,7 +121,7 @@
             },
           },
           {
-            record: 'mixin_pod_workload',
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
               max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
@@ -135,7 +135,7 @@
             },
           },
           {
-            record: 'mixin_pod_workload',
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
               max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
