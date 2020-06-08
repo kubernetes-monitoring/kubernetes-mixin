@@ -19,6 +19,10 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'KubeAPILatencyHigh',
             expr: |||
+              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99"}
+              >
+              %(kubeAPILatencyWarningSeconds)s
+              and on (verb,resource)
               (
                 cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s}
                 >
@@ -30,10 +34,6 @@ local utils = import 'utils.libsonnet';
                 )
               ) > on (verb) group_left()
               1.2 * avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
-              and on (verb,resource)
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99"}
-              >
-              %(kubeAPILatencyWarningSeconds)s
             ||| % $._config,
             'for': '5m',
             labels: {
