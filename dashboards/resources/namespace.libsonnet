@@ -236,7 +236,8 @@ local template = grafana.template;
           g.tablePanel(
             networkColumns,
             networkTableStyles
-          ),
+          ) +
+          { interval: '1m' },
         )
       )
       .addRow(

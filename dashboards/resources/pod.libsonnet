@@ -215,7 +215,7 @@ local template = grafana.template;
           g.panel('Receive Bandwidth') +
           g.queryPanel('sum(irate(container_network_receive_bytes_total{namespace=~"$namespace", pod=~"$pod"}[$__interval])) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('Bps'), interval: '1m' },
         )
       )
       .addRow(
@@ -224,7 +224,7 @@ local template = grafana.template;
           g.panel('Transmit Bandwidth') +
           g.queryPanel('sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace", pod=~"$pod"}[$__interval])) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('Bps'), interval: '1m' },
         )
       )
       .addRow(
@@ -233,7 +233,7 @@ local template = grafana.template;
           g.panel('Rate of Received Packets') +
           g.queryPanel('sum(irate(container_network_receive_packets_total{namespace=~"$namespace", pod=~"$pod"}[$__interval])) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('Bps'), interval: '1m' },
         )
       )
       .addRow(
@@ -242,7 +242,7 @@ local template = grafana.template;
           g.panel('Rate of Transmitted Packets') +
           g.queryPanel('sum(irate(container_network_transmit_packets_total{namespace=~"$namespace", pod=~"$pod"}[$__interval])) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('Bps'), interval: '1m' },
         )
       )
       .addRow(
@@ -251,7 +251,7 @@ local template = grafana.template;
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace", pod=~"$pod"}[$__interval])) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('Bps'), interval: '1m' },
         )
       )
       .addRow(
@@ -260,7 +260,7 @@ local template = grafana.template;
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace", pod=~"$pod"}[$__interval])) by (pod)', '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps') },
+          { yaxes: g.yaxes('Bps'), interval: '1m' },
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
   },
