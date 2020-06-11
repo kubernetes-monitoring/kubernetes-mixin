@@ -277,7 +277,7 @@ local template = grafana.template;
             networkColumns,
             networkTableStyles
           ) +
-          { interval: '1m' },
+          { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(

@@ -97,7 +97,7 @@ local template = grafana.template;
         .addPanel(
           g.panel('CPU Utilisation') +
           g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle", %(clusterLabel)s="$cluster"}[$__interval]))' % $._config) +
-          { interval: '1m' },
+          { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
@@ -185,7 +185,7 @@ local template = grafana.template;
             networkColumns,
             networkTableStyles
           ) +
-          { interval: '1m' },
+          { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
