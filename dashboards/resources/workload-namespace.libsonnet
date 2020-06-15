@@ -276,7 +276,8 @@ local template = grafana.template;
           g.tablePanel(
             networkColumns,
             networkTableStyles
-          ),
+          ) +
+          { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
@@ -376,7 +377,7 @@ local template = grafana.template;
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel(|||
             (sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[$__interval])
-            * on (namespace,pod) 
+            * on (namespace,pod)
             group_left(workload,workload_type) mixin_pod_workload{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
           ||| % $._config, '{{workload}}') +
           g.stack +

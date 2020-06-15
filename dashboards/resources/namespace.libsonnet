@@ -236,7 +236,8 @@ local template = grafana.template;
           g.tablePanel(
             networkColumns,
             networkTableStyles
-          ),
+          ) +
+          { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
