@@ -6,7 +6,7 @@
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
       uid: std.md5(filename),
-      timezone: '',
+      timezone: 'UTC',
 
       // Modify tooltip to only show a single value
       rows: [
