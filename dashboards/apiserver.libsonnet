@@ -272,6 +272,20 @@ local singlestat = grafana.singlestat;
           sort=1,
         )
       )
+      .addPanel(
+        grafana.text.new(
+          title='Notice',
+          content='The SLO (service level objective) and other metrics displayed on this dashboard are for informational purposes only.',
+          description='The SLO (service level objective) and other metrics displayed on this dashboard are for informational purposes only.',
+          span=12,
+        ),
+        gridPos={
+          "h": 2,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+      )
       .addRow(
         row.new()
         .addPanel(availability1d)
