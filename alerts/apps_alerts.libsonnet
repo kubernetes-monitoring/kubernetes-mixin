@@ -204,19 +204,6 @@
             'for': '15m',
           },
           {
-            alert: 'KubeCronJobRunning',
-            expr: |||
-              time() - kube_cronjob_next_schedule_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 3600
-            ||| % $._config,
-            'for': '1h',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: 'CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is taking more than 1h to complete.',
-            },
-          },
-          {
             alert: 'KubeJobCompletion',
             expr: |||
               kube_job_spec_completions{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
