@@ -106,18 +106,6 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeletTooManyPods"
 + *Message*: `Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110.`
 + *Severity*: warning
-##### Alert Name: "KubeAPILatencyHigh"
-+ *Message*: `The API server has a 99th percentile latency of {{ $value }} seconds for {{$labels.verb}} {{$labels.resource}}.`
-+ *Severity*: warning
-##### Alert Name: "KubeAPILatencyHigh"
-+ *Message*: `The API server has a 99th percentile latency of {{ $value }} seconds for {{$labels.verb}} {{$labels.resource}}.`
-+ *Severity*: critical
-##### Alert Name: "KubeAPIErrorsHigh"
-+ *Message*: `API server is erroring for {{ $value | humanizePercentage }} of requests.`
-+ *Severity*: critical
-##### Alert Name: "KubeAPIErrorsHigh"
-+ *Message*: `API server is erroring for {{ $value | humanizePercentage }} of requests.`
-+ *Severity*: warning
 ##### Alert Name: "KubeClientCertificateExpiration"
 + *Message*: `A client certificate used to authenticate to the apiserver is expiring in less than 7 days.`
 + *Severity*: warning

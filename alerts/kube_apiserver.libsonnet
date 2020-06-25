@@ -46,48 +46,6 @@ local utils = import 'utils.libsonnet';
         name: 'kubernetes-system-apiserver',
         rules: [
           {
-            alert: 'KubeAPILatencyHigh',
-            expr: |||
-              cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{%(kubeApiserverSelector)s,quantile="0.99"}
-              >
-              %(kubeAPILatencyWarningSeconds)s
-              and on (verb,resource)
-              (
-                cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s}
-                >
-                on (verb) group_left()
-                (
-                  avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
-                  +
-                  2*stddev by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
-                )
-              ) > on (verb) group_left()
-              1.2 * avg by (verb) (cluster:apiserver_request_duration_seconds:mean5m{%(kubeApiserverSelector)s} >= 0)
-            ||| % $._config,
-            'for': '5m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: 'The API server has an abnormal latency of {{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.',
-            },
-          },
-          {
-            alert: 'KubeAPIErrorsHigh',
-            expr: |||
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (resource,subresource,verb)
-                /
-              sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[5m])) by (resource,subresource,verb) > 0.05
-            ||| % $._config,
-            'for': '10m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              message: 'API server is returning errors for {{ $value | humanizePercentage }} of requests for {{ $labels.verb }} {{ $labels.resource }} {{ $labels.subresource }}.',
-            },
-          },
-          {
             alert: 'KubeClientCertificateExpiration',
             expr: |||
               apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
