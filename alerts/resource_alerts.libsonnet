@@ -91,7 +91,7 @@
             'for': '5m',
           },
           {
-            alert: 'KubeQuotaExceeded',
+            alert: 'KubeQuotaFullyUsed',
             expr: |||
               kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
                 / ignoring(instance, job, type)
