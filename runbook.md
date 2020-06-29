@@ -80,9 +80,9 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeMemOvercommit"
 + *Message*: `Overcommited Memory resource request quota on Namespaces.`
 + *Severity*: warning
-##### Alert Name: "KubeQuotaExceeded"
+##### Alert Name: "KubeQuotaFullyUsed"
 + *Message*: `{{ $value | humanizePercentage }} usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.`
-+ *Severity*: warning
++ *Severity*: info
 ### Group Name: "kubernetes-storage"
 ##### Alert Name: "KubePersistentVolumeFillingUp"
 + *Message*: `The persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has {{ $value | humanizePercentage }} free.`
