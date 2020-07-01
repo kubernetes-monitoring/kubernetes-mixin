@@ -252,14 +252,13 @@ local singlestat = grafana.singlestat;
       )
       .addTemplate(
         template.new(
-          name='cluster',
-          datasource='$datasource',
-          query='label_values(apiserver_request_total, %(clusterLabel)s)' % $._config,
-          current='prod',
+          'cluster',
+          '$datasource',
+          'label_values(apiserver_request_total, %(clusterLabel)s)' % $._config,
+          label='cluster',
+          refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
-          refresh=1,
-          includeAll=false,
-          sort=1
+          sort=1,
         )
       )
       .addTemplate(
