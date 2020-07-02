@@ -39,7 +39,13 @@
             // Some node has a capacity of 1 like AWS's Fargate and only exists while a pod is running on it.
             // We have to ignore this special node in the KubeletTooManyPods alert.
             expr: |||
-              max(max(kubelet_running_pod_count{%(kubeletSelector)s}) by(instance) * on(instance) group_left(node) kubelet_node_name{%(kubeletSelector)s}) by(node) / max(kube_node_status_capacity_pods{%(kubeStateMetricsSelector)s} != 1) by(node) > 0.95
+              count by(node) (
+                (kube_pod_status_phase{%(kubeStateMetricsSelector)s,phase="Running"} == 1) * on(instance,pod,namespace,cluster) group_left(node) topk by(instance,pod,namespace,cluster) (1, kube_pod_info{%(kubeStateMetricsSelector)s})
+              )
+              /
+              max by(node) (
+                kube_node_status_capacity_pods{%(kubeStateMetricsSelector)s} != 1
+              ) > 0.95
             ||| % $._config,
             'for': '15m',
             labels: {
