@@ -12,7 +12,7 @@
           {
             record: 'namespace:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
-              sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (namespace)
+              sum(rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!="", container!="POD"}[5m])) by (%(clusterLabel)s, namespace)
             ||| % $._config,
           },
           {
@@ -67,17 +67,17 @@
           {
             record: 'namespace:container_memory_usage_bytes:sum',
             expr: |||
-              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container!="POD"}) by (namespace)
+              sum(container_memory_usage_bytes{%(cadvisorSelector)s, image!="", container!="POD"}) by (%(clusterLabel)s, namespace)
             ||| % $._config,
           },
           {
             record: 'namespace:kube_pod_container_resource_requests_memory_bytes:sum',
             expr: |||
-              sum by (namespace) (
-                  sum by (namespace, pod) (
-                      max by (namespace, pod, container) (
+              sum by (%(clusterLabel)s, namespace) (
+                  sum by (%(clusterLabel)s, namespace, pod) (
+                      max by (%(clusterLabel)s, namespace, pod, container) (
                           kube_pod_container_resource_requests_memory_bytes{%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod) group_left() max by (namespace, pod) (
+                      ) * on(%(clusterLabel)s, namespace, pod) group_left() max by (namespace, pod) (
                           kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
@@ -87,11 +87,11 @@
           {
             record: 'namespace:kube_pod_container_resource_requests_cpu_cores:sum',
             expr: |||
-              sum by (namespace) (
-                  sum by (namespace, pod) (
-                      max by (namespace, pod, container) (
+              sum by (%(clusterLabel)s, namespace) (
+                  sum by (%(clusterLabel)s, namespace, pod) (
+                      max by (%(clusterLabel)s, namespace, pod, container) (
                           kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod) group_left() max by (namespace, pod) (
+                      ) * on(%(clusterLabel)s, namespace, pod) group_left() max by (%(clusterLabel)s, namespace, pod) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
@@ -107,8 +107,8 @@
                   label_replace(
                     kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
                     "replicaset", "$1", "owner_name", "(.*)"
-                  ) * on(replicaset, namespace) group_left(owner_name) topk by(replicaset, namespace) (
-                    1, max by (replicaset, namespace, owner_name) (
+                  ) * on(%(clusterLabel)s, replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
+                    1, max by (%(clusterLabel)s, replicaset, namespace, owner_name) (
                       kube_replicaset_owner{%(kubeStateMetricsSelector)s}
                     )
                   ),
