@@ -103,7 +103,7 @@ local template = grafana.template;
         g.row('CPU Throttling')
         .addPanel(
           g.panel('CPU Throttling') +
-          g.queryPanel('sum(increase(container_cpu_cfs_throttled_periods_total{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}[5m])) by (container) /sum(increase(container_cpu_cfs_periods_total{namespace="$namespace", pod="$pod", container!="POD", %(clusterLabel)s="$cluster"}[5m])) by (container)' % $._config, '{{container}}') +
+          g.queryPanel('sum(increase(container_cpu_cfs_throttled_periods_total{namespace="$namespace", pod="$pod", container!="POD", container!="", %(clusterLabel)s="$cluster"}[5m])) by (container) /sum(increase(container_cpu_cfs_periods_total{namespace="$namespace", pod="$pod", container!="POD", container!="", %(clusterLabel)s="$cluster"}[5m])) by (container)' % $._config, '{{container}}') +
           g.stack
           + {
             yaxes: g.yaxes({ format: 'percentunit', max: 1 }),
