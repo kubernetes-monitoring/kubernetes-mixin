@@ -22,7 +22,7 @@ local singlestat = grafana.singlestat;
           decimals=3,
           description='How many percent of requests (both read and write) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
         )
-        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="all"}' % $._config.SLOs.apiserver.days));
+        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]));
 
       local errorBudget =
         graphPanel.new(
@@ -34,7 +34,7 @@ local singlestat = grafana.singlestat;
           fill=10,
           description='How much error budget is left looking at our %.3f%% availability gurantees?' % $._config.SLOs.apiserver.target,
         )
-        .addTarget(prometheus.target('100 * (apiserver_request:availability%dd{verb="all"} - %f)' % [$._config.SLOs.apiserver.days, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
+        .addTarget(prometheus.target('100 * (apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"} - %f)' % [$._config.SLOs.apiserver.days, $._config.clusterLabel, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
 
       local readAvailability =
         singlestat.new(
@@ -45,7 +45,7 @@ local singlestat = grafana.singlestat;
           decimals=3,
           description='How many percent of read requests (LIST,GET) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
         )
-        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="read"}' % $._config.SLOs.apiserver.days));
+        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="read", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]));
 
       local readRequests =
         graphPanel.new(
@@ -61,7 +61,7 @@ local singlestat = grafana.singlestat;
         .addSeriesOverride({ alias: '/3../i', color: '#F2CC0C' })
         .addSeriesOverride({ alias: '/4../i', color: '#3274D9' })
         .addSeriesOverride({ alias: '/5../i', color: '#E02F44' })
-        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="read"})', legendFormat='{{ code }}'));
+        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="read", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ code }}'));
 
       local readErrors =
         graphPanel.new(
@@ -72,7 +72,7 @@ local singlestat = grafana.singlestat;
           format='percentunit',
           description='How many percent of read requests (LIST,GET) per second are returned with errors (5xx)?',
         )
-        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read",code=~"5.."}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read"})', legendFormat='{{ resource }}'));
+        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read",code=~"5..", %(clusterLabel)s="$cluster"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ resource }}'));
 
       local readDuration =
         graphPanel.new(
@@ -82,7 +82,7 @@ local singlestat = grafana.singlestat;
           format='s',
           description='How many seconds is the 99th percentile for reading (LIST|GET) a given resource?',
         )
-        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="read"}', legendFormat='{{ resource }}'));
+        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="read", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
 
       local writeAvailability =
         singlestat.new(
@@ -93,7 +93,7 @@ local singlestat = grafana.singlestat;
           decimals=3,
           description='How many percent of write requests (POST|PUT|PATCH|DELETE) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
         )
-        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="write"}' % $._config.SLOs.apiserver.days));
+        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="write", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]));
 
       local writeRequests =
         graphPanel.new(
@@ -109,7 +109,7 @@ local singlestat = grafana.singlestat;
         .addSeriesOverride({ alias: '/3../i', color: '#F2CC0C' })
         .addSeriesOverride({ alias: '/4../i', color: '#3274D9' })
         .addSeriesOverride({ alias: '/5../i', color: '#E02F44' })
-        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="write"})', legendFormat='{{ code }}'));
+        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="write", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ code }}'));
 
       local writeErrors =
         graphPanel.new(
@@ -120,7 +120,7 @@ local singlestat = grafana.singlestat;
           format='percentunit',
           description='How many percent of write requests (POST|PUT|PATCH|DELETE) per second are returned with errors (5xx)?',
         )
-        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write",code=~"5.."}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write"})', legendFormat='{{ resource }}'));
+        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write",code=~"5..", %(clusterLabel)s="$cluster"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ resource }}'));
 
       local writeDuration =
         graphPanel.new(
@@ -130,7 +130,7 @@ local singlestat = grafana.singlestat;
           format='s',
           description='How many seconds is the 99th percentile for writing (POST|PUT|PATCH|DELETE) a given resource?',
         )
-        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="write"}', legendFormat='{{ resource }}'));
+        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="write", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
 
       local workQueueAddRate =
         graphPanel.new(
@@ -252,14 +252,13 @@ local singlestat = grafana.singlestat;
       )
       .addTemplate(
         template.new(
-          name='cluster',
-          datasource='$datasource',
-          query='label_values(apiserver_request_total, %(clusterLabel)s)' % $._config,
-          current='prod',
+          'cluster',
+          '$datasource',
+          'label_values(apiserver_request_total, %(clusterLabel)s)' % $._config,
+          label='cluster',
+          refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
-          refresh=1,
-          includeAll=false,
-          sort=1
+          sort=1,
         )
       )
       .addTemplate(
