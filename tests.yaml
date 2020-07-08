@@ -243,15 +243,15 @@ tests:
     values: '1 stale'
   promql_expr_test:
   - eval_time: 0m
-    expr: mixin_pod_workload
+    expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'mixin_pod_workload{namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
   - eval_time: 1m
-    expr: mixin_pod_workload
+    expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'mixin_pod_workload{namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
 
 - interval: 1m
   input_series:
