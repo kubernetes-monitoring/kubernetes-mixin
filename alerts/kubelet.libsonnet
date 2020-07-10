@@ -2,6 +2,10 @@
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeletSelector: error 'must provide selector for kubelet',
+    kubeNodeUnreachableIgnoreKeys: [
+      'ToBeDeletedByClusterAutoscaler',
+      'cloud.google.com/impending-node-termination',
+    ],
   },
 
   prometheusAlerts+:: {
@@ -24,8 +28,10 @@
           },
           {
             expr: |||
-              (kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="ToBeDeletedByClusterAutoscaler"}) == 1
-            ||| % $._config,
+              (kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{%(kubeStateMetricsSelector)s,key=~"%(kubeNodeUnreachableIgnoreKeys)s"}) == 1
+            ||| % $._config {
+              kubeNodeUnreachableIgnoreKeys: std.join('|', super.kubeNodeUnreachableIgnoreKeys),
+            },
             labels: {
               severity: 'warning',
             },
