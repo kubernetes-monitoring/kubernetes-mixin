@@ -5,6 +5,7 @@
     kubeNodeUnreachableIgnoreKeys: [
       'ToBeDeletedByClusterAutoscaler',
       'cloud.google.com/impending-node-termination',
+      'aws-node-termination-handler/spot-itn',
     ],
   },
 
