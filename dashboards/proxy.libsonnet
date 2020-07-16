@@ -88,7 +88,7 @@ local singlestat = grafana.singlestat;
           format='s',
           min=0,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_latency_seconds_bucket{%(kubeProxySelector)s,instance=~"$instance",verb="POST"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(kubeProxySelector)s,instance=~"$instance",verb="POST"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
 
       local getRequestLatency =
         graphPanel.new(
@@ -103,7 +103,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_latency_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance", verb="GET"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(kubeProxySelector)s, instance=~"$instance", verb="GET"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
 
       local memory =
         graphPanel.new(

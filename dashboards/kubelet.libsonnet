@@ -292,7 +292,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_latency_seconds_bucket{%(clusterLabel)s="$cluster",%(kubeletSelector)s, instance=~"$instance"}[5m])) by (instance, verb, url, le))' % $._config, legendFormat='{{instance}} {{verb}} {{url}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster",%(kubeletSelector)s, instance=~"$instance"}[5m])) by (instance, verb, url, le))' % $._config, legendFormat='{{instance}} {{verb}} {{url}}'));
 
       local memory =
         graphPanel.new(
