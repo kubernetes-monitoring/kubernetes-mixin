@@ -84,14 +84,14 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'AggregatedAPIDown',
             expr: |||
-              sum by(name, namespace)(sum_over_time(aggregator_unavailable_apiservice[5m])) > 0
+              (1 - max by(name, namespace)(avg_over_time(aggregator_unavailable_apiservice[5m]))) * 100 < 90
             ||| % $._config,
             'for': '5m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} is down. It has not been available at least for the past five minutes.',
+              message: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 5m.',
             },
           },
           (import '../lib/absent_alert.libsonnet') {
