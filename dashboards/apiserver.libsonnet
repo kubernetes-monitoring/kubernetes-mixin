@@ -169,38 +169,6 @@ local singlestat = grafana.singlestat;
         )
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 
-      local etcdCacheEntryTotal =
-        graphPanel.new(
-          'ETCD Cache Entry Total',
-          datasource='$datasource',
-          span=4,
-          format='short',
-          min=0,
-        )
-        .addTarget(prometheus.target('etcd_helper_cache_entry_total{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{instance}}'));
-
-      local etcdCacheEntryRate =
-        graphPanel.new(
-          'ETCD Cache Hit/Miss Rate',
-          datasource='$datasource',
-          span=4,
-          format='ops',
-          min=0,
-        )
-        .addTarget(prometheus.target('sum(rate(etcd_helper_cache_hit_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance)' % $._config, legendFormat='{{instance}} hit'))
-        .addTarget(prometheus.target('sum(rate(etcd_helper_cache_miss_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance)' % $._config, legendFormat='{{instance}} miss'));
-
-      local etcdCacheLatency =
-        graphPanel.new(
-          'ETCD Cache Duration 99th Quantile',
-          datasource='$datasource',
-          span=4,
-          format='s',
-          min=0,
-        )
-        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}} get'))
-        .addTarget(prometheus.target('histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[5m])) by (instance, le))' % $._config, legendFormat='{{instance}} miss'));
-
       local memory =
         graphPanel.new(
           'Memory',
@@ -308,11 +276,6 @@ local singlestat = grafana.singlestat;
         .addPanel(workQueueAddRate)
         .addPanel(workQueueDepth)
         .addPanel(workQueueLatency)
-      ).addRow(
-        row.new()
-        .addPanel(etcdCacheEntryTotal)
-        .addPanel(etcdCacheEntryRate)
-        .addPanel(etcdCacheLatency)
       ).addRow(
         row.new()
         .addPanel(memory)
