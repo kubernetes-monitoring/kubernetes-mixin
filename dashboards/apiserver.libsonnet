@@ -136,7 +136,7 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Work Queue Add Rate',
           datasource='$datasource',
-          span=4,
+          span=6,
           format='ops',
           legend_show=false,
           min=0,
@@ -147,7 +147,7 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Work Queue Depth',
           datasource='$datasource',
-          span=4,
+          span=6,
           format='short',
           legend_show=false,
           min=0,
@@ -159,7 +159,7 @@ local singlestat = grafana.singlestat;
         graphPanel.new(
           'Work Queue Latency',
           datasource='$datasource',
-          span=4,
+          span=12,
           format='s',
           legend_show=true,
           legend_values=true,
