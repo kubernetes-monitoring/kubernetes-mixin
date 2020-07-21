@@ -208,7 +208,7 @@
             expr: |||
               kube_job_spec_completions{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
             ||| % $._config,
-            'for': '1h',
+            'for': '12h',
             labels: {
               severity: 'warning',
             },
