@@ -220,7 +220,7 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than one hour to complete.',
+              message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12 hours to complete.',
             },
           },
           {
