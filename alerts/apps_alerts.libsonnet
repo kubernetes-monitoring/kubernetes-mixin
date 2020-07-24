@@ -150,15 +150,35 @@
           {
             alert: 'KubeDaemonSetRolloutStuck',
             expr: |||
-              kube_daemonset_status_number_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                /
-              kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} < 1.00
+              (
+                (
+                  kube_daemonset_status_current_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                   !=
+                  kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                ) or (
+                  kube_daemonset_status_number_misscheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                   !=
+                  0
+                ) or (
+                  kube_daemonset_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                   !=
+                  kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                ) or (
+                  kube_daemonset_status_number_available{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                   !=
+                  kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                )
+              ) and (
+                changes(kube_daemonset_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
+                  ==
+                0
+              )
             ||| % $._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              message: 'Only {{ $value | humanizePercentage }} of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.',
+              message: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least 15 minutes.',
             },
             'for': '15m',
           },
