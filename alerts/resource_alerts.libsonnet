@@ -35,7 +35,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Cluster has overcommitted CPU resource requests for Pods and cannot tolerate node failure.',
+              description: 'Cluster has overcommitted CPU resource requests for Pods and cannot tolerate node failure.',
+              summary: 'Cluster has overcommitted CPU resource requests.',
             },
             'for': '5m',
           },
@@ -54,7 +55,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Cluster has overcommitted memory resource requests for Pods and cannot tolerate node failure.',
+              description: 'Cluster has overcommitted memory resource requests for Pods and cannot tolerate node failure.',
+              summary: 'Cluster has overcommitted memory resource requests.',
             },
             'for': '5m',
           },
@@ -70,7 +72,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Cluster has overcommitted CPU resource requests for Namespaces.',
+              description: 'Cluster has overcommitted CPU resource requests for Namespaces.',
+              summary: 'Cluster has overcommitted CPU resource requests.',
             },
             'for': '5m',
           },
@@ -86,7 +89,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Cluster has overcommitted memory resource requests for Namespaces.',
+              description: 'Cluster has overcommitted memory resource requests for Namespaces.',
+              summary: 'Cluster has overcommitted memory resource requests.',
             },
             'for': '5m',
           },
@@ -103,7 +107,8 @@
               severity: 'info',
             },
             annotations: {
-              message: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              summary: 'Namespace quota is fully used.',
             },
           },
           {
@@ -119,7 +124,8 @@
               severity: 'info',
             },
             annotations: {
-              message: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
+              description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
+              summary: 'Processes experience elevated CPU throttling.',
             },
           },
         ],

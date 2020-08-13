@@ -18,7 +18,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.',
+              summary: 'Pod is crash looping.',
             },
             'for': '15m',
             alert: 'KubePodCrashLooping',
@@ -41,7 +42,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes.',
+              summary: 'Pod has been in a non-ready state for more than 15 minutes.',
             },
             'for': '15m',
             alert: 'KubePodNotReady',
@@ -56,7 +58,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.',
+              description: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.',
+              summary: 'Deployment generation mismatch due to possible roll-back',
             },
             'for': '15m',
             alert: 'KubeDeploymentGenerationMismatch',
@@ -77,7 +80,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 15 minutes.',
+              description: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 15 minutes.',
+              summary: 'Deployment has not matched the expected number of replicas.',
             },
             'for': '15m',
             alert: 'KubeDeploymentReplicasMismatch',
@@ -98,7 +102,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
+              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
+              summary: 'Deployment has not matched the expected number of replicas.',
             },
             'for': '15m',
             alert: 'KubeStatefulSetReplicasMismatch',
@@ -113,7 +118,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.',
+              description: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.',
+              summary: 'StatefulSet generation mismatch due to possible roll-back',
             },
             'for': '15m',
             alert: 'KubeStatefulSetGenerationMismatch',
@@ -142,7 +148,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.',
+              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.',
+              summary: 'StatefulSet update has not been rolled out.',
             },
             'for': '15m',
             alert: 'KubeStatefulSetUpdateNotRolledOut',
@@ -178,7 +185,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least 15 minutes.',
+              description: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least 15 minutes.',
+              summary: 'DaemonSet rollout is stuck.',
             },
             'for': '15m',
           },
@@ -190,7 +198,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
+              summary: 'Pod container waiting longer than 1 hour',
             },
             'for': '1h',
             alert: 'KubeContainerWaiting',
@@ -206,7 +215,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.',
+              description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.',
+              summary: 'DaemonSet pods are not scheduled.',
             },
             'for': '10m',
           },
@@ -219,7 +229,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.',
+              description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.',
+              summary: 'DaemonSet pods are misscheduled.',
             },
             'for': '15m',
           },
@@ -233,7 +244,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12 hours to complete.',
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12 hours to complete.',
+              sumary: 'Job did not complete in time',
             },
           },
           {
@@ -246,7 +258,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.',
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.',
+              summary: 'Job failed to complete.',
             },
           },
           {
@@ -261,7 +274,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has not matched the desired number of replicas for longer than 15 minutes.',
+              description: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has not matched the desired number of replicas for longer than 15 minutes.',
+              summary: 'HPA has not matched descired number of replicas.',
             },
             'for': '15m',
             alert: 'KubeHpaReplicasMismatch',
@@ -276,7 +290,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has been running at max replicas for longer than 15 minutes.',
+              description: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has been running at max replicas for longer than 15 minutes.',
+              summary: 'HPA is running at max replicas',
             },
             'for': '15m',
             alert: 'KubeHpaMaxedOut',

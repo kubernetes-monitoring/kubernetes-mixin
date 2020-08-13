@@ -29,7 +29,8 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is only {{ $value | humanizePercentage }} free.',
+              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is only {{ $value | humanizePercentage }} free.',
+              summary: 'PersistentVolume is filling up.',
             },
           },
           {
@@ -48,7 +49,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.',
+              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.',
+              summary: 'PersistentVolume is filling up.',
             },
           },
           {
@@ -61,7 +63,8 @@
               severity: 'critical',
             },
             annotations: {
-              message: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.',
+              description: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.',
+              summary: 'PersistentVolume is having issues with provisioning.',
             },
           },
         ],

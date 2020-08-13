@@ -12,6 +12,7 @@
     severity: 'critical',
   },
   annotations: {
-    message: '%s has disappeared from Prometheus target discovery.' % absentAlert.componentName,
+    description: '%s has disappeared from Prometheus target discovery.' % absentAlert.componentName,
+    summary: 'Target disappeared from Prometheus target discovery.',
   },
 }

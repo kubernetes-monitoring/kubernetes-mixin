@@ -22,7 +22,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $labels.node }} has been unready for more than 15 minutes.',
+              description: '{{ $labels.node }} has been unready for more than 15 minutes.',
+              summary: 'Node is not ready.',
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
@@ -37,7 +38,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: '{{ $labels.node }} is unreachable and some workloads may be rescheduled.',
+              description: '{{ $labels.node }} is unreachable and some workloads may be rescheduled.',
+              summary: 'Node is unreachable.',
             },
             alert: 'KubeNodeUnreachable',
           },
@@ -59,7 +61,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: "Kubelet '{{ $labels.node }}' is running at {{ $value | humanizePercentage }} of its Pod capacity.",
+              description: "Kubelet '{{ $labels.node }}' is running at {{ $value | humanizePercentage }} of its Pod capacity.",
+              summary: 'Kubelet is running at capacity.',
             },
           },
           {
@@ -72,7 +75,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.',
+              description: 'The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.',
+              summary: 'Node readiness status is flapping.',
             },
           },
           {
@@ -85,7 +89,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.',
+              description: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.',
+              summary: 'Kubelet Pod Lifecycle Event Generator is taking too long to relist.',
             },
           },
           {
@@ -98,7 +103,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'Kubelet Pod startup 99th percentile latency is {{ $value }} seconds on node {{ $labels.node }}.',
+              description: 'Kubelet Pod startup 99th percentile latency is {{ $value }} seconds on node {{ $labels.node }}.',
+              summary: 'Kubelet Pod startup latency is too high.',
             },
           },
           (import '../lib/absent_alert.libsonnet') {

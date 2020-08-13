@@ -27,7 +27,8 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.562% free.'
+        summary: "PersistentVolume is filling up."
+        description: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.562% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefillingup
 
 - interval: 1m
@@ -46,7 +47,8 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.294% free.'
+        summary: "PersistentVolume is filling up."
+        description: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.294% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefillingup
 
 - interval: 1m
@@ -65,7 +67,8 @@ tests:
         persistentvolumeclaim: somepvc
         severity: warning
       exp_annotations:
-        message: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 1.263% is available.'
+        summary: "PersistentVolume is filling up."
+        description: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to fill up within four days. Currently 1.263% is available.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefillingup
     - exp_labels:
         job: kubelet
@@ -73,7 +76,8 @@ tests:
         persistentvolumeclaim: somepvc
         severity: critical
       exp_annotations:
-        message: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.263% free.'
+        summary: "PersistentVolume is filling up."
+        description: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.263% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefillingup
 
 - interval: 1m
@@ -102,7 +106,8 @@ tests:
         node: minikube
         severity: warning
       exp_annotations:
-        message: "Kubelet 'minikube' is running at 100% of its Pod capacity."
+        summary: "Kubelet is running at capacity."
+        description: "Kubelet 'minikube' is running at 100% of its Pod capacity."
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods
 
 - interval: 1m
@@ -189,7 +194,8 @@ tests:
         quantile: 0.99
         severity: warning
       exp_annotations:
-        message: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of 10 seconds on node minikube.'
+        summary: "Kubelet Pod Lifecycle Event Generator is taking too long to relist."
+        description: 'The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of 10 seconds on node minikube.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletplegdurationhigh'
 
 - interval: 1m
@@ -204,7 +210,8 @@ tests:
         node: minikube
         severity: warning
       exp_annotations:
-        message: 'The readiness status of node minikube has changed 10 times in the last 15 minutes.'
+        summary: "Node readiness status is flapping."
+        description: 'The readiness status of node minikube has changed 10 times in the last 15 minutes.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodereadinessflapping'
 
 - interval: 1m
@@ -270,7 +277,8 @@ tests:
         pod: pod-ds-7cc77d965f-cgsdv
         severity: warning
       exp_annotations:
-        message: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
+        summary: "Pod has been in a non-ready state for more than 15 minutes."
+        description: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready"
 
 - interval: 1m
@@ -402,7 +410,8 @@ tests:
         daemonset: node-exporter
         severity: warning
       exp_annotations:
-        message: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        summary: "DaemonSet rollout is stuck."
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
@@ -431,7 +440,8 @@ tests:
         daemonset: node-exporter
         severity: warning
       exp_annotations:
-        message: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        summary: "DaemonSet rollout is stuck."
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
@@ -460,7 +470,8 @@ tests:
         daemonset: node-exporter
         severity: warning
       exp_annotations:
-        message: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        summary: "DaemonSet rollout is stuck."
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
@@ -489,7 +500,8 @@ tests:
         daemonset: node-exporter
         severity: warning
       exp_annotations:
-        message: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        summary: "DaemonSet rollout is stuck."
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 36m
     alertname: KubeDaemonSetRolloutStuck
