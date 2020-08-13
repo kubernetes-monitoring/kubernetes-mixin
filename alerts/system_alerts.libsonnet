@@ -18,7 +18,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: 'There are {{ $value }} different semantic versions of Kubernetes components running.',
+              description: 'There are {{ $value }} different semantic versions of Kubernetes components running.',
+              summary: 'Different semantic versions of Kubernetes components running.',
             },
           },
           {
@@ -37,7 +38,8 @@
               severity: 'warning',
             },
             annotations: {
-              message: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors.'",
+              description: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors.'",
+              summary: 'Kubernetes API server client is experiencing errors.',
             },
           },
         ],

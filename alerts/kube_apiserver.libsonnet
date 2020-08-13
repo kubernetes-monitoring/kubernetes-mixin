@@ -35,7 +35,8 @@ local utils = import 'utils.libsonnet';
               long: '%(long)s' % w,
             },
             annotations: {
-              message: 'The API server is burning too much error budget',
+              description: 'The API server is burning too much error budget.',
+              summary: 'The API server is burning too much error budget.',
             },
             'for': '%(for)s' % w,
           }
@@ -54,7 +55,8 @@ local utils = import 'utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+              summary: 'Client certificate is about to expire.',
             },
           },
           {
@@ -66,7 +68,8 @@ local utils = import 'utils.libsonnet';
               severity: 'critical',
             },
             annotations: {
-              message: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+              summary: 'Client certificate is about to expire.',
             },
           },
           {
@@ -78,7 +81,8 @@ local utils = import 'utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              message: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. The number of errors have increased for it in the past five minutes. High values indicate that the availability of the service changes too often.',
+              description: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. The number of errors have increased for it in the past five minutes. High values indicate that the availability of the service changes too often.',
+              summary: 'An aggregated API has reported errors.',
             },
           },
           {
@@ -91,7 +95,8 @@ local utils = import 'utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              message: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 5m.',
+              description: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 5m.',
+              summary: 'An aggregated API is down.',
             },
           },
           (import '../lib/absent_alert.libsonnet') {
