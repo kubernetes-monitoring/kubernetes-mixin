@@ -247,10 +247,10 @@ local singlestat = grafana.singlestat;
           span=12,
         ),
         gridPos={
-          "h": 2,
-          "w": 24,
-          "x": 0,
-          "y": 0
+          h: 2,
+          w: 24,
+          x: 0,
+          y: 0,
         },
       )
       .addRow(
