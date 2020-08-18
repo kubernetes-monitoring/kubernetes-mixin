@@ -245,7 +245,7 @@
             },
             annotations: {
               description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12 hours to complete.',
-              sumary: 'Job did not complete in time',
+              summary: 'Job did not complete in time',
             },
           },
           {
