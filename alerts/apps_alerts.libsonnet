@@ -251,7 +251,13 @@
           {
             alert: 'KubeJobFailed',
             expr: |||
-              kube_job_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
+              sum by (namespace, job_name) (
+                max by(namespace, job_name) (
+                  kube_job_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                ) * on(namespace, job_name) group_left(owner_kind) topk by(namespace, job_name) (
+                  1, max by(namespace, job_name, owner_kind) (kube_job_owner{owner_kind!="CronJob"})
+                )
+              ) > 0
             ||| % $._config,
             'for': '15m',
             labels: {
