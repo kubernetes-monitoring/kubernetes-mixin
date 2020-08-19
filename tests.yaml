@@ -505,3 +505,33 @@ tests:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 36m
     alertname: KubeDaemonSetRolloutStuck
+
+- interval: 1m
+  input_series:
+  - series: 'kube_job_failed{instance="instance1",condition="true",job="kube-state-metrics",job_name="job-1597623120",namespace="ns1"}'
+    values: '1+0x20'
+  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",job_name="job-1597623120",namespace="ns1",owner_is_controller="<none>",owner_kind="<none>",owner_name="<none>"}'
+    values: '1+0x20'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubeJobFailed
+    exp_alerts:
+    - exp_labels:
+        namespace: ns1
+        job_name: job-1597623120
+        severity: warning
+      exp_annotations:
+        summary: "Job failed to complete."
+        description: "Job ns1/job-1597623120 failed to complete."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobfailed"
+
+- interval: 1m
+  input_series:
+  - series: 'kube_job_failed{instance="instance1",condition="true",job="kube-state-metrics",job_name="job-cron-1597623120",namespace="ns1"}'
+    values: '1+0x20'
+  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",job_name="job-cron-1597623120",namespace="ns1",owner_is_controller="true",owner_kind="CronJob",owner_name="cron-job-name"}'
+    values: '1+0x20'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubeJobFailed
+
