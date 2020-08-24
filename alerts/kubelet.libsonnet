@@ -7,6 +7,9 @@
       'cloud.google.com/impending-node-termination',
       'aws-node-termination-handler/spot-itn',
     ],
+
+    kubeletCertExpirationWarningSeconds: 7 * 24 * 3600,
+    kubeletCertExpirationCriticalSeconds: 1 * 24 * 3600,
   },
 
   prometheusAlerts+:: {
@@ -105,6 +108,86 @@
             annotations: {
               description: 'Kubelet Pod startup 99th percentile latency is {{ $value }} seconds on node {{ $labels.node }}.',
               summary: 'Kubelet Pod startup latency is too high.',
+            },
+          },
+          {
+            alert: 'KubeletClientCertificateExpiration',
+            expr: |||
+              kubelet_certificate_manager_client_ttl_seconds < %(kubeletCertExpirationWarningSeconds)s
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Client certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
+              summary: 'Kubelet client certificate is about to expire.',
+            },
+          },
+          {
+            alert: 'KubeletClientCertificateExpiration',
+            expr: |||
+              kubelet_certificate_manager_client_ttl_seconds < %(kubeletCertExpirationCriticalSeconds)s
+            ||| % $._config,
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              description: 'Client certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
+              summary: 'Kubelet client certificate is about to expire.',
+            },
+          },
+          {
+            alert: 'KubeletServerCertificateExpiration',
+            expr: |||
+              kubelet_certificate_manager_server_ttl_seconds < %(kubeletCertExpirationWarningSeconds)s
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Server certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
+              summary: 'Kubelet server certificate is about to expire.',
+            },
+          },
+          {
+            alert: 'KubeletServerCertificateExpiration',
+            expr: |||
+              kubelet_certificate_manager_server_ttl_seconds < %(kubeletCertExpirationCriticalSeconds)s
+            ||| % $._config,
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              description: 'Server certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
+              summary: 'Kubelet server certificate is about to expire.',
+            },
+          },
+          {
+            alert: 'KubeletClientCertificateRenewalErrors',
+            expr: |||
+              increase(kubelet_certificate_manager_client_expiration_renew_errors[5m]) > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            'for': '15m',
+            annotations: {
+              description: 'Kubelet on node {{ $labels.node }} has failed to renew its client certificate ({{ $value | humanize }} errors in the last 5 minutes).',
+              summary: 'Kubelet has failed to renew its client certificate.',
+            },
+          },
+          {
+            alert: 'KubeletServerCertificateRenewalErrors',
+            expr: |||
+              increase(kubelet_server_expiration_renew_errors[5m]) > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            'for': '15m',
+            annotations: {
+              description: 'Kubelet on node {{ $labels.node }} has failed to renew its server certificate ({{ $value | humanize }} errors in the last 5 minutes).',
+              summary: 'Kubelet has failed to renew its server certificate.',
             },
           },
           (import '../lib/absent_alert.libsonnet') {
