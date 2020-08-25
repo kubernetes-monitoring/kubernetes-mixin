@@ -41,6 +41,7 @@
               description: '{{ $labels.node }} is unreachable and some workloads may be rescheduled.',
               summary: 'Node is unreachable.',
             },
+            'for': '15m',
             alert: 'KubeNodeUnreachable',
           },
           {
