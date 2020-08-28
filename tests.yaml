@@ -260,7 +260,7 @@ tests:
     - exp_labels:
         namespace: ns1
         pod: pod-ds-7cc77d965f-cgsdv
-        severity: critical
+        severity: warning
       exp_annotations:
         message: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready"
