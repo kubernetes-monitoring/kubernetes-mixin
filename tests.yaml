@@ -620,3 +620,23 @@ tests:
         summary: "Kubelet has failed to renew its server certificate."
         description: 'Kubelet on node minikube has failed to renew its server certificate (5 errors in the last 5 minutes).'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletservercertificaterenewalerrors
+
+- interval: 1m
+  input_series:
+  - series: 'kube_job_failed{instance="instance1",condition="true",job="kube-state-metrics",job_name="job-1597623120",namespace="ns1"}'
+    values: '1+0x20'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubeJobFailed
+    exp_alerts:
+    - exp_labels:
+        namespace: ns1
+        job_name: job-1597623120
+        severity: warning
+        condition: true
+        instance: instance1
+        job: kube-state-metrics
+      exp_annotations:
+        summary: "Job failed to complete."
+        description: "Job ns1/job-1597623120 failed to complete."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobfailed"
