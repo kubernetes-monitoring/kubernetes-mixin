@@ -100,7 +100,7 @@
               kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
                 / ignoring(instance, job, type)
               (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
-                = 1
+                == 1
             ||| % $._config,
             'for': '15m',
             labels: {
