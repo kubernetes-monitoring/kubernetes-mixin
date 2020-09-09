@@ -83,6 +83,9 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeQuotaFullyUsed"
 + *Message*: `{{ $value | humanizePercentage }} usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.`
 + *Severity*: info
+##### Alert Name: "KubeQuotaExceeded"
++ *Message*: `{{ $value | humanizePercentage }} usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.`
++ *Severity*: warning
 ### Group Name: "kubernetes-storage"
 ##### Alert Name: "KubePersistentVolumeFillingUp"
 + *Message*: `The persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has {{ $value | humanizePercentage }} free.`
