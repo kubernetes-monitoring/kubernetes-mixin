@@ -91,12 +91,29 @@
             'for': '5m',
           },
           {
+            alert: 'KubeQuotaAlmostFull',
+            expr: |||
+              kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+                / ignoring(instance, job, type)
+              (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
+                > 0.9 < 1
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'info',
+            },
+            annotations: {
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              summary: 'Namespace quota is going to be full.',
+            },
+          },
+          {
             alert: 'KubeQuotaFullyUsed',
             expr: |||
               kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
                 / ignoring(instance, job, type)
               (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
-                >= 1
+                == 1
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -104,6 +121,23 @@
             },
             annotations: {
               message: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+            },
+          },
+          {
+            alert: 'KubeQuotaExceeded',
+            expr: |||
+              kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+                / ignoring(instance, job, type)
+              (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
+                > 1
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              summary: 'Namespace quota has exceeded the limits.',
             },
           },
           {
