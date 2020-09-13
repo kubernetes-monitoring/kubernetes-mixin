@@ -86,7 +86,7 @@ local template = grafana.template;
         .addRow(
           g.row('Memory Requests')
           .addPanel(
-            g.panel('Requests by Namespace') +
+            g.panel('Requests by Cluster') +
             g.tablePanel([
               // Not using container_memory_usage_bytes here because that includes page cache
               'sum(container_memory_rss{container!=""}) by (%(clusterLabel)s)' % $._config,
