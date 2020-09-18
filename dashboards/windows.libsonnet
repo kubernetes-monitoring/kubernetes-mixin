@@ -337,11 +337,11 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
             legend_avg=true,
           )
           .addTarget(prometheus.target(
-            'sort_desc(sum by (container) (rate(windows_container_network_receive_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+            'sort_desc(sum by (container) (rate(windows_container_network_received_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
             legendFormat='Received : {{ container }}',
           ))
           .addTarget(prometheus.target(
-            'sort_desc(sum by (container) (rate(windows_container_network_transmit_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+            'sort_desc(sum by (container) (rate(windows_container_network_transmitted_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
             legendFormat='Transmitted : {{ container }}',
           ))
         )

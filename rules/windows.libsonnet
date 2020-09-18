@@ -202,13 +202,13 @@
             ||| % $._config,
           },
           {
-            record: 'windows_container_network_receive_bytes_total',
+            record: 'windows_container_network_received_bytes_total',
             expr: |||
               windows_container_network_receive_bytes_total{%(wmiExporterSelector)s} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{%(kubeStateMetricsSelector)s}) by(container, container_id, pod, namespace)
             ||| % $._config,
           },
           {
-            record: 'windows_container_network_transmit_bytes_total',
+            record: 'windows_container_network_transmitted_bytes_total',
             expr: |||
               windows_container_network_transmit_bytes_total{%(wmiExporterSelector)s} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{%(kubeStateMetricsSelector)s}) by(container, container_id, pod, namespace)
             ||| % $._config,
