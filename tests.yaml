@@ -638,5 +638,5 @@ tests:
         job: kube-state-metrics
       exp_annotations:
         summary: "Job failed to complete."
-        description: "Job ns1/job-1597623120 failed to complete."
+        description: "Job ns1/job-1597623120 failed to complete. Removing failed job after investigation should clear this alert."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobfailed"

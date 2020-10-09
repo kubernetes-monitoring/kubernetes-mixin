@@ -258,7 +258,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.',
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete. Removing failed job after investigation should clear this alert.',
               summary: 'Job failed to complete.',
             },
           },
