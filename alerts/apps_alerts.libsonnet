@@ -25,6 +25,23 @@
             alert: 'KubePodCrashLooping',
           },
           {
+            expr: |||
+              (
+                kube_pod_container_status_last_terminated_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, reason="OOMKilled"} == 1
+              ) and on(pod) (
+                increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) > 0
+              )
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) was OOMKilled.',
+              summary: 'Pod was OOMKilled.',
+            },
+            alert: 'KubePodOOMKilled',
+          },
+          {
             // We wrap kube_pod_owner with the topk() aggregator to ensure that
             // every (namespace, pod) tuple is unique even if the "owner_kind"
             // label exists for 2 values. This avoids "many-to-many matching
