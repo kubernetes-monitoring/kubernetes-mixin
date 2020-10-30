@@ -28,7 +28,7 @@
             expr: |||
               (
                 kube_pod_container_status_last_terminated_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, reason="OOMKilled"} == 1
-              ) and on(pod) (
+              ) and on(container, namespace, pod) (
                 increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) > 0
               )
             ||| % $._config,
