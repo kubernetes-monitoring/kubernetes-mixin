@@ -82,7 +82,7 @@
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="memory"})
                 /
-              sum(kube_node_status_allocatable_memory_bytes{%(nodeExporterSelector)s})
+              sum(kube_node_status_allocatable_memory_bytes{%(kubeStateMetricsSelector)s})
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
