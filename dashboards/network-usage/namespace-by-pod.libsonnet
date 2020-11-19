@@ -227,12 +227,20 @@ local singlestat = grafana.singlestat;
           targets: targets,
         };
 
+      local clusterTemplate =
+        template.new(
+          name='cluster', 
+          datasource='$datasource',
+          query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+          hide=if $._config.showMultiCluster then '' else '2',
+          refresh=1
+      );
 
       local namespaceTemplate =
         template.new(
           name='namespace',
           datasource='$datasource',
-          query='label_values(container_network_receive_packets_total, namespace)',
+          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           allValues='.+',
           current='kube-system',
           hide='',
@@ -243,7 +251,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(container_network_receive_packets_total, namespace)',
+          definition: 'label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           skipUrlSync: false,
         };
 
@@ -362,6 +370,7 @@ local singlestat = grafana.singlestat;
           type: 'datasource',
         },
       )
+      .addTemplate(clusterTemplate)
       .addTemplate(namespaceTemplate)
       .addTemplate(resolutionTemplate)
       .addTemplate(intervalTemplate)
@@ -370,14 +379,14 @@ local singlestat = grafana.singlestat;
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Received',
-          gaugeQuery='sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution]))'
+          gaugeQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Transmitted',
-          gaugeQuery='sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution]))'
+          gaugeQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
@@ -385,12 +394,12 @@ local singlestat = grafana.singlestat;
         newTablePanel(
           tableTitle='Current Status',
           colQueries=[
-            'sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
-            'sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
-            'sum(irate(container_network_receive_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
-            'sum(irate(container_network_transmit_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
-            'sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
-            'sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            'sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)'  % $._config,
+            'sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            'sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            'sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            'sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
           ]
         ),
         gridPos={ h: 9, w: 24, x: 0, y: 10 }
@@ -399,14 +408,14 @@ local singlestat = grafana.singlestat;
       .addPanel(
         newGraphPanel(
           graphTitle='Receive Bandwidth',
-          graphQuery='sum(irate(container_network_receive_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)'
+          graphQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 20 }
       )
       .addPanel(
         newGraphPanel(
           graphTitle='Transmit Bandwidth',
-          graphQuery='sum(irate(container_network_transmit_bytes_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)'
+          graphQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 20 }
       )
@@ -415,7 +424,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Received Packets',
-            graphQuery='sum(irate(container_network_receive_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 0, y: 30 }
@@ -423,7 +432,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets',
-            graphQuery='sum(irate(container_network_transmit_packets_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 12, y: 30 }
@@ -435,7 +444,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Received Packets Dropped',
-            graphQuery='sum(irate(container_network_receive_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 0, y: 40 }
@@ -443,7 +452,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets Dropped',
-            graphQuery='sum(irate(container_network_transmit_packets_dropped_total{namespace=~"$namespace"}[$interval:$resolution])) by (pod)',
+            graphQuery='sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 12, y: 40 }
