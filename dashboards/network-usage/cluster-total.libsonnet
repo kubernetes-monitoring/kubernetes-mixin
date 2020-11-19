@@ -334,7 +334,7 @@ local singlestat = grafana.singlestat;
           title='Errors',
           collapse=true,
         );
-      local cluster_template =
+      local clusterTemplate =
         template.new(
           name='cluster', 
           datasource='$datasource',
@@ -374,7 +374,7 @@ local singlestat = grafana.singlestat;
           type: 'datasource',
         },
       )
-      .addTemplate(cluster_template)
+      .addTemplate(clusterTemplate)
       .addPanel(
         newBarplotPanel(
           graphTitle='Current Rate of Bytes Received',
