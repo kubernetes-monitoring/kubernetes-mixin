@@ -58,6 +58,10 @@
       'kubelet.json': 'B1azll2ETo7DTiM8CysrH6g4s5NCgkOz6ZdU8Q0j',
     },
 
+    // Support for Grafana 7.2+ `$__rate_interval` instead of `$__interval`
+    grafana72: true,
+    grafanaIntervalVar: if self.grafana72 then '$__rate_interval' else '$__interval',
+
     // Config for the Grafana dashboards in the Kubernetes Mixin
     grafanaK8s: {
       dashboardNamePrefix: 'Kubernetes / ',

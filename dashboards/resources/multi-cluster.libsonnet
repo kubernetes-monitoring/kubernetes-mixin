@@ -24,7 +24,7 @@ local template = grafana.template;
            })
           .addPanel(
             g.panel('CPU Utilisation') +
-            g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle"}[$__interval]))' % $._config)
+            g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle"}[%(grafanaIntervalVar)s]))' % $._config)
           )
           .addPanel(
             g.panel('CPU Requests Commitment') +

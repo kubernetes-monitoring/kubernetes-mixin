@@ -23,6 +23,8 @@ Some alerts now use Prometheus filters made available in Prometheus 2.11.0, whic
 
 Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings. 
 
+Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$__rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *_config*
+
 ## How to use
 
 This mixin is designed to be vendored into the repo with your infrastructure config.
