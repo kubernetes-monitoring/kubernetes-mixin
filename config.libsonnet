@@ -59,7 +59,7 @@
     },
 
     // Support for Grafana 7.2+ `$__rate_interval` instead of `$__interval`
-    grafana72: false,
+    grafana72: true,
     grafanaIntervalVar: if self.grafana72 then '$__rate_interval' else '$__interval',
 
     // Config for the Grafana dashboards in the Kubernetes Mixin
