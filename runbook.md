@@ -74,10 +74,10 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeMemOvercommit"
 + *Message*: `Overcommited Memory resource requests on Pods, cannot tolerate node failure.`
 + *Severity*: warning
-##### Alert Name: "KubeCPUOvercommit"
+##### Alert Name: "KubeCPUQuotaOvercommit"
 + *Message*: `Overcommited CPU resource request quota on Namespaces.`
 + *Severity*: warning
-##### Alert Name: "KubeMemOvercommit"
+##### Alert Name: "KubeMemQuotaOvercommit"
 + *Message*: `Overcommited Memory resource request quota on Namespaces.`
 + *Severity*: warning
 ##### Alert Name: "KubeQuotaAlmostFull"
