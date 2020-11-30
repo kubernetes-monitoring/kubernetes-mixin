@@ -262,7 +262,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='type',
           datasource='$datasource',
-          query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config, 
+          query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config, 
           current='deployment',
           hide='',
           refresh=1,
@@ -272,7 +272,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config, 
+          definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config, 
           skipUrlSync: false,
         };
 
