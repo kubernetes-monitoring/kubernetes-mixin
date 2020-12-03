@@ -11,14 +11,6 @@
         name: 'node.rules',
         rules: [
           {
-            // Number of nodes in the cluster
-            // SINCE 2018-02-08
-            record: ':kube_pod_info_node_count:',
-            expr: |||
-              sum(min(kube_pod_info{node!=""}) by (%(clusterLabel)s, node))
-            ||| % $._config,
-          },
-          {
             // This rule results in the tuples (node, namespace, instance) => 1.
             // It is used to calculate per-node metrics, given namespace & instance.
             // We use the topk() aggregator to ensure that each (namespace,
