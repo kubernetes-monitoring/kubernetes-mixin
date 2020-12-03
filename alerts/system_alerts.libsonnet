@@ -32,7 +32,7 @@
                 /
               sum(rate(rest_client_requests_total[5m])) by (%(clusterLabel)s, instance, job))
               > 0.01
-            |||,
+            ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
