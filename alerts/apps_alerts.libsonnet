@@ -26,15 +26,15 @@
           },
           {
             // We wrap kube_pod_owner with the topk() aggregator to ensure that
-            // every (namespace, pod) tuple is unique even if the "owner_kind"
+            // every (cluster, namespace, pod) tuple is unique even if the "owner_kind"
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
             expr: |||
-              sum by (namespace, pod) (
-                max by(namespace, pod) (
+              sum by (cluster, namespace, pod) (
+                max by(cluster, namespace, pod) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}
-                ) * on(namespace, pod) group_left(owner_kind) topk by(namespace, pod) (
-                  1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+                ) * on(cluster, namespace, pod) group_left(owner_kind) topk by(cluster, namespace, pod) (
+                  1, max by(cluster, namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
             ||| % $._config,
@@ -192,7 +192,7 @@
           },
           {
             expr: |||
-              sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
+              sum by (cluster, namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
             ||| % $._config,
             labels: {
               severity: 'warning',

@@ -25,11 +25,11 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (cluster)
                 /
-              sum(kube_node_status_allocatable_cpu_cores)
+              sum(kube_node_status_allocatable_cpu_cores) by (cluster)
                 >
-              (count(kube_node_status_allocatable_cpu_cores)-1) / count(kube_node_status_allocatable_cpu_cores)
+              (count(kube_node_status_allocatable_cpu_cores) by (cluster) - 1) / count(kube_node_status_allocatable_cpu_cores) by (cluster)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -43,13 +43,13 @@
           {
             alert: 'KubeMemoryOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (cluster)
                 /
-              sum(kube_node_status_allocatable_memory_bytes)
+              sum(kube_node_status_allocatable_memory_bytes) by (cluster)
                 >
-              (count(kube_node_status_allocatable_memory_bytes)-1)
+              (count(kube_node_status_allocatable_memory_bytes) by (cluster) -1)
                 /
-              count(kube_node_status_allocatable_memory_bytes)
+              count(kube_node_status_allocatable_memory_bytes) by (cluster)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -63,9 +63,9 @@
           {
             alert: 'KubeCPUQuotaOvercommit',
             expr: |||
-              sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="cpu"})
+              sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="cpu"}) by (cluster)
                 /
-              sum(kube_node_status_allocatable_cpu_cores)
+              sum(kube_node_status_allocatable_cpu_cores) by (cluster)
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
@@ -80,9 +80,9 @@
           {
             alert: 'KubeMemoryQuotaOvercommit',
             expr: |||
-              sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="memory"})
+              sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="memory"}) by (cluster)
                 /
-              sum(kube_node_status_allocatable_memory_bytes{%(kubeStateMetricsSelector)s})
+              sum(kube_node_status_allocatable_memory_bytes{%(kubeStateMetricsSelector)s}) by (cluster)
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
@@ -148,9 +148,9 @@
           {
             alert: 'CPUThrottlingHigh',
             expr: |||
-              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
+              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace, cluster)
                 /
-              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
+              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace, cluster)
                 > ( %(cpuThrottlingPercent)s / 100 )
             ||| % $._config,
             'for': '15m',
