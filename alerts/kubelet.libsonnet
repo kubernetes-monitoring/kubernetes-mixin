@@ -52,11 +52,11 @@
             // Some node has a capacity of 1 like AWS's Fargate and only exists while a pod is running on it.
             // We have to ignore this special node in the KubeletTooManyPods alert.
             expr: |||
-              count by(cluster, node) (
-                (kube_pod_status_phase{%(kubeStateMetricsSelector)s,phase="Running"} == 1) * on(instance,pod,namespace) group_left(cluster, node) topk by(instance,pod,namespace) (1, kube_pod_info{%(kubeStateMetricsSelector)s})
+              count by(%(clusterLabel)s, node) (
+                (kube_pod_status_phase{%(kubeStateMetricsSelector)s,phase="Running"} == 1) * on(instance,pod,namespace) group_left(%(clusterLabel)s, node) topk by(instance,pod,namespace) (1, kube_pod_info{%(kubeStateMetricsSelector)s})
               )
               /
-              max by(cluster, node) (
+              max by(%(clusterLabel)s, node) (
                 kube_node_status_capacity_pods{%(kubeStateMetricsSelector)s} != 1
               ) > 0.95
             ||| % $._config,
@@ -72,7 +72,7 @@
           {
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
-              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (cluster, node) > 2
+              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (%(clusterLabel)s, node) > 2
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -100,7 +100,7 @@
           {
             alert: 'KubeletPodStartUpLatencyHigh',
             expr: |||
-              histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])) by (instance, le)) * on(instance) group_left(cluster, node) kubelet_node_name{%(kubeletSelector)s} > 60
+              histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])) by (instance, le)) * on(instance) group_left(%(clusterLabel)s, node) kubelet_node_name{%(kubeletSelector)s} > 60
             ||| % $._config,
             'for': '15m',
             labels: {

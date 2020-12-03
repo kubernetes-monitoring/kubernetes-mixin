@@ -30,11 +30,11 @@
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
             expr: |||
-              sum by (cluster, namespace, pod) (
-                max by(cluster, namespace, pod) (
+              sum by (%(clusterLabel)s, namespace, pod) (
+                max by(%(clusterLabel)s, namespace, pod) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}
-                ) * on(cluster, namespace, pod) group_left(owner_kind) topk by(cluster, namespace, pod) (
-                  1, max by(cluster, namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+                ) * on(%(clusterLabel)s, namespace, pod) group_left(owner_kind) topk by(%(clusterLabel)s, namespace, pod) (
+                  1, max by(%(clusterLabel)s, namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
             ||| % $._config,
@@ -192,7 +192,7 @@
           },
           {
             expr: |||
-              sum by (cluster, namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
+              sum by (%(clusterLabel)s, namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
