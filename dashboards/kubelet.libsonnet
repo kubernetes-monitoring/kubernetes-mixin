@@ -26,6 +26,7 @@ local singlestat = grafana.singlestat;
           span=2,
           valueName='min',
         )
+        // TODO: The second query selected by the OR operator is for backward compatibility with kubernetes < 1.19, so this can be retored to a single query once 1.23 is out
         .addTarget(prometheus.target('sum(kubelet_running_pods{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance"}) OR sum(kubelet_running_pod_count{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance"})' % $._config, legendFormat='{{instance}}'));
 
       local runningContainerCount =
@@ -35,6 +36,7 @@ local singlestat = grafana.singlestat;
           span=2,
           valueName='min',
         )
+        // TODO: The second query selected by the OR operator is for backward compatibility with kubernetes < 1.19, so this can be retored to a single query once 1.23 is out
         .addTarget(prometheus.target('sum(kubelet_running_containers{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance"}) OR sum(kubelet_running_container_count{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance"})' % $._config, legendFormat='{{instance}}'));
 
       local actualVolumeCount =
