@@ -233,18 +233,18 @@ local singlestat = grafana.singlestat;
 
       local clusterTemplate =
         template.new(
-          name='cluster', 
+          name='cluster',
           datasource='$datasource',
           query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
           refresh=1
-      ); 
+        );
 
       local namespaceTemplate =
         template.new(
           name='namespace',
           datasource='$datasource',
-          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config, 
+          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           current='kube-system',
           hide='',
           refresh=1,
@@ -254,7 +254,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config, 
+          definition: 'label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           skipUrlSync: false,
         };
 
@@ -262,7 +262,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='type',
           datasource='$datasource',
-          query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config, 
+          query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config,
           current='deployment',
           hide='',
           refresh=1,
@@ -272,7 +272,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config, 
+          definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config,
           skipUrlSync: false,
         };
 
@@ -413,7 +413,7 @@ local singlestat = grafana.singlestat;
             sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, 
+          ||| % $._config,
           legendFormat='{{ workload }}',
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 1 }
@@ -425,7 +425,7 @@ local singlestat = grafana.singlestat;
             sort_desc(sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, 
+          ||| % $._config,
           legendFormat='{{ workload }}',
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
@@ -438,42 +438,42 @@ local singlestat = grafana.singlestat;
               sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(avg(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(avg(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             |||
               sort_desc(sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
           ]
         ),
         gridPos={ h: 9, w: 24, x: 0, y: 10 }
@@ -487,7 +487,7 @@ local singlestat = grafana.singlestat;
               sort_desc(avg(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             legendFormat='{{ workload }}',
           ),
           gridPos={ h: 9, w: 12, x: 0, y: 20 }
@@ -499,7 +499,7 @@ local singlestat = grafana.singlestat;
               sort_desc(avg(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             legendFormat='{{ workload }}',
           ),
           gridPos={ h: 9, w: 12, x: 12, y: 20 }
@@ -516,7 +516,7 @@ local singlestat = grafana.singlestat;
             sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, 
+          ||| % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 38 }
       )
@@ -527,7 +527,7 @@ local singlestat = grafana.singlestat;
             sort_desc(sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, 
+          ||| % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 38 }
       )
@@ -540,7 +540,7 @@ local singlestat = grafana.singlestat;
               sort_desc(sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 9, w: 12, x: 0, y: 40 }
@@ -552,7 +552,7 @@ local singlestat = grafana.singlestat;
               sort_desc(sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 9, w: 12, x: 12, y: 40 }
@@ -568,7 +568,7 @@ local singlestat = grafana.singlestat;
               sort_desc(sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 9, w: 12, x: 0, y: 41 }
@@ -580,7 +580,7 @@ local singlestat = grafana.singlestat;
               sort_desc(sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-            ||| % $._config, 
+            ||| % $._config,
             graphFormat='pps'
           ),
           gridPos={ h: 9, w: 12, x: 12, y: 41 }

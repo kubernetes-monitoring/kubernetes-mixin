@@ -336,12 +336,12 @@ local singlestat = grafana.singlestat;
         );
       local clusterTemplate =
         template.new(
-          name='cluster', 
+          name='cluster',
           datasource='$datasource',
           query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
           refresh=1
-      ); 
+        );
 
       dashboard.new(
         title='%(dashboardNamePrefix)sNetworking / Cluster' % $._config.grafanaK8s,
@@ -378,7 +378,7 @@ local singlestat = grafana.singlestat;
       .addPanel(
         newBarplotPanel(
           graphTitle='Current Rate of Bytes Received',
-          graphQuery='sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~".+"}[$interval:$resolution])) by (namespace))'  % $._config,
+          graphQuery='sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~".+"}[$interval:$resolution])) by (namespace))' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
