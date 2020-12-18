@@ -229,12 +229,12 @@ local singlestat = grafana.singlestat;
 
       local clusterTemplate =
         template.new(
-          name='cluster', 
+          name='cluster',
           datasource='$datasource',
           query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
           refresh=1
-      );
+        );
 
       local namespaceTemplate =
         template.new(
@@ -395,7 +395,7 @@ local singlestat = grafana.singlestat;
           tableTitle='Current Status',
           colQueries=[
             'sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
-            'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)'  % $._config,
+            'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             'sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             'sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
             'sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,

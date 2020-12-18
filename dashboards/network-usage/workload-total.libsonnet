@@ -98,18 +98,18 @@ local singlestat = grafana.singlestat;
 
       local clusterTemplate =
         template.new(
-          name='cluster', 
+          name='cluster',
           datasource='$datasource',
           query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
           refresh=1
-      ); 
+        );
 
       local namespaceTemplate =
         template.new(
           name='namespace',
           datasource='$datasource',
-          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config, 
+          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           allValues='.+',
           current='kube-system',
           hide='',
