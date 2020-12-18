@@ -48,6 +48,7 @@ local gauge = promgrafonnet.gauge;
       local sizeGauge = gauge.new(
         'Volume Space Usage',
         |||
+          max without(instance,node) (
           (
             kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
             -
@@ -55,7 +56,7 @@ local gauge = promgrafonnet.gauge;
           )
           /
           kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
-          * 100
+          * 100)
         ||| % $._config,
       ).withLowerBeingBetter();
 
@@ -97,10 +98,11 @@ local gauge = promgrafonnet.gauge;
       local inodeGauge = gauge.new(
         'Volume inodes Usage',
         |||
+          max without(instance,node) (
           kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
           /
           kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"}
-          * 100
+          * 100)
         ||| % $._config,
       ).withLowerBeingBetter();
 
