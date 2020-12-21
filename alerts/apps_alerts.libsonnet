@@ -12,13 +12,13 @@
         rules: [
           {
             expr: |||
-              rate(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) * 60 * 5 > 0
+              rate(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m]) * 60 * 5 > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 10 minutes.',
               summary: 'Pod is crash looping.',
             },
             'for': '15m',
