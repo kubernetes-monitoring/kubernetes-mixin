@@ -28,6 +28,9 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: KubePodCrashLooping
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf \"%.2f\" $value }} / second`
 + *Severity*: critical
+##### Alert Name: KubePodOOMKilled
++ *Message*: `Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) was OOMKilled.`
++ *Severity*: critical
 ##### Alert Name: "KubePodNotReady"
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} is not ready.`
 + *Severity*: critical
