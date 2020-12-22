@@ -640,3 +640,22 @@ tests:
         summary: "Job failed to complete."
         description: "Job ns1/job-1597623120 failed to complete. Removing failed job after investigation should clear this alert."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobfailed"
+
+- interval: 1m
+  input_series:
+  - series: 'apiserver_request_terminations_total{job="kube-apiserver",apiserver="kube-apiserver"}'
+    values: '1+1x10'
+  - series: 'apiserver_request_total{job="kube-apiserver",apiserver="kube-apiserver"}'
+    values: '1+2x10'
+  alert_rule_test:
+  - eval_time: 5m    # alert hasn't fired
+    alertname: KubeAPITerminatedRequests
+  - eval_time: 10m   # alert fired
+    alertname: KubeAPITerminatedRequests
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+      exp_annotations:
+        summary: "The apiserver has terminated 33.33% of its incoming requests."
+        description: "The apiserver has terminated 33.33% of its incoming requests."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiterminatedrequests"

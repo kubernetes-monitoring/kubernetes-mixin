@@ -118,6 +118,10 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeClientCertificateExpiration"
 + *Message*: `A client certificate used to authenticate to the apiserver is expiring in less than 1 day.`
 + *Severity*: critical
+##### Alert Name: "KubeAPITerminatedRequests"
++ *Message*: `The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.`
++ *Severity*: warning
++ *Action*: Use the `apiserver_flowcontrol_rejected_requests_total` metric to determine which flow schema is throttling the traffic to the API Server. The flow schema also provides information on the affected resources and subjects.
 
 ## Other Kubernetes Runbooks and troubleshooting
 + [Troubleshoot Clusters ](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/)
