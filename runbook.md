@@ -27,25 +27,25 @@ This page collects this repositories alerts and begins the process of describing
 ### Group Name: kubernetes-apps
 ##### Alert Name: KubePodCrashLooping
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf \"%.2f\" $value }} / second`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubePodNotReady"
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} is not ready.`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubeDeploymentGenerationMismatch"
 + *Message*: `Deployment {{ $labels.namespace }}/{{ $labels.deployment }} generation mismatch`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubeDeploymentReplicasMismatch"
 + *Message*: `Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica mismatch`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubeStatefulSetReplicasMismatch"
 + *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica mismatch`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubeStatefulSetGenerationMismatch"
 + *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} generation mismatch`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubeDaemonSetRolloutStuck"
 + *Message*: `Only {{$value | humanizePercentage }} of desired pods scheduled and ready for daemon set {{$labels.namespace}}/{{$labels.daemonset}}`
-+ *Severity*: critical
++ *Severity*: warning
 ##### Alert Name: "KubeContainerWaiting"
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is in waiting state.`
 + *Severity*: warning
