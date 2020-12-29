@@ -69,16 +69,16 @@ This page collects this repositories alerts and begins the process of describing
 
 ### Group Name: "kubernetes-resources"
 ##### Alert Name: "KubeCPUOvercommit"
-+ *Message*: `Overcommited CPU resource requests on Pods, cannot tolerate node failure.`
++ *Message*: `Cluster has overcommitted CPU resource requests for Pods and cannot tolerate node failure.`
 + *Severity*: warning
 ##### Alert Name: "KubeMemOvercommit"
-+ *Message*: `Overcommited Memory resource requests on Pods, cannot tolerate node failure.`
++ *Message*: `Cluster has overcommitted memory resource requests for Pods and cannot tolerate node failure.`
 + *Severity*: warning
 ##### Alert Name: "KubeCPUQuotaOvercommit"
-+ *Message*: `Overcommited CPU resource request quota on Namespaces.`
++ *Message*: `Cluster has overcommitted CPU resource requests for Namespaces.`
 + *Severity*: warning
 ##### Alert Name: "KubeMemQuotaOvercommit"
-+ *Message*: `Overcommited Memory resource request quota on Namespaces.`
++ *Message*: `Cluster has overcommitted memory resource requests for Namespaces.`
 + *Severity*: warning
 ##### Alert Name: "KubeQuotaAlmostFull"
 + *Message*: `{{ $value | humanizePercentage }} usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.`
