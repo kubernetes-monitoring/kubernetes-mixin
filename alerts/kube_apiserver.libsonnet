@@ -103,6 +103,20 @@ local utils = import 'utils.libsonnet';
             componentName:: 'KubeAPI',
             selector:: $._config.kubeApiserverSelector,
           },
+          {
+            alert: 'KubeAPITerminatedRequests',
+            expr: |||
+              sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m]))  / (  sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[10m])) + sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) ) > 0.20
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
+              summary: 'The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
+            },
+            'for': '5m',
+          },
         ],
       },
     ],
