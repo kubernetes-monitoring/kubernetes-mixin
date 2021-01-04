@@ -290,9 +290,13 @@
           },
           {
             expr: |||
-              kube_hpa_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              (kube_hpa_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 ==
-              kube_hpa_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              kube_hpa_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s})
+                and
+              (kube_hpa_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                !=
+              kube_hpa_spec_min_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s})
             ||| % $._config,
             labels: {
               severity: 'warning',
