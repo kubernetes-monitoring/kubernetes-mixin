@@ -219,12 +219,18 @@
               verb: 'write',
             },
           },
-        ] + [
           {
             record: 'code_verb:apiserver_request_total:increase%s' % SLODays,
             expr: |||
-              sum by (code, verb) (increase(apiserver_request_total{%s,verb="%s",code=~"%s"}[%s]))
-            ||| % [$._config.kubeApiserverSelector, verb, code, SLODays],
+              avg_over_time(code_verb:apiserver_request_total:increase1h[%s]) * 24 * %d
+            ||| % [SLODays, $._config.SLOs.apiserver.days],
+          },
+        ] + [
+          {
+            record: 'code_verb:apiserver_request_total:increase1h',
+            expr: |||
+              sum by (code, verb) (increase(apiserver_request_total{%s,verb="%s",code=~"%s"}[1h]))
+            ||| % [$._config.kubeApiserverSelector, verb, code],
           }
           for code in ['2..', '3..', '4..', '5..']
           for verb in ['LIST', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE']
