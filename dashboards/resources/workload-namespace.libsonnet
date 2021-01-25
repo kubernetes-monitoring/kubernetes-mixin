@@ -8,7 +8,7 @@ local template = grafana.template;
       template.new(
         name='type',
         datasource='$datasource',
-        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)',
         current='deployment',
         hide='',
         refresh=1,
@@ -18,7 +18,7 @@ local template = grafana.template;
         auto: false,
         auto_count: 30,
         auto_min: '10s',
-        definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)',
         skipUrlSync: false,
       },
 
