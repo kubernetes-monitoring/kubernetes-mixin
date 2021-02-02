@@ -514,7 +514,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           { yaxes: g.yaxes('percentunit') },
         )
         .addPanel(
-          graphPanel.new('Disk I/O',)
+          graphPanel.new('Disk I/O', datasource='$datasource')
           .addTarget(prometheus.target('max(rate(windows_logical_disk_read_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
           .addTarget(prometheus.target('max(rate(windows_logical_disk_write_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
           .addTarget(prometheus.target('max(rate(windows_logical_disk_read_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]) + rate(windows_logical_disk_write_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]))' % $._config, legendFormat='io time')) +
