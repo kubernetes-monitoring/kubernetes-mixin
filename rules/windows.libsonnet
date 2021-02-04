@@ -159,16 +159,16 @@
           {
             record: ':windows_node_net_saturation:sum_irate',
             expr: |||
-              sum(irate(windows_net_packets_received_discarded{%(wmiExporterSelector)s}[1m])) +
-              sum(irate(windows_net_packets_outbound_discarded{%(wmiExporterSelector)s}[1m]))
+              sum(irate(windows_net_packets_received_discarded_total{%(wmiExporterSelector)s}[1m])) +
+              sum(irate(windows_net_packets_outbound_discarded_total{%(wmiExporterSelector)s}[1m]))
             ||| % $._config,
           },
           {
             record: 'node:windows_node_net_saturation:sum_irate',
             expr: |||
               sum by (instance) (
-                (irate(windows_net_packets_received_discarded{%(wmiExporterSelector)s}[1m]) +
-                irate(windows_net_packets_outbound_discarded{%(wmiExporterSelector)s}[1m]))
+                (irate(windows_net_packets_received_discarded_total{%(wmiExporterSelector)s}[1m]) +
+                irate(windows_net_packets_outbound_discarded_total{%(wmiExporterSelector)s}[1m]))
               )
             ||| % $._config,
           },
