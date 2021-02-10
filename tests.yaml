@@ -83,19 +83,19 @@ tests:
 - interval: 1m
   input_series:
   - series: 'kube_node_status_capacity_pods{instance="172.17.0.5:8443",node="minikube",job="kube-state-metrics", namespace="kube-system"}'
-    values: '3x15'
+    values: '3+0x15'
   - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",node="minikube",pod="pod-1",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",phase="Running",pod="pod-1",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",node="minikube",pod="pod-2",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",phase="Running",pod="pod-2",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",node="minikube",pod="pod-3",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",phase="Running",pod="pod-3",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeletTooManyPods
