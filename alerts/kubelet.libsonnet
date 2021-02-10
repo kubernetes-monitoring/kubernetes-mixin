@@ -112,58 +112,6 @@
             },
           },
           {
-            alert: 'KubeletClientCertificateExpiration',
-            expr: |||
-              kubelet_certificate_manager_client_ttl_seconds < %(kubeletCertExpirationWarningSeconds)s
-            ||| % $._config,
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              description: 'Client certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
-              summary: 'Kubelet client certificate is about to expire.',
-            },
-          },
-          {
-            alert: 'KubeletClientCertificateExpiration',
-            expr: |||
-              kubelet_certificate_manager_client_ttl_seconds < %(kubeletCertExpirationCriticalSeconds)s
-            ||| % $._config,
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              description: 'Client certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
-              summary: 'Kubelet client certificate is about to expire.',
-            },
-          },
-          {
-            alert: 'KubeletServerCertificateExpiration',
-            expr: |||
-              kubelet_certificate_manager_server_ttl_seconds < %(kubeletCertExpirationWarningSeconds)s
-            ||| % $._config,
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              description: 'Server certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
-              summary: 'Kubelet server certificate is about to expire.',
-            },
-          },
-          {
-            alert: 'KubeletServerCertificateExpiration',
-            expr: |||
-              kubelet_certificate_manager_server_ttl_seconds < %(kubeletCertExpirationCriticalSeconds)s
-            ||| % $._config,
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              description: 'Server certificate for Kubelet on node {{ $labels.node }} expires in {{ $value | humanizeDuration }}.',
-              summary: 'Kubelet server certificate is about to expire.',
-            },
-          },
-          {
             alert: 'KubeletClientCertificateRenewalErrors',
             expr: |||
               increase(kubelet_certificate_manager_client_expiration_renew_errors[5m]) > 0
