@@ -160,7 +160,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         template.new(
           'namespace',
           '$datasource',
-          'label_values(windows_container_available, namespace)',
+          'label_values(windows_pod_container_available, namespace)',
           label='Namespace',
           refresh='time',
           sort=1,
@@ -253,7 +253,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         template.new(
           'namespace',
           '$datasource',
-          'label_values(windows_container_available, namespace)',
+          'label_values(windows_pod_container_available, namespace)',
           label='Namespace',
           refresh='time',
           sort=1,
@@ -263,7 +263,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         template.new(
           'pod',
           '$datasource',
-          'label_values(windows_container_available{namespace="$namespace"}, pod)',
+          'label_values(windows_pod_container_available{namespace="$namespace"}, pod)',
           label='Pod',
           refresh='time',
           sort=1,

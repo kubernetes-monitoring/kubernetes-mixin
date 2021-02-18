@@ -178,7 +178,7 @@
         name: 'windows.pod.rules',
         rules: [
           {
-            record: 'windows_container_available',
+            record: 'windows_pod_container_available',
             expr: |||
               windows_container_available{%(wmiExporterSelector)s} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{%(kubeStateMetricsSelector)s}) by(container, container_id, pod, namespace)
             ||| % $._config,
@@ -216,25 +216,25 @@
           {
             record: 'kube_pod_windows_container_resource_memory_request',
             expr: |||
-              kube_pod_container_resource_requests_memory_bytes {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_container_available)
+              kube_pod_container_resource_requests_memory_bytes {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
             ||| % $._config,
           },
           {
             record: 'kube_pod_windows_container_resource_memory_limit',
             expr: |||
-              kube_pod_container_resource_limits_memory_bytes {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_container_available)
+              kube_pod_container_resource_limits_memory_bytes {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
             ||| % $._config,
           },
           {
             record: 'kube_pod_windows_container_resource_cpu_cores_request',
             expr: |||
-              kube_pod_container_resource_requests_cpu_cores  {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_container_available)
+              kube_pod_container_resource_requests_cpu_cores  {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
             ||| % $._config,
           },
           {
             record: 'kube_pod_windows_container_resource_cpu_cores_limit',
             expr: |||
-              kube_pod_container_resource_limits_cpu_cores  {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_container_available)
+              kube_pod_container_resource_limits_cpu_cores  {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
             ||| % $._config,
           },
           {
