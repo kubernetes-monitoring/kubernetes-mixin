@@ -83,19 +83,19 @@ tests:
 - interval: 1m
   input_series:
   - series: 'kube_node_status_capacity_pods{instance="172.17.0.5:8443",node="minikube",job="kube-state-metrics", namespace="kube-system"}'
-    values: '3x15'
+    values: '3+0x15'
   - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",node="minikube",pod="pod-1",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",phase="Running",pod="pod-1",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",node="minikube",pod="pod-2",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",phase="Running",pod="pod-2",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",node="minikube",pod="pod-3",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",namespace="kube-system",phase="Running",pod="pod-3",service="kube-state-metrics"}'
-    values: '1x15'
+    values: '1+0x15'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeletTooManyPods
@@ -214,6 +214,7 @@ tests:
         description: 'The readiness status of node minikube has changed 10 times in the last 15 minutes.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodereadinessflapping'
 
+# Verify that node:node_num_cpu:sum triggers no many-to-many errors.
 - interval: 1m
   input_series:
   - series: 'node_cpu_seconds_total{cpu="0",endpoint="https",instance="instance1",job="node-exporter",mode="idle",namespace="openshift-monitoring",pod="node-exporter-1",service="node-exporter"}'
@@ -237,6 +238,43 @@ tests:
     exp_samples:
     - value: 2
       labels: 'node:node_num_cpu:sum{node="node-1"}'
+
+# Verify that node:node_num_cpu:sum doesn't trigger many-to-many errors when
+# node_namespace_pod:kube_pod_info: has duplicate entries for the same
+# (namespace,pod) tuple. This can happen when Prometheus is restarted because
+# it didn't add stale markers to the "old" series on shutdown.
+- interval: 1m
+  input_series:
+  - series: 'node_cpu_seconds_total{cpu="0",endpoint="https",instance="instance1",job="node-exporter",mode="idle",namespace="openshift-monitoring",pod="node-exporter-1",service="node-exporter"}'
+    values: '1 1'
+  - series: 'node_cpu_seconds_total{cpu="0",endpoint="https",instance="instance2",job="node-exporter",mode="idle",namespace="openshift-monitoring",pod="node-exporter-2",service="node-exporter"}'
+    values: '1 1'
+  - series: 'node_namespace_pod:kube_pod_info:{node="node-1",namespace="openshift-monitoring",pod="node-exporter-1"}'
+    values: '1 1'
+  - series: 'node_namespace_pod:kube_pod_info:{node="node-2",namespace="openshift-monitoring",pod="node-exporter-2"}'
+    values: '1 1'
+  # series for the "old" prometheus instance.
+  - series: 'node_namespace_pod:kube_pod_info:{node="node-1",namespace="openshift-monitoring",pod="prometheus-0"}'
+    values: '1'
+  # series for the "new" prometheus instance.
+  - series: 'node_namespace_pod:kube_pod_info:{node="node-2",namespace="openshift-monitoring",pod="prometheus-0"}'
+    values: 'stale 1'
+  promql_expr_test:
+  - eval_time: 0m
+    expr: node:node_num_cpu:sum
+    exp_samples:
+    - value: 1
+      labels: 'node:node_num_cpu:sum{node="node-1"}'
+    - value: 1
+      labels: 'node:node_num_cpu:sum{node="node-2"}'
+  - eval_time: 1m
+    expr: node:node_num_cpu:sum
+    exp_samples:
+    - value: 1
+      labels: 'node:node_num_cpu:sum{node="node-1"}'
+    - value: 1
+      labels: 'node:node_num_cpu:sum{node="node-2"}'
+
 
 - interval: 1m
   input_series:
