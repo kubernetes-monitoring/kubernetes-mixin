@@ -2,10 +2,6 @@
   _config+:: {
     cadvisorSelector: 'job="cadvisor"',
     kubeStateMetricsSelector: 'job="kube-state-metrics"',
-    memorySelector: 'resource="memory"',
-    cpuSelector: 'resource="cpu"',
-    byteSelector: 'unit="byte"',
-    coreSelector: 'unit="core"'
   },
 
   prometheusRules+:: {
@@ -68,7 +64,7 @@
               sum by (namespace) (
                   sum by (namespace, pod) (
                       max by (namespace, pod, container) (
-                          kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(memorySelector)s, %(byteSelector)s}
+                          kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory", unit="byte"}
                       ) * on(namespace, pod) group_left() max by (namespace, pod) (
                           kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
@@ -82,7 +78,7 @@
               sum by (namespace) (
                   sum by (namespace, pod) (
                       max by (namespace, pod, container) (
-                          kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, $(cpuSelector)s, %(coreSelector)s}
+                          kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu", unit="core"}
                       ) * on(namespace, pod) group_left() max by (namespace, pod) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
