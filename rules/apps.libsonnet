@@ -77,7 +77,7 @@
             expr: |||
               sum by (namespace, cluster) (
                   sum by (namespace, pod, cluster) (
-                      max by (namespace, pod, container,cluster) (
+                      max by (namespace, pod, container, cluster) (
                           kube_pod_container_resource_requests_cpu_cores{%(kubeStateMetricsSelector)s}
                       ) * on(namespace, pod) group_left() max by (namespace, pod) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
