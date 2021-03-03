@@ -112,17 +112,17 @@ tests:
 
 - interval: 1m
   input_series:
-  - series: 'kube_pod_container_resource_requests_cpu_cores{container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
+  - series: 'kube_pod_container_resource_requests{resource="cpu",unit="core",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '0.15+0x10'
-  - series: 'kube_pod_container_resource_requests_cpu_cores{container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm"}'
+  - series: 'kube_pod_container_resource_requests{resource="cpu",unit="core",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm"}'
     values: '0.15+0x10'
-  - series: 'kube_pod_container_resource_requests_cpu_cores{container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
+  - series: 'kube_pod_container_resource_requests{resource="cpu",unit="core",container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '0.1+0x10'
-  - series: 'kube_pod_container_resource_requests_memory_bytes{container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
+  - series: 'kube_pod_container_resource_requests{resource="memory",unit="byte",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '1E9+0x10'
-  - series: 'kube_pod_container_resource_requests_memory_bytes{container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm"}'
+  - series: 'kube_pod_container_resource_requests{resource="memory",unit="byte",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm"}'
     values: '1E9+0x10'
-  - series: 'kube_pod_container_resource_requests_memory_bytes{container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
+  - series: 'kube_pod_container_resource_requests{resource="memory",unit="byte",container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '0.5E9+0x10'
   # Duplicate kube_pod_status_phase timeseries for the same pod.
   - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",namespace="kube-apiserver",phase="Running",pod="pod-1",service="ksm"}'
