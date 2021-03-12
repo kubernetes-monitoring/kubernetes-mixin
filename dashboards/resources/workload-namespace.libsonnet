@@ -4,6 +4,19 @@ local template = grafana.template;
 
 {
   grafanaDashboards+:: {
+
+    local clusterTemplate =
+      template.new(
+        name='cluster',
+        datasource='$datasource',
+        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        current='',
+        hide=if $._config.showMultiCluster then '' else '2',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
+  
     local typeTemplate =
       template.new(
         name='type',
@@ -21,18 +34,6 @@ local template = grafana.template;
         definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)',
         skipUrlSync: false,
       },
-
-    local clusterTemplate =
-      template.new(
-        name='cluster',
-        datasource='$datasource',
-        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-        current='',
-        hide=if $._config.showMultiCluster then '' else '2',
-        refresh=1,
-        includeAll=false,
-        sort=1
-      ),
 
     local namespaceTemplate =
       template.new(
@@ -383,7 +384,7 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [typeTemplate, clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, typeTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
 
   },
 }
