@@ -1,5 +1,6 @@
 (import 'network.libsonnet') +
 (import 'persistentvolumesusage.libsonnet') +
+(import 'pods.libsonnet') +
 (import 'resources.libsonnet') +
 (import 'apiserver.libsonnet') +
 (import 'controller-manager.libsonnet') +
