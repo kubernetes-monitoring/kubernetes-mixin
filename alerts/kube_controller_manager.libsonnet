@@ -3,7 +3,7 @@
     kubeControllerManagerSelector: error 'must provide selector for kube-controller-manager',
   },
 
-  prometheusAlerts+:: {
+  prometheusAlerts+:: if !$._config.managedCluster then {
     groups+: [
       {
         name: 'kubernetes-system-controller-manager',
@@ -15,5 +15,5 @@
         ],
       },
     ],
-  },
+  } else {},
 }

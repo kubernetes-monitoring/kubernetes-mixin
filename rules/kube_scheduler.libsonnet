@@ -4,7 +4,7 @@
     podLabel: 'pod',
   },
 
-  prometheusRules+:: {
+  prometheusRules+:: if !$._config.managedCluster then {
     groups+: [
       {
         name: 'kube-scheduler.rules',
@@ -27,5 +27,5 @@
         ],
       },
     ],
-  },
+  } else {},
 }

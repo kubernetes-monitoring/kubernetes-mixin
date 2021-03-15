@@ -3,7 +3,7 @@
     kubeSchedulerSelector: 'job="kube-scheduler"',
   },
 
-  prometheusAlerts+:: {
+  prometheusAlerts+:: if !$._config.managedCluster then {
     groups+: [
       {
         name: 'kubernetes-system-scheduler',
@@ -15,5 +15,5 @@
         ],
       },
     ],
-  },
+  } else {},
 }

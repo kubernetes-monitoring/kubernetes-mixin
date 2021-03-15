@@ -7,7 +7,7 @@ local graphPanel = grafana.graphPanel;
 local singlestat = grafana.singlestat;
 
 {
-  grafanaDashboards+:: {
+  grafanaDashboards+:: if !$._config.managedCluster then {
     'controller-manager.json':
       local upCount =
         singlestat.new(
@@ -181,5 +181,5 @@ local singlestat = grafana.singlestat;
         .addPanel(cpu)
         .addPanel(goroutines)
       ) + { refresh: $._config.grafanaK8s.refresh },
-  },
+  } else {},
 }

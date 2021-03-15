@@ -76,6 +76,10 @@
       minimumTimeInterval: '1m',
     },
 
+    // Removes alerting rules and dashboards of components which
+    // are managed by a service(GKE, AKS, EKS).
+    managedCluster: false,
+
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
     clusterLabel: 'cluster',
