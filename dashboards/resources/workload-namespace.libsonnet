@@ -179,6 +179,7 @@ local template = grafana.template;
                 legend: true,
                 linewidth: 2,
                 stack: false,
+                hiddenSeries: true,
               },
               {
                 alias: 'quota - limits',
@@ -189,6 +190,7 @@ local template = grafana.template;
                 legend: true,
                 linewidth: 2,
                 stack: false,
+                hiddenSeries: true,
               },
             ],
           },
@@ -233,6 +235,7 @@ local template = grafana.template;
                 legend: true,
                 linewidth: 2,
                 stack: false,
+                hiddenSeries: true,
               },
               {
                 alias: 'quota - limits',
@@ -243,6 +246,7 @@ local template = grafana.template;
                 legend: true,
                 linewidth: 2,
                 stack: false,
+                hiddenSeries: true,
               },
             ],
           },
