@@ -134,7 +134,7 @@ local template = grafana.template;
 
       local cpuRequestsQuery = |||
         sum(
-            kube_pod_container_resource_requests_cpu_cores{%(clusterLabel)s="$cluster", namespace="$namespace"}
+            kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}
           * on(namespace,pod)
             group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type="$type"}
         ) by (pod)
