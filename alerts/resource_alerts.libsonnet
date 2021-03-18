@@ -25,11 +25,11 @@
           {
             alert: 'KubeCPUOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_cpu_cores:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
                 /
-              sum(kube_node_status_allocatable_cpu_cores)
+              sum(kube_node_status_allocatable{resource="cpu"})
                 >
-              (count(kube_node_status_allocatable_cpu_cores)-1) / count(kube_node_status_allocatable_cpu_cores)
+              (count(kube_node_status_allocatable{resource="cpu"}) -1) / count(kube_node_status_allocatable{resource="cpu"})
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -42,13 +42,13 @@
           {
             alert: 'KubeMemOvercommit',
             expr: |||
-              sum(namespace:kube_pod_container_resource_requests_memory_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+              sum(namespace_memory:kube_pod_container_resource_requests_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s})
                 /
-              sum(kube_node_status_allocatable_memory_bytes)
+              sum(kube_node_status_allocatable{resource="memory"})
                 >
-              (count(kube_node_status_allocatable_memory_bytes)-1)
+              (count(kube_node_status_allocatable{resource="memory"})-1)
                 /
-              count(kube_node_status_allocatable_memory_bytes)
+              count(kube_node_status_allocatable{resource="memory"})
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -63,7 +63,7 @@
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="cpu"})
                 /
-              sum(kube_node_status_allocatable_cpu_cores)
+              sum(kube_node_status_allocatable{resource="cpu"}) 
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
@@ -79,7 +79,7 @@
             expr: |||
               sum(kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource="memory"})
                 /
-              sum(kube_node_status_allocatable_memory_bytes{%(nodeExporterSelector)s})
+              sum(kube_node_status_allocatable{resource="memory",%(kubeStateMetricsSelector)s})
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             labels: {
