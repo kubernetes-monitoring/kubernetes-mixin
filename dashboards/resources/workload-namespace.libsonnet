@@ -280,9 +280,6 @@ local template = grafana.template;
           ) +
           { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Receive Bandwidth') +
           g.queryPanel(|||
@@ -293,9 +290,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Transmit Bandwidth') +
           g.queryPanel(|||
@@ -306,9 +300,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Average Container Bandwidth by Workload: Received') +
           g.queryPanel(|||
@@ -319,9 +310,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Average Container Bandwidth by Workload: Transmitted') +
           g.queryPanel(|||
@@ -332,9 +320,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Received Packets') +
           g.queryPanel(|||
@@ -345,9 +330,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
           g.queryPanel(|||
@@ -358,9 +340,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel(|||
@@ -371,9 +350,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel(|||
