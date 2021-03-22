@@ -29,7 +29,7 @@
                 /
               sum(kube_node_status_allocatable_cpu_cores)
                 >
-              (count(kube_node_status_allocatable_cpu_cores)-1) / count(kube_node_status_allocatable_cpu_cores)
+              (sum(kube_node_status_allocatable_cpu_cores)-1) / sum(kube_node_status_allocatable_cpu_cores)
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -47,9 +47,9 @@
                 /
               sum(kube_node_status_allocatable_memory_bytes)
                 >
-              (count(kube_node_status_allocatable_memory_bytes)-1)
+              (sum(kube_node_status_allocatable_memory_bytes)-1)
                 /
-              count(kube_node_status_allocatable_memory_bytes)
+              sum(kube_node_status_allocatable_memory_bytes)
             ||| % $._config,
             labels: {
               severity: 'warning',
