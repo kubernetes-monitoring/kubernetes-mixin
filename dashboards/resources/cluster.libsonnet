@@ -178,7 +178,7 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Current Network Usage')
         .addPanel(
           g.panel('Current Network Usage') +
           g.tablePanel(
@@ -189,16 +189,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Bandwidth')
         .addPanel(
           g.panel('Receive Bandwidth') +
           g.queryPanel('sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Transmit Bandwidth') +
           g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
@@ -207,16 +204,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Average Container Bandwidth by Namespace')
         .addPanel(
           g.panel('Average Container Bandwidth by Namespace: Received') +
           g.queryPanel('avg(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Average Container Bandwidth by Namespace: Transmitted') +
           g.queryPanel('avg(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
@@ -225,16 +219,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Rate of Packets')
         .addPanel(
           g.panel('Rate of Received Packets') +
           g.queryPanel('sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
           g.queryPanel('sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
@@ -243,16 +234,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Rate of Packets Dropped')
         .addPanel(
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % $._config, '{{namespace}}') +

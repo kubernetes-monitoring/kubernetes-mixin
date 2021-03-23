@@ -210,16 +210,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Bandwidth')
         .addPanel(
           g.panel('Receive Bandwidth') +
           g.queryPanel('sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Transmit Bandwidth') +
           g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
@@ -228,16 +225,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Rate of Packets')
         .addPanel(
           g.panel('Rate of Received Packets') +
           g.queryPanel('sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
           g.queryPanel('sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
@@ -246,16 +240,13 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Rate of Packets Dropped')
         .addPanel(
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
-      )
-      .addRow(
-        g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
