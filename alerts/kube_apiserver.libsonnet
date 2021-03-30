@@ -75,7 +75,7 @@ local utils = import 'utils.libsonnet';
           {
             alert: 'AggregatedAPIErrors',
             expr: |||
-              sum by(name, namespace)(increase(aggregator_unavailable_apiservice_count[10m])) > 4
+              sum by(name, namespace)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
             ||| % $._config,
             labels: {
               severity: 'warning',
