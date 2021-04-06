@@ -340,7 +340,7 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
-          refresh=1
+          refresh=2
         );
 
       dashboard.new(

@@ -12,7 +12,7 @@ local template = grafana.template;
         query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
         current='',
         hide=if $._config.showMultiCluster then '' else '2',
-        refresh=1,
+        refresh=2,
         includeAll=false,
         sort=1
       ),
@@ -24,7 +24,7 @@ local template = grafana.template;
         query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config.clusterLabel,
         current='deployment',
         hide='',
-        refresh=1,
+        refresh=2,
         includeAll=false,
         sort=0
       ) + {
@@ -42,7 +42,7 @@ local template = grafana.template;
         query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
         current='',
         hide='',
-        refresh=1,
+        refresh=2,
         includeAll=false,
         sort=1
       ),

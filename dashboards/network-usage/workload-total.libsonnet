@@ -102,7 +102,7 @@ local singlestat = grafana.singlestat;
           datasource='$datasource',
           query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
-          refresh=1
+          refresh=2
         );
 
       local namespaceTemplate =
@@ -113,7 +113,7 @@ local singlestat = grafana.singlestat;
           allValues='.+',
           current='kube-system',
           hide='',
-          refresh=1,
+          refresh=2,
           includeAll=true,
           sort=1
         ) + {
@@ -131,7 +131,7 @@ local singlestat = grafana.singlestat;
           query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace"}, workload)' % $._config,
           current='',
           hide='',
-          refresh=1,
+          refresh=2,
           includeAll=false,
           sort=1
         ) + {
@@ -149,7 +149,7 @@ local singlestat = grafana.singlestat;
           query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload"}, workload_type)' % $._config,
           current='deployment',
           hide='',
-          refresh=1,
+          refresh=2,
           includeAll=false,
           sort=0
         ) + {
