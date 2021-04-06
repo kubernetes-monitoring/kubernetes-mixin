@@ -224,7 +224,7 @@
           {
             record: 'kube_pod_windows_container_resource_memory_limit',
             expr: |||
-              kube_pod_container_resource_limits_memory_bytes {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
+              kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
             ||| % $._config,
           },
           {
@@ -238,7 +238,7 @@
           {
             record: 'kube_pod_windows_container_resource_cpu_cores_limit',
             expr: |||
-              kube_pod_container_resource_limits_cpu_cores  {%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
+              kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s} * on(container,pod,namespace) (windows_pod_container_available)
             ||| % $._config,
           },
           {
