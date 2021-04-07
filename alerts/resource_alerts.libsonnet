@@ -43,7 +43,7 @@
           {
             alert: 'KubeMemoryOvercommit',
             expr: |||
-              sum(namespace_memory:kube_pod_container_resource_requests_bytes:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+              sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
                 /
               sum(kube_node_status_allocatable{resource="memory"})
                 >

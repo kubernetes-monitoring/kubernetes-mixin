@@ -28,11 +28,11 @@ local template = grafana.template;
           )
           .addPanel(
             g.panel('CPU Requests Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_requests_cpu_cores) / sum(kube_node_status_allocatable{resource="cpu"})')
+            g.statPanel('sum(kube_pod_container_resource_requests{resource="cpu"}) / sum(kube_node_status_allocatable{resource="cpu"})')
           )
           .addPanel(
             g.panel('CPU Limits Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_limits_cpu_cores) / sum(kube_node_status_allocatable{resource="cpu"})')
+            g.statPanel('sum(kube_pod_container_resource_limits{resource="cpu"}) / sum(kube_node_status_allocatable{resource="cpu"})')
           )
           .addPanel(
             g.panel('Memory Utilisation') +
@@ -40,11 +40,11 @@ local template = grafana.template;
           )
           .addPanel(
             g.panel('Memory Requests Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_requests_memory_bytes) / sum(kube_node_status_allocatable{resource="memory"})')
+            g.statPanel('sum(kube_pod_container_resource_requests{resource="memory"}) / sum(kube_node_status_allocatable{resource="memory"})')
           )
           .addPanel(
             g.panel('Memory Limits Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_limits_memory_bytes) / sum(kube_node_status_allocatable{resource="memory"})')
+            g.statPanel('sum(kube_pod_container_resource_limits{resource="memory"}) / sum(kube_node_status_allocatable{resource="memory"})')
           )
         )
         .addRow(
