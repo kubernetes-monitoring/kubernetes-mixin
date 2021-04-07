@@ -275,7 +275,7 @@ local template = grafana.template;
         )
       )
       .addRow(
-        g.row('Network')
+        g.row('Current Network Usage')
         .addPanel(
           g.panel('Current Network Usage') +
           g.tablePanel(
@@ -284,6 +284,9 @@ local template = grafana.template;
           ) +
           { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
+      )
+      .addRow(
+        g.row('Bandwidth')
         .addPanel(
           g.panel('Receive Bandwidth') +
           g.queryPanel(|||
@@ -304,6 +307,9 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
+      )
+      .addRow(
+        g.row('Average Container Bandwidth by Workload')
         .addPanel(
           g.panel('Average Container Bandwidth by Workload: Received') +
           g.queryPanel(|||
@@ -324,6 +330,9 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
+      )
+      .addRow(
+        g.row('Rate of Packets')
         .addPanel(
           g.panel('Rate of Received Packets') +
           g.queryPanel(|||
@@ -344,6 +353,9 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
+      )
+      .addRow(
+        g.row('Rate of Packets Dropped')
         .addPanel(
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel(|||
