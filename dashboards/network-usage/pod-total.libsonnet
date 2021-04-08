@@ -229,19 +229,15 @@ local singlestat = grafana.singlestat;
         );
 
       //##### Packet  Row ######
-      // collapsed, so row must include panels
       local packetRow =
         row.new(
           title='Packets',
-          collapse=true,
         );
 
       //##### Error Row ######
-      // collapsed, so row must include panels
       local errorRow =
         row.new(
           title='Errors',
-          collapse=true,
         );
 
       dashboard.new(

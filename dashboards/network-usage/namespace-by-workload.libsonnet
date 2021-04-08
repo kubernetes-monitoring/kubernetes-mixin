@@ -348,7 +348,6 @@ local singlestat = grafana.singlestat;
       local averageBandwidthRow =
         row.new(
           title='Average Bandwidth',
-          collapse=true,
         );
 
       //#####  Bandwidth History Row ######
@@ -359,19 +358,15 @@ local singlestat = grafana.singlestat;
         );
 
       //##### Packet  Row ######
-      // collapsed, so row must include panels
       local packetRow =
         row.new(
           title='Packets',
-          collapse=true,
         );
 
       //##### Error Row ######
-      // collapsed, so row must include panels
       local errorRow =
         row.new(
           title='Errors',
-          collapse=true,
         );
 
       dashboard.new(
