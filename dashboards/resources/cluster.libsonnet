@@ -109,7 +109,7 @@ local template = grafana.template;
         )
         .addPanel(
           g.panel('Memory Utilisation') +
-          g.statPanel('1 - sum(:node_memory_MemAvailable_bytes:sum{%(clusterLabel)s="$cluster"}) / sum(kube_node_status_allocatable{resource="memory",%(clusterLabel)s="$cluster"})' % $._config)
+          g.statPanel('1 - sum(:node_memory_MemAvailable_bytes:sum{%(clusterLabel)s="$cluster"}) / sum(node_memory_MemTotal_bytes{resource="memory",%(clusterLabel)s="$cluster""})' % $._config)
         )
         .addPanel(
           g.panel('Memory Requests Commitment') +
