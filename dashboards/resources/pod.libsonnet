@@ -57,6 +57,50 @@ local template = grafana.template;
       local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
 
+      local storageIOColumns = [
+        'sum by(container) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config,
+        'sum by(container) (rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config,
+        'sum by(container) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config,
+        'sum by(container) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config,
+        'sum by(container) (rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config,
+        'sum by(container) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config,
+      ];
+
+      local storageIOTableStyles = {
+        pod: {
+          alias: 'Pod',
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
+          linkTooltip: 'Drill down to pods',
+        },
+        'Value #A': {
+          alias: 'IOPS(Reads)',
+          unit: 'short',
+          decimals: -1,
+        },
+        'Value #B': {
+          alias: 'IOPS(Writes)',
+          unit: 'short',
+          decimals: -1,
+        },
+        'Value #C': {
+          alias: 'IOPS(Reads + Writes)',
+          unit: 'short',
+          decimals: -1,
+        },
+        'Value #D': {
+          alias: 'Throughput(Read)',
+          unit: 'Bps',
+        },
+        'Value #E': {
+          alias: 'Throughput(Write)',
+          unit: 'Bps',
+        },
+        'Value #F': {
+          alias: 'Throughput(Read + Write)',
+          unit: 'Bps',
+        },
+      };
+
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Pod' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
@@ -253,6 +297,52 @@ local template = grafana.template;
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+        )
+      )
+      .addRow(
+        g.row('Storage IO - Distribution(Pod - Read & Writes)')
+        .addPanel(
+          g.panel('IOPS') +
+          g.queryPanel(['ceil(sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[5m])))' % $._config, 'ceil(sum by(pod) (rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[5m])))' % $._config,], ['Reads','Writes']) +
+          g.stack +
+          { yaxes: g.yaxes('short'), decimals: -1 },
+        )
+        .addPanel(
+          g.panel('ThroughPut') +
+          g.queryPanel(['sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[5m]))' % $._config, 'sum by(pod) (rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[5m]))' % $._config,], ['Reads','Writes']) +
+          g.stack +
+          { yaxes: g.yaxes('Bps') },
+        )
+      )
+      .addRow(
+        g.row('Storage IO - Distribution(Containers)')
+        .addPanel(
+          g.panel('IOPS(Reads+Writes)') +
+          g.queryPanel('ceil(sum by(container) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m])))' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('short'), decimals: -1 },
+        )
+        .addPanel(
+          g.panel('ThroughPut(Read+Write)') +
+          g.queryPanel('sum by(container) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace", pod="$pod"}[5m]))' % $._config, '{{pod}}') +
+          g.stack +
+          { yaxes: g.yaxes('Bps') },
+        )
+      )
+      .addRow(
+        g.row('Storage IO - Distribution')
+        .addPanel(
+          g.panel('Current Storage IO') +
+          g.tablePanel(
+            storageIOColumns,
+            storageIOTableStyles
+          ) +
+          {
+            sort: {
+              col: 4,
+              desc: true,
+            }
+          },
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
   },
