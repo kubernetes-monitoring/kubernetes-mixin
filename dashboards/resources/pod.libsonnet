@@ -54,8 +54,8 @@ local template = grafana.template;
       ||| % $._config;
 
       local cpuLimitsQuery = std.strReplace(cpuRequestsQuery, 'requests', 'limits');
-      local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
-      local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
+      local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu', 'memory');
+      local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu', 'memory');
 
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Pod' % $._config.grafanaK8s,
