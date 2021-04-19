@@ -152,8 +152,8 @@ local template = grafana.template;
             group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}
         ) by (workload, workload_type)
       ||| % $._config;
-      local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu_cores', 'memory_bytes');
-      local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu_cores', 'memory_bytes');
+      local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu', 'memory');
+      local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu', 'memory');
 
       local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config;
       local cpuQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.cpu');
