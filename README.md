@@ -7,16 +7,17 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 
 ## Releases
 
-| Release branch | Kubernetes Compatibility   | Prometheus Compatibility |
-| ------- | -------------------------- | ------------------------ |
-| release-0.1  | v1.13 and before   |           |
-| release-0.2  | v1.14.1 and before | v2.11.0+  |
-| release-0.3  | v1.17 and before   | v2.11.0+  |
-| release-0.4  | v1.18              | v2.11.0+  |
-| release-0.5  | v1.19              | v2.11.0+  |
-| release-0.6  | v1.19+             | v2.11.0+  |
-| release-0.7  | v1.19+             | v2.11.0+  |
-| master       | v1.19+             | v2.11.0+  |
+| Release branch | Kubernetes Compatibility   | Prometheus Compatibility | Kube-state-metrics Compatibility |
+| -------------- | -------------------------- | ------------------------ | -------------------------------- |
+| release-0.1  | v1.13 and before   |           |       |
+| release-0.2  | v1.14.1 and before | v2.11.0+  |       |
+| release-0.3  | v1.17 and before   | v2.11.0+  |       |
+| release-0.4  | v1.18              | v2.11.0+  |       |
+| release-0.5  | v1.19              | v2.11.0+  |       |
+| release-0.6  | v1.19+             | v2.11.0+  |       |
+| release-0.7  | v1.19+             | v2.11.0+  | v1.x  |
+| release-0.8  | v1.20+             | v2.11.0+  | v2.0+ |
+| master       | v1.20+             | v2.11.0+  | v2.0+ |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented.
 Therefore v0.1.x of this repository is the last release to support Kubernetes 1.13 and previous version on a best effort basis.
