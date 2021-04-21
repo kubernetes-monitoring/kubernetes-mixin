@@ -17,7 +17,7 @@ local singlestat = grafana.singlestat;
           span=2,
           valueName='min',
         )
-        .addTarget(prometheus.target('sum(up{%(clusterLabel)s="$cluster", %(kubeletSelector)s})' % $._config));
+        .addTarget(prometheus.target('sum(up{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, metrics_path="/metrics")' % $._config));
 
       local runningPodCount =
         singlestat.new(
