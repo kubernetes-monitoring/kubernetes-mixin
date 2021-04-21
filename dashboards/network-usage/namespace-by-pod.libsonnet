@@ -39,62 +39,53 @@ local singlestat = grafana.singlestat;
         unit: unit,
       };
 
-      local newGaugePanel(gaugeTitle, gaugeQuery) =
+      local newBarplotPanel(graphTitle, graphQuery, graphFormat='Bps', legendFormat='{{pod}}') =
         local target =
           prometheus.target(
-            gaugeQuery,
+            graphQuery
           ) + {
-            instant: null,
             intervalFactor: 1,
+            legendFormat: legendFormat,
+            step: 10,
           };
 
-        singlestat.new(
-          title=gaugeTitle,
+        graphPanel.new(
+          title=graphTitle,
+          span=24,
           datasource='$datasource',
-          format='time_series',
-          height=9,
-          span=12,
-          min_span=12,
-          decimals=0,
-          valueName='current'
+          fill=2,
+          min_span=24,
+          format=graphFormat,
+          min=0,
+          max=null,
+          show_xaxis=false,
+          x_axis_mode='series',
+          x_axis_values='current',
+          lines=false,
+          bars=true,
+          stack=false,
+          legend_show=true,
+          legend_values=true,
+          legend_min=false,
+          legend_max=false,
+          legend_current=true,
+          legend_avg=false,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
+          legend_sort='current',
+          legend_sortDesc=true,
+          nullPointMode='null'
         ).addTarget(target) + {
-          timeFrom: null,
-          timeShift: null,
-          type: 'gauge',
-          options: {
-            fieldOptions: {
-              calcs: [
-                'last',
-              ],
-              defaults: {
-                max: 10000000000,  // 10GBs
-                min: 0,
-                title: '$namespace',
-                unit: 'Bps',
-              },
-              mappings: [],
-              override: {},
-              thresholds: [
-                {
-                  color: 'dark-green',
-                  index: 0,
-                  value: null,  // 0GBs
-                },
-                {
-                  color: 'dark-yellow',
-                  index: 1,
-                  value: 5000000000,  // 5GBs
-                },
-                {
-                  color: 'dark-red',
-                  index: 2,
-                  value: 7000000000,  // 7GBs
-                },
-              ],
-              values: false,
-            },
+          legend+: {
+            hideEmpty: true,
+            hideZero: true,
+          },
+          paceLength: 10,
+          tooltip+: {
+            sort: 2,
           },
         };
+
 
       local newGraphPanel(graphTitle, graphQuery, graphFormat='Bps') =
         local target =
@@ -377,16 +368,16 @@ local singlestat = grafana.singlestat;
       .addAnnotation(annotation.default)
       .addPanel(currentBandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 0 })
       .addPanel(
-        newGaugePanel(
-          gaugeTitle='Current Rate of Bytes Received',
-          gaugeQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % $._config,
+        newBarplotPanel(
+          graphTitle='Current Rate of Bytes Received',
+          graphQuery='sort_desc(sum by (pod) (irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])))' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
       .addPanel(
-        newGaugePanel(
-          gaugeTitle='Current Rate of Bytes Transmitted',
-          gaugeQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % $._config,
+        newBarplotPanel(
+          graphTitle='Current Rate of Bytes Transmitted',
+          graphQuery='sort_desc(sum by (pod) (irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])))' % $._config,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
