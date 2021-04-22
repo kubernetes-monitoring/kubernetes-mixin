@@ -191,7 +191,7 @@ local template = grafana.template;
       .addRow(
         g.row('Memory Usage')
         .addPanel(
-          g.panel('Memory Usage') +
+          g.panel('Memory Usage (WSS)') +
           g.queryPanel([
             'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="", image!=""}) by (container)' % $._config,
             memRequestsQuery,
@@ -243,7 +243,7 @@ local template = grafana.template;
             'sum(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container != "", container != "POD"}) by (container)' % $._config,
             'sum(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container != "", container != "POD"}) by (container)' % $._config,
           ], tableStyles {
-            'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
+            'Value #A': { alias: 'Memory Usage (WSS)', unit: 'bytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
             'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
             'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
