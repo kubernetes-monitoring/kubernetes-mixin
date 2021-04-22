@@ -191,7 +191,7 @@ local template = grafana.template;
       .addRow(
         g.row('Memory Usage')
         .addPanel(
-          g.panel('Memory Usage') +
+          g.panel('Memory Usage (WSS)') +
           g.queryPanel([
             'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", container!="", image!=""}) by (container)' % $._config,
             memRequestsQuery,
