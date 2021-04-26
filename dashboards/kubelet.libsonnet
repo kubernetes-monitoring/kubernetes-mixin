@@ -12,12 +12,12 @@ local singlestat = grafana.singlestat;
     'kubelet.json':
       local upCount =
         singlestat.new(
-          'Up',
+          'Running Kubelets',
           datasource='$datasource',
           span=2,
           valueName='min',
         )
-        .addTarget(prometheus.target('sum(up{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, metrics_path="/metrics")' % $._config));
+        .addTarget(prometheus.target('sum(kubelet_node_name{%(clusterLabel)s="$cluster", %(kubeletSelector)s})' % $._config));
 
       local runningPodCount =
         singlestat.new(
