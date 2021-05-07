@@ -148,7 +148,7 @@ local template = grafana.template;
           g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})' % $._config)
         )
         .addPanel(
-          g.panel('Memory Utilization (from requests)') +
+          g.panel('Memory Utilisation (from requests)') +
           g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"})' % $._config)
         )
         .addPanel(
