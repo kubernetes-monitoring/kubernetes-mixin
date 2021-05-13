@@ -30,7 +30,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
+        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (cluster, instance, name)' % $._config, legendFormat='{{cluster}} {{instance}} {{name}}'));
 
       local workQueueDepth =
         graphPanel.new(
@@ -45,7 +45,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
+        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (cluster, instance, name)' % $._config, legendFormat='{{cluster}} {{instance}} {{name}}'));
 
       local workQueueLatency =
         graphPanel.new(
@@ -59,7 +59,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (cluster, instance, name, le))' % $._config, legendFormat='{{cluster}} {{instance}} {{name}}'));
 
       local rpcRate =
         graphPanel.new(
