@@ -205,7 +205,7 @@ $ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDa
 
 ### Customising alert annotations
 
-The steps described bellow extend on the existing mixin library without modifying the original git repository. This is to make consuming updates to your extended alert definitions easier. These definitions can reside outside of this repository and added to your own custom location, where you can define your alert dependencies in your `jsonnetfile.json` and add customisations to the existing definitions.
+The steps described below extend on the existing mixin library without modifying the original git repository. This is to make consuming updates to your extended alert definitions easier. These definitions can reside outside of this repository and added to your own custom location, where you can define your alert dependencies in your `jsonnetfile.json` and add customisations to the existing definitions.
 
 In your working directory, create a new file `kubernetes_mixin_override.libsonnet` with the following:
 
