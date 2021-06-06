@@ -50,10 +50,10 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} e2e % $._config '))
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} binding % $._config'))
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} scheduling algorithm % $._config'))
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} volume % $._config'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} e2e' % $._config))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} binding' % $._config))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} scheduling algorithm' % $._config))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} volume' % $._config));
 
       local rpcRate =
         graphPanel.new(
