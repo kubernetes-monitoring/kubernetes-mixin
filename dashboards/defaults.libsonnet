@@ -7,7 +7,7 @@
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
       uid: std.md5(filename),
-      timezone: '%(grafanaTimezone)s' % $._config.grafanaK8s,
+      timezone: $._config.grafanaK8s.grafanaTimezone,
 
       // Modify tooltip to only show a single value
       rows: [
