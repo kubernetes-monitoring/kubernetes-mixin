@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeApiserverSelector: 'job="kube-apiserver"',
     podLabel: 'pod',
@@ -8,11 +10,11 @@
 
 
   prometheusRules+:: {
-    local SLODays = $._config.SLOs.apiserver.days + 'd',
-    local SLOTarget = $._config.SLOs.apiserver.target,
+    local SLODays = kubernetesMixin._config.SLOs.apiserver.days + 'd',
+    local SLOTarget = kubernetesMixin._config.SLOs.apiserver.target,
     local verbs = [
-      { type: 'read', selector: $._config.kubeApiserverReadSelector },
-      { type: 'write', selector: $._config.kubeApiserverWriteSelector },
+      { type: 'read', selector: kubernetesMixin._config.kubeApiserverReadSelector },
+      { type: 'write', selector: kubernetesMixin._config.kubeApiserverWriteSelector },
     ],
 
     groups+: [
@@ -45,17 +47,17 @@
               )
               /
               sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s}[%(window)s]))
-            ||| % ($._config { window: w }),
+            ||| % (kubernetesMixin._config { window: w }),
             labels: {
               verb: 'read',
             },
           }
           for w in std.set([  // Get the unique array of short and long window rates
             w.short
-            for w in $._config.SLOs.apiserver.windows
+            for w in kubernetesMixin._config.SLOs.apiserver.windows
           ] + [
             w.long
-            for w in $._config.SLOs.apiserver.windows
+            for w in kubernetesMixin._config.SLOs.apiserver.windows
           ])
         ] + [
           {
@@ -73,24 +75,24 @@
               )
               /
               sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s}[%(window)s]))
-            ||| % ($._config { window: w }),
+            ||| % (kubernetesMixin._config { window: w }),
             labels: {
               verb: 'write',
             },
           }
           for w in std.set([  // Get the unique array of short and long window rates
             w.short
-            for w in $._config.SLOs.apiserver.windows
+            for w in kubernetesMixin._config.SLOs.apiserver.windows
           ] + [
             w.long
-            for w in $._config.SLOs.apiserver.windows
+            for w in kubernetesMixin._config.SLOs.apiserver.windows
           ])
         ] + [
           {
             record: 'code_resource:apiserver_request_total:rate5m',
             expr: |||
               sum by (%s,code,resource) (rate(apiserver_request_total{%s}[5m]))
-            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+            ||| % [kubernetesMixin._config.clusterLabel, std.join(',', [kubernetesMixin._config.kubeApiserverSelector, verb.selector])],
             labels: {
               verb: verb.type,
             },
@@ -101,7 +103,7 @@
             record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
             expr: |||
               histogram_quantile(0.99, sum by (%s, le, resource) (rate(apiserver_request_duration_seconds_bucket{%s}[5m]))) > 0
-            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+            ||| % [kubernetesMixin._config.clusterLabel, std.join(',', [kubernetesMixin._config.kubeApiserverSelector, verb.selector])],
             labels: {
               verb: verb.type,
               quantile: '0.99',
@@ -113,7 +115,7 @@
             record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
             expr: |||
               histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|DELETECOLLECTION|PROXY|CONNECT"}[5m])) without(instance, %(podLabel)s))
-            ||| % ({ quantile: quantile } + $._config),
+            ||| % ({ quantile: quantile } + kubernetesMixin._config),
             labels: {
               quantile: quantile,
             },
@@ -156,7 +158,7 @@
               )
               /
               sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s)
-            ||| % ($._config { SLODays: SLODays }),
+            ||| % (kubernetesMixin._config { SLODays: SLODays }),
             labels: {
               verb: 'all',
             },
@@ -185,7 +187,7 @@
               )
               /
               sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="read"})
-            ||| % ($._config { SLODays: SLODays }),
+            ||| % (kubernetesMixin._config { SLODays: SLODays }),
             labels: {
               verb: 'read',
             },
@@ -206,7 +208,7 @@
               )
               /
               sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="write"})
-            ||| % ($._config { SLODays: SLODays }),
+            ||| % (kubernetesMixin._config { SLODays: SLODays }),
             labels: {
               verb: 'write',
             },
@@ -215,14 +217,14 @@
             record: 'code_verb:apiserver_request_total:increase%s' % SLODays,
             expr: |||
               avg_over_time(code_verb:apiserver_request_total:increase1h[%s]) * 24 * %d
-            ||| % [SLODays, $._config.SLOs.apiserver.days],
+            ||| % [SLODays, kubernetesMixin._config.SLOs.apiserver.days],
           },
         ] + [
           {
             record: 'code_verb:apiserver_request_total:increase1h',
             expr: |||
               sum by (%s, code, verb) (increase(apiserver_request_total{%s,verb="%s",code=~"%s"}[1h]))
-            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, verb, code],
+            ||| % [kubernetesMixin._config.clusterLabel, kubernetesMixin._config.kubeApiserverSelector, verb, code],
           }
           for code in ['2..', '3..', '4..', '5..']
           for verb in ['LIST', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE']
@@ -231,7 +233,7 @@
             record: 'code:apiserver_request_total:increase%s' % SLODays,
             expr: |||
               sum by (%s, code) (code_verb:apiserver_request_total:increase%s{%s})
-            ||| % [$._config.clusterLabel, SLODays, verb.selector],
+            ||| % [kubernetesMixin._config.clusterLabel, SLODays, verb.selector],
             labels: {
               verb: verb.type,
             },

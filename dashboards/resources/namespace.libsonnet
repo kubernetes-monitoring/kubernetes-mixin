@@ -3,14 +3,16 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 local template = grafana.template;
 
 {
+  local kubernetesMixin = self,
+
   grafanaDashboards+:: {
     local clusterTemplate =
       template.new(
         name='cluster',
         datasource='$datasource',
-        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        query='label_values(kube_pod_info, %s)' % kubernetesMixin._config.clusterLabel,
         current='',
-        hide=if $._config.showMultiCluster then '' else '2',
+        hide=if kubernetesMixin._config.showMultiCluster then '' else '2',
         refresh=2,
         includeAll=false,
         sort=1
@@ -20,7 +22,7 @@ local template = grafana.template;
       template.new(
         name='namespace',
         datasource='$datasource',
-        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % kubernetesMixin._config.clusterLabel,
         current='',
         hide='',
         refresh=2,
@@ -31,23 +33,23 @@ local template = grafana.template;
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
         },
       };
 
       local networkColumns = [
-        'sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config,
-        'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config,
-        'sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config,
-        'sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config,
-        'sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config,
-        'sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config,
+        'sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config,
+        'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config,
+        'sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config,
+        'sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config,
+        'sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config,
+        'sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config,
       ];
 
       local networkTableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
           linkTooltip: 'Drill down to pods',
         },
         'Value #A': {
@@ -76,28 +78,28 @@ local template = grafana.template;
         },
       };
 
-      local cpuUsageQuery = 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config;
+      local cpuUsageQuery = 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % kubernetesMixin._config;
 
-      local memoryUsageQuery = 'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!="", image!=""}) by (pod)' % $._config;
+      local memoryUsageQuery = 'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!="", image!=""}) by (pod)' % kubernetesMixin._config;
 
-      local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config;
+      local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % kubernetesMixin._config;
       local cpuQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.cpu');
       local memoryQuotaRequestsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'requests.memory');
       local memoryQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.memory');
 
       local storageIOColumns = [
-        'sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config,
-        'sum by(pod) (rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config,
-        'sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config,
-        'sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config,
-        'sum by(pod) (rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config,
-        'sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config,
+        'sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config,
+        'sum by(pod) (rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config,
+        'sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config,
+        'sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config,
+        'sum by(pod) (rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config,
+        'sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config,
       ];
 
       local storageIOTableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-pod?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-pod=$__cell' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-pod.json') },
           linkTooltip: 'Drill down to pods',
         },
         'Value #A': {
@@ -130,8 +132,8 @@ local template = grafana.template;
       };
 
       g.dashboard(
-        '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
+        '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
       )
       .addRow(
         (g.row('Headlines') +
@@ -141,19 +143,19 @@ local template = grafana.template;
          })
         .addPanel(
           g.panel('CPU Utilisation (from requests)') +
-          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})' % $._config)
+          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})' % kubernetesMixin._config)
         )
         .addPanel(
           g.panel('CPU Utilisation (from limits)') +
-          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})' % $._config)
+          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})' % kubernetesMixin._config)
         )
         .addPanel(
           g.panel('Memory Utilisation (from requests)') +
-          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"})' % $._config)
+          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"})' % kubernetesMixin._config)
         )
         .addPanel(
           g.panel('Memory Utilisation (from limits)') +
-          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"})' % $._config)
+          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"})' % kubernetesMixin._config)
         )
       )
       .addRow(
@@ -198,11 +200,11 @@ local template = grafana.template;
         .addPanel(
           g.panel('CPU Quota') +
           g.tablePanel([
-            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config,
-            'sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % $._config,
-            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % $._config,
-            'sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % $._config,
-            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % $._config,
+            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % kubernetesMixin._config,
+            'sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % kubernetesMixin._config,
+            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % kubernetesMixin._config,
+            'sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % kubernetesMixin._config,
+            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}) by (pod)' % kubernetesMixin._config,
           ], tableStyles {
             'Value #A': { alias: 'CPU Usage' },
             'Value #B': { alias: 'CPU Requests' },
@@ -257,14 +259,14 @@ local template = grafana.template;
         .addPanel(
           g.panel('Memory Quota') +
           g.tablePanel([
-            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod)' % $._config,
-            'sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % $._config,
-            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % $._config,
-            'sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % $._config,
-            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % $._config,
-            'sum(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) by (pod)' % $._config,
-            'sum(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) by (pod)' % $._config,
-            'sum(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) by (pod)' % $._config,
+            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod)' % kubernetesMixin._config,
+            'sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % kubernetesMixin._config,
+            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod) / sum(kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % kubernetesMixin._config,
+            'sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % kubernetesMixin._config,
+            'sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod) / sum(kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", namespace="$namespace", resource="memory"}) by (pod)' % kubernetesMixin._config,
+            'sum(container_memory_rss{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) by (pod)' % kubernetesMixin._config,
+            'sum(container_memory_cache{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) by (pod)' % kubernetesMixin._config,
+            'sum(container_memory_swap{%(clusterLabel)s="$cluster", namespace="$namespace",container!=""}) by (pod)' % kubernetesMixin._config,
           ], tableStyles {
             'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
             'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
@@ -285,20 +287,20 @@ local template = grafana.template;
             networkColumns,
             networkTableStyles
           ) +
-          { interval: $._config.grafanaK8s.minimumTimeInterval },
+          { interval: kubernetesMixin._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
         g.row('Bandwidth')
         .addPanel(
           g.panel('Receive Bandwidth') +
-          g.queryPanel('sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel('sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
         .addPanel(
           g.panel('Transmit Bandwidth') +
-          g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -307,13 +309,13 @@ local template = grafana.template;
         g.row('Rate of Packets')
         .addPanel(
           g.panel('Rate of Received Packets') +
-          g.queryPanel('sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel('sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
-          g.queryPanel('sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel('sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -322,13 +324,13 @@ local template = grafana.template;
         g.row('Rate of Packets Dropped')
         .addPanel(
           g.panel('Rate of Received Packets Dropped') +
-          g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
         .addPanel(
           g.panel('Rate of Transmitted Packets Dropped') +
-          g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
+          g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -337,14 +339,14 @@ local template = grafana.template;
         g.row('Storage IO')
         .addPanel(
           g.panel('IOPS(Reads+Writes)') +
-          g.queryPanel('ceil(sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m])))' % $._config, '{{pod}}') +
+          g.queryPanel('ceil(sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m])))' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('short'), decimals: -1 },
 
         )
         .addPanel(
           g.panel('ThroughPut(Read+Write)') +
-          g.queryPanel('sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % $._config, '{{pod}}') +
+          g.queryPanel('sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace=~"$namespace"}[5m]))' % kubernetesMixin._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -364,6 +366,6 @@ local template = grafana.template;
             },
           },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + { tags: kubernetesMixin._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate] }, refresh: kubernetesMixin._config.grafanaK8s.refresh },
   },
 }

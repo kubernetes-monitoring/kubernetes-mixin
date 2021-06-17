@@ -7,6 +7,8 @@ local graphPanel = grafana.graphPanel;
 local singlestat = grafana.singlestat;
 
 {
+  local kubernetesMixin = self,
+
   grafanaDashboards+:: {
     'controller-manager.json':
       local upCount =
@@ -16,7 +18,7 @@ local singlestat = grafana.singlestat;
           span=2,
           valueName='min',
         )
-        .addTarget(prometheus.target('sum(up{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s})' % $._config));
+        .addTarget(prometheus.target('sum(up{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s})' % kubernetesMixin._config));
 
       local workQueueAddRate =
         graphPanel.new(
@@ -30,7 +32,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name)' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % $._config));
+        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name)' % kubernetesMixin._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % kubernetesMixin._config));
 
       local workQueueDepth =
         graphPanel.new(
@@ -45,7 +47,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name)' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % $._config));
+        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name)' % kubernetesMixin._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % kubernetesMixin._config));
 
       local workQueueLatency =
         graphPanel.new(
@@ -59,7 +61,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % $._config));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name, le))' % kubernetesMixin._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % kubernetesMixin._config));
 
       local rpcRate =
         graphPanel.new(
@@ -68,10 +70,10 @@ local singlestat = grafana.singlestat;
           span=4,
           format='ops',
         )
-        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"2.."}[5m]))' % $._config, legendFormat='2xx'))
-        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"3.."}[5m]))' % $._config, legendFormat='3xx'))
-        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"4.."}[5m]))' % $._config, legendFormat='4xx'))
-        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"5.."}[5m]))' % $._config, legendFormat='5xx'));
+        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"2.."}[5m]))' % kubernetesMixin._config, legendFormat='2xx'))
+        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"3.."}[5m]))' % kubernetesMixin._config, legendFormat='3xx'))
+        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"4.."}[5m]))' % kubernetesMixin._config, legendFormat='4xx'))
+        .addTarget(prometheus.target('sum(rate(rest_client_requests_total{%(kubeControllerManagerSelector)s, instance=~"$instance",code=~"5.."}[5m]))' % kubernetesMixin._config, legendFormat='5xx'));
 
       local postRequestLatency =
         graphPanel.new(
@@ -81,7 +83,7 @@ local singlestat = grafana.singlestat;
           format='s',
           min=0,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="POST"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="POST"}[5m])) by (verb, url, le))' % kubernetesMixin._config, legendFormat='{{verb}} {{url}}'));
 
       local getRequestLatency =
         graphPanel.new(
@@ -96,7 +98,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="GET"}[5m])) by (verb, url, le))' % $._config, legendFormat='{{verb}} {{url}}'));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="GET"}[5m])) by (verb, url, le))' % kubernetesMixin._config, legendFormat='{{verb}} {{url}}'));
 
       local memory =
         graphPanel.new(
@@ -105,7 +107,7 @@ local singlestat = grafana.singlestat;
           span=4,
           format='bytes',
         )
-        .addTarget(prometheus.target('process_resident_memory_bytes{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s,instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('process_resident_memory_bytes{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s,instance=~"$instance"}' % kubernetesMixin._config, legendFormat='{{instance}}'));
 
       local cpu =
         graphPanel.new(
@@ -115,7 +117,7 @@ local singlestat = grafana.singlestat;
           format='short',
           min=0,
         )
-        .addTarget(prometheus.target('rate(process_cpu_seconds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s,instance=~"$instance"}[5m])' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('rate(process_cpu_seconds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s,instance=~"$instance"}[5m])' % kubernetesMixin._config, legendFormat='{{instance}}'));
 
       local goroutines =
         graphPanel.new(
@@ -124,14 +126,14 @@ local singlestat = grafana.singlestat;
           span=4,
           format='short',
         )
-        .addTarget(prometheus.target('go_goroutines{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s,instance=~"$instance"}' % $._config, legendFormat='{{instance}}'));
+        .addTarget(prometheus.target('go_goroutines{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s,instance=~"$instance"}' % kubernetesMixin._config, legendFormat='{{instance}}'));
 
 
       dashboard.new(
-        '%(dashboardNamePrefix)sController Manager' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sController Manager' % kubernetesMixin._config.grafanaK8s,
         time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['controller-manager.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['controller-manager.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -152,10 +154,10 @@ local singlestat = grafana.singlestat;
         template.new(
           'cluster',
           '$datasource',
-          'label_values(kube_pod_info, %(clusterLabel)s)' % $._config,
+          'label_values(kube_pod_info, %(clusterLabel)s)' % kubernetesMixin._config,
           label='cluster',
           refresh='time',
-          hide=if $._config.showMultiCluster then '' else 'variable',
+          hide=if kubernetesMixin._config.showMultiCluster then '' else 'variable',
           sort=1,
         )
       )
@@ -163,7 +165,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(process_cpu_seconds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s}, instance)' % $._config,
+          'label_values(process_cpu_seconds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s}, instance)' % kubernetesMixin._config,
           refresh='time',
           includeAll=true,
           sort=1,
@@ -191,6 +193,6 @@ local singlestat = grafana.singlestat;
         .addPanel(memory)
         .addPanel(cpu)
         .addPanel(goroutines)
-      ) + { refresh: $._config.grafanaK8s.refresh },
+      ) + { refresh: kubernetesMixin._config.grafanaK8s.refresh },
   },
 }

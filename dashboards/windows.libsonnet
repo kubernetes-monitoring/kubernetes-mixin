@@ -10,19 +10,21 @@ local gauge = promgrafonnet.gauge;
 local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libsonnet';
 
 {
+  local kubernetesMixin = self,
+
   grafanaDashboards+:: {
     'k8s-resources-windows-cluster.json':
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-namespace.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-namespace.json') },
         },
       };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sCompute Resources / Cluster(Windows)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-resources-windows-cluster.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        '%(dashboardNamePrefix)sCompute Resources / Cluster(Windows)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-resources-windows-cluster.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -132,14 +134,14 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-pod.json') },
         },
       };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sCompute Resources / Namespace(Windows)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-resources-windows-namespace.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        '%(dashboardNamePrefix)sCompute Resources / Namespace(Windows)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-resources-windows-namespace.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -230,9 +232,9 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sCompute Resources / Pod(Windows)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-resources-windows-pod.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        '%(dashboardNamePrefix)sCompute Resources / Pod(Windows)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-resources-windows-pod.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -337,23 +339,23 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
             legend_avg=true,
           )
           .addTarget(prometheus.target(
-            'sort_desc(sum by (container) (rate(windows_container_network_received_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+            'sort_desc(sum by (container) (rate(windows_container_network_received_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % kubernetesMixin._config,
             legendFormat='Received : {{ container }}',
           ))
           .addTarget(prometheus.target(
-            'sort_desc(sum by (container) (rate(windows_container_network_transmitted_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % $._config,
+            'sort_desc(sum by (container) (rate(windows_container_network_transmitted_bytes_total{namespace="$namespace", pod="$pod"}[1m])))' % kubernetesMixin._config,
             legendFormat='Transmitted : {{ container }}',
           ))
         )
       ),
 
     'k8s-windows-cluster-rsrc-use.json':
-      local legendLink = '%(prefix)s/d/%(uid)s/k8s-windows-node-rsrc-use' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-windows-node-rsrc-use.json') };
+      local legendLink = '%(prefix)s/d/%(uid)s/k8s-windows-node-rsrc-use' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-windows-node-rsrc-use.json') };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sUSE Method / Cluster(Windows)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-windows-cluster-rsrc-use.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        '%(dashboardNamePrefix)sUSE Method / Cluster(Windows)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-windows-cluster-rsrc-use.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -427,7 +429,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           g.queryPanel(
             |||
               sum by (instance)(node:windows_node_filesystem_usage:)
-            ||| % $._config, '{{instance}}', legendLink
+            ||| % kubernetesMixin._config, '{{instance}}', legendLink
           ) +
           g.stack +
           { yaxes: g.yaxes({ format: 'percentunit', max: 1 }) },
@@ -436,9 +438,9 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 
     'k8s-windows-node-rsrc-use.json':
       dashboard.new(
-        '%(dashboardNamePrefix)sUSE Method / Node(Windows)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-windows-node-rsrc-use.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        '%(dashboardNamePrefix)sUSE Method / Node(Windows)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-windows-node-rsrc-use.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -474,7 +476,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         )
         .addPanel(
           g.panel('CPU Usage Per Core') +
-          g.queryPanel('sum by (core) (irate(windows_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[5m]))' % $._config, '{{core}}') +
+          g.queryPanel('sum by (core) (irate(windows_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[5m]))' % kubernetesMixin._config, '{{core}}') +
           { yaxes: g.yaxes('percentunit') },
         )
       )
@@ -495,10 +497,10 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
                 windows_os_visible_memory_bytes{%(wmiExporterSelector)s, instance="$instance"}
                 - windows_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"}
               )
-            ||| % $._config, legendFormat='memory used'
+            ||| % kubernetesMixin._config, legendFormat='memory used'
           ))
-          .addTarget(prometheus.target('max(node:windows_node_memory_totalCached_bytes:sum{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory cached'))
-          .addTarget(prometheus.target('max(windows_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"})' % $._config, legendFormat='memory free'))
+          .addTarget(prometheus.target('max(node:windows_node_memory_totalCached_bytes:sum{%(wmiExporterSelector)s, instance="$instance"})' % kubernetesMixin._config, legendFormat='memory cached'))
+          .addTarget(prometheus.target('max(windows_memory_available_bytes{%(wmiExporterSelector)s, instance="$instance"})' % kubernetesMixin._config, legendFormat='memory free'))
         )
         .addPanel(
           g.panel('Memory Saturation (Swap I/O) Pages') +
@@ -515,9 +517,9 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         )
         .addPanel(
           graphPanel.new('Disk I/O', datasource='$datasource')
-          .addTarget(prometheus.target('max(rate(windows_logical_disk_read_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='read'))
-          .addTarget(prometheus.target('max(rate(windows_logical_disk_write_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % $._config, legendFormat='written'))
-          .addTarget(prometheus.target('max(rate(windows_logical_disk_read_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]) + rate(windows_logical_disk_write_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]))' % $._config, legendFormat='io time')) +
+          .addTarget(prometheus.target('max(rate(windows_logical_disk_read_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % kubernetesMixin._config, legendFormat='read'))
+          .addTarget(prometheus.target('max(rate(windows_logical_disk_write_bytes_total{%(wmiExporterSelector)s, instance="$instance"}[2m]))' % kubernetesMixin._config, legendFormat='written'))
+          .addTarget(prometheus.target('max(rate(windows_logical_disk_read_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]) + rate(windows_logical_disk_write_seconds_total{%(wmiExporterSelector)s,  instance="$instance"}[2m]))' % kubernetesMixin._config, legendFormat='io time')) +
           {
             seriesOverrides: [
               {
@@ -556,11 +558,11 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           g.queryPanel(
             |||
               node:windows_node_filesystem_usage:{instance="$instance"}
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             '{{volume}}',
           ) +
           { yaxes: g.yaxes('percentunit') },
         ),
-      ) + { refresh: $._config.grafanaK8s.refresh },
+      ) + { refresh: kubernetesMixin._config.grafanaK8s.refresh },
   },
 }

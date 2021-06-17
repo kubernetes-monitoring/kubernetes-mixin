@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     cadvisorSelector: 'job="cadvisor"',
     kubeStateMetricsSelector: 'job="kube-state-metrics"',
@@ -20,7 +22,7 @@
               ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
                 1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_working_set_bytes',
@@ -29,7 +31,7 @@
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
                 max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_rss',
@@ -38,7 +40,7 @@
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
                 max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_cache',
@@ -47,7 +49,7 @@
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
                 max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             record: 'node_namespace_pod_container:container_memory_swap',
@@ -56,7 +58,7 @@
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
                 max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             record: 'namespace_memory:kube_pod_container_resource_requests:sum',
@@ -70,7 +72,7 @@
                       )
                   )
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             record: 'namespace_cpu:kube_pod_container_resource_requests:sum',
@@ -84,7 +86,7 @@
                       )
                   )
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           // workload aggregation for deployments
           {
@@ -103,7 +105,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               workload_type: 'deployment',
             },
@@ -117,7 +119,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               workload_type: 'daemonset',
             },
@@ -131,7 +133,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               workload_type: 'statefulset',
             },

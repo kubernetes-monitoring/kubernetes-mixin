@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeControllerManagerSelector: error 'must provide selector for kube-controller-manager',
   },
@@ -10,7 +12,7 @@
         rules: [
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeControllerManager',
-            selector:: $._config.kubeControllerManagerSelector,
+            selector:: kubernetesMixin._config.kubeControllerManagerSelector,
           },
         ],
       },

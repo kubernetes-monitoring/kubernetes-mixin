@@ -3,15 +3,17 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 local template = grafana.template;
 
 {
+  local kubernetesMixin = self,
+
   grafanaDashboards+:: {
 
     local clusterTemplate =
       template.new(
         name='cluster',
         datasource='$datasource',
-        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        query='label_values(kube_pod_info, %s)' % kubernetesMixin._config.clusterLabel,
         current='',
-        hide=if $._config.showMultiCluster then '' else '2',
+        hide=if kubernetesMixin._config.showMultiCluster then '' else '2',
         refresh=2,
         includeAll=false,
         sort=1
@@ -21,7 +23,7 @@ local template = grafana.template;
       template.new(
         name='type',
         datasource='$datasource',
-        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config.clusterLabel,
+        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)' % kubernetesMixin._config.clusterLabel,
         current='deployment',
         hide='',
         refresh=2,
@@ -31,7 +33,7 @@ local template = grafana.template;
         auto: false,
         auto_count: 30,
         auto_min: '10s',
-        definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config.clusterLabel,
+        definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace=~"$namespace", workload=~".+"}, workload_type)' % kubernetesMixin._config.clusterLabel,
         skipUrlSync: false,
       },
 
@@ -39,7 +41,7 @@ local template = grafana.template;
       template.new(
         name='namespace',
         datasource='$datasource',
-        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % kubernetesMixin._config.clusterLabel,
         current='',
         hide='',
         refresh=2,
@@ -51,7 +53,7 @@ local template = grafana.template;
       local tableStyles = {
         workload: {
           alias: 'Workload',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$__cell_2' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$__cell_2' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
         },
         workload_type: {
           alias: 'Workload Type',
@@ -63,38 +65,38 @@ local template = grafana.template;
           (sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])
           * on (namespace,pod)
           group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload_type="$type"}) by (workload))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         |||
           (sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])
           * on (namespace,pod)
           group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload_type="$type"}) by (workload))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         |||
           (sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])
           * on (namespace,pod)
           group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload_type="$type"}) by (workload))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         |||
           (sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])
           * on (namespace,pod)
           group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload_type="$type"}) by (workload))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         |||
           (sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])
           * on (namespace,pod)
           group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload_type="$type"}) by (workload))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         |||
           (sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace"}[%(grafanaIntervalVar)s])
           * on (namespace,pod)
           group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload_type="$type"}) by (workload))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
       ];
 
       local networkTableStyles = {
         workload: {
           alias: 'Workload',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$type' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$type' % { prefix: kubernetesMixin._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
           linkTooltip: 'Drill down to pods',
         },
         workload_type: {
@@ -132,7 +134,7 @@ local template = grafana.template;
         * on(namespace,pod)
           group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}
         ) by (workload, workload_type)
-      ||| % $._config;
+      ||| % kubernetesMixin._config;
 
       local cpuRequestsQuery = |||
         sum(
@@ -140,9 +142,9 @@ local template = grafana.template;
         * on(namespace,pod)
           group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}
         ) by (workload, workload_type)
-      ||| % $._config;
+      ||| % kubernetesMixin._config;
 
-      local podCountQuery = 'count(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}) by (workload, workload_type)' % $._config;
+      local podCountQuery = 'count(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}) by (workload, workload_type)' % kubernetesMixin._config;
       local cpuLimitsQuery = std.strReplace(cpuRequestsQuery, 'requests', 'limits');
 
       local memUsageQuery = |||
@@ -151,18 +153,18 @@ local template = grafana.template;
           * on(namespace,pod)
             group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}
         ) by (workload, workload_type)
-      ||| % $._config;
+      ||| % kubernetesMixin._config;
       local memRequestsQuery = std.strReplace(cpuRequestsQuery, 'cpu', 'memory');
       local memLimitsQuery = std.strReplace(cpuLimitsQuery, 'cpu', 'memory');
 
-      local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config;
+      local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % kubernetesMixin._config;
       local cpuQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.cpu');
       local memoryQuotaRequestsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'requests.memory');
       local memoryQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.memory');
 
       g.dashboard(
-        '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % $._config.grafanaK8s,
-        uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
+        '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % kubernetesMixin._config.grafanaK8s,
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
       )
       .addRow(
         g.row('CPU Usage')
@@ -282,7 +284,7 @@ local template = grafana.template;
             networkColumns,
             networkTableStyles
           ) +
-          { interval: $._config.grafanaK8s.minimumTimeInterval },
+          { interval: kubernetesMixin._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
@@ -293,7 +295,7 @@ local template = grafana.template;
             (sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -303,7 +305,7 @@ local template = grafana.template;
             (sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -316,7 +318,7 @@ local template = grafana.template;
             (avg(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -326,7 +328,7 @@ local template = grafana.template;
             (avg(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -339,7 +341,7 @@ local template = grafana.template;
             (sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -349,7 +351,7 @@ local template = grafana.template;
             (sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -362,7 +364,7 @@ local template = grafana.template;
             (sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
@@ -372,11 +374,11 @@ local template = grafana.template;
             (sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~"$namespace", workload=~".+", workload_type="$type"}) by (workload))
-          ||| % $._config, '{{workload}}') +
+          ||| % kubernetesMixin._config, '{{workload}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, typeTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + { tags: kubernetesMixin._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, typeTemplate, namespaceTemplate] }, refresh: kubernetesMixin._config.grafanaK8s.refresh },
 
   },
 }

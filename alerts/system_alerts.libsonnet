@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     notKubeDnsCoreDnsSelector: 'job!~"kube-dns|coredns"',
   },
@@ -12,7 +14,7 @@
             alert: 'KubeVersionMismatch',
             expr: |||
               count(count by (git_version) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*"))) > 1
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'warning',

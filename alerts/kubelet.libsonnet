@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeletSelector: error 'must provide selector for kubelet',
@@ -20,7 +22,7 @@
           {
             expr: |||
               kube_node_status_condition{%(kubeStateMetricsSelector)s,condition="Ready",status="true"} == 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -34,7 +36,7 @@
           {
             expr: |||
               (kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{%(kubeStateMetricsSelector)s,key=~"%(kubeNodeUnreachableIgnoreKeys)s"}) == 1
-            ||| % $._config {
+            ||| % kubernetesMixin._config {
               kubeNodeUnreachableIgnoreKeys: std.join('|', super.kubeNodeUnreachableIgnoreKeys),
             },
             labels: {
@@ -59,7 +61,7 @@
               max by(node) (
                 kube_node_status_capacity{%(kubeStateMetricsSelector)s,resource="pods"} != 1
               ) > 0.95
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -73,7 +75,7 @@
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
               sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (node) > 2
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -87,7 +89,7 @@
             alert: 'KubeletPlegDurationHigh',
             expr: |||
               node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '5m',
             labels: {
               severity: 'warning',
@@ -101,7 +103,7 @@
             alert: 'KubeletPodStartUpLatencyHigh',
             expr: |||
               histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])) by (instance, le)) * on(instance) group_left(node) kubelet_node_name{%(kubeletSelector)s} > 60
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -115,7 +117,7 @@
             alert: 'KubeletClientCertificateExpiration',
             expr: |||
               kubelet_certificate_manager_client_ttl_seconds < %(kubeletCertExpirationWarningSeconds)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -128,7 +130,7 @@
             alert: 'KubeletClientCertificateExpiration',
             expr: |||
               kubelet_certificate_manager_client_ttl_seconds < %(kubeletCertExpirationCriticalSeconds)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'critical',
             },
@@ -141,7 +143,7 @@
             alert: 'KubeletServerCertificateExpiration',
             expr: |||
               kubelet_certificate_manager_server_ttl_seconds < %(kubeletCertExpirationWarningSeconds)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -154,7 +156,7 @@
             alert: 'KubeletServerCertificateExpiration',
             expr: |||
               kubelet_certificate_manager_server_ttl_seconds < %(kubeletCertExpirationCriticalSeconds)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'critical',
             },
@@ -167,7 +169,7 @@
             alert: 'KubeletClientCertificateRenewalErrors',
             expr: |||
               increase(kubelet_certificate_manager_client_expiration_renew_errors[5m]) > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -181,7 +183,7 @@
             alert: 'KubeletServerCertificateRenewalErrors',
             expr: |||
               increase(kubelet_server_expiration_renew_errors[5m]) > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -193,7 +195,7 @@
           },
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'Kubelet',
-            selector:: $._config.kubeletSelector,
+            selector:: kubernetesMixin._config.kubeletSelector,
           },
         ],
       },

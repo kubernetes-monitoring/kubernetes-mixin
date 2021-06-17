@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeSchedulerSelector: 'job="kube-scheduler"',
     podLabel: 'pod',
@@ -13,7 +15,7 @@
             record: 'cluster_quantile:%s:histogram_quantile' % metric,
             expr: |||
               histogram_quantile(%(quantile)s, sum(rate(%(metric)s_bucket{%(kubeSchedulerSelector)s}[5m])) without(instance, %(podLabel)s))
-            ||| % ({ quantile: quantile, metric: metric } + $._config),
+            ||| % ({ quantile: quantile, metric: metric } + kubernetesMixin._config),
             labels: {
               quantile: quantile,
             },
