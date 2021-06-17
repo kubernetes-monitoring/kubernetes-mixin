@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeletSelector: error 'must provide selector for kubelet',
@@ -23,7 +25,7 @@
                 /
               kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                 < 0.03
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '1m',
             labels: {
               severity: 'critical',
@@ -43,7 +45,7 @@
               ) < 0.15
               and
               predict_linear(kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '1h',
             labels: {
               severity: 'warning',
@@ -57,7 +59,7 @@
             alert: 'KubePersistentVolumeErrors',
             expr: |||
               kube_persistentvolume_status_phase{phase=~"Failed|Pending",%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '5m',
             labels: {
               severity: 'critical',

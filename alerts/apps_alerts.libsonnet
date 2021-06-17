@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     namespaceSelector: null,
@@ -13,7 +15,7 @@
           {
             expr: |||
               increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m]) > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -37,7 +39,7 @@
                   1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -53,7 +55,7 @@
               kube_deployment_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
               kube_deployment_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -75,7 +77,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -97,7 +99,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -113,7 +115,7 @@
               kube_statefulset_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
               kube_statefulset_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -143,7 +145,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -180,7 +182,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -193,7 +195,7 @@
           {
             expr: |||
               sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -210,7 +212,7 @@
               kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 -
               kube_daemonset_status_current_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -224,7 +226,7 @@
             alert: 'KubeDaemonSetMisScheduled',
             expr: |||
               kube_daemonset_status_number_misscheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -238,7 +240,7 @@
             alert: 'KubeJobCompletion',
             expr: |||
               kube_job_spec_completions{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '12h',
             labels: {
               severity: 'warning',
@@ -252,7 +254,7 @@
             alert: 'KubeJobFailed',
             expr: |||
               kube_job_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -277,7 +279,7 @@
               kube_horizontalpodautoscaler_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s})
                 and
               changes(kube_horizontalpodautoscaler_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[15m]) == 0
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -293,7 +295,7 @@
               kube_horizontalpodautoscaler_status_current_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 ==
               kube_horizontalpodautoscaler_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },

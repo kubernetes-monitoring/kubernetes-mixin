@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     nodeExporterSelector: error 'must provide selector for node-exporter',
@@ -30,7 +32,7 @@
               sum(kube_node_status_allocatable{resource="cpu"})
                 >
               ((count(kube_node_status_allocatable{resource="cpu"}) > 1) - 1) / count(kube_node_status_allocatable{resource="cpu"})
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -50,7 +52,7 @@
               ((count(kube_node_status_allocatable{resource="memory"}) > 1) - 1)
                 /
               count(kube_node_status_allocatable{resource="memory"})
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -67,7 +69,7 @@
                 /
               sum(kube_node_status_allocatable{resource="cpu"})
                 > %(namespaceOvercommitFactor)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -84,7 +86,7 @@
                 /
               sum(kube_node_status_allocatable{resource="memory",%(kubeStateMetricsSelector)s})
                 > %(namespaceOvercommitFactor)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -101,7 +103,7 @@
                 / ignoring(instance, job, type)
               (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
                 > 0.9 < 1
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'info',
@@ -118,7 +120,7 @@
                 / ignoring(instance, job, type)
               (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
                 == 1
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'info',
@@ -135,7 +137,7 @@
                 / ignoring(instance, job, type)
               (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
                 > 1
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -152,7 +154,7 @@
                 /
               sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
                 > ( %(cpuThrottlingPercent)s / 100 )
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '15m',
             labels: {
               severity: 'info',

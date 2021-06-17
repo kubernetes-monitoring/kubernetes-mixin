@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeSchedulerSelector: 'job="kube-scheduler"',
   },
@@ -10,7 +12,7 @@
         rules: [
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeScheduler',
-            selector:: $._config.kubeSchedulerSelector,
+            selector:: kubernetesMixin._config.kubeSchedulerSelector,
           },
         ],
       },

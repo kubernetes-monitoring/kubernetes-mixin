@@ -9,6 +9,8 @@ local annotation = grafana.annotation;
 local singlestat = grafana.singlestat;
 
 {
+  local kubernetesMixin = self,
+
   grafanaDashboards+:: {
 
     'namespace-by-pod.json':
@@ -231,8 +233,8 @@ local singlestat = grafana.singlestat;
         template.new(
           name='cluster',
           datasource='$datasource',
-          query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-          hide=if $._config.showMultiCluster then '' else '2',
+          query='label_values(kube_pod_info, %s)' % kubernetesMixin._config.clusterLabel,
+          hide=if kubernetesMixin._config.showMultiCluster then '' else '2',
           refresh=2
         );
 
@@ -240,7 +242,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='namespace',
           datasource='$datasource',
-          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
+          query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % kubernetesMixin._config,
           allValues='.+',
           current='kube-system',
           hide='',
@@ -251,7 +253,7 @@ local singlestat = grafana.singlestat;
           auto: false,
           auto_count: 30,
           auto_min: '10s',
-          definition: 'label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
+          definition: 'label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % kubernetesMixin._config,
           skipUrlSync: false,
         };
 
@@ -346,11 +348,11 @@ local singlestat = grafana.singlestat;
         );
 
       dashboard.new(
-        title='%(dashboardNamePrefix)sNetworking / Namespace (Pods)' % $._config.grafanaK8s,
-        tags=($._config.grafanaK8s.dashboardTags),
+        title='%(dashboardNamePrefix)sNetworking / Namespace (Pods)' % kubernetesMixin._config.grafanaK8s,
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
         editable=true,
         schemaVersion=18,
-        refresh=($._config.grafanaK8s.refresh),
+        refresh=(kubernetesMixin._config.grafanaK8s.refresh),
         time_from='now-1h',
         time_to='now',
       )
@@ -379,14 +381,14 @@ local singlestat = grafana.singlestat;
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Received',
-          gaugeQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % $._config,
+          gaugeQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % kubernetesMixin._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 1 }
       )
       .addPanel(
         newGaugePanel(
           gaugeTitle='Current Rate of Bytes Transmitted',
-          gaugeQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % $._config,
+          gaugeQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution]))' % kubernetesMixin._config,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 1 }
       )
@@ -394,12 +396,12 @@ local singlestat = grafana.singlestat;
         newTablePanel(
           tableTitle='Current Status',
           colQueries=[
-            'sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
-            'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
-            'sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
-            'sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
-            'sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
-            'sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            'sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
+            'sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
+            'sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
+            'sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
+            'sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
+            'sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
           ]
         ),
         gridPos={ h: 9, w: 24, x: 0, y: 10 }
@@ -408,14 +410,14 @@ local singlestat = grafana.singlestat;
       .addPanel(
         newGraphPanel(
           graphTitle='Receive Bandwidth',
-          graphQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+          graphQuery='sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
         ),
         gridPos={ h: 9, w: 12, x: 0, y: 20 }
       )
       .addPanel(
         newGraphPanel(
           graphTitle='Transmit Bandwidth',
-          graphQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+          graphQuery='sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
         ),
         gridPos={ h: 9, w: 12, x: 12, y: 20 }
       )
@@ -424,7 +426,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Received Packets',
-            graphQuery='sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            graphQuery='sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 0, y: 30 }
@@ -432,7 +434,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets',
-            graphQuery='sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            graphQuery='sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 12, y: 30 }
@@ -444,7 +446,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Received Packets Dropped',
-            graphQuery='sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            graphQuery='sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 0, y: 40 }
@@ -452,7 +454,7 @@ local singlestat = grafana.singlestat;
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets Dropped',
-            graphQuery='sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % $._config,
+            graphQuery='sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])) by (pod)' % kubernetesMixin._config,
             graphFormat='pps'
           ),
           gridPos={ h: 10, w: 12, x: 12, y: 40 }

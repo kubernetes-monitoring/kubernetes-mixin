@@ -1,6 +1,8 @@
 local utils = import 'utils.libsonnet';
 
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeApiserverSelector: error 'must provide selector for kube-apiserver',
 
@@ -24,10 +26,10 @@ local utils = import 'utils.libsonnet';
             ||| % [
               w.long,
               w.factor,
-              (1 - $._config.SLOs.apiserver.target),
+              (1 - kubernetesMixin._config.SLOs.apiserver.target),
               w.short,
               w.factor,
-              (1 - $._config.SLOs.apiserver.target),
+              (1 - kubernetesMixin._config.SLOs.apiserver.target),
             ],
             labels: {
               severity: w.severity,
@@ -40,7 +42,7 @@ local utils = import 'utils.libsonnet';
             },
             'for': '%(for)s' % w,
           }
-          for w in $._config.SLOs.apiserver.windows
+          for w in kubernetesMixin._config.SLOs.apiserver.windows
         ],
       },
       {
@@ -50,12 +52,12 @@ local utils = import 'utils.libsonnet';
             alert: 'KubeClientCertificateExpiration',
             expr: |||
               apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds(kubernetesMixin._config.certExpirationWarningSeconds)),
               summary: 'Client certificate is about to expire.',
             },
           },
@@ -63,12 +65,12 @@ local utils = import 'utils.libsonnet';
             alert: 'KubeClientCertificateExpiration',
             expr: |||
               apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'critical',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds(kubernetesMixin._config.certExpirationCriticalSeconds)),
               summary: 'Client certificate is about to expire.',
             },
           },
@@ -76,7 +78,7 @@ local utils = import 'utils.libsonnet';
             alert: 'AggregatedAPIErrors',
             expr: |||
               sum by(name, namespace)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },
@@ -89,7 +91,7 @@ local utils = import 'utils.libsonnet';
             alert: 'AggregatedAPIDown',
             expr: |||
               (1 - max by(name, namespace)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             'for': '5m',
             labels: {
               severity: 'warning',
@@ -101,13 +103,13 @@ local utils = import 'utils.libsonnet';
           },
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeAPI',
-            selector:: $._config.kubeApiserverSelector,
+            selector:: kubernetesMixin._config.kubeApiserverSelector,
           },
           {
             alert: 'KubeAPITerminatedRequests',
             expr: |||
               sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m]))  / (  sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[10m])) + sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) ) > 0.20
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
             labels: {
               severity: 'warning',
             },

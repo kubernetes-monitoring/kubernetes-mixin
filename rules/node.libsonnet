@@ -1,4 +1,6 @@
 {
+  local kubernetesMixin = self,
+
   _config+:: {
     kubeStateMetricsSelector: 'job="kube-state-metrics"',
     nodeExporterSelector: 'job="node-exporter"',
@@ -24,7 +26,7 @@
                 max by (node, namespace, %(podLabel)s) (
                   label_replace(kube_pod_info{%(kubeStateMetricsSelector)s,node!=""}, "%(podLabel)s", "$1", "pod", "(.*)")
               ))
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           {
             // This rule gives the number of CPUs per node.
@@ -35,7 +37,7 @@
               * on (namespace, %(podLabel)s) group_left(node)
                 topk by(namespace, %(podLabel)s) (1, node_namespace_pod:kube_pod_info:)
               ))
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
           // Add separate rules for Available memory, so we can aggregate across clusters in dashboards.
           {
@@ -50,7 +52,7 @@
                   node_memory_Slab_bytes{%(nodeExporterSelector)s}
                 )
               ) by (%(clusterLabel)s)
-            ||| % $._config,
+            ||| % kubernetesMixin._config,
           },
         ],
       },

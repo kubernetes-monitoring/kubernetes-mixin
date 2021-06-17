@@ -9,6 +9,8 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
 local gauge = promgrafonnet.gauge;
 
 {
+  local kubernetesMixin = self,
+
   grafanaDashboards+:: {
     'persistentvolumesusage.json':
       local sizeGraph = graphPanel.new(
@@ -34,13 +36,13 @@ local gauge = promgrafonnet.gauge;
             -
             sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
           )
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         legendFormat='Used Space',
         intervalFactor=1,
       )).addTarget(prometheus.target(
         |||
           sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         legendFormat='Free Space',
         intervalFactor=1,
       ));
@@ -57,7 +59,7 @@ local gauge = promgrafonnet.gauge;
           /
           topk(1, kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
           * 100)
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
       ).withLowerBeingBetter();
 
 
@@ -80,7 +82,7 @@ local gauge = promgrafonnet.gauge;
       ).addTarget(prometheus.target(
         |||
           sum without(instance, node) (topk(1, (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         legendFormat='Used inodes',
         intervalFactor=1,
       )).addTarget(prometheus.target(
@@ -90,7 +92,7 @@ local gauge = promgrafonnet.gauge;
             -
             sum without(instance, node) (topk(1, (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
           )
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
         legendFormat=' Free inodes',
         intervalFactor=1,
       ));
@@ -103,15 +105,15 @@ local gauge = promgrafonnet.gauge;
           /
           topk(1, kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
           * 100)
-        ||| % $._config,
+        ||| % kubernetesMixin._config,
       ).withLowerBeingBetter();
 
 
       dashboard.new(
-        '%(dashboardNamePrefix)sPersistent Volumes' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sPersistent Volumes' % kubernetesMixin._config.grafanaK8s,
         time_from='now-7d',
-        uid=($._config.grafanaDashboardIDs['persistentvolumesusage.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
+        uid=(kubernetesMixin._config.grafanaDashboardIDs['persistentvolumesusage.json']),
+        tags=(kubernetesMixin._config.grafanaK8s.dashboardTags),
       ).addTemplate(
         {
           current: {
@@ -132,10 +134,10 @@ local gauge = promgrafonnet.gauge;
         template.new(
           'cluster',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes, %s)' % $._config.clusterLabel,
+          'label_values(kubelet_volume_stats_capacity_bytes, %s)' % kubernetesMixin._config.clusterLabel,
           label='cluster',
           refresh='time',
-          hide=if $._config.showMultiCluster then '' else 'variable',
+          hide=if kubernetesMixin._config.showMultiCluster then '' else 'variable',
           sort=1,
         )
       )
@@ -143,7 +145,7 @@ local gauge = promgrafonnet.gauge;
         template.new(
           'namespace',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, namespace)' % $._config,
+          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}, namespace)' % kubernetesMixin._config,
           label='Namespace',
           refresh='time',
           sort=1,
@@ -153,7 +155,7 @@ local gauge = promgrafonnet.gauge;
         template.new(
           'volume',
           '$datasource',
-          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace"}, persistentvolumeclaim)' % $._config,
+          'label_values(kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace"}, persistentvolumeclaim)' % kubernetesMixin._config,
           label='PersistentVolumeClaim',
           refresh='time',
           sort=1,
@@ -168,6 +170,6 @@ local gauge = promgrafonnet.gauge;
         row.new()
         .addPanel(inodesGraph)
         .addPanel(inodeGauge)
-      ) + { refresh: $._config.grafanaK8s.refresh },
+      ) + { refresh: kubernetesMixin._config.grafanaK8s.refresh },
   },
 }
