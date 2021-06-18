@@ -12,7 +12,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.storage_enabled then 'groups']+: [
       {
         name: 'kubernetes-storage',
         rules: [

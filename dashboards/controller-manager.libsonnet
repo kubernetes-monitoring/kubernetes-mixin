@@ -8,7 +8,7 @@ local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
-    'controller-manager.json':
+    [if $._config.dashboards.controller_manager_enabled then 'controller-manager.json']:
       local upCount =
         singlestat.new(
           'Up',

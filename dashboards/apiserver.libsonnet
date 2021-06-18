@@ -12,7 +12,7 @@ local singlestat = grafana.singlestat;
   },
 
   grafanaDashboards+:: {
-    'apiserver.json':
+    [if $._config.dashboards.apiserver_enabled then 'apiserver.json']:
       local availability1d =
         singlestat.new(
           'Availability (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],

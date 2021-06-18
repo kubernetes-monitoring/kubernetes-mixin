@@ -11,7 +11,7 @@ local singlestat = grafana.singlestat;
 {
   grafanaDashboards+:: {
 
-    'cluster-total.json':
+    [if $._config.dashboards.network_enabled then 'cluster-total.json']:
 
       local newStyle(
         alias,

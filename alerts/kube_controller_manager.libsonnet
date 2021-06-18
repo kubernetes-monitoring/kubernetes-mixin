@@ -4,7 +4,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.kube_controller_manager_enabled then 'groups']+: [
       {
         name: 'kubernetes-system-controller-manager',
         rules: [

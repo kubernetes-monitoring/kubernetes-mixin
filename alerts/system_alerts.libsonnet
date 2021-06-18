@@ -4,7 +4,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.system_enabled then 'groups']+: [
       {
         name: 'kubernetes-system',
         rules: [

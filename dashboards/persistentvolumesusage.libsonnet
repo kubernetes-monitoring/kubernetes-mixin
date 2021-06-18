@@ -10,7 +10,7 @@ local gauge = promgrafonnet.gauge;
 
 {
   grafanaDashboards+:: {
-    'persistentvolumesusage.json':
+    [if $._config.dashboards.persistentvolumesusage_enabled then 'persistentvolumesusage.json']:
       local sizeGraph = graphPanel.new(
         'Volume Space Usage',
         datasource='$datasource',

@@ -11,7 +11,7 @@ local utils = import 'utils.libsonnet';
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.kube_apiserver_enabled then 'groups']+: [
       {
         name: 'kube-apiserver-slos',
         rules: [

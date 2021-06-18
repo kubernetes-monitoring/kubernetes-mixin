@@ -4,7 +4,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.kube_scheduler_enabled then 'groups']+: [
       {
         name: 'kubernetes-system-scheduler',
         rules: [

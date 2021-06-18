@@ -13,7 +13,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.kubelet_enabled then 'groups']+: [
       {
         name: 'kubernetes-system-kubelet',
         rules: [

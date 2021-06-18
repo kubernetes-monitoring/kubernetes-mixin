@@ -8,7 +8,7 @@ local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
-    'scheduler.json':
+    [if $._config.dashboards.scheduler_enabled then 'scheduler.json']:
       local upCount =
         singlestat.new(
           'Up',

@@ -9,7 +9,7 @@ local statPanel = grafana.statPanel;
 
 {
   grafanaDashboards+:: {
-    'kubelet.json':
+    [if $._config.dashboards.kubelet_enabled then 'kubelet.json']:
       local upCount =
         statPanel.new(
           'Running Kubelets',

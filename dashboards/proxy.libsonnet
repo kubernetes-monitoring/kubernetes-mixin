@@ -8,7 +8,7 @@ local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
-    'proxy.json':
+    [if $._config.dashboards.proxy_enabled then 'proxy.json']:
       local upCount =
         singlestat.new(
           'Up',

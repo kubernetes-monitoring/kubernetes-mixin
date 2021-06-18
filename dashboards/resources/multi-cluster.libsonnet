@@ -5,7 +5,7 @@ local template = grafana.template;
 {
   grafanaDashboards+::
     if $._config.showMultiCluster then {
-      'k8s-resources-multicluster.json':
+      [if $._config.dashboards.resources_enabled then 'k8s-resources-multicluster.json']:
         local tableStyles = {
           [$._config.clusterLabel]: {
             alias: 'Cluster',

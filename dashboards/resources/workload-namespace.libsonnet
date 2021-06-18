@@ -47,7 +47,7 @@ local template = grafana.template;
         sort=1
       ),
 
-    'k8s-resources-workloads-namespace.json':
+    [if $._config.dashboards.resources_enabled then 'k8s-resources-workloads-namespace.json']:
       local tableStyles = {
         workload: {
           alias: 'Workload',
