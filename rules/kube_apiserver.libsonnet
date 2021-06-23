@@ -6,7 +6,6 @@
     kubeApiserverWriteSelector: 'verb=~"POST|PUT|PATCH|DELETE"',
   },
 
-
   prometheusRules+:: {
     local SLODays = $._config.SLOs.apiserver.days + 'd',
     local SLOTarget = $._config.SLOs.apiserver.target,
@@ -17,7 +16,7 @@
 
     groups+: [
       {
-        name: 'kube-apiserver.rules',
+        name: 'kube-apiserver-burnrate.rules',
         rules: [
           {
             record: 'apiserver_request:burnrate%(window)s' % w,
@@ -85,18 +84,12 @@
             w.long
             for w in $._config.SLOs.apiserver.windows
           ])
-        ] + [
-          {
-            record: 'code_resource:apiserver_request_total:rate5m',
-            expr: |||
-              sum by (%s,code,resource) (rate(apiserver_request_total{%s}[5m]))
-            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
-            labels: {
-              verb: verb.type,
-            },
-          }
-          for verb in verbs
-        ] + [
+        ]
+      },
+      {
+        name: 'kube-apiserver-histogram.rules',
+        rules:
+        [
           {
             record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
             expr: |||
@@ -119,12 +112,30 @@
             },
           }
           for quantile in ['0.99', '0.9', '0.5']
-        ],
+        ]
       },
       {
         name: 'kube-apiserver-availability.rules',
         interval: '3m',
         rules: [
+          {
+            record: 'code_verb:apiserver_request_total:increase%s' % SLODays,
+            expr: |||
+              avg_over_time(code_verb:apiserver_request_total:increase1h[%s]) * 24 * %d
+            ||| % [SLODays, $._config.SLOs.apiserver.days],
+          },
+        ] + [
+          {
+            record: 'code:apiserver_request_total:increase%s' % SLODays,
+            expr: |||
+              sum by (%s, code) (code_verb:apiserver_request_total:increase%s{%s})
+            ||| % [$._config.clusterLabel, SLODays, verb.selector],
+            labels: {
+              verb: verb.type,
+            },
+          }
+          for verb in verbs
+        ] + [
           {
             record: 'apiserver_request:availability%s' % SLODays,
             expr: |||
@@ -211,12 +222,17 @@
               verb: 'write',
             },
           },
+        ] + [
           {
-            record: 'code_verb:apiserver_request_total:increase%s' % SLODays,
+            record: 'code_resource:apiserver_request_total:rate5m',
             expr: |||
-              avg_over_time(code_verb:apiserver_request_total:increase1h[%s]) * 24 * %d
-            ||| % [SLODays, $._config.SLOs.apiserver.days],
-          },
+              sum by (%s,code,resource) (rate(apiserver_request_total{%s}[5m]))
+            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+            labels: {
+              verb: verb.type,
+            },
+          }
+          for verb in verbs
         ] + [
           {
             record: 'code_verb:apiserver_request_total:increase1h',
@@ -225,18 +241,20 @@
             ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, verb, code],
           }
           for code in ['2..', '3..', '4..', '5..']
-          for verb in ['LIST', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-        ] + [
+          for verb in ['LIST', 'GET']
+        ],
+      },
+      {
+        name: 'kube-apiserver-request.rules',
+        rules: [
           {
-            record: 'code:apiserver_request_total:increase%s' % SLODays,
+            record: 'code_verb:apiserver_request_total:increase1h',
             expr: |||
-              sum by (%s, code) (code_verb:apiserver_request_total:increase%s{%s})
-            ||| % [$._config.clusterLabel, SLODays, verb.selector],
-            labels: {
-              verb: verb.type,
-            },
+              sum by (%s, code, verb) (increase(apiserver_request_total{%s,verb="%s",code=~"%s"}[1h]))
+            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, verb, code],
           }
-          for verb in verbs
+          for code in ['2..', '3..', '4..', '5..']
+          for verb in ['POST', 'PUT', 'PATCH', 'DELETE']
         ],
       },
     ],
