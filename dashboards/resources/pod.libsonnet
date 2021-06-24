@@ -273,13 +273,13 @@ local template = grafana.template;
           g.panel('Rate of Received Packets') +
           g.queryPanel('sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
           g.queryPanel('sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
@@ -288,13 +288,13 @@ local template = grafana.template;
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
         .addPanel(
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster", namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
         )
       )
       .addRow(
