@@ -74,6 +74,9 @@
       // The default refresh time for all dashboards, default to 10s
       refresh: '10s',
       minimumTimeInterval: '1m',
+
+      // Timezone for Grafana dashboards:: UTC, browser, ...
+      grafanaTimezone: 'UTC',
     },
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
