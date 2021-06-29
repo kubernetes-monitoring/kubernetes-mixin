@@ -70,7 +70,7 @@
             expr: |||
               (
                 kube_deployment_spec_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                  !=
+                  >
                 kube_deployment_status_replicas_available{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
               ) and (
                 changes(kube_deployment_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m])
