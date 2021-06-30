@@ -237,24 +237,10 @@
           {
             record: 'code_verb:apiserver_request_total:increase1h',
             expr: |||
-              sum by (%s, code, verb) (increase(apiserver_request_total{%s,verb="%s",code=~"%s"}[1h]))
-            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, verb, code],
+              sum by (%s, code, verb) (increase(apiserver_request_total{%s,verb=~"LIST|GET|POST|PUT|PATCH|DELETE",code=~"%s"}[1h]))
+            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, code],
           }
           for code in ['2..', '3..', '4..', '5..']
-          for verb in ['LIST', 'GET']
-        ],
-      },
-      {
-        name: 'kube-apiserver-request.rules',
-        rules: [
-          {
-            record: 'code_verb:apiserver_request_total:increase1h',
-            expr: |||
-              sum by (%s, code, verb) (increase(apiserver_request_total{%s,verb="%s",code=~"%s"}[1h]))
-            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, verb, code],
-          }
-          for code in ['2..', '3..', '4..', '5..']
-          for verb in ['POST', 'PUT', 'PATCH', 'DELETE']
         ],
       },
     ],
