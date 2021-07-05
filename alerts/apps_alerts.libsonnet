@@ -14,7 +14,7 @@
             expr: |||
               increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m]) > 0
               and
-              sum without (phase) (kube_pod_status_phase{phase!="Running",%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} == 1)
+              kube_pod_container_status_waiting{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} == 1
             ||| % $._config,
             labels: {
               severity: 'warning',

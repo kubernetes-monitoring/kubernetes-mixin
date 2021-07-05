@@ -697,3 +697,28 @@ tests:
         summary: "The apiserver has terminated 33.33% of its incoming requests."
         description: "The apiserver has terminated 33.33% of its incoming requests."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiterminatedrequests"
+
+- interval: 30s
+  input_series:
+  - series: 'kube_pod_container_status_restarts_total{namespace="test",pod="static-web",container="script",job="kube-state-metrics"}'
+    values: '0 1 2 3 4+0x3 5+0x6 6+0x12 7+0x12 8+0x33'
+  - series: 'kube_pod_container_status_waiting{namespace="test",pod="static-web",container="script",job="kube-state-metrics"}'
+    values: '1+0x38 0+0x32'
+  alert_rule_test:
+  - eval_time: 10m    # alert hasn't fired
+    alertname: KubePodCrashLooping
+  - eval_time: 16m   # alert fired
+    alertname: KubePodCrashLooping
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        container: "script"
+        job: "kube-state-metrics"
+        namespace: "test"
+        pod: "static-web"
+      exp_annotations:
+        description: "Pod test/static-web (script) is restarting 2.00 times / 10 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping"
+        summary: "Pod is crash looping."
+  - eval_time: 20m 
+    alertname: KubePodCrashLooping  # alert recovery
