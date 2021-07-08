@@ -6,4 +6,4 @@
 (import 'kubelet.libsonnet') +
 (import 'kube_scheduler.libsonnet') +
 (import 'kube_controller_manager.libsonnet') +
-(import 'add-runbook-links.libsonnet')
+(import '../lib/add-runbook-links.libsonnet')
