@@ -9,7 +9,7 @@
     // If you want to change these, make sure the "le" buckets exist on the histogram!
     kubeApiserverReadResourceLatency: '1',
     kubeApiserverReadNamespaceLatency: '5',
-    kubeApiserverReadClusterLatency: '40', // 30 doesn't exist as a bucket and thus it's 40
+    kubeApiserverReadClusterLatency: '40',  // 30 doesn't exist as a bucket and thus it's 40
     kubeApiserverWriteLatency: '1',
   },
 
@@ -52,6 +52,7 @@
               /
               sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s}[%(window)s]))
             ||| % {
+              clusterLabel: $._config.clusterLabel,
               window: w,
               kubeApiserverSelector: $._config.kubeApiserverSelector,
               kubeApiserverReadSelector: $._config.kubeApiserverReadSelector,
@@ -87,6 +88,7 @@
               /
               sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s}[%(window)s]))
             ||| % {
+              clusterLabel: $._config.clusterLabel,
               window: w,
               kubeApiserverSelector: $._config.kubeApiserverSelector,
               kubeApiserverWriteSelector: $._config.kubeApiserverWriteSelector,
@@ -103,35 +105,35 @@
             w.long
             for w in $._config.SLOs.apiserver.windows
           ])
-        ]
+        ],
       },
       {
         name: 'kube-apiserver-histogram.rules',
         rules:
-        [
-          {
-            record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
-            expr: |||
-              histogram_quantile(0.99, sum by (%s, le, resource) (rate(apiserver_request_duration_seconds_bucket{%s}[5m]))) > 0
-            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
-            labels: {
-              verb: verb.type,
-              quantile: '0.99',
-            },
-          }
-          for verb in verbs
-        ] + [
-          {
-            record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
-            expr: |||
-              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|DELETECOLLECTION|PROXY|CONNECT"}[5m])) without(instance, %(podLabel)s))
-            ||| % ({ quantile: quantile } + $._config),
-            labels: {
-              quantile: quantile,
-            },
-          }
-          for quantile in ['0.99', '0.9', '0.5']
-        ]
+          [
+            {
+              record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
+              expr: |||
+                histogram_quantile(0.99, sum by (%s, le, resource) (rate(apiserver_request_duration_seconds_bucket{%s}[5m]))) > 0
+              ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+              labels: {
+                verb: verb.type,
+                quantile: '0.99',
+              },
+            }
+            for verb in verbs
+          ] + [
+            {
+              record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
+              expr: |||
+                histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|DELETECOLLECTION|PROXY|CONNECT"}[5m])) without(instance, %(podLabel)s))
+              ||| % ({ quantile: quantile } + $._config),
+              labels: {
+                quantile: quantile,
+              },
+            }
+            for quantile in ['0.99', '0.9', '0.5']
+          ],
       },
       {
         name: 'kube-apiserver-availability.rules',
