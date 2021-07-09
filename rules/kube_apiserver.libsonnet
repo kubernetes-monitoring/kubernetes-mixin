@@ -9,7 +9,7 @@
     // If you want to change these, make sure the "le" buckets exist on the histogram!
     kubeApiserverReadResourceLatency: '1',
     kubeApiserverReadNamespaceLatency: '5',
-    kubeApiserverReadClusterLatency: '40',
+    kubeApiserverReadClusterLatency: '40', // 30 doesn't exist as a bucket and thus it's 40
     kubeApiserverWriteLatency: '1',
   },
 
