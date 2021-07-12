@@ -4,6 +4,13 @@
     podLabel: 'pod',
     kubeApiserverReadSelector: 'verb=~"LIST|GET"',
     kubeApiserverWriteSelector: 'verb=~"POST|PUT|PATCH|DELETE"',
+    // These are buckets that exist on the apiserver_request_duration_seconds_bucket histogram.
+    // They are what the Kubernetes SIG Scalability is using to measure availability of Kubernetes clusters.
+    // If you want to change these, make sure the "le" buckets exist on the histogram!
+    kubeApiserverReadResourceLatency: '1',
+    kubeApiserverReadNamespaceLatency: '5',
+    kubeApiserverReadClusterLatency: '40',  // 30 doesn't exist as a bucket and thus it's 40
+    kubeApiserverWriteLatency: '1',
   },
 
   prometheusRules+:: {
@@ -28,14 +35,14 @@
                   -
                   (
                     (
-                      sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope=~"resource|",le="0.1"}[%(window)s]))
+                      sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(window)s]))
                       or
                       vector(0)
                     )
                     +
-                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="namespace",le="0.5"}[%(window)s]))
+                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"}[%(window)s]))
                     +
-                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="cluster",le="5"}[%(window)s]))
+                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="cluster",le="%(kubeApiserverReadClusterLatency)s"}[%(window)s]))
                   )
                 )
                 +
@@ -44,7 +51,15 @@
               )
               /
               sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s}[%(window)s]))
-            ||| % ($._config { window: w }),
+            ||| % {
+              clusterLabel: $._config.clusterLabel,
+              window: w,
+              kubeApiserverSelector: $._config.kubeApiserverSelector,
+              kubeApiserverReadSelector: $._config.kubeApiserverReadSelector,
+              kubeApiserverReadResourceLatency: $._config.kubeApiserverReadResourceLatency,
+              kubeApiserverReadNamespaceLatency: $._config.kubeApiserverReadNamespaceLatency,
+              kubeApiserverReadClusterLatency: $._config.kubeApiserverReadClusterLatency,
+            },
             labels: {
               verb: 'read',
             },
@@ -65,14 +80,20 @@
                   # too slow
                   sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_count{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s}[%(window)s]))
                   -
-                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s,le="1"}[%(window)s]))
+                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s,le="%(kubeApiserverWriteLatency)s"}[%(window)s]))
                 )
                 +
                 sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s,code=~"5.."}[%(window)s]))
               )
               /
               sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s}[%(window)s]))
-            ||| % ($._config { window: w }),
+            ||| % {
+              clusterLabel: $._config.clusterLabel,
+              window: w,
+              kubeApiserverSelector: $._config.kubeApiserverSelector,
+              kubeApiserverWriteSelector: $._config.kubeApiserverWriteSelector,
+              kubeApiserverWriteLatency: $._config.kubeApiserverWriteLatency,
+            },
             labels: {
               verb: 'write',
             },
@@ -84,35 +105,35 @@
             w.long
             for w in $._config.SLOs.apiserver.windows
           ])
-        ]
+        ],
       },
       {
         name: 'kube-apiserver-histogram.rules',
         rules:
-        [
-          {
-            record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
-            expr: |||
-              histogram_quantile(0.99, sum by (%s, le, resource) (rate(apiserver_request_duration_seconds_bucket{%s}[5m]))) > 0
-            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
-            labels: {
-              verb: verb.type,
-              quantile: '0.99',
-            },
-          }
-          for verb in verbs
-        ] + [
-          {
-            record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
-            expr: |||
-              histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|DELETECOLLECTION|PROXY|CONNECT"}[5m])) without(instance, %(podLabel)s))
-            ||| % ({ quantile: quantile } + $._config),
-            labels: {
-              quantile: quantile,
-            },
-          }
-          for quantile in ['0.99', '0.9', '0.5']
-        ]
+          [
+            {
+              record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
+              expr: |||
+                histogram_quantile(0.99, sum by (%s, le, resource) (rate(apiserver_request_duration_seconds_bucket{%s}[5m]))) > 0
+              ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+              labels: {
+                verb: verb.type,
+                quantile: '0.99',
+              },
+            }
+            for verb in verbs
+          ] + [
+            {
+              record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
+              expr: |||
+                histogram_quantile(%(quantile)s, sum(rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,subresource!="log",verb!~"LIST|WATCH|WATCHLIST|DELETECOLLECTION|PROXY|CONNECT"}[5m])) without(instance, %(podLabel)s))
+              ||| % ({ quantile: quantile } + $._config),
+              labels: {
+                quantile: quantile,
+              },
+            }
+            for quantile in ['0.99', '0.9', '0.5']
+          ],
       },
       {
         name: 'kube-apiserver-availability.rules',
@@ -144,7 +165,7 @@
                   # write too slow
                   sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_count{%(kubeApiserverWriteSelector)s}[%(SLODays)s]))
                   -
-                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverWriteSelector)s,le="1"}[%(SLODays)s]))
+                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverWriteSelector)s,le="%(kubeApiserverWriteLatency)s"}[%(SLODays)s]))
                 ) +
                 (
                   # read too slow
@@ -152,14 +173,14 @@
                   -
                   (
                     (
-                      sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverReadSelector)s,scope=~"resource|",le="0.1"}[%(SLODays)s]))
+                      sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverReadSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(SLODays)s]))
                       or
                       vector(0)
                     )
                     +
-                    sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverReadSelector)s,scope="namespace",le="0.5"}[%(SLODays)s]))
+                    sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverReadSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"}[%(SLODays)s]))
                     +
-                    sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverReadSelector)s,scope="cluster",le="5"}[%(SLODays)s]))
+                    sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverReadSelector)s,scope="cluster",le="%(kubeApiserverReadClusterLatency)s"}[%(SLODays)s]))
                   )
                 ) +
                 # errors
@@ -181,14 +202,14 @@
                 (
                   # too slow
                   (
-                    sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope=~"resource|",le="0.1"}[%(SLODays)s]))
+                    sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(SLODays)s]))
                     or
                     vector(0)
                   )
                   +
-                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="namespace",le="0.5"}[%(SLODays)s]))
+                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"}[%(SLODays)s]))
                   +
-                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="cluster",le="5"}[%(SLODays)s]))
+                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,scope="cluster",le="%(kubeApiserverReadClusterLatency)s"}[%(SLODays)s]))
                 )
                 +
                 # errors
@@ -209,7 +230,7 @@
                   # too slow
                   sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_count{%(kubeApiserverWriteSelector)s}[%(SLODays)s]))
                   -
-                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverWriteSelector)s,le="1"}[%(SLODays)s]))
+                  sum by (%(clusterLabel)s) (increase(apiserver_request_duration_seconds_bucket{%(kubeApiserverWriteSelector)s,le="%(kubeApiserverWriteLatency)s"}[%(SLODays)s]))
                 )
                 +
                 # errors
