@@ -3,80 +3,33 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 local template = grafana.template;
 
 {
-    grafanaDashboards+:: {   
-         local intervalTemplate =
-        template.new(
-            name='interval',
-            datasource='$datasource',
-            query='4h',
-            current='5m',
-            hide=2,
-            refresh=2,
-            includeAll=false,
-            sort=1
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            skipUrlSync: false,
-            type: 'interval',
-            options: [
-            {
-                selected: true,
-                text: '4h',
-                value: '4h',
-            },
-            ],
-        },
+  grafanaDashboards+:: {
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='$datasource',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
 
-        local clusterTemplate =
-            template.new(
-                name='cluster',
-                datasource='$datasource',
-                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-
-        local namespaceTemplate =
-            template.new(
-                name='namespace',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-
-        local workloadTemplate =
-            template.new(
-                name='workload',
-                datasource='$datasource',
-                query='label_values(mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}, workload)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-
-        local workloadTypeTemplate =
-            template.new(
-                name='type',
-                datasource='$datasource',
-                query='label_values(mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}, workload_type)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-      'k8s-resources-workload.json':
+    'k8s-resources-workload.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',
@@ -180,7 +133,10 @@ local template = grafana.template;
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Workload' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workload.json']),
-      )
+      ).addTemplate('cluster', 'up{%(kubeSchedulerSelector)s}', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
+      .addTemplate('workload', 'mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace"}' % $._config, 'workload')
+      .addTemplate('type', 'mixin_pod_workload{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}' % $._config, 'workload_type')
       .addRow(
         g.row('CPU Usage')
         .addPanel(
@@ -349,6 +305,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate, workloadTemplate, workloadTypeTemplate] }, refresh: $._config.grafanaK8s.refresh },
-    }
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
+  },
 }

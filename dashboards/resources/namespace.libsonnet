@@ -3,56 +3,33 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 local template = grafana.template;
 
 {
-    grafanaDashboards+:: {
-       local intervalTemplate =
-        template.new(
-            name='interval',
-            datasource='$datasource',
-            query='4h',
-            current='5m',
-            hide=2,
-            refresh=2,
-            includeAll=false,
-            sort=1
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            skipUrlSync: false,
-            type: 'interval',
-            options: [
-            {
-                selected: true,
-                text: '4h',
-                value: '4h',
-            },
-            ],
-        },
+  grafanaDashboards+:: {
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='$datasource',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
 
-        local clusterTemplate =
-            template.new(
-                name='cluster',
-                datasource='$datasource',
-                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-
-        local namespaceTemplate =
-            template.new(
-                name='namespace',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
-        'k8s-resources-namespace.json':
+    'k8s-resources-namespace.json':
       local tableStyles = {
         pod: {
           alias: 'Pod',
@@ -113,30 +90,8 @@ local template = grafana.template;
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
-      )
-      .addRow(
-        (g.row('Headlines') +
-         {
-           height: '100px',
-           showTitle: false,
-         })
-        .addPanel(
-          g.panel('CPU Utilisation (from requests)') +
-          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_requests{namespace="$namespace", resource="cpu"})' % $._config)
-        )
-        .addPanel(
-          g.panel('CPU Utilisation (from limits)') +
-          g.statPanel('sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{%(clusterLabel)s="$cluster", namespace="$namespace"}) / sum(kube_pod_container_resource_limits{namespace="$namespace", resource="cpu"})' % $._config)
-        )
-        .addPanel(
-          g.panel('Memory Utilization (from requests)') +
-          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_requests{namespace="$namespace", resource="memory"})' % $._config)
-        )
-        .addPanel(
-          g.panel('Memory Utilisation (from limits)') +
-          g.statPanel('sum(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) / sum(kube_pod_container_resource_limits{namespace="$namespace", resource="memory"})' % $._config)
-        )
-      )
+      ).addTemplate('cluster', 'up{%(cadvisorSelector)s}', $._config.clusterLabel, hide=if $._config.showMultiCluster then 0 else 2)
+      .addTemplate('namespace', 'kube_pod_info{%(clusterLabel)s="$cluster"}' % $._config, 'namespace')
       .addRow(
         g.row('CPU Usage')
         .addPanel(
@@ -312,6 +267,6 @@ local template = grafana.template;
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, clusterTemplate, namespaceTemplate] },refresh: $._config.grafanaK8s.refresh }
-    }
+      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate] } },
+  },
 }
