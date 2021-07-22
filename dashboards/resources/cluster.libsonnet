@@ -237,7 +237,7 @@ local template = grafana.template;
         g.row('Network')
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
-          g.queryPanel('sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[$__interval])) by (namespace)' % $._config, '{{namespace}}') +
+          g.queryPanel('sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[$__interval])) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
