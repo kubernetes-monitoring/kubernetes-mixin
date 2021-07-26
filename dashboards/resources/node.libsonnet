@@ -29,6 +29,30 @@ local template = grafana.template;
         ],
       },
 
+    local clusterTemplate =
+      template.new(
+        name='cluster',
+        datasource='$datasource',
+        query='label_values(up{%(nodeExporterSelector)s}, %(clusterLabel)s)' % $._config,
+        current='',
+        hide=if $._config.showMultiCluster then '' else '2',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
+
+    local nodeTemplate =
+      template.new(
+        name='node',
+        datasource='$datasource',
+        query='label_values(up{%(nodeExporterSelector)s}, node)' % $._config,
+        current='',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
+
     'k8s-resources-node.json':
       local tableStyles = {
         pod: {
@@ -102,6 +126,6 @@ local template = grafana.template;
             'Value #H': { alias: 'Memory Usage (Swap)', unit: 'bytes' },
           })
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags },
+      ) + { tags: $._config.grafanaK8s.dashboardTags, refresh: $._config.grafanaK8s.refresh, templating+: { list+: [intervalTemplate, clusterTemplate, nodeTemplate] } },
   },
 }

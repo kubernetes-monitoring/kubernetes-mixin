@@ -3,75 +3,75 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 local template = grafana.template;
 
 {
-    grafanaDashboards+:: {
-       local intervalTemplate =
-        template.new(
-            name='interval',
-            datasource='$datasource',
-            query='4h',
-            current='5m',
-            hide=2,
-            refresh=2,
-            includeAll=false,
-            sort=1
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            skipUrlSync: false,
-            type: 'interval',
-            options: [
-            {
-                selected: true,
-                text: '4h',
-                value: '4h',
-            },
-            ],
-        },
+  grafanaDashboards+:: {
+    local intervalTemplate =
+      template.new(
+        name='interval',
+        datasource='$datasource',
+        query='4h',
+        current='5m',
+        hide=2,
+        refresh=2,
+        includeAll=false,
+        sort=1
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        skipUrlSync: false,
+        type: 'interval',
+        options: [
+          {
+            selected: true,
+            text: '4h',
+            value: '4h',
+          },
+        ],
+      },
 
-         local typeTemplate =
-        template.new(
-            name='type',
-            datasource='$datasource',
-            query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
-            current='deployment',
-            hide='',
-            refresh=1,
-            includeAll=false,
-            sort=0
-        ) + {
-            auto: false,
-            auto_count: 30,
-            auto_min: '10s',
-            definition: 'label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
-            skipUrlSync: false,
-        },
+    local typeTemplate =
+      template.new(
+        name='type',
+        datasource='$datasource',
+        query='label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        current='deployment',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=0
+      ) + {
+        auto: false,
+        auto_count: 30,
+        auto_min: '10s',
+        definition: 'label_values(mixin_pod_workload{namespace=~"$namespace", workload=~".+"}, workload_type)',
+        skipUrlSync: false,
+      },
 
-                local clusterTemplate =
-            template.new(
-                name='cluster',
-                datasource='$datasource',
-                query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
-                current='',
-                hide=if $._config.showMultiCluster then '' else '2',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local clusterTemplate =
+      template.new(
+        name='cluster',
+        datasource='$datasource',
+        query='label_values(up{%(kubeStateMetricsSelector)s}, %(clusterLabel)s)' % $._config,
+        current='',
+        hide=if $._config.showMultiCluster then '' else '2',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-        local namespaceTemplate =
-            template.new(
-                name='namespace',
-                datasource='$datasource',
-                query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
-                current='',
-                hide='',
-                refresh=1,
-                includeAll=false,
-                sort=1
-            ),
+    local namespaceTemplate =
+      template.new(
+        name='namespace',
+        datasource='$datasource',
+        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config.clusterLabel,
+        current='',
+        hide='',
+        refresh=1,
+        includeAll=false,
+        sort=1
+      ),
 
-        'k8s-resources-workloads-namespace.json':
+    'k8s-resources-workloads-namespace.json':
       local tableStyles = {
         workload: {
           alias: 'Workload',
@@ -193,29 +193,29 @@ local template = grafana.template;
         .addPanel(
           g.panel('CPU Usage') +
           g.queryPanel([cpuUsageQuery, cpuQuotaRequestsQuery, cpuQuotaLimitsQuery], ['{{workload}} - {{workload_type}}', 'quota - requests', 'quota - limits']) +
-          g.stack+ {
-                seriesOverrides: [
-                    {
-                        "alias": "quota - requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "quota - limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ]
+          g.stack + {
+            seriesOverrides: [
+              {
+                alias: 'quota - requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'quota - limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
           },
         )
       )
@@ -246,29 +246,31 @@ local template = grafana.template;
           g.panel('Memory Usage') +
           g.queryPanel([memUsageQuery, memoryQuotaRequestsQuery, memoryQuotaLimitsQuery], ['{{workload}} - {{workload_type}}', 'quota - requests', 'quota - limits']) +
           g.stack +
-          { yaxes: g.yaxes('bytes'),
-                seriesOverrides: [
-                    {
-                        "alias": "quota - requests",
-                        "color": "#F2495C",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                    {
-                        "alias": "quota - limits",
-                        "color": "#FF9830",
-                        "dashes": true,
-                        "fill": 0,
-                        "hideTooltip": true,
-                        "legend": false,
-                        "linewidth": 2,
-                        "stack": false
-                    },
-                ] },
+          {
+            yaxes: g.yaxes('bytes'),
+            seriesOverrides: [
+              {
+                alias: 'quota - requests',
+                color: '#F2495C',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+              {
+                alias: 'quota - limits',
+                color: '#FF9830',
+                dashes: true,
+                fill: 0,
+                hideTooltip: true,
+                legend: false,
+                linewidth: 2,
+                stack: false,
+              },
+            ],
+          },
         )
       )
       .addRow(
@@ -407,5 +409,5 @@ local template = grafana.template;
         )
       ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [intervalTemplate, typeTemplate, clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
 
-    }
+  },
 }

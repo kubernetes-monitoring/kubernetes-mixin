@@ -235,7 +235,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='cluster',
           datasource='$datasource',
-          query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+          query='label_values(up{%(cadvisorSelector)s}, %(clusterLabel)s)' % $._config,
           hide=if $._config.showMultiCluster then '' else '2',
           refresh=1
         );
