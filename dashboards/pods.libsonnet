@@ -159,7 +159,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         template.new(
           'namespace',
           '$datasource',
-          'label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
+          'label_values(container_memory_working_set_bytes{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
           sort=1,
@@ -169,7 +169,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         template.new(
           'pod',
           '$datasource',
-          'label_values(kube_pod_info{%(clusterLabel)s="$cluster", namespace=~"$namespace"}, pod)' % $._config,
+          'label_values(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace=~"$namespace"}, pod)' % $._config,
           label='Pod',
           refresh='time',
           sort=1,
@@ -179,7 +179,7 @@ local numbersinglestat = promgrafonnet.numbersinglestat;
         template.new(
           'container',
           '$datasource',
-          'label_values(kube_pod_container_info{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}, container)' % $._config,
+          'label_values(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}, container)' % $._config,
           label='Container',
           refresh='time',
           includeAll=true,
