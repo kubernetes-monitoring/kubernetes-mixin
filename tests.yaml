@@ -819,8 +819,8 @@ tests:
     - exp_labels:
         severity: warning
       exp_annotations:
-        summary: "The apiserver has terminated 33.33% of its incoming requests."
-        description: "The apiserver has terminated 33.33% of its incoming requests."
+        summary: "The kubernetes apiserver has terminated 33.33% of its incoming requests."
+        description: "The kubernetes apiserver has terminated 33.33% of its incoming requests."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiterminatedrequests"
 
 - interval: 1m

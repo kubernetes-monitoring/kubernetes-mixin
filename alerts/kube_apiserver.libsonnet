@@ -55,7 +55,7 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
               summary: 'Client certificate is about to expire.',
             },
           },
@@ -68,12 +68,12 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'critical',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to the apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
               summary: 'Client certificate is about to expire.',
             },
           },
           {
-            alert: 'AggregatedAPIErrors',
+            alert: 'KubeAggregatedAPIErrors',
             expr: |||
               sum by(name, namespace)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
             ||| % $._config,
@@ -81,12 +81,12 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. It has appeared unavailable {{ $value | humanize }} times averaged over the past 10m.',
-              summary: 'An aggregated API has reported errors.',
+              description: 'Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. It has appeared unavailable {{ $value | humanize }} times averaged over the past 10m.',
+              summary: 'Kubernetes aggregated API has reported errors.',
             },
           },
           {
-            alert: 'AggregatedAPIDown',
+            alert: 'KubeAggregatedAPIDown',
             expr: |||
               (1 - max by(name, namespace)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
             ||| % $._config,
@@ -95,8 +95,8 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 10m.',
-              summary: 'An aggregated API is down.',
+              description: 'Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 10m.',
+              summary: 'Kubernetes aggregated API is down.',
             },
           },
           (import '../lib/absent_alert.libsonnet') {
@@ -112,8 +112,8 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
-              summary: 'The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
+              description: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
+              summary: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
             },
             'for': '5m',
           },
