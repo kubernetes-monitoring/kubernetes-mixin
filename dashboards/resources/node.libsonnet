@@ -33,7 +33,7 @@ local template = grafana.template;
       template.new(
         name='cluster',
         datasource='$datasource',
-        query='label_values(up{%(nodeExporterSelector)s}, %(clusterLabel)s)' % $._config,
+        query='label_values(up{%(cadvisorSelector)s}, %(clusterLabel)s)' % $._config,
         current='',
         hide=if $._config.showMultiCluster then '' else '2',
         refresh=1,
@@ -45,7 +45,7 @@ local template = grafana.template;
       template.new(
         name='node',
         datasource='$datasource',
-        query='label_values(up{%(nodeExporterSelector)s}, node)' % $._config,
+        query='label_values(up{%(cadvisorSelector)s}, node)' % $._config,
         current='',
         hide='',
         refresh=1,

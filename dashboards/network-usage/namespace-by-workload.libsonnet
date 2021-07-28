@@ -262,7 +262,7 @@ local singlestat = grafana.singlestat;
         template.new(
           name='type',
           datasource='$datasource',
-          query='label_values(mixin_pod_workload{%(clusterLabel)s="$cluster",%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config,
+          query='label_values(mixin_pod_workload{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~".+"}, workload_type)' % $._config,
           current='deployment',
           hide='',
           refresh=1,
