@@ -74,7 +74,7 @@
                   sum by (namespace, pod, cluster) (
                       max by (namespace, pod, container, cluster) (
                         kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod) (
+                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
@@ -97,7 +97,7 @@
                   sum by (namespace, pod, cluster) (
                       max by (namespace, pod, container, cluster) (
                         kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod) (
+                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
@@ -120,7 +120,7 @@
                   sum by (namespace, pod, cluster) (
                       max by (namespace, pod, container, cluster) (
                         kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod) (
+                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
@@ -143,7 +143,7 @@
                   sum by (namespace, pod, cluster) (
                       max by (namespace, pod, container, cluster) (
                         kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod) (
+                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
