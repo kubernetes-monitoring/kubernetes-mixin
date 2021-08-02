@@ -66,7 +66,7 @@ local slo = import 'slo-libsonnet/slo.libsonnet';
       linkPrefix: '.',
 
       // The default refresh time for all dashboards, default to 10s
-      refresh: '10s'
+      refresh: '10s',
     },
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
@@ -74,6 +74,7 @@ local slo = import 'slo-libsonnet/slo.libsonnet';
     clusterLabel: 'cluster',
 
     namespaceLabel: 'namespace',
+    nodeLabel: 'node',
 
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
