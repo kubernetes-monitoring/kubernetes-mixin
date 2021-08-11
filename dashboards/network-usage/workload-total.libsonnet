@@ -10,7 +10,7 @@ local singlestat = grafana.singlestat;
 {
   grafanaDashboards+:: {
 
-    'workload-total.json':
+    'network-workload-total.json':
 
       local newBarplotPanel(graphTitle, graphQuery, graphFormat='Bps', legendFormat='{{namespace}}') =
         local target =
@@ -59,23 +59,23 @@ local singlestat = grafana.singlestat;
           },
         };
 
-      local newGraphPanel(graphTitle, graphQuery, graphFormat='Bps') =
+      local newGraphPanel(graphTitle, graphQuery, graphFormat='Bps', legendFormat='{{workload}}') =
         local target =
           prometheus.target(
             graphQuery
           ) + {
             intervalFactor: 1,
-            legendFormat: '{{pod}}',
+            legendFormat: legendFormat,
             step: 10,
           };
 
         graphPanel.new(
           title=graphTitle,
-          span=12,
+          span=24,
           datasource='$datasource',
           fill=2,
           linewidth=2,
-          min_span=12,
+          min_span=24,
           format=graphFormat,
           min=0,
           max=null,
@@ -84,6 +84,13 @@ local singlestat = grafana.singlestat;
           lines=true,
           stack=true,
           legend_show=true,
+          legend_values=true,
+          legend_min=true,
+          legend_max=true,
+          legend_current=true,
+          legend_avg=true,
+          legend_alignAsTable=true,
+          legend_rightSide=true,
           nullPointMode='connected'
         ).addTarget(target) + {
           legend+: {
@@ -110,7 +117,6 @@ local singlestat = grafana.singlestat;
           name='namespace',
           datasource='$datasource',
           query='label_values(container_network_receive_packets_total{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
-          allValues='.+',
           current='kube-system',
           hide='',
           refresh=2,
@@ -132,7 +138,9 @@ local singlestat = grafana.singlestat;
           current='',
           hide='',
           refresh=2,
-          includeAll=false,
+          allValues='.+',
+          includeAll=true,
+          multi=true,
           sort=1
         ) + {
           auto: false,
@@ -150,7 +158,7 @@ local singlestat = grafana.singlestat;
           current='deployment',
           hide='',
           refresh=2,
-          includeAll=false,
+          includeAll=true,
           sort=0
         ) + {
           auto: false,
@@ -158,41 +166,6 @@ local singlestat = grafana.singlestat;
           auto_min: '10s',
           definition: 'label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload"}, workload_type)' % $._config,
           skipUrlSync: false,
-        };
-
-      local resolutionTemplate =
-        template.new(
-          name='resolution',
-          datasource='$datasource',
-          query='30s,5m,1h',
-          current='5m',
-          hide='',
-          refresh=2,
-          includeAll=false,
-          sort=1
-        ) + {
-          auto: false,
-          auto_count: 30,
-          auto_min: '10s',
-          skipUrlSync: false,
-          type: 'interval',
-          options: [
-            {
-              selected: false,
-              text: '30s',
-              value: '30s',
-            },
-            {
-              selected: true,
-              text: '5m',
-              value: '5m',
-            },
-            {
-              selected: false,
-              text: '1h',
-              value: '1h',
-            },
-          ],
         };
 
       local intervalTemplate =
@@ -227,14 +200,6 @@ local singlestat = grafana.singlestat;
           title='Current Bandwidth'
         );
 
-      //#####  Average Bandwidth Row ######
-
-      local averageBandwidthRow =
-        row.new(
-          title='Average Bandwidth',
-          collapse=true,
-        );
-
       //#####  Bandwidth History Row ######
 
       local bandwidthHistoryRow =
@@ -260,13 +225,21 @@ local singlestat = grafana.singlestat;
 
       dashboard.new(
         title='%(dashboardNamePrefix)sNetworking / Workload' % $._config.grafanaK8s,
-        tags=($._config.grafanaK8s.dashboardTags),
-        editable=true,
+        tags=($._config.grafanaK8s.dashboardTags + ['network-usage']),
+        editable=false,
         schemaVersion=18,
         refresh=($._config.grafanaK8s.refresh),
         time_from='now-1h',
         time_to='now',
       )
+      .addLink({
+        title: 'Networking Dashboards',
+        type: 'dashboards',
+        asDropdown: false,
+        includeVars: true,
+        keepTime: true,
+        tags: ($._config.grafanaK8s.dashboardTags + ['network-usage']),
+      })
       .addTemplate(
         {
           current: {
@@ -287,7 +260,6 @@ local singlestat = grafana.singlestat;
       .addTemplate(namespaceTemplate)
       .addTemplate(workloadTemplate)
       .addTemplate(typeTemplate)
-      .addTemplate(resolutionTemplate)
       .addTemplate(intervalTemplate)
       .addAnnotation(annotation.default)
       .addPanel(currentBandwidthRow, gridPos={ h: 1, w: 24, x: 0, y: 0 })
@@ -295,53 +267,25 @@ local singlestat = grafana.singlestat;
         newBarplotPanel(
           graphTitle='Current Rate of Bytes Received',
           graphQuery=|||
-            sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+            sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           ||| % $._config,
           legendFormat='{{ pod }}',
         ),
-        gridPos={ h: 9, w: 12, x: 0, y: 1 }
+        gridPos={ h: 8, w: 12, x: 0, y: 1 }
       )
       .addPanel(
         newBarplotPanel(
           graphTitle='Current Rate of Bytes Transmitted',
           graphQuery=|||
-            sort_desc(sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+            sort_desc(sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           ||| % $._config,
           legendFormat='{{ pod }}',
         ),
-        gridPos={ h: 9, w: 12, x: 12, y: 1 }
-      )
-      .addPanel(
-        averageBandwidthRow
-        .addPanel(
-          newBarplotPanel(
-            graphTitle='Average Rate of Bytes Received',
-            graphQuery=|||
-              sort_desc(avg(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
-              * on (namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
-            ||| % $._config,
-            legendFormat='{{ pod }}',
-          ),
-          gridPos={ h: 9, w: 12, x: 0, y: 11 }
-        )
-        .addPanel(
-          newBarplotPanel(
-            graphTitle='Average Rate of Bytes Transmitted',
-            graphQuery=|||
-              sort_desc(avg(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
-              * on (namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
-            ||| % $._config,
-            legendFormat='{{ pod }}',
-          ),
-          gridPos={ h: 9, w: 12, x: 12, y: 11 }
-        ),
-        gridPos={ h: 1, w: 24, x: 0, y: 10 },
+        gridPos={ h: 8, w: 12, x: 12, y: 1 }
       )
       .addPanel(
         bandwidthHistoryRow, gridPos={ h: 1, w: 24, x: 0, y: 11 }
@@ -350,23 +294,23 @@ local singlestat = grafana.singlestat;
         newGraphPanel(
           graphTitle='Receive Bandwidth',
           graphQuery=|||
-            sort_desc(sum(irate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+            sort_desc(sum(rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           ||| % $._config,
         ),
-        gridPos={ h: 9, w: 12, x: 0, y: 12 }
+        gridPos={ h: 9, w: 24, x: 0, y: 12 }
       )
       .addPanel(
         newGraphPanel(
           graphTitle='Transmit Bandwidth',
           graphQuery=|||
-            sort_desc(sum(irate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+            sort_desc(sum(rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
             * on (namespace,pod)
             group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
           ||| % $._config,
         ),
-        gridPos={ h: 9, w: 12, x: 12, y: 12 }
+        gridPos={ h: 9, w: 24, x: 12, y: 12 }
       )
       .addPanel(
         packetRow
@@ -374,25 +318,25 @@ local singlestat = grafana.singlestat;
           newGraphPanel(
             graphTitle='Rate of Received Packets',
             graphQuery=|||
-              sort_desc(sum(irate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+              sort_desc(sum(rate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             ||| % $._config,
             graphFormat='pps'
           ),
-          gridPos={ h: 9, w: 12, x: 0, y: 22 }
+          gridPos={ h: 9, w: 24, x: 0, y: 22 }
         )
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets',
             graphQuery=|||
-              sort_desc(sum(irate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+              sort_desc(sum(rate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             ||| % $._config,
             graphFormat='pps'
           ),
-          gridPos={ h: 9, w: 12, x: 12, y: 22 }
+          gridPos={ h: 9, w: 24, x: 12, y: 22 }
         ),
         gridPos={ h: 1, w: 24, x: 0, y: 21 }
       )
@@ -402,25 +346,25 @@ local singlestat = grafana.singlestat;
           newGraphPanel(
             graphTitle='Rate of Received Packets Dropped',
             graphQuery=|||
-              sort_desc(sum(irate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+              sort_desc(sum(rate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             ||| % $._config,
             graphFormat='pps'
           ),
-          gridPos={ h: 9, w: 12, x: 0, y: 23 }
+          gridPos={ h: 9, w: 24, x: 0, y: 23 }
         )
         .addPanel(
           newGraphPanel(
             graphTitle='Rate of Transmitted Packets Dropped',
             graphQuery=|||
-              sort_desc(sum(irate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[$interval:$resolution])
+              sort_desc(sum(rate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
               * on (namespace,pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type="$type"}) by (pod))
             ||| % $._config,
             graphFormat='pps'
           ),
-          gridPos={ h: 9, w: 12, x: 12, y: 23 }
+          gridPos={ h: 9, w: 24, x: 12, y: 23 }
         ),
         gridPos={ h: 1, w: 24, x: 0, y: 22 }
       ),
