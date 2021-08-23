@@ -62,7 +62,7 @@
             ||| % $._config,
             'for': '15m',
             labels: {
-              severity: 'warning',
+              severity: 'info',
             },
             annotations: {
               description: "Kubelet '{{ $labels.node }}' is running at {{ $value | humanizePercentage }} of its Pod capacity.",

@@ -144,7 +144,7 @@ tests:
     exp_alerts:
     - exp_labels:
         node: minikube
-        severity: warning
+        severity: info
       exp_annotations:
         summary: "Kubelet is running at capacity."
         description: "Kubelet 'minikube' is running at 100% of its Pod capacity."
