@@ -85,6 +85,9 @@
 
     namespaceLabel: 'namespace',
 
+    // Default datasource name
+    datasourceName: 'default',
+
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],
     fstypeSelector: 'fstype=~"%s"' % std.join('|', self.fstypes),

@@ -144,7 +144,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         {
           current: {
             text: 'default',
-            value: 'default',
+            value: $._config.datasourceName,
           },
           hide: 0,
           label: null,

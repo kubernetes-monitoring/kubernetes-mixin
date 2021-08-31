@@ -271,7 +271,7 @@ local singlestat = grafana.singlestat;
         {
           current: {
             text: 'default',
-            value: 'default',
+            value: $._config.datasourceName,
           },
           hide: 0,
           label: null,
