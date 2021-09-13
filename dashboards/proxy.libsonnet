@@ -159,7 +159,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'cluster',
           '$datasource',
-          'label_values(kube_pod_info, %(clusterLabel)s)' % $._config,
+          'label_values(up{%(kubeProxySelector)s}, %(clusterLabel)s)' % $._config,
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
@@ -170,7 +170,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(kubeproxy_network_programming_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeProxySelector)s}, instance)' % $._config,
+          'label_values(up{%(kubeProxySelector)s, %(clusterLabel)s="$cluster", %(kubeProxySelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
           sort=1,

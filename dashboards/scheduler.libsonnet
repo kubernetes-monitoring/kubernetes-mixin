@@ -158,7 +158,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(process_cpu_seconds_total{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s}, instance)' % $._config,
+          'label_values(up{%(kubeSchedulerSelector)s, %(clusterLabel)s="$cluster"}, instance)' % $._config,
           refresh='time',
           includeAll=true,
           sort=1,
