@@ -26,6 +26,8 @@
               ) < 0.03
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
+              unless on(namespace, persistentvolumeclaim)
+              kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
             ||| % $._config,
             'for': '1m',
             labels: {
@@ -48,6 +50,8 @@
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
               predict_linear(kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
+              unless on(namespace, persistentvolumeclaim)
+              kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
             ||| % $._config,
             'for': '1h',
             labels: {

@@ -13,6 +13,8 @@ tests:
     values: '1024 1024 1024 1024'
   - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
     values: '16 64 512 1024'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+    values: '1 1 1 1'
   alert_rule_test:
   - eval_time: 1m
     alertname: KubePersistentVolumeFillingUp
@@ -32,6 +34,27 @@ tests:
         summary: "PersistentVolume is filling up."
         description: 'The PersistentVolume claimed by somepvc in Namespace monitoring is only 1.562% free.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumefillingup
+
+# Don't alert when PVC access_mode is ReadOnlyMany
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 512 64 16'
+  - series: 'kubelet_volume_stats_capacity_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 1024 1024 1024'
+  - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '16 64 512 1024'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadOnlyMany", service="kube-state-metrics"}'
+    values: '1 1 1 1'
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: KubePersistentVolumeFillingUp
+  - eval_time: 2m
+    alertname: KubePersistentVolumeFillingUp
+  - eval_time: 3m
+    alertname: KubePersistentVolumeFillingUp
+  - eval_time: 4m
+    alertname: KubePersistentVolumeFillingUp
 
 # Block volume mounts can report 0 for the kubelet_volume_stats_used_bytes metric but it shouldn't trigger the KubePersistentVolumeFillingUp alert.
 # See https://github.com/kubernetes/kubernetes/commit/b997e0e4d6ccbead435a47d6ac75b0db3d17252f for details.
@@ -83,6 +106,8 @@ tests:
     values: '32768+0x61'
   - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
     values: '1024+10x61'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+    values: '1x61'
   alert_rule_test:
   - eval_time: 61m
     alertname: KubePersistentVolumeFillingUp
@@ -116,6 +141,21 @@ tests:
     values: '32768+0x61'
   - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
     values: '0x61'
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: KubePersistentVolumeFillingUp
+
+# Don't alert when PVC access_mode is ReadOnlyMany
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024-10x61'
+  - series: 'kubelet_volume_stats_capacity_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '32768+0x61'
+  - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1x61'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadOnlyMany", service="kube-state-metrics"}'
+    values: '1x61'
   alert_rule_test:
   - eval_time: 61m
     alertname: KubePersistentVolumeFillingUp
