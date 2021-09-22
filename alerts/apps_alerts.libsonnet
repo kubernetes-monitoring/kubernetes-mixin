@@ -12,15 +12,13 @@
         rules: [
           {
             expr: |||
-              increase(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m]) > 0
-              and
-              kube_pod_container_status_waiting{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} == 1
+              max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) >= 1
             ||| % $._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 10 minutes.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is in waiting state (reason: "CrashLoopBackOff").',
               summary: 'Pod is crash looping.',
             },
             'for': '15m',
