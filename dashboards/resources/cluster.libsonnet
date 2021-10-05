@@ -140,7 +140,7 @@ local template = grafana.template;
          })
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode="idle", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]))' % $._config) +
+          g.statPanel('1 - avg(rate(node_cpu_seconds_total{mode=~"idle|iowait|steal", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]))' % $._config) +
           { interval: $._config.grafanaK8s.minimumTimeInterval },
         )
         .addPanel(
