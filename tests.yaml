@@ -823,12 +823,10 @@ tests:
         description: "The apiserver has terminated 33.33% of its incoming requests."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiterminatedrequests"
 
-- interval: 30s
+- interval: 1m
   input_series:
-  - series: 'kube_pod_container_status_restarts_total{namespace="test",pod="static-web",container="script",job="kube-state-metrics"}'
-    values: '0 1 2 3 4+0x3 5+0x6 6+0x12 7+0x12 8+0x33'
-  - series: 'kube_pod_container_status_waiting{namespace="test",pod="static-web",container="script",job="kube-state-metrics"}'
-    values: '1+0x38 0+0x32'
+  - series: 'kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff",namespace="test",pod="static-web",container="script",job="kube-state-metrics"}'
+    values: '1 1 stale _x3 1 1 stale _x2 1+0x4 stale'
   alert_rule_test:
   - eval_time: 10m    # alert hasn't fired
     alertname: KubePodCrashLooping
@@ -836,14 +834,29 @@ tests:
     alertname: KubePodCrashLooping
     exp_alerts:
     - exp_labels:
-        severity: warning
+        severity: "warning"
         container: "script"
         job: "kube-state-metrics"
         namespace: "test"
         pod: "static-web"
+        reason: "CrashLoopBackOff"
       exp_annotations:
-        description: "Pod test/static-web (script) is restarting 2.00 times / 10 minutes."
+        description: 'Pod test/static-web (script) is in waiting state (reason: "CrashLoopBackOff").'
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping"
         summary: "Pod is crash looping."
-  - eval_time: 20m 
-    alertname: KubePodCrashLooping  # alert recovery
+  - eval_time: 20m
+    alertname: KubePodCrashLooping   # alert fired for a period of 5 minutes after resolution because the alert looks back at the last 5 minutes of data and the range vector doesn't take stale samples into account 
+    exp_alerts:
+      - exp_labels:
+          severity: "warning"
+          container: "script"
+          job: "kube-state-metrics"
+          namespace: "test"
+          pod: "static-web"
+          reason: "CrashLoopBackOff"
+        exp_annotations:
+          description: 'Pod test/static-web (script) is in waiting state (reason: "CrashLoopBackOff").'
+          runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping"
+          summary: "Pod is crash looping."
+  - eval_time: 21m    # alert recovers
+    alertname: KubePodCrashLooping
