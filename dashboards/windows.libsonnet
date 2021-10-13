@@ -35,7 +35,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )
@@ -152,7 +152,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )
@@ -245,7 +245,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )
@@ -366,7 +366,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )
@@ -451,7 +451,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )

@@ -304,7 +304,7 @@ local statPanel = grafana.statPanel;
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )

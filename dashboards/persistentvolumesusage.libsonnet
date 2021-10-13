@@ -124,7 +124,7 @@ local gauge = promgrafonnet.gauge;
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )
