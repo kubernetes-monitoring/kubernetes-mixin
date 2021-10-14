@@ -116,7 +116,7 @@ local gauge = promgrafonnet.gauge;
         {
           current: {
             text: 'default',
-            value: 'default',
+            value: $._config.datasourceName,
           },
           hide: 0,
           label: null,
@@ -124,7 +124,7 @@ local gauge = promgrafonnet.gauge;
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: '',
+          regex: $._config.datasourceFilterRegex,
           type: 'datasource',
         },
       )
