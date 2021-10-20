@@ -222,7 +222,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'cluster',
           '$datasource',
-          'label_values(apiserver_request_total, %(clusterLabel)s)' % $._config,
+          'label_values(up{%(kubeApiserverSelector)s}, %(clusterLabel)s)' % $._config,
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
@@ -233,7 +233,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(apiserver_request_total{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"}, instance)' % $._config,
+          'label_values(up{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"}, instance)' % $._config,
           refresh='time',
           includeAll=true,
           sort=1,

@@ -8,7 +8,7 @@ local template = grafana.template;
       template.new(
         name='cluster',
         datasource='$datasource',
-        query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
+        query='label_values(up{%(kubeStateMetricsSelector)s}, %(clusterLabel)s)' % $._config,
         current='',
         hide=if $._config.showMultiCluster then '' else '2',
         refresh=2,
@@ -20,7 +20,7 @@ local template = grafana.template;
       template.new(
         name='node',
         datasource='$datasource',
-        query='label_values(kube_pod_info{%(clusterLabel)s="$cluster"}, node)' % $._config.clusterLabel,
+        query='label_values(up{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster"}, node)' % $._config,
         current='',
         hide='',
         refresh=2,
