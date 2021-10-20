@@ -69,7 +69,7 @@
 
       // For links between grafana dashboards, you need to tell us if your grafana
       // servers under some non-root path.
-      linkPrefix: '.',
+      linkPrefix: '',
 
       // The default refresh time for all dashboards, default to 10s
       refresh: '10s',
