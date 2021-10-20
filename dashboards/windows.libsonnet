@@ -470,7 +470,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         )
         .addPanel(
           g.panel('CPU Usage Per Core') +
-          g.queryPanel('sum by (core) (irate(windows_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[5m]))' % $._config, '{{core}}') +
+          g.queryPanel('sum by (core) (irate(windows_cpu_time_total{%(wmiExporterSelector)s, mode!="idle", instance="$instance"}[%(grafanaIntervalVar)s]))' % $._config, '{{core}}') +
           { yaxes: g.yaxes('percentunit') },
         )
       )
