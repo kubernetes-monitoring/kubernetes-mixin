@@ -198,7 +198,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
+              description: 'pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
               summary: 'Pod container waiting longer than 1 hour',
             },
             'for': '1h',
