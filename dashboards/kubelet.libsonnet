@@ -297,7 +297,7 @@ local statPanel = grafana.statPanel;
             value: $._config.datasourceName,
           },
           hide: 0,
-          label: null,
+          label: 'Data Source',
           name: 'datasource',
           options: [],
           query: 'prometheus',
