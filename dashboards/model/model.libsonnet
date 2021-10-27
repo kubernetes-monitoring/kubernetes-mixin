@@ -48,6 +48,20 @@
                 // TODO find a metric to relate CronJobs to Jobs.
             ],
         },
+        Deployment: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/deploy-128.png",
+            namespaced: true,
+            info: [],
+            relationships: [
+                {
+                    one: 'Deployment',
+                    many: 'ReplicaSet',
+                    one_label: 'owner_name',
+                    metric: 'kube_replicaset_owner',
+                    filters: ['owner_is_controller="true"', 'owner_kind="Deployment"'],
+                },
+            ],
+        },
         DaemonSet: {
             icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/ds-128.png",
             namespaced: true,
@@ -79,7 +93,20 @@
         Namespace: {
             icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/ns-128.png",
             namespaced: false,
-            info: [],
+            info: [
+                {
+                    name: 'Phase',
+                    type: 'label',
+                    metric: 'kube_namespace_status_phase',
+                    label: 'phase',
+                    value: 1,
+                },
+                {
+                    name: 'Created On',
+                    type: 'datetime',
+                    metric: 'kube_namespace_created',
+                },
+            ],
             relationships: [
                 {
                     one: 'Namespace',

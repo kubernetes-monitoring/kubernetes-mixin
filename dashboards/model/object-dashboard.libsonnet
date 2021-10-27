@@ -30,9 +30,14 @@ local headerPanel(kind) =
 local infoPanel(kind, info) =
     local kindLabel = std.asciiLower(kind);
     {
-        'datetime': null,
-        'label': c.addLabelPanel('%s{%s="$%s"}' % [info.metric, kindLabel, kindLabel], info.label),
-        'number': null,
+        'datetime':
+            c.addDatetimePanel('%s{cluster="$cluster", %s="$%s"} * 1e3' % [info.metric, kindLabel, kindLabel]),
+        'label':
+            if 'value' in info
+            then c.addLabelPanel('%s{cluster="$cluster", %s="$%s"} == %d' % [info.metric, kindLabel, kindLabel, info.value], info.label)
+            else c.addLabelPanel('%s{cluster="$cluster", %s="$%s"}' % [info.metric, kindLabel, kindLabel], info.label),
+        'number':
+            c.addNumberPanel('%s{cluster="$cluster", %s="$%s"}' % [info.metric, kindLabel, kindLabel]),
     }[info.type];
 
 local infoRows(kind) =

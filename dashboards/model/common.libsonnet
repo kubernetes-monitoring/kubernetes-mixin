@@ -11,15 +11,12 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
         )
         .addTemplate(
             g.template.query.new(
-                allValue='.+',
                 datasource='${datasource}',
-                includeAll=true,
                 label='cluster',
                 name='cluster',
-                query='',
+                query='label_values(up{job="default/kube-state-metrics"}, cluster)',
                 refresh=1,
                 regex='',
-                //hide=2,
             )
         )
         + layout {
@@ -146,6 +143,123 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                                 url: link,
                             }
                         ],
+                    },
+                    "overrides": []
+                },
+            }),
+
+    addNumberPanel(query):
+        function(d)
+            d.addPanel({
+                type: "stat",
+                gridPos: {
+                    "w": 16,
+                    "h": 2,
+                },
+                transformations: [],
+                datasource: '$datasource',
+                targets: [
+                    {
+                        "expr": query,
+                        "legendFormat": '',
+                        "interval": "",
+                        "exemplar": false,
+                        "refId": "A",
+                        "datasource": "$datasource",
+                        "instant": true,
+                    }
+                ],
+                options: {
+                    "reduceOptions": {
+                        "values": true,
+                        "calcs": [
+                            "lastNotNull"
+                        ],
+                        "fields": ""
+                    },
+                    "orientation": "auto",
+                    "textMode": "value",
+                    "colorMode": "value",
+                    "graphMode": "area",
+                    "justifyMode": "auto",
+                    "text": {
+                        "valueSize": 18
+                    }
+                },
+                fieldConfig: {
+                    "defaults": {
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "text",
+                                    "value": null
+                                }
+                            ]
+                        },
+                        "mappings": [],
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                    },
+                    "overrides": []
+                },
+            }),
+
+    addDatetimePanel(query):
+        function(d)
+            d.addPanel({
+                type: "stat",
+                gridPos: {
+                    "w": 16,
+                    "h": 2,
+                },
+                transformations: [],
+                datasource: '$datasource',
+                targets: [
+                    {
+                        "expr": query,
+                        "legendFormat": '',
+                        "interval": "",
+                        "exemplar": false,
+                        "refId": "A",
+                        "datasource": "$datasource",
+                        "instant": true,
+                    }
+                ],
+                options: {
+                    "reduceOptions": {
+                        "values": true,
+                        "calcs": [
+                            "lastNotNull"
+                        ],
+                        "fields": ""
+                    },
+                    "orientation": "auto",
+                    "textMode": "value",
+                    "colorMode": "value",
+                    "graphMode": "area",
+                    "justifyMode": "auto",
+                    "text": {
+                        "valueSize": 18
+                    }
+                },
+                fieldConfig: {
+                    "defaults": {
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "text",
+                                    "value": null
+                                }
+                            ]
+                        },
+                        "mappings": [],
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "unit": "dateTimeAsIso"
                     },
                     "overrides": []
                 },
