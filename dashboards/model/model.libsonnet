@@ -51,7 +51,23 @@
         Deployment: {
             icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/deploy-128.png",
             namespaced: true,
-            info: [],
+            info: [
+                {
+                    name: "Created On",
+                    type: "datetime",
+                    metric: "kube_deployment_created",
+                },
+                {
+                    name: "Intended Replicas",
+                    type: "number",
+                    metric: "kube_deployment_spec_replicas",
+                },
+                {
+                    name: "Current Replicas",
+                    type: "number",
+                    metric: "kube_deployment_status_replicas",
+                },
+            ],
             relationships: [
                 {
                     one: 'Deployment',

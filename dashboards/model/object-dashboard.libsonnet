@@ -18,7 +18,7 @@ local headerPanel(kind) =
                     <div style="padding: 0px;">
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
                             <img style="height: 48px; width: 48px; margin-right: 10px;" src="%s" alt="%s"/>
-                            <h1 style=\"margin-top: 5px;\">%s: $%s</h1>
+                            <h1 style="margin-top: 5px;">%s: $%s</h1>
                         </div>
                     </div>
                 ||| % [icon, kind, kind, kindLabel],
@@ -29,15 +29,23 @@ local headerPanel(kind) =
 
 local infoPanel(kind, info) =
     local kindLabel = std.asciiLower(kind);
+    local filters = [
+        'cluster="$cluster"',
+        if model.kinds[kind].namespaced
+        then 'namespace="$namespace"'
+        else null,
+        '%s="$%s"' % [kindLabel, kindLabel],
+    ];
+    local selector = std.join(',', [f for f in filters if f != null]);
     {
         'datetime':
-            c.addDatetimePanel('%s{cluster="$cluster", %s="$%s"} * 1e3' % [info.metric, kindLabel, kindLabel]),
+            c.addDatetimePanel('%s{%s} * 1e3' % [info.metric, selector]),
         'label':
             if 'value' in info
-            then c.addLabelPanel('%s{cluster="$cluster", %s="$%s"} == %d' % [info.metric, kindLabel, kindLabel, info.value], info.label)
-            else c.addLabelPanel('%s{cluster="$cluster", %s="$%s"}' % [info.metric, kindLabel, kindLabel], info.label),
+            then c.addLabelPanel('%s{%s} == %d' % [info.metric, selector, info.value], info.label)
+            else c.addLabelPanel('%s{%s}' % [info.metric, selector], info.label),
         'number':
-            c.addNumberPanel('%s{cluster="$cluster", %s="$%s"}' % [info.metric, kindLabel, kindLabel]),
+            c.addNumberPanel('%s{%s}' % [info.metric, selector]),
     }[info.type];
 
 local infoRows(kind) =
@@ -46,10 +54,10 @@ local infoRows(kind) =
         local d2 = d.chain([
             c.nextRow,
             c.addTextPanel('Labels'),
-            c.addLabelTablePanel('kube_%s_labels{%s="$%s"}' % [kindLabel, kindLabel, kindLabel], "label_.+"),
+            c.addLabelTablePanel('kube_%s_labels{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], "label_.+"),
             c.nextRow,
             c.addTextPanel('Annotations'),
-            c.addLabelTablePanel('kube_%s_annotations{%s="$%s"}' % [kindLabel, kindLabel, kindLabel], "annotations_.+"),
+            c.addLabelTablePanel('kube_%s_annotations{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], "annotations_.+"),
             c.nextRow,
         ]);
         std.foldl(function(d, i)
@@ -68,17 +76,19 @@ local manyToOne(many) =
                 if 'one_label' in r
                 then r.one_label
                 else std.asciiLower(r.one);
-            local namespaceFilter =
-                if model.kinds[r.one].namespaced
-                then ['namespace="$namespace"']
-                else [];
-            local manyFilter = ['%s="$%s"' % [manyLabel, manyLabel]];
             local filters =
-                if 'filters' in r
-                then r.filters + namespaceFilter + manyFilter
-                else namespaceFilter + manyFilter;
+                [
+                    'cluster="$cluster"',
+                    '%s="$%s"' % [manyLabel, manyLabel],
+                ] +
+                (if model.kinds[r.many].namespaced
+                then ['namespace="$namespace"']
+                else []) +
+                (if 'filters' in r
+                then r.filters
+                else []);
             local query = 'group by (%s) (%s{%s})' % [oneLabel, r.metric, std.join(',', filters)];
-            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-%s=${__series.name}" % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
+            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-%s=${__series.name}" % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
 
             if r.many == many
             then d.chain([
@@ -98,13 +108,19 @@ local oneToMany(one) =
                 if 'one_label' in r
                 then r.one_label
                 else std.asciiLower(r.one);
-            local oneFilter = '%s="$%s"' % [oneLabel, std.asciiLower(r.one)];
-            local filters =
-                if 'filters' in r
-                then r.filters + [oneFilter]
-                else [oneFilter];
+             local filters =
+                [
+                    'cluster="$cluster"',
+                    '%s="$%s"' % [oneLabel, std.asciiLower(r.one)],
+                ] +
+                (if model.kinds[r.one].namespaced
+                then ['namespace="$namespace"']
+                else []) +
+                (if 'filters' in r
+                then r.filters
+                else []);
             local query = 'group by (%s) (%s{%s})' % [manyLabel, r.metric, std.join(',', filters)];
-            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
+            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
 
             if r.one == one
             then d.chain([
