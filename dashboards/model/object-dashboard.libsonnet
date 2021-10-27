@@ -2,6 +2,7 @@ local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonn
 local model = import "model.libsonnet";
 local c = import "common.libsonnet";
 
+// eg manyToOne(pod) adds rows for namespace, node, statefulset etc...
 local manyToOne(many) =
     function(d)
         std.foldl(function(d, r)
@@ -27,6 +28,32 @@ local manyToOne(many) =
             else d,
         model.relationships, d);
 
+// eg manyToOne(node) adds rows for pod etc...
+local oneToMany(one) =
+    function(d)
+        std.foldl(function(d, r)
+            local manyLabel = std.asciiLower(r.many);
+            local oneLabel =
+                if 'one_label' in r
+                then r.one_label
+                else std.asciiLower(r.one);
+            local oneFilter = '%s="$%s"' % [oneLabel, oneLabel];
+            local filters =
+                if 'filters' in r
+                then r.filters + [oneFilter]
+                else [oneFilter];
+            local query = 'group by (%s) (%s{%s})' % [manyLabel, r.metric, std.join(',', filters)];
+            local link = "/grafana/d/%s/explore-%s?var-%s=${__series.name}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many)];
+
+            if r.one == one
+            then d.chain([
+                c.addTextPanel(r.many + '(s)', height=4),
+                c.addTablePanel(query, manyLabel, link=link),
+                c.nextRow,
+            ])
+            else d,
+        model.relationships, d);
+
 {
     local dashboardForKind(kind) =
         local kindLabel = std.asciiLower(kind);
@@ -35,7 +62,8 @@ local manyToOne(many) =
             c.addTemplate('namespace'),
             c.addTemplate(kindLabel),
             c.addRow('Related Objects'),
-            manyToOne(kind)
+            manyToOne(kind),
+            oneToMany(kind),
         ]),
 
     grafanaDashboards: {

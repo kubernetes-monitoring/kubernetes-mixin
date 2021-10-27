@@ -71,14 +71,14 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
 
     nextRow(d): d.nextRow(),
 
-    addTextPanel(text):
+    addTextPanel(text, height=2):
         function(d)
             d.addPanel({
                 type: 'text',
                 title: text,
                 gridPos: {
                     w: 8,
-                    h: 1,
+                    h: height,
                 },
                 transparent: true,
                 options: {
@@ -149,5 +149,84 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                     },
                     "overrides": []
                 },
+            }),
+
+    addTablePanel(query, label, link=null):
+        function(d)
+            d.addPanel({
+                "datasource": "$datasource",
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "align": null,
+                            "filterable": false
+                        },
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "text",
+                                    "value": null
+                                }
+                            ]
+                        },
+                        "mappings": [
+                            {
+                                "id": 1,
+                                "type": 1,
+                                "from": "",
+                                "to": "",
+                                "text": ""
+                            }
+                        ],
+                        "links": [
+                            {
+                                "title": label,
+                                "url": link,
+                            }
+                        ],
+                        "color": {
+                            "mode": "thresholds"
+                        }
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 16,
+                },
+                "options": {
+                    "showHeader": false
+                },
+                "targets": [
+                    {
+                        "expr": query,
+                        "legendFormat": "",
+                        "interval": "",
+                        "datasource": "$datasource",
+                        "exemplar": false,
+                        "instant": true,
+                        "refId": "A"
+                    }
+                ],
+                "transformations": [
+                    {
+                        "id": "labelsToFields",
+                        "options": {}
+                    },
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {
+                            "Time": true,
+                            "Value": true
+                            },
+                            "indexByName": {},
+                            "renameByName": {}
+                        }
+                    }
+                ],
+                "type": "table",
+                "pluginVersion": "7.2.2"
             }),
 }
