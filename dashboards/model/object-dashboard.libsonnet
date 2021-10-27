@@ -93,7 +93,7 @@ local oneToMany(one) =
                 if 'one_label' in r
                 then r.one_label
                 else std.asciiLower(r.one);
-            local oneFilter = '%s="$%s"' % [oneLabel, oneLabel];
+            local oneFilter = '%s="$%s"' % [oneLabel, std.asciiLower(r.one)];
             local filters =
                 if 'filters' in r
                 then r.filters + [oneFilter]

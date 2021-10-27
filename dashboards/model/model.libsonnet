@@ -94,17 +94,17 @@
                 {
                     one: 'Namespace',
                     many: 'DaemonSet',
-                    metric: 'kube_daemonset_info',
+                    metric: 'kube_daemonset_labels',
                 },
                 {
                     one: 'Namespace',
                     many: 'Deployment',
-                    metric: 'kube_deployment_info',
+                    metric: 'kube_deployment_labels', // TODO no info metric?
                 },
                 {
                     one: 'Namespace',
                     many: 'StatefulSet',
-                    metric: 'kube_statefulset_info',
+                    metric: 'kube_statefulset_labels',
                 },
                 {
                     one: 'Namespace',
