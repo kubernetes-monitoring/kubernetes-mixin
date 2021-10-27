@@ -42,7 +42,7 @@ local headerPanel(kind) =
                     <div style="padding: 0px;">
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
                             <img style="height: 48px; width: 48px; margin-right: 10px;" src="%s" alt="%s"/>
-                            <h1 style=\"margin-top: 5px;\">%s: $%s</h1>
+                            <h1 style="margin-top: 5px;">%s: $%s</h1>
                         </div>
                     </div>
                 ||| % [icon, kind, kind, kindLabel],
