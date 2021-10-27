@@ -95,7 +95,38 @@
         },
         Node: {
             namespaced: false,
-            info: [],
+            info: [
+                {
+                    name: 'Internal IP',
+                    type: 'label',
+                    metric: 'kube_node_info',
+                    label: 'internal_ip',
+                },
+                {
+                    name: 'Pod CIDR',
+                    type: 'label',
+                    metric: 'kube_node_info',
+                    label: 'pod_cidr ',
+                },
+                {
+                    name: 'Kubelet Version',
+                    type: 'label',
+                    metric: 'kube_node_info',
+                    label: 'kubelet_version',
+                },
+                {
+                    name: 'KubeProxy Version',
+                    type: 'label',
+                    metric: 'kube_node_info',
+                    label: 'kubeproxy_version',
+                },
+                {
+                    name: 'Kernel Version',
+                    type: 'label',
+                    metric: 'kube_node_info',
+                    label: 'kernel_version',
+                },
+            ],
             relationships: [
                  {
                     one: 'Node',

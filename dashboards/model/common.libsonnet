@@ -100,7 +100,7 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                 targets: [
                     {
                         "expr": query,
-                        "legendFormat": '{{%s}}' % label,
+                        "legendFormat": '{{%s}} ' % label, // TODO space to handle missing labels
                         "interval": "",
                         "exemplar": false,
                         "refId": "A",
