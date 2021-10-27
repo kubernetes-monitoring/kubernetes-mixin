@@ -6,5 +6,5 @@
 (import 'scheduler.libsonnet') +
 (import 'proxy.libsonnet') +
 (import 'kubelet.libsonnet') +
-(import 'model/model.libsonnet') +
+(import 'model/object-dashboard.libsonnet') +
 (import 'defaults.libsonnet')
