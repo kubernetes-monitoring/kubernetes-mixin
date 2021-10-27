@@ -43,7 +43,7 @@ local oneToMany(one) =
                 then r.filters + [oneFilter]
                 else [oneFilter];
             local query = 'group by (%s) (%s{%s})' % [manyLabel, r.metric, std.join(',', filters)];
-            local link = "/grafana/d/%s/explore-%s?var-%s=${__series.name}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many)];
+            local link = "/grafana/d/%s/explore-%s?var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
 
             if r.one == one
             then d.chain([
