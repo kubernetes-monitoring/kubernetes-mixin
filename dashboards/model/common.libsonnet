@@ -37,7 +37,7 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
             // ])
             //
             // This saves you having to nest the return value from each monad.
-            chain(fs):: std.foldl(function(d, f) f(d), fs, self),
+            chain(fs):: std.foldl(function(d, f) if f != null then f(d) else d, fs, self),
         },
 
     addTemplate(name):
@@ -228,5 +228,69 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                 ],
                 "type": "table",
                 "pluginVersion": "7.2.2"
+            }),
+
+    addLabelTablePanel(query, prefix):
+        function(d)
+             d.addPanel({
+                "type": "table",
+                "title": "",
+                "gridPos": {
+                    "w": 16,
+                    "h": 2
+                },
+                "targets": [
+                    {
+                    "expr": query,
+                    "legendFormat": "",
+                    "interval": "",
+                    "refId": "A",
+                    "instant": true
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                    "custom": {
+                        "align": null,
+                        "filterable": false
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "value": null,
+                                "color": "green"
+                            },
+                            {
+                                "value": 80,
+                                "color": "red"
+                            }
+                        ]
+                    },
+                    "mappings": []
+                    },
+                    "overrides": []
+                },
+                "pluginVersion": "7.2.2",
+                "timeFrom": null,
+                "timeShift": null,
+                "options": {
+                    "showHeader": true
+                },
+                "transformations": [
+                    {
+                        "id": "labelsToFields",
+                        "options": {}
+                    },
+                    {
+                        "id": "filterFieldsByName",
+                        "options": {
+                            "include": {
+                                "pattern": prefix,
+                            }
+                        }
+                    }
+                ],
+                "datasource": null
             }),
 }
