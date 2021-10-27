@@ -75,7 +75,7 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
         function(d)
             d.addPanel({
                 type: 'text',
-                title: text,
+                title: '',
                 gridPos: {
                     w: 8,
                     h: height,
@@ -83,7 +83,7 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                 transparent: true,
                 options: {
                     mode: "markdown",
-                    content: ""
+                    content: "## %s" % text
                 },
             }),
 

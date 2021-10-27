@@ -2,6 +2,31 @@ local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonn
 local model = import "model.libsonnet";
 local c = import "common.libsonnet";
 
+local headerPanel(kind) =
+    local kindLabel = std.asciiLower(kind);
+    local icon = model.kinds[kind].icon;
+    function(d)
+        d.addPanel({
+            "gridPos": {
+                "w": 24,
+                "h": 2
+            },
+            "type": "text",
+            "options": {
+                "mode": "html",
+                "content": |||
+                    <div style="padding: 0px;">
+                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
+                            <img style="height: 48px; width: 48px; margin-right: 10px;" src="%s" alt="%s"/>
+                            <h1 style=\"margin-top: 5px;\">%s: $%s</h1>
+                        </div>
+                    </div>
+                ||| % [icon, kind, kind, kindLabel],
+            },
+            "transparent": true,
+            "datasource": null
+        });
+
 local infoPanel(kind, info) =
     local kindLabel = std.asciiLower(kind);
     {
@@ -14,8 +39,6 @@ local infoRows(kind) =
     function(d)
         local kindLabel = std.asciiLower(kind);
         local d2 = d.chain([
-            c.addTextPanel('Name'),
-            c.addLabelPanel('kube_%s_info{%s="$%s"}' % [kindLabel, kindLabel, kindLabel], kindLabel),
             c.nextRow,
             c.addTextPanel('Labels'),
             c.addLabelTablePanel('kube_%s_labels{%s="$%s"}' % [kindLabel, kindLabel, kindLabel], "label_.+"),
@@ -50,7 +73,7 @@ local manyToOne(many) =
                 then r.filters + namespaceFilter + manyFilter
                 else namespaceFilter + manyFilter;
             local query = 'group by (%s) (%s{%s})' % [oneLabel, r.metric, std.join(',', filters)];
-            local link = "/grafana/d/%s/explore-%s?var-%s=${__series.name}" % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
+            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-%s=${__series.name}" % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
 
             if r.many == many
             then d.chain([
@@ -76,7 +99,7 @@ local oneToMany(one) =
                 then r.filters + [oneFilter]
                 else [oneFilter];
             local query = 'group by (%s) (%s{%s})' % [manyLabel, r.metric, std.join(',', filters)];
-            local link = "/grafana/d/%s/explore-%s?var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
+            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
 
             if r.one == one
             then d.chain([
@@ -87,20 +110,23 @@ local oneToMany(one) =
             else d,
         model.relationships, d);
 
-{
-    local dashboardForKind(kind) =
-        local kindLabel = std.asciiLower(kind);
+local dashboardForKind(kind) =
+    local kindLabel = std.asciiLower(kind);
 
-        c.dashboard(kind).chain([
-            if model.kinds[kind].namespaced
-            then c.addTemplate('namespace'),
-            c.addTemplate(kindLabel),
-            c.addRow('Info'),
-            infoRows(kind),
-            c.addRow('Related Objects'),
-            manyToOne(kind),
-            oneToMany(kind),
-        ]),
+    c.dashboard(kind).chain([
+        if model.kinds[kind].namespaced
+        then c.addTemplate('namespace'),
+        headerPanel(kind),
+        c.addTemplate(kindLabel),
+        c.addRow('Info'),
+        infoRows(kind),
+        c.addRow('Related Objects'),
+        manyToOne(kind),
+        oneToMany(kind),
+    ]);
+
+{
+    grafanaDashboardFolder: "Kubernetes Explore",
 
     grafanaDashboards: {
         ['model-%s.json' % std.asciiLower(kind)]: dashboardForKind(kind)

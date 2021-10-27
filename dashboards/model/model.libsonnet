@@ -11,6 +11,7 @@
     // }
     kinds: {
         ConfigMap: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/cm-128.png",
             namespaced: true,
             info: [
                 {
@@ -27,6 +28,7 @@
             relationships: [],
         },
         CronJob: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/cronjob-128.png",
             namespaced: true,
             info: [
                 {
@@ -47,6 +49,7 @@
             ],
         },
         DaemonSet: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/ds-128.png",
             namespaced: true,
             info: [],
             relationships: [
@@ -60,6 +63,7 @@
             ],
         },
         Job: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/job-128.png",
             namespaced: true,
             info: [],
             relationships: [
@@ -73,6 +77,7 @@
             ],
         },
         Namespace: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/ns-128.png",
             namespaced: false,
             info: [],
             relationships: [
@@ -88,12 +93,28 @@
                 },
                 {
                     one: 'Namespace',
+                    many: 'DaemonSet',
+                    metric: 'kube_daemonset_info',
+                },
+                {
+                    one: 'Namespace',
+                    many: 'Deployment',
+                    metric: 'kube_deployment_info',
+                },
+                {
+                    one: 'Namespace',
+                    many: 'StatefulSet',
+                    metric: 'kube_statefulset_info',
+                },
+                {
+                    one: 'Namespace',
                     many: 'Pod',
                     metric: 'kube_pod_info',
                 },
             ],
         },
         Node: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/infrastructure_components/unlabeled/node-128.png",
             namespaced: false,
             info: [
                 {
@@ -136,6 +157,7 @@
             ],
         },
         Pod: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/pod-128.png",
             namespaced: true,
             info: [
                 {
@@ -154,6 +176,7 @@
             ],
         },
         ReplicaSet: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/rs-128.png",
             namespaced: true,
             info: [],
             relationships: [
@@ -167,6 +190,7 @@
             ],
         },
         StatefulSet: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/sts-128.png",
             namespaced: true,
             info: [],
             relationships: [
