@@ -131,7 +131,7 @@ local addRelationships(kind) =
     local link = '/d/%s/explore-%s?%s' % [std.md5(r.one), oneVar, std.join('&', linkVars)];
 
     d.chain([
-      c.addTextPanel(r.one),
+      c.addLinkPanel(r.one, r.one),
       c.addLabelPanel(query, oneLabel, link=link),
       c.nextRow,
     ]);
@@ -182,7 +182,7 @@ local addRelationships(kind) =
     local link = '/d/%s/explore-%s?%s' % [std.md5(r.many), manyLabel, std.join('&', linkVars)];
 
     d.chain([
-      c.addTextPanel(r.many + '(s)', height=4),
+      c.addLinkPanel(r.many, r.many + '(s)', height=4),
       c.addTablePanel(query, manyLabel, link=link),
       c.nextRow,
     ]);

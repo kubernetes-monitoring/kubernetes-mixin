@@ -1,5 +1,6 @@
 local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet';
 local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonnet';
+local model = import 'model.libsonnet';
 
 {
   dashboard(kind):
@@ -67,6 +68,30 @@ local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonn
       .nextRow(),
 
   nextRow(d): d.nextRow(),
+
+  addLinkPanel(kind, text, height=2):
+    local icon = model.kinds[kind].icon;
+    function(d)
+        d.addPanel({
+            gridPos: {
+                w: 8,
+                h: height,
+            },
+            type: 'text',
+            options: {
+                mode: 'html',
+                content: |||
+                    <div style="padding: 0px;">
+                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
+                            <img style="height: 32px; width: 32px; margin-right: 10px;" src="%s" alt="%s"/>
+                            <h2 style="margin-top: 5px;">%s</h1>
+                        </div>
+                    </div>
+                ||| % [icon, kind, text],
+            },
+            transparent: true,
+            datasource: null,
+        }),
 
   addTextPanel(text, height=2):
     function(d)
