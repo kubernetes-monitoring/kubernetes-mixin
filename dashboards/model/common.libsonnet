@@ -47,7 +47,7 @@ local model = import 'model.libsonnet';
           query='',
           refresh=1,
           regex='',
-          //hide=2,
+          hide=2,
         )
       ),
 
@@ -72,40 +72,40 @@ local model = import 'model.libsonnet';
   addLinkPanel(kind, text, height=2):
     local icon = model.kinds[kind].icon;
     function(d)
-        d.addPanel({
-            gridPos: {
-                w: 8,
-                h: height,
-            },
-            type: 'text',
-            options: {
-                mode: 'html',
-                content: |||
-                    <div style="padding: 0px;">
-                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
-                            <img style="height: 32px; width: 32px; margin-right: 10px;" src="%s" alt="%s"/>
-                            <h2 style="margin-top: 5px;">%s</h1>
-                        </div>
-                    </div>
-                ||| % [icon, kind, text],
-            },
-            transparent: true,
-            datasource: null,
-        }),
+      d.addPanel({
+        gridPos: {
+          w: 8,
+          h: height,
+        },
+        type: 'text',
+        options: {
+          mode: 'html',
+          content: |||
+            <div style="padding: 0px;">
+                <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
+                    <img style="height: 32px; width: 32px; margin-right: 10px;" src="%s" alt="%s"/>
+                    <h2 style="margin-top: 5px;">%s</h1>
+                </div>
+            </div>
+          ||| % [icon, kind, text],
+        },
+        transparent: true,
+        datasource: null,
+      }),
 
-  addTextPanel(text, height=2):
+  addTextPanel(text, width=8, height=2):
     function(d)
       d.addPanel({
         type: 'text',
         title: '',
         gridPos: {
-          w: 8,
+          w: width,
           h: height,
         },
         transparent: true,
         options: {
           mode: 'markdown',
-          content: '## %s' % text,
+          content: '%s' % text,
         },
       }),
 
@@ -437,4 +437,33 @@ local model = import 'model.libsonnet';
         ],
         datasource: null,
       }),
+
+  addLogsPanel(query):
+    function(d)
+      d.addPanel({
+          gridPos: {
+            w: 12,
+            h: 8,
+          },
+          type: 'logs',
+          title: 'Pod Logs',
+          targets: [
+            {
+              refId: 'A',
+              datasource: 'Grafana Logging',
+              expr: query,
+            },
+          ],
+          options: {
+            showTime: false,
+            showLabels: false,
+            showCommonLabels: false,
+            wrapLogMessage: false,
+            prettifyLogMessage: false,
+            enableLogDetails: true,
+            dedupStrategy: 'none',
+            sortOrder: 'Descending',
+          },
+          datasource: 'Grafana Logging',
+        }),
 }

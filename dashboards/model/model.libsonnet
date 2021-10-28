@@ -210,6 +210,13 @@
       namespaced: true,
       info: [
         {
+          name: 'Status',
+          type: 'label',
+          metric: 'kube_pod_status_phase',
+          label: 'phase',
+          value: 1,
+        },
+        {
           name: 'Pod IP',
           type: 'label',
           metric: 'kube_pod_info',
@@ -227,7 +234,18 @@
     ReplicaSet: {
       icon: 'https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/rs-128.png',
       namespaced: true,
-      info: [],
+      info: [
+        {
+          name: 'Intended Replicas',
+          type: 'number',
+          metric: 'kube_replicaset_spec_replicas',
+        },
+        {
+          name: 'Current Replicas',
+          type: 'number',
+          metric: 'kube_replicaset_status_replicas',
+        },
+      ],
       relationships: [
         {
           one: 'ReplicaSet',
@@ -241,7 +259,23 @@
     StatefulSet: {
       icon: 'https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/sts-128.png',
       namespaced: true,
-      info: [],
+      info: [
+        {
+          name: 'Created On',
+          type: 'datetime',
+          metric: 'kube_statefulset_created',
+        },
+        {
+          name: 'Intended Replicas',
+          type: 'number',
+          metric: 'kube_statefulset_replicas',
+        },
+        {
+          name: 'Current Replicas',
+          type: 'number',
+          metric: 'kube_statefulset_status_replicas',
+        },
+      ],
       relationships: [
         {
           one: 'StatefulSet',

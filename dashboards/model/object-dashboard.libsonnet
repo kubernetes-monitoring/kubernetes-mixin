@@ -53,16 +53,16 @@ local infoRows(kind) =
     local kindLabel = std.asciiLower(kind);
     local d2 = d.chain([
       c.nextRow,
-      c.addTextPanel('Labels'),
+      c.addTextPanel('## Labels'),
       c.addLabelTablePanel('kube_%s_labels{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], 'label_.+'),
       c.nextRow,
-      c.addTextPanel('Annotations'),
+      c.addTextPanel('## Annotations'),
       c.addLabelTablePanel('kube_%s_annotations{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], 'annotations_.+'),
       c.nextRow,
     ]);
     std.foldl(function(d, i)
       d.chain([
-        c.addTextPanel(i.name),
+        c.addTextPanel('## %s' % i.name),
         infoPanel(kind, i),
         c.nextRow,
       ]), model.kinds[kind].info, d2);
