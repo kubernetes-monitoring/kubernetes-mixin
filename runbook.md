@@ -125,5 +125,5 @@ This page collects this repositories alerts and begins the process of describing
 
 ## Other Kubernetes Runbooks and troubleshooting
 + [Troubleshoot Clusters ](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/)
-+ [Cloud.gov Kubernetes Runbook ](https://cloud.gov/docs/ops/runbook/troubleshooting-kubernetes/)
++ [Cloud.gov Kubernetes Runbook ](https://landing.app.cloud.gov/docs/ops/runbook/troubleshooting-kubernetes/)
 + [Recover a Broken Cluster](https://codefresh.io/Kubernetes-Tutorial/recover-broken-kubernetes-cluster/)
