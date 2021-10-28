@@ -27,29 +27,29 @@ local headerPanel(kind) =
     });
 
 local headerPanel(kind) =
-    local kindLabel = std.asciiLower(kind);
-    local icon = model.kinds[kind].icon;
-    function(d)
-        d.addPanel({
-            "gridPos": {
-                "w": 24,
-                "h": 2
-            },
-            "type": "text",
-            "options": {
-                "mode": "html",
-                "content": |||
-                    <div style="padding: 0px;">
-                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
-                            <img style="height: 48px; width: 48px; margin-right: 10px;" src="%s" alt="%s"/>
-                            <h1 style="margin-top: 5px;">%s: $%s</h1>
-                        </div>
-                    </div>
-                ||| % [icon, kind, kind, kindLabel],
-            },
-            "transparent": true,
-            "datasource": null
-        });
+  local kindLabel = std.asciiLower(kind);
+  local icon = model.kinds[kind].icon;
+  function(d)
+    d.addPanel({
+      gridPos: {
+        w: 24,
+        h: 2,
+      },
+      type: 'text',
+      options: {
+        mode: 'html',
+        content: |||
+          <div style="padding: 0px;">
+              <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
+                  <img style="height: 48px; width: 48px; margin-right: 10px;" src="%s" alt="%s"/>
+                  <h1 style="margin-top: 5px;">%s: $%s</h1>
+              </div>
+          </div>
+        ||| % [icon, kind, kind, kindLabel],
+      },
+      transparent: true,
+      datasource: null,
+    });
 
 local infoPanel(kind, info) =
   local kindLabel = std.asciiLower(kind);
