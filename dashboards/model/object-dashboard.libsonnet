@@ -68,18 +68,36 @@ local infoRows(kind) =
       ]), model.kinds[kind].info, d2);
 
 // addRelationships adds rows (linking the current king to other kind) to d.
+//
+// There a 8 cases to think about and test if you change this function...
+//
+// 1. One (namespaced) -> Many (namespaced), eg StatefulSet -> Pod
+// 2. One (non-namespaced) -> Many (namespaced), eg Node -> Pod
+// 3. Many (namespaced) -> One (namespaced), eg Pod -> StatefulSet
+// 4. Many (namespaced) -> One (non-namespaced), eg Pod -> Node
+//
+// There are 4 cases that are possible, but I don't think actually exist:
+//
+// a. One (namespaced) -> Many (non-namespaced), eg ???
+// b. One (non-namespaced) -> Many (non-namespaced), eg ???
+// c. Many (non-namespaced) -> One (namespaced), eg ???
+// d. Many (non-namespaced) -> One (non-namespaced), eg ???
 local addRelationships(kind) =
+
+  // addSingularLinks adds links from kinds on the 'many' side of a relationship
+  // to kinds on the 'one' side of the relationship, eg links from pods -> nodes.
   local addSingularLinks(d, r) =
     local manyLabel = std.asciiLower(r.many);
 
-    // Some relationships don't use the actual name of the type for
-    // the 'one' side of the link (they use owner_name).
+    // Some relationships don't use the actual name of the kind for the 'one'
+    // side of the link (eg kube_pod_owner, where we use owner_name).
+    local oneVar = std.asciiLower(r.one);
     local oneLabel =
       if 'one_label' in r
       then r.one_label
       else std.asciiLower(r.one);
 
-    // If the 'one' side of the relationships (eg pod -> controller) is
+    // If the 'one' side of the relationship (eg pod -> controller) is
     // namespaced, we need to group by that label to enrich the link.
     local groupLabels =
       if model.kinds[r.one].namespaced
@@ -101,7 +119,16 @@ local addRelationships(kind) =
        else []);
 
     local query = 'group by (%s) (%s{%s})' % [std.join(',', groupLabels), r.metric, std.join(',', selectors)];
-    local link = '/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=${__data.fields.namespace}&var-%s=${__series.name}' % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
+
+    local linkVars = [
+      'var-datasource=$datasource',
+      'var-cluster=$cluster',
+      if model.kinds[r.one].namespaced
+      then 'var-namespace=${__field.labels.namespace}',
+      'var-%s=${__field.labels.%s}' % [oneVar, oneLabel],
+    ];
+
+    local link = '/d/%s/explore-%s?%s' % [std.md5(r.one), oneVar, std.join('&', linkVars)];
 
     d.chain([
       c.addTextPanel(r.one),
@@ -109,22 +136,27 @@ local addRelationships(kind) =
       c.nextRow,
     ]);
 
+  // addListLinks adds links from kinds on the 'one' side of a relationship
+  // to kinds on the 'many' side of the relationship, eg links from node -> pods.
   local addListLinks(d, r) =
     local manyLabel = std.asciiLower(r.many);
 
-    // Some relationships don't use the actual name of the type for the one side of the link (they use owner_name).
+    // Some relationships don't use the actual name of the kind for the 'one'
+    // side of the link (eg kube_pod_owner, where we use owner_name).
     local oneLabel =
       if 'one_label' in r
       then r.one_label
       else std.asciiLower(r.one);
 
-    // If the many (eg node -> pods) are namespace, we need to group by that label to enrich the link.
+    // If the 'many' side of the relationship (eg node -> pods) is namespaced,
+    // we need to group by that label to enrich the link.
     local groupLabels =
       if model.kinds[r.many].namespaced
       then ['namespace', manyLabel]
       else [manyLabel];
 
-    // If the one (eg pod -> controller) is namespace, we need to include that in the selectors.
+    // If the 'one' side of the relatioship (eg pod -> controller) is namespaced,
+    // we need to include that in the selectors.
     local selectors =
       [
         'cluster="$cluster"',
@@ -138,7 +170,16 @@ local addRelationships(kind) =
        else []);
 
     local query = 'group by (%s) (%s{%s})' % [std.join(',', groupLabels), r.metric, std.join(',', selectors)];
-    local link = '/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=${__data.fields.namespace}&var-%s=${__data.fields.%s}' % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
+
+    local linkVars = [
+      'var-datasource=$datasource',
+      'var-cluster=$cluster',
+      if model.kinds[r.many].namespaced
+      then 'var-namespace=${__data.fields.namespace}',
+      'var-%s=${__data.fields.%s}' % [manyLabel, manyLabel],
+    ];
+
+    local link = '/d/%s/explore-%s?%s' % [std.md5(r.many), manyLabel, std.join('&', linkVars)];
 
     d.chain([
       c.addTextPanel(r.many + '(s)', height=4),
