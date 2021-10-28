@@ -199,6 +199,12 @@
                 },
             ],
         },
+        Persistentvolumeclaims: {
+            icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/pvc-128.png",
+            namespaced: true,
+            info: [],
+            relationships: [],
+        },
         Pod: {
             icon: "https://github.com/kubernetes/community/raw/master/icons/png/resources/unlabeled/pod-128.png",
             namespaced: true,

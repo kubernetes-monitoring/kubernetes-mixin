@@ -67,69 +67,100 @@ local infoRows(kind) =
                 c.nextRow,
             ]), model.kinds[kind].info, d2);
 
-// eg manyToOne(pod) adds rows for namespace, node, statefulset etc...
-local manyToOne(many) =
+// addRelationships adds rows (linking the current king to other kind) to d.
+local addRelationships(kind) =
+    local addSingularLinks(d, r) =
+        local manyLabel = std.asciiLower(r.many);
+
+        // Some relationships don't use the actual name of the type for
+        // the 'one' side of the link (they use owner_name).
+        local oneLabel =
+            if 'one_label' in r
+            then r.one_label
+            else std.asciiLower(r.one);
+
+        // If the 'one' side of the relationships (eg pod -> controller) is
+        // namespaced, we need to group by that label to enrich the link.
+        local groupLabels =
+            if model.kinds[r.one].namespaced
+            then ['namespace', oneLabel]
+            else [oneLabel];
+
+        // I'm the 'many' side of the relationship; if I'm namespaced, we
+        // need to include that in the selectors.
+        local selectors =
+            [
+                'cluster="$cluster"',
+                '%s="$%s"' % [manyLabel, manyLabel],
+            ] +
+            (if model.kinds[r.many].namespaced
+            then ['namespace="$namespace"']
+            else []) +
+            (if 'filters' in r
+            then r.filters
+            else []);
+
+        local query = 'group by (%s) (%s{%s})' % [std.join(',', groupLabels), r.metric, std.join(',', selectors)];
+        local link = "/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=${__data.fields.namespace}&var-%s=${__series.name}" % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
+
+        d.chain([
+            c.addTextPanel(r.one),
+            c.addLabelPanel(query, oneLabel, link=link),
+            c.nextRow,
+        ]);
+
+    local addListLinks(d, r) =
+        local manyLabel = std.asciiLower(r.many);
+
+        // Some relationships don't use the actual name of the type for the one side of the link (they use owner_name).
+        local oneLabel =
+            if 'one_label' in r
+            then r.one_label
+            else std.asciiLower(r.one);
+
+        // If the many (eg node -> pods) are namespace, we need to group by that label to enrich the link.
+        local groupLabels =
+            if model.kinds[r.many].namespaced
+            then ['namespace', manyLabel]
+            else [manyLabel];
+
+        // If the one (eg pod -> controller) is namespace, we need to include that in the selectors.
+        local selectors =
+            [
+                'cluster="$cluster"',
+                '%s="$%s"' % [oneLabel, std.asciiLower(r.one)],
+            ] +
+            (if model.kinds[r.one].namespaced
+            then ['namespace="$namespace"']
+            else []) +
+            (if 'filters' in r
+            then r.filters
+            else []);
+
+        local query = 'group by (%s) (%s{%s})' % [std.join(',', groupLabels), r.metric, std.join(',', selectors)];
+        local link = "/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=${__data.fields.namespace}&var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
+
+        d.chain([
+            c.addTextPanel(r.many + '(s)', height=4),
+            c.addTablePanel(query, manyLabel, link=link),
+            c.nextRow,
+        ]);
+
     function(d)
-        std.foldl(function(d, r)
-            local manyLabel = std.asciiLower(r.many);
-            local oneLabel =
-                if 'one_label' in r
-                then r.one_label
-                else std.asciiLower(r.one);
-            local filters =
-                [
-                    'cluster="$cluster"',
-                    '%s="$%s"' % [manyLabel, manyLabel],
-                ] +
-                (if model.kinds[r.many].namespaced
-                then ['namespace="$namespace"']
-                else []) +
-                (if 'filters' in r
-                then r.filters
-                else []);
-            local query = 'group by (%s) (%s{%s})' % [oneLabel, r.metric, std.join(',', filters)];
-            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-%s=${__series.name}" % [std.md5(r.one), std.asciiLower(r.one), std.asciiLower(r.one)];
-
-            if r.many == many
-            then d.chain([
-                c.addTextPanel(r.one),
-                c.addLabelPanel(query, oneLabel, link=link),
-                c.nextRow,
-            ])
-            else d,
-        model.relationships, d);
-
-// eg manyToOne(node) adds rows for pod etc...
-local oneToMany(one) =
-    function(d)
-        std.foldl(function(d, r)
-            local manyLabel = std.asciiLower(r.many);
-            local oneLabel =
-                if 'one_label' in r
-                then r.one_label
-                else std.asciiLower(r.one);
-             local filters =
-                [
-                    'cluster="$cluster"',
-                    '%s="$%s"' % [oneLabel, std.asciiLower(r.one)],
-                ] +
-                (if model.kinds[r.one].namespaced
-                then ['namespace="$namespace"']
-                else []) +
-                (if 'filters' in r
-                then r.filters
-                else []);
-            local query = 'group by (%s) (%s{%s})' % [manyLabel, r.metric, std.join(',', filters)];
-            local link = "/d/%s/explore-%s?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-%s=${__data.fields.%s}" % [std.md5(r.many), std.asciiLower(r.many), std.asciiLower(r.many), manyLabel];
-
-            if r.one == one
-            then d.chain([
-                c.addTextPanel(r.many + '(s)', height=4),
-                c.addTablePanel(query, manyLabel, link=link),
-                c.nextRow,
-            ])
-            else d,
-        model.relationships, d);
+        d.chain([
+            function(d)
+                std.foldl(function(d, r)
+                        if r.many == kind
+                        then addSingularLinks(d, r)
+                        else d,
+                    model.relationships, d),
+            function(d)
+                std.foldl(function(d, r)
+                        if r.one == kind
+                        then addListLinks(d, r)
+                        else d,
+                    model.relationships, d),
+        ]);
 
 local dashboardForKind(kind) =
     local kindLabel = std.asciiLower(kind);
@@ -142,8 +173,7 @@ local dashboardForKind(kind) =
         c.addRow('Info'),
         infoRows(kind),
         c.addRow('Related Objects'),
-        manyToOne(kind),
-        oneToMany(kind),
+        addRelationships(kind),
     ]);
 
 {

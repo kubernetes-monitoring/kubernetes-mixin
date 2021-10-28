@@ -310,7 +310,7 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                     "w": 16,
                 },
                 "options": {
-                    "showHeader": false
+                    "showHeader": true
                 },
                 "targets": [
                     {
@@ -332,10 +332,15 @@ local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet
                         "id": "organize",
                         "options": {
                             "excludeByName": {
-                            "Time": true,
-                            "Value": true
+                                "Time": true,
+                                "Value": true,
                             },
-                            "indexByName": {},
+                            "indexByName": {
+                                "Time": 0,
+                                "Value": 1,
+                                "namespace": 2,
+                                [label]: 3,
+                            },
                             "renameByName": {}
                         }
                     }
