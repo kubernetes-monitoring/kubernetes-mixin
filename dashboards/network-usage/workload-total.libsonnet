@@ -5,7 +5,6 @@ local prometheus = grafana.prometheus;
 local template = grafana.template;
 local graphPanel = grafana.graphPanel;
 local annotation = grafana.annotation;
-local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {

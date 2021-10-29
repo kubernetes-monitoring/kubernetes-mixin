@@ -6,7 +6,6 @@ local template = grafana.template;
 local graphPanel = grafana.graphPanel;
 local tablePanel = grafana.tablePanel;
 local annotation = grafana.annotation;
-local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
