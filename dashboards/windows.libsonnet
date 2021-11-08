@@ -1,12 +1,8 @@
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
-local row = grafana.row;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 local graphPanel = grafana.graphPanel;
-local promgrafonnet = import '../lib/promgrafonnet/promgrafonnet.libsonnet';
-local numbersinglestat = promgrafonnet.numbersinglestat;
-local gauge = promgrafonnet.gauge;
 local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libsonnet';
 
 {

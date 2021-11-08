@@ -1,6 +1,4 @@
-local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libsonnet';
-local template = grafana.template;
 
 {
   grafanaDashboards+::

@@ -1,10 +1,8 @@
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
-local row = grafana.row;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 local graphPanel = grafana.graphPanel;
-local tablePanel = grafana.tablePanel;
 local statPanel = grafana.statPanel;
 
 {

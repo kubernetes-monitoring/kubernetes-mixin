@@ -15,7 +15,6 @@
 
   prometheusRules+:: {
     local SLODays = $._config.SLOs.apiserver.days + 'd',
-    local SLOTarget = $._config.SLOs.apiserver.target,
     local verbs = [
       { type: 'read', selector: $._config.kubeApiserverReadSelector },
       { type: 'write', selector: $._config.kubeApiserverWriteSelector },
