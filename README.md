@@ -1,4 +1,5 @@
 # Prometheus Monitoring Mixin for Kubernetes
+[![ci](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml/badge.svg)](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml)
 
 > NOTE: This project is *pre-release* stage. Flags, configuration, behaviour and design may change significantly in following releases.
 
