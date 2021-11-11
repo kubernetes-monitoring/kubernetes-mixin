@@ -51,7 +51,7 @@ local template = grafana.template;
         includeAll=false,
         sort=1
       ),
-    'k8s-resources-workload.json':
+    [if $._config.dashboards.resources_enabled then 'k8s-resources-workload.json']:
       local tableStyles = {
         pod: {
           alias: 'Pod',

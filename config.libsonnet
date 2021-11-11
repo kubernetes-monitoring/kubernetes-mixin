@@ -17,6 +17,28 @@
       },
     },
 
+    dashboards: {
+      network_enabled: true,
+      persistentvolumesusage_enabled: true,
+      resources_enabled: true,
+      apiserver_enabled: true,
+      controller_manager_enabled: true,
+      scheduler_enabled: true,
+      proxy_enabled: true,
+      kubelet_enabled: true,
+    },
+
+    alerts: {
+      apps_enabled: true,
+      resource_enabled: true,
+      storage_enabled: true,
+      system_enabled: true,
+      kube_apiserver_enabled: true,
+      kubelet_enabled: true,
+      kube_scheduler_enabled: true,
+      kube_controller_manager_enabled: true,
+    },
+
     // Selectors are inserted between {} in Prometheus queries.
     cadvisorSelector: 'job="cadvisor"',
     kubeletSelector: 'job="kubelet"',

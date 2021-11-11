@@ -18,7 +18,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.resource_enabled then 'groups']+: [
       {
         name: 'kubernetes-resources',
         rules: [

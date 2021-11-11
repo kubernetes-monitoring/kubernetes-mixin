@@ -27,7 +27,7 @@ local template = grafana.template;
         includeAll=false,
         sort=1
       ),
-    'k8s-resources-namespace.json':
+    [if $._config.dashboards.resources_enabled then 'k8s-resources-namespace.json']:
       local tableStyles = {
         pod: {
           alias: 'Pod',

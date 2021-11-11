@@ -16,7 +16,7 @@ local template = grafana.template;
         sort=1
       ),
 
-    'k8s-resources-cluster.json':
+    [if $._config.dashboards.resources_enabled then 'k8s-resources-cluster.json']:
       local tableStyles = {
         namespace: {
           alias: 'Namespace',

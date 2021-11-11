@@ -10,7 +10,7 @@ local singlestat = grafana.singlestat;
 {
   grafanaDashboards+:: {
 
-    'pod-total.json':
+    [if $._config.dashboards.network_enabled then 'pod-total.json']:
 
       local newGaugePanel(gaugeTitle, gaugeQuery) =
         local target =

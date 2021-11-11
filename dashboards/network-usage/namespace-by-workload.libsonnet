@@ -10,7 +10,7 @@ local annotation = grafana.annotation;
 {
   grafanaDashboards+:: {
 
-    'namespace-by-workload.json':
+    [if $._config.dashboards.network_enabled then 'namespace-by-workload.json']:
 
       local newStyle(
         alias,

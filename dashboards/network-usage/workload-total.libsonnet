@@ -9,7 +9,7 @@ local annotation = grafana.annotation;
 {
   grafanaDashboards+:: {
 
-    'workload-total.json':
+    [if $._config.dashboards.network_enabled then 'workload-total.json']:
 
       local newBarplotPanel(graphTitle, graphQuery, graphFormat='Bps', legendFormat='{{namespace}}') =
         local target =

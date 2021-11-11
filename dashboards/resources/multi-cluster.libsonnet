@@ -3,7 +3,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 {
   grafanaDashboards+::
     if $._config.showMultiCluster then {
-      'k8s-resources-multicluster.json':
+      [if $._config.dashboards.resources_enabled then 'k8s-resources-multicluster.json']:
         local tableStyles = {
           [$._config.clusterLabel]: {
             alias: 'Cluster',

@@ -6,7 +6,7 @@
   },
 
   prometheusAlerts+:: {
-    groups+: [
+    [if $._config.alerts.apps_enabled then 'groups']+: [
       {
         name: 'kubernetes-apps',
         rules: [

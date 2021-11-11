@@ -11,7 +11,7 @@ local singlestat = grafana.singlestat;
 {
   grafanaDashboards+:: {
 
-    'namespace-by-pod.json':
+    [if $._config.dashboards.network_enabled then 'namespace-by-pod.json']:
 
       local newStyle(
         alias,
