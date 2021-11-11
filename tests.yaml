@@ -860,3 +860,89 @@ tests:
           summary: "Pod is crash looping."
   - eval_time: 21m    # alert recovers
     alertname: KubePodCrashLooping
+
+# When ResourceQuota has both cpu and requests.cpu, min value of those will be taken into account for quota calculation.
+- interval: 1m
+  input_series:
+  - series: 'kube_resourcequota{namespace="test", resource="cpu", type="hard", job="kube-state-metrics"}'
+    values: '1000x10'
+  - series: 'kube_resourcequota{namespace="test", resource="requests.cpu", type="hard", job="kube-state-metrics"}'
+    values: '100x10'
+  - series: 'kube_resourcequota{namespace="test1", resource="requests.cpu", type="hard", job="kube-state-metrics"}'
+    values: '50x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n1", resource="cpu", job="kube-state-metrics"}'
+    values: '100x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n2", resource="cpu", job="kube-state-metrics"}'
+    values: '100x10'
+  alert_rule_test:
+  - eval_time: 4m
+    alertname: KubeCPUQuotaOvercommit
+  - eval_time: 5m    # alert shouldn't fire
+    alertname: KubeCPUQuotaOvercommit
+- interval: 1m
+  input_series:
+  - series: 'kube_resourcequota{namespace="test", resource="cpu", type="hard", job="kube-state-metrics"}'
+    values: '1000x10'
+  - series: 'kube_resourcequota{namespace="test", resource="requests.cpu", type="hard", job="kube-state-metrics"}'
+    values: '200x10'
+  - series: 'kube_resourcequota{namespace="test1", resource="requests.cpu", type="hard", job="kube-state-metrics"}'
+    values: '200x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n1", resource="cpu", job="kube-state-metrics"}'
+    values: '100x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n2", resource="cpu", job="kube-state-metrics"}'
+    values: '100x10'
+  alert_rule_test:
+  - eval_time: 4m
+    alertname: KubeCPUQuotaOvercommit
+  - eval_time: 5m    # alert shouldn't fire
+    alertname: KubeCPUQuotaOvercommit
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+      exp_annotations:
+        description: 'Cluster has overcommitted CPU resource requests for Namespaces.'
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecpuquotaovercommit"
+        summary: "Cluster has overcommitted CPU resource requests."
+
+# When ResourceQuota has both memory and requests.memory, min value of those will be taken into account for quota calculation.
+- interval: 1m
+  input_series:
+  - series: 'kube_resourcequota{namespace="test", resource="memory", type="hard", job="kube-state-metrics"}'
+    values: '1000x10'
+  - series: 'kube_resourcequota{namespace="test", resource="requests.memory", type="hard", job="kube-state-metrics"}'
+    values: '100x10'
+  - series: 'kube_resourcequota{namespace="test1", resource="requests.memory", type="hard", job="kube-state-metrics"}'
+    values: '50x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n1", resource="memory", job="kube-state-metrics"}'
+    values: '100x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n2", resource="memory", job="kube-state-metrics"}'
+    values: '100x10'
+  alert_rule_test:
+  - eval_time: 4m
+    alertname: KubeMemoryQuotaOvercommit
+  - eval_time: 5m    # alert shouldn't fire
+    alertname: KubeMemoryQuotaOvercommit
+- interval: 1m
+  input_series:
+  - series: 'kube_resourcequota{namespace="test", resource="memory", type="hard", job="kube-state-metrics"}'
+    values: '1000x10'
+  - series: 'kube_resourcequota{namespace="test", resource="requests.memory", type="hard", job="kube-state-metrics"}'
+    values: '500x10'
+  - series: 'kube_resourcequota{namespace="test1", resource="requests.memory", type="hard", job="kube-state-metrics"}'
+    values: '500x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n1", resource="memory", job="kube-state-metrics"}'
+    values: '10x10'
+  - series: 'kube_node_status_allocatable{namespace="monitoring", node="n2", resource="memory", job="kube-state-metrics"}'
+    values: '10x10'
+  alert_rule_test:
+  - eval_time: 4m
+    alertname: KubeMemoryQuotaOvercommit
+  - eval_time: 5m    # alert shouldn't fire
+    alertname: KubeMemoryQuotaOvercommit
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+      exp_annotations:
+        description: 'Cluster has overcommitted memory resource requests for Namespaces.'
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubememoryquotaovercommit"
+        summary: "Cluster has overcommitted memory resource requests."
