@@ -77,7 +77,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           .addPanel(
             g.panel('Memory Usage (w/o cache)') +
             // Not using container_memory_usage_bytes here because that includes page cache
-            g.queryPanel('sum(container_memory_rss{%(kubeletSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config) +
+            g.queryPanel('sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config, '{{%(clusterLabel)s}}' % $._config) +
             { fill: 0, linewidth: 2, yaxes: g.yaxes('bytes') },
           )
         )
@@ -87,11 +87,11 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
             g.panel('Requests by Cluster') +
             g.tablePanel([
               // Not using container_memory_usage_bytes here because that includes page cache
-              'sum(container_memory_rss{%(kubeletSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config,
+              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config,
               'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
-              'sum(container_memory_rss{%(kubeletSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
+              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
               'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
-              'sum(container_memory_rss{%(kubeletSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
+              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
             ], tableStyles {
               'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
               'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
