@@ -351,7 +351,6 @@ local statPanel = grafana.statPanel;
       .addPanel(requestDuration, gridPos={ h: 7, w: 24, x: 0, y: 70 })
       .addPanel(memory, gridPos={ h: 7, w: 8, x: 0, y: 77 })
       .addPanel(cpu, gridPos={ h: 7, w: 8, x: 8, y: 77 })
-      .addPanel(goroutines, gridPos={ h: 7, w: 8, x: 16, y: 77 })
-      + { refresh: $._config.grafanaK8s.refresh },
+      .addPanel(goroutines, gridPos={ h: 7, w: 8, x: 16, y: 77 }),
   },
 }

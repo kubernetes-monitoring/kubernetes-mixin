@@ -140,8 +140,7 @@ local template = grafana.template;
          })
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.statPanel('1 - sum(avg by (mode) (rate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode=~"idle|iowait|steal", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])))' % $._config) +
-          { interval: $._config.grafanaK8s.minimumTimeInterval },
+          g.statPanel('1 - sum(avg by (mode) (rate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode=~"idle|iowait|steal", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])))' % $._config)
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
@@ -324,9 +323,9 @@ local template = grafana.template;
           },
         )
       ) + {
-        tags: $._config.grafanaK8s.dashboardTags,
-        templating+: { list+: [clusterTemplate] },
-        refresh: $._config.grafanaK8s.refresh,
+        templating+: {
+          list+: [clusterTemplate],
+        },
       },
   },
 }

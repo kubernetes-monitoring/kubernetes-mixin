@@ -259,13 +259,13 @@ local template = grafana.template;
           g.panel('Receive Bandwidth') +
           g.queryPanel('sum(irate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('Bps') },
         )
         .addPanel(
           g.panel('Transmit Bandwidth') +
           g.queryPanel('sum(irate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('Bps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('Bps') },
         )
       )
       .addRow(
@@ -274,13 +274,13 @@ local template = grafana.template;
           g.panel('Rate of Received Packets') +
           g.queryPanel('sum(irate(container_network_receive_packets_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps') },
         )
         .addPanel(
           g.panel('Rate of Transmitted Packets') +
           g.queryPanel('sum(irate(container_network_transmit_packets_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps') },
         )
       )
       .addRow(
@@ -289,13 +289,13 @@ local template = grafana.template;
           g.panel('Rate of Received Packets Dropped') +
           g.queryPanel('sum(irate(container_network_receive_packets_dropped_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps') },
         )
         .addPanel(
           g.panel('Rate of Transmitted Packets Dropped') +
           g.queryPanel('sum(irate(container_network_transmit_packets_dropped_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('pps'), interval: $._config.grafanaK8s.minimumTimeInterval },
+          { yaxes: g.yaxes('pps') },
         )
       )
       .addRow(
@@ -343,6 +343,10 @@ local template = grafana.template;
             },
           },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate, podTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + {
+        templating+: {
+          list+: [clusterTemplate, namespaceTemplate, podTemplate],
+        },
+      },
   },
 }

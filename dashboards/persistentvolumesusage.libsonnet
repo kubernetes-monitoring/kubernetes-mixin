@@ -167,6 +167,6 @@ local gauge = promgrafonnet.gauge;
         row.new()
         .addPanel(inodesGraph)
         .addPanel(inodeGauge)
-      ) + { refresh: $._config.grafanaK8s.refresh },
+      ),
   },
 }
