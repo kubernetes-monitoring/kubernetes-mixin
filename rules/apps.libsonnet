@@ -62,7 +62,7 @@
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests',
             expr: |||
               kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
+              group_left() max by (namespace, pod, %(clusterLabel)s) (
                 (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
             ||| % $._config,
@@ -85,7 +85,7 @@
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests',
             expr: |||
               kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
+              group_left() max by (namespace, pod, %(clusterLabel)s) (
                 (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
             ||| % $._config,
@@ -108,7 +108,7 @@
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_limits',
             expr: |||
               kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
+              group_left() max by (namespace, pod, %(clusterLabel)s) (
                 (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
             ||| % $._config,
@@ -131,7 +131,7 @@
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits',
             expr: |||
               kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
+              group_left() max by (namespace, pod, %(clusterLabel)s) (
                (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
                )
             ||| % $._config,
