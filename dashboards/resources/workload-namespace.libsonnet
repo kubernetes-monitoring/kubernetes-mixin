@@ -39,7 +39,7 @@ local template = grafana.template;
       template.new(
         name='namespace',
         datasource='$datasource',
-        query='label_values(kube_pod_info{%(kubeStateMetricsSelector)s}, %(clusterLabel)s="$cluster"}, namespace)' % $._config,
+        query='label_values(kube_pod_info{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster"}, namespace)' % $._config,
         current='',
         hide='',
         refresh=2,
