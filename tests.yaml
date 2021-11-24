@@ -76,6 +76,29 @@ tests:
   - eval_time: 4m
     alertname: KubePersistentVolumeFillingUp
 
+  # Don't alert when PVC has been labelled as fully utilised
+- interval: 1m
+  input_series:
+    - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024 512 64 16'
+    - series: 'kubelet_volume_stats_capacity_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024 1024 1024 1024'
+    - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '16 64 512 1024'
+    - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+      values: '1 1 1 1'
+    - series: 'kube_persistentvolumeclaim_labels{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc",label_excluded_from_alerts="true"}'
+      values: '1 1 1 1'
+  alert_rule_test:
+    - eval_time: 1m
+      alertname: KubePersistentVolumeFillingUp
+    - eval_time: 2m
+      alertname: KubePersistentVolumeFillingUp
+    - eval_time: 3m
+      alertname: KubePersistentVolumeFillingUp
+    - eval_time: 4m
+      alertname: KubePersistentVolumeFillingUp
+
 - interval: 1m
   input_series:
   - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
@@ -159,6 +182,22 @@ tests:
   alert_rule_test:
   - eval_time: 61m
     alertname: KubePersistentVolumeFillingUp
+
+- interval: 1m
+  input_series:
+    - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024-10x61'
+    - series: 'kubelet_volume_stats_capacity_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '32768+0x61'
+    - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024+10x61'
+    - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+      values: '1x61'
+    - series: 'kube_persistentvolumeclaim_labels{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc",label_excluded_from_alerts="true"}'
+      values: '1x61'
+  alert_rule_test:
+    - eval_time: 61m
+      alertname: KubePersistentVolumeFillingUp
 
 - interval: 1m
   input_series:
