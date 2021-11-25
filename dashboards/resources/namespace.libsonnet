@@ -285,8 +285,7 @@ local template = grafana.template;
           g.tablePanel(
             networkColumns,
             networkTableStyles
-          ) +
-          { interval: $._config.grafanaK8s.minimumTimeInterval },
+          ),
         )
       )
       .addRow(
@@ -365,6 +364,10 @@ local template = grafana.template;
             },
           },
         )
-      ) + { tags: $._config.grafanaK8s.dashboardTags, templating+: { list+: [clusterTemplate, namespaceTemplate] }, refresh: $._config.grafanaK8s.refresh },
+      ) + {
+        templating+: {
+          list+: [clusterTemplate, namespaceTemplate],
+        },
+      },
   },
 }

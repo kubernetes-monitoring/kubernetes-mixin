@@ -100,6 +100,6 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
               'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
             })
           )
-        ) + { tags: $._config.grafanaK8s.dashboardTags, refresh: $._config.grafanaK8s.refresh },
+        ),
     } else {},
 }
