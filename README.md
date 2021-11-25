@@ -90,10 +90,8 @@ Steps to configure wmi_exporter
 
 ## Running the tests
 
-Build the mixins, run the tests:
-
-```
-$ docker run -v $(pwd):/tmp --entrypoint "/bin/promtool" prom/prometheus:latest test rules /tmp/tests.yaml
+```sh
+make test
 ```
 
 ## Using with prometheus-ksonnet
