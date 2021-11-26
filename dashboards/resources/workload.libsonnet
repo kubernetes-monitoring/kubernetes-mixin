@@ -29,11 +29,11 @@ local template = grafana.template;
         sort=1
       ),
 
-    local workloadTemplate =
+    local workloadTypeTemplate =
       template.new(
-        name='workload',
+        name='type',
         datasource='$datasource',
-        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace"}, workload)' % $._config.clusterLabel,
+        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace"}, workload_type)' % $._config.clusterLabel,
         current='',
         hide='',
         refresh=2,
@@ -41,11 +41,11 @@ local template = grafana.template;
         sort=1
       ),
 
-    local workloadTypeTemplate =
+    local workloadTemplate =
       template.new(
-        name='type',
+        name='workload',
         datasource='$datasource',
-        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload"}, workload_type)' % $._config.clusterLabel,
+        query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type="$type"}, workload)' % $._config.clusterLabel,
         current='',
         hide='',
         refresh=2,
@@ -315,7 +315,7 @@ local template = grafana.template;
         )
       ) + {
         templating+: {
-          list+: [clusterTemplate, namespaceTemplate, workloadTemplate, workloadTypeTemplate],
+          list+: [clusterTemplate, namespaceTemplate, workloadTypeTemplate, workloadTemplate],
         },
       },
   },
