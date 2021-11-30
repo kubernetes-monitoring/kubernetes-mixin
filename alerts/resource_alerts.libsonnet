@@ -49,7 +49,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Cluster has overcommitted memory resource requests for Pods by {{ $value }} bytes and cannot tolerate node failure.',
+              description: 'Cluster has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.',
               summary: 'Cluster has overcommitted memory resource requests.',
             },
             'for': '10m',
