@@ -33,6 +33,20 @@
           },
           {
             expr: |||
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 1
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              summary: 'Node is unschedulable.',
+              description: '{{ $labels.node }} has been unschedulable for more than 24 hours.',
+            },
+            'for': '24h',
+            alert: 'KubeNodeUnschedulable',
+          },
+          {
+            expr: |||
               (kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{%(kubeStateMetricsSelector)s,key=~"%(kubeNodeUnreachableIgnoreKeys)s"}) == 1
             ||| % $._config {
               kubeNodeUnreachableIgnoreKeys: std.join('|', super.kubeNodeUnreachableIgnoreKeys),
