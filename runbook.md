@@ -98,19 +98,46 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 ### Group Name: "kubernetes-system"
 ##### Alert Name: "KubeNodeNotReady"
-+ *Message*: `{{ $labels.node }} has been unready for more than an 15 minutes"`
++ *Message*: `{{ $labels.node }} has been unready for more than 15 minutes."`
++ *Severity*: warning
+##### Alert Name: "KubeNodeUnreachable"
++ *Message*: `{{ $labels.node }} is unreachable and some workloads may be rescheduled.`
++ *Severity*: warning
+##### Alert Name: "KubeletTooManyPods"
++ *Message*: `Kubelet '{{ $labels.node }}' is running at {{ $value | humanizePercentage }} of its Pod capacity.`
++ *Severity*: info
+##### Alert Name: "KubeNodeReadinessFlapping"
++ *Message*: `The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.`
++ *Severity*: warning
+##### Alert Name: "KubeletPlegDurationHigh"
++ *Message*: `The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.`
++ *Severity*: warning
+##### Alert Name: "KubeletPodStartUpLatencyHigh"
++ *Message*: `Kubelet Pod startup 99th percentile latency is {{ $value }} seconds on node {{ $labels.node }}.`
++ *Severity*: warning
+##### Alert Name: "KubeletClientCertificateExpiration"
++ *Message*: `Client certificate for Kubelet on node {{ $labels.node }} expires in 7 days.`
++ *Severity*: warning
+##### Alert Name: "KubeletClientCertificateExpiration"
++ *Message*: `Client certificate for Kubelet on node {{ $labels.node }} expires in 1 day.`
++ *Severity*: critical
+##### Alert Name: "KubeletServerCertificateExpiration"
++ *Message*: `Server certificate for Kubelet on node {{ $labels.node }} expires in 7 days.`
++ *Severity*: warning
+##### Alert Name: "KubeletServerCertificateExpiration"
++ *Message*: `Server certificate for Kubelet on node {{ $labels.node }} expires in 1 day.`
++ *Severity*: critical
+##### Alert Name: "KubeletClientCertificateRenewalErrors"
++ *Message*: `Kubelet on node {{ $labels.node }} has failed to renew its client certificate ({{ $value | humanize }} errors in the last 15 minutes).`
++ *Severity*: warning
+##### Alert Name: "KubeletServerCertificateRenewalErrors"
++ *Message*: `Kubelet on node {{ $labels.node }} has failed to renew its server certificate ({{ $value | humanize }} errors in the last 5 minutes).`
 + *Severity*: warning
 ##### Alert Name: "KubeVersionMismatch"
 + *Message*: `There are {{ $value }} different versions of Kubernetes components running.`
 + *Severity*: warning
 ##### Alert Name: "KubeClientErrors"
 + *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors.'`
-+ *Severity*: warning
-##### Alert Name: "KubeClientErrors"
-+ *Message*: `Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf \"%0.0f\" $value }} errors / sec.'`
-+ *Severity*: warning
-##### Alert Name: "KubeletTooManyPods"
-+ *Message*: `Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110.`
 + *Severity*: warning
 ##### Alert Name: "KubeClientCertificateExpiration"
 + *Message*: `A client certificate used to authenticate to the apiserver is expiring in less than 7 days.`
