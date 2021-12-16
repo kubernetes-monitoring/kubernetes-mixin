@@ -18,6 +18,7 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 | release-0.7  | v1.19+             | v2.11.0+  | v1.x  |
 | release-0.8  | v1.20+             | v2.11.0+  | v2.0+ |
 | release-0.9  | v1.20+             | v2.11.0+  | v2.0+ |
+| release-0.10 | v1.20+             | v2.11.0+  | v2.0+ |
 | master       | v1.20+             | v2.11.0+  | v2.0+ |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented.
