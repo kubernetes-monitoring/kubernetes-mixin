@@ -222,7 +222,7 @@ local dashboardForKind(kind) =
 {
   grafanaDashboardFolder: 'Kubernetes Explore',
 
-  grafanaDashboards: {
+  grafanaDashboards+: {
     ['model-%s.json' % std.asciiLower(kind)]: dashboardForKind(kind)
     for kind in std.objectFields(model.kinds)
   },
