@@ -1,9 +1,8 @@
 local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet';
 local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonnet';
 local model = import 'model.libsonnet';
-local config = import '../../config.libsonnet';
 
-config {
+{
   dashboard(kind):
     g.dashboard.new(title='Explore / %s' % kind, refresh='5m', uid=std.md5(kind))
     .setTime(from='now-1h', to='now')
