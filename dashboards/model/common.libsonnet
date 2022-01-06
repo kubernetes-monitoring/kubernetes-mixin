@@ -16,7 +16,7 @@ config {
         datasource='${datasource}',
         label='cluster',
         name='cluster',
-        query='label_values(up{job="%(kubeStateMetricsSelector)s"}, cluster)' % $._config,
+        query='label_values(up{%(kubeStateMetricsSelector)s}, cluster)' % $._config,
         refresh=1,
         regex='',
       )
