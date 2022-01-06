@@ -1,7 +1,6 @@
 local layout = import 'github.com/grafana/grafonnet-lib/contrib/layout.libsonnet';
 local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonnet';
 local model = import 'model.libsonnet';
-local config = import '../../config.libsonnet';
 
 {
   dashboard(kind, config):
