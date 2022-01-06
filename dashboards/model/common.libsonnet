@@ -15,7 +15,7 @@ local model = import 'model.libsonnet';
         datasource='${datasource}',
         label='cluster',
         name='cluster',
-        query='label_values(up{job="default/kube-state-metrics"}, cluster)',
+        query='label_values(up{job="%(kubeStateMetricsSelector)s"}, cluster)' % $._config,
         refresh=1,
         regex='',
       )
