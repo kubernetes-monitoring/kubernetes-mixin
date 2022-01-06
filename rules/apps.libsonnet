@@ -211,7 +211,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'Job',
+              workload_type: 'job',
             },
           },
         ],
