@@ -10,7 +10,9 @@
       timezone: kubernetesMixin._config.grafanaK8s.grafanaTimezone,
       refresh: kubernetesMixin._config.grafanaK8s.refresh,
       tags: kubernetesMixin._config.grafanaK8s.dashboardTags,
-
+    } +
+    if 'rows' in super then
+    {
       rows: [
         row {
           panels: [
@@ -33,7 +35,7 @@
         for row in super.rows
       ],
 
-    }
+    } else {}
     for filename in std.objectFields(grafanaDashboards)
   },
 }
