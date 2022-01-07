@@ -38,13 +38,13 @@ local model = import 'model.libsonnet';
       chain(fs):: std.foldl(function(d, f) if f != null then f(d) else d, fs, self),
     },
 
-  addTemplate(name):
+  addTemplate(name, config):
     function(d)
       d.addTemplate(
         g.template.query.new(
           datasource='${datasource}',
           name=name,
-          query='',
+          query='label_values(up{%(kubeStateMetricsSelector)s, cluster="$cluster"}, %(name)s)' % {kubeStateMetricsSelector: config.kubeStateMetricsSelector, name: name},
           refresh=1,
           regex='',
           hide=2,

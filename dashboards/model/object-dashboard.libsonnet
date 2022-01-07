@@ -128,7 +128,7 @@ local addRelationships(kind) =
       'var-%s=${__field.labels.%s}' % [oneVar, oneLabel],
     ];
 
-    local link = '/d/%s/explore-%s?%s' % [std.md5(r.one), oneVar, std.join('&', linkVars)];
+    local link = '/d/%s/explore-%s?%s' % [std.md5('model-%s.json' % oneVar), oneVar, std.join('&', linkVars)];
 
     d.chain([
       c.addLinkPanel(r.one, r.one),
@@ -179,7 +179,7 @@ local addRelationships(kind) =
       'var-%s=${__data.fields.%s}' % [manyLabel, manyLabel],
     ];
 
-    local link = '/d/%s/explore-%s?%s' % [std.md5(r.many), manyLabel, std.join('&', linkVars)];
+    local link = '/d/%s/explore-%s?%s' % [std.md5('model-%s.json' % manyLabel), manyLabel, std.join('&', linkVars)];
 
     d.chain([
       c.addLinkPanel(r.many, r.many + '(s)', height=4),
@@ -210,9 +210,9 @@ local dashboardForKind(kind, config) =
 
   c.dashboard(kind, config).chain([
     if model.kinds[kind].namespaced
-    then c.addTemplate('namespace'),
+    then c.addTemplate('namespace', config),
     headerPanel(kind),
-    c.addTemplate(kindLabel),
+    c.addTemplate(kindLabel, config),
     c.addRow('Info'),
     infoRows(kind),
     c.addRow('Related Objects'),
