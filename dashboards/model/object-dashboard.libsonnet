@@ -1,5 +1,4 @@
 local c = import 'common.libsonnet';
-local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonnet';
 local model = import 'model.libsonnet';
 
 local headerPanel(kind) =
