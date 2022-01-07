@@ -44,7 +44,7 @@ local model = import 'model.libsonnet';
         g.template.query.new(
           datasource='${datasource}',
           name=name,
-          query='label_values(up{%(kubeStateMetricsSelector)s, cluster="$cluster"}, %(name)s)' % {kubeStateMetricsSelector: config.kubeStateMetricsSelector, name: name},
+          query='label_values(up{%(kubeStateMetricsSelector)s, cluster="$cluster"}, %(name)s)' % { kubeStateMetricsSelector: config.kubeStateMetricsSelector, name: name },
           refresh=1,
           regex='',
           hide=2,
@@ -441,29 +441,29 @@ local model = import 'model.libsonnet';
   addLogsPanel(query):
     function(d)
       d.addPanel({
-          gridPos: {
-            w: 12,
-            h: 8,
+        gridPos: {
+          w: 12,
+          h: 8,
+        },
+        type: 'logs',
+        title: 'Pod Logs',
+        targets: [
+          {
+            refId: 'A',
+            datasource: 'Grafana Logging',
+            expr: query,
           },
-          type: 'logs',
-          title: 'Pod Logs',
-          targets: [
-            {
-              refId: 'A',
-              datasource: 'Grafana Logging',
-              expr: query,
-            },
-          ],
-          options: {
-            showTime: false,
-            showLabels: false,
-            showCommonLabels: false,
-            wrapLogMessage: false,
-            prettifyLogMessage: false,
-            enableLogDetails: true,
-            dedupStrategy: 'none',
-            sortOrder: 'Descending',
-          },
-          datasource: 'Grafana Logging',
-        }),
+        ],
+        options: {
+          showTime: false,
+          showLabels: false,
+          showCommonLabels: false,
+          wrapLogMessage: false,
+          prettifyLogMessage: false,
+          enableLogDetails: true,
+          dedupStrategy: 'none',
+          sortOrder: 'Descending',
+        },
+        datasource: 'Grafana Logging',
+      }),
 }
