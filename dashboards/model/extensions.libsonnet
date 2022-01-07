@@ -1,7 +1,7 @@
 local c = import 'common.libsonnet';
 
 (import 'object-dashboard.libsonnet') {
-  grafanaDashboards+: {
+  grafanaDashboards+:: {
     'model-pod.json':
       super['model-pod.json'].chain([
         c.addRow('Debugging'),

@@ -3,7 +3,7 @@ local g = import 'github.com/grafana/grafonnet-lib/grafonnet-7.0/grafana.libsonn
 local model = import 'model.libsonnet';
 
 {
-  dashboard(kind):
+  dashboard(kind, config):
     g.dashboard.new(title='Explore / %s' % kind, refresh='5m', uid=std.md5(kind))
     .setTime(from='now-1h', to='now')
     .addTemplate(
@@ -15,7 +15,7 @@ local model = import 'model.libsonnet';
         datasource='${datasource}',
         label='cluster',
         name='cluster',
-        query='label_values(up{%(kubeStateMetricsSelector)s}, cluster)' % $._config,
+        query='label_values(up{%(kubeStateMetricsSelector)s}, cluster)' % config,
         refresh=1,
         regex='',
       )

@@ -205,10 +205,10 @@ local addRelationships(kind) =
                   d),
     ]);
 
-local dashboardForKind(kind) =
+local dashboardForKind(kind, config) =
   local kindLabel = std.asciiLower(kind);
 
-  c.dashboard(kind).chain([
+  c.dashboard(kind, config).chain([
     if model.kinds[kind].namespaced
     then c.addTemplate('namespace'),
     headerPanel(kind),
@@ -222,8 +222,8 @@ local dashboardForKind(kind) =
 {
   grafanaDashboardFolder: 'Kubernetes Explore',
 
-  grafanaDashboards+: {
-    ['model-%s.json' % std.asciiLower(kind)]: dashboardForKind(kind)
+  grafanaDashboards+:: {
+    ['model-%s.json' % std.asciiLower(kind)]: dashboardForKind(kind, $._config)
     for kind in std.objectFields(model.kinds)
   },
 }
