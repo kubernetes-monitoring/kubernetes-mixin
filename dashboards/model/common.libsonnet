@@ -44,10 +44,9 @@ local model = import 'model.libsonnet';
         g.template.query.new(
           datasource='${datasource}',
           name=name,
-          query='label_values(up{%(kubeStateMetricsSelector)s, cluster="$cluster"}, %(name)s)' % { kubeStateMetricsSelector: config.kubeStateMetricsSelector, name: name },
+          query='label_values(kube_%(name)s_created{%(kubeStateMetricsSelector)s, cluster="$cluster"}, %(name)s)' % { kubeStateMetricsSelector: config.kubeStateMetricsSelector, name: name },
           refresh=1,
           regex='',
-          hide=2,
         )
       ),
 
