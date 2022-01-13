@@ -82,6 +82,8 @@
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
     clusterLabel: 'cluster',
+    clusterGroupLabels: if self.showMultiCluster then [self.clusterLabel] else [],
+    clusterGroupLabelsStr: std.join(',', self.clusterGroupLabels),
 
     namespaceLabel: 'namespace',
 

@@ -18,14 +18,16 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAPIErrorBudgetBurn',
             expr: |||
-              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+              sum(apiserver_request:burnrate%s) by (%s) > (%.2f * %.5f)
               and
-              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+              sum(apiserver_request:burnrate%s) by (%s) > (%.2f * %.5f)
             ||| % [
               w.long,
+              $._config.clusterGroupLabelsStr,
               w.factor,
               (1 - $._config.SLOs.apiserver.target),
               w.short,
+              $._config.clusterGroupLabelsStr,
               w.factor,
               (1 - $._config.SLOs.apiserver.target),
             ],
@@ -75,7 +77,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIErrors',
             expr: |||
-              sum by(name, namespace)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
+              sum by(name, namespace, %(clusterGroupLabelsStr)s)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -88,7 +90,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIDown',
             expr: |||
-              (1 - max by(name, namespace)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
+              (1 - max by(name, namespace, %(clusterGroupLabelsStr)s)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
             ||| % $._config,
             'for': '5m',
             labels: {
@@ -106,7 +108,12 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAPITerminatedRequests',
             expr: |||
-              sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m]))  / (  sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[10m])) + sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) ) > 0.20
+              sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) by (%(clusterGroupLabelsStr)s)
+              /
+              (
+                sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[10m])) by (%(clusterGroupLabelsStr)s)
+                + sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) by (%(clusterGroupLabelsStr)s)
+              ) > 0.20
             ||| % $._config,
             labels: {
               severity: 'warning',
