@@ -29,7 +29,7 @@
     podLabel: 'pod',
     hostNetworkInterfaceSelector: 'device!~"veth.+"',
     hostMountpointSelector: 'mountpoint="/"',
-    wmiExporterSelector: 'job="wmi-exporter"',
+    windowsExporterSelector: 'job="kubernetes-windows-exporter"',
 
     // Grafana dashboard IDs are necessary for stable links for dashboards
     grafanaDashboardIDs: {
