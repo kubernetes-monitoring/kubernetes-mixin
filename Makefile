@@ -1,19 +1,20 @@
 BIN_DIR ?= $(shell pwd)/tmp/bin
 
 JSONNET_VENDOR=vendor
+GRAFANA_DASHBOARD_LINTER_BIN=$(BIN_DIR)/dashboard-linter
 JB_BIN=$(BIN_DIR)/jb
 JSONNET_BIN=$(BIN_DIR)/jsonnet
 JSONNETLINT_BIN=$(BIN_DIR)/jsonnet-lint
 JSONNETFMT_BIN=$(BIN_DIR)/jsonnetfmt
 PROMTOOL_BIN=$(BIN_DIR)/promtool
-TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN)
+TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(GRAFANA_DASHBOARD_LINTER_BIN)
 JSONNETFMT_ARGS=-n 2 --max-blank-lines 2 --string-style s --comment-style s
 
 .PHONY: all
 all: fmt generate lint test
 
 .PHONY: generate
-generate: prometheus_alerts.yaml prometheus_rules.yaml dashboards_out
+generate: prometheus_alerts.yaml prometheus_rules.yaml dashboards_out/.lint
 
 $(JSONNET_VENDOR): $(JB_BIN) jsonnetfile.json
 	$(JB_BIN) install
@@ -29,17 +30,25 @@ prometheus_alerts.yaml: $(JSONNET_BIN) mixin.libsonnet lib/alerts.jsonnet alerts
 prometheus_rules.yaml: $(JSONNET_BIN) mixin.libsonnet lib/rules.jsonnet rules/*.libsonnet
 	@$(JSONNET_BIN) -J vendor -S lib/rules.jsonnet > $@
 
-dashboards_out: $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
+dashboards_out/.lint: $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
 	@mkdir -p dashboards_out
 	@$(JSONNET_BIN) -J vendor -m dashboards_out lib/dashboards.jsonnet
+	@cp .lint $@
 
 .PHONY: lint
-lint: $(PROMTOOL_BIN) $(JSONNET_VENDOR) prometheus_alerts.yaml prometheus_rules.yaml
+lint: $(PROMTOOL_BIN) $(JSONNET_VENDOR) prometheus_alerts.yaml prometheus_rules.yaml dashboard_lint
 	find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print | \
 		xargs -n 1 -- $(JSONNETLINT_BIN) -J vendor
 
 	@$(PROMTOOL_BIN) check rules prometheus_rules.yaml
 	@$(PROMTOOL_BIN) check rules prometheus_alerts.yaml
+
+.PHONY: dashboard_lint
+dashboard_lint: dashboards_out/.lint
+	# Replace $$interval:$$resolution var with $$__rate_interval to make dashboard-linter happy.
+	@sed -i -e 's/$$interval:$$resolution/$$__rate_interval/g' dashboards_out/*.json
+	@find dashboards_out -name '*.json' -print0 | xargs -n 1 -0 $(GRAFANA_DASHBOARD_LINTER_BIN) lint --strict
+
 
 .PHONY: clean
 clean:
