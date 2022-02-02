@@ -78,7 +78,6 @@ local template = grafana.template;
       };
 
       local cpuUsageQuery = 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config;
-
       local memoryUsageQuery = 'sum(container_memory_working_set_bytes{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", container!="", image!=""}) by (pod)' % $._config;
 
       local cpuQuotaRequestsQuery = 'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config;
@@ -87,12 +86,12 @@ local template = grafana.template;
       local memoryQuotaLimitsQuery = std.strReplace(cpuQuotaRequestsQuery, 'requests.cpu', 'limits.memory');
 
       local storageIOColumns = [
-        'sum by(pod) (rate(container_fs_reads_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
-        'sum by(pod) (rate(container_fs_writes_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
-        'sum by(pod) (rate(container_fs_reads_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
-        'sum by(pod) (rate(container_fs_reads_bytes_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
-        'sum by(pod) (rate(container_fs_writes_bytes_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
-        'sum by(pod) (rate(container_fs_reads_bytes_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_bytes_total{%(cadvisorSelector)s, container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
+        'sum by(pod) (rate(container_fs_reads_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
+        'sum by(pod) (rate(container_fs_writes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
+        'sum by(pod) (rate(container_fs_reads_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
+        'sum by(pod) (rate(container_fs_reads_bytes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
+        'sum by(pod) (rate(container_fs_writes_bytes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
+        'sum by(pod) (rate(container_fs_reads_bytes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_bytes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config,
       ];
 
       local storageIOTableStyles = {
@@ -337,14 +336,14 @@ local template = grafana.template;
         g.row('Storage IO')
         .addPanel(
           g.panel('IOPS(Reads+Writes)') +
-          g.queryPanel('ceil(sum by(pod) (rate(container_fs_reads_total{container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s])))' % $._config, '{{pod}}') +
+          g.queryPanel('ceil(sum by(pod) (rate(container_fs_reads_total{%(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{%(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s])))' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('short'), decimals: -1 },
 
         )
         .addPanel(
           g.panel('ThroughPut(Read+Write)') +
-          g.queryPanel('sum by(pod) (rate(container_fs_reads_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_bytes_total{container!="", %(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config, '{{pod}}') +
+          g.queryPanel('sum by(pod) (rate(container_fs_reads_bytes_total{%(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_bytes_total{%(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config, '{{pod}}') +
           g.stack +
           { yaxes: g.yaxes('Bps') },
         )
