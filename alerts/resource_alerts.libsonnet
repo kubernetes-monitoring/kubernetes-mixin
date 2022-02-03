@@ -155,6 +155,32 @@
               description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
               summary: 'Processes experience elevated CPU throttling.',
             },
+          {
+            alert: 'HostHighCPULoad',
+            expr: |||
+              100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 75
+            ||| % $._config,
+            'for': '1m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'CPU load is > 75%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}.',
+              summary: 'Host high CPU load (instance {{ $labels.instance }}).',
+            },
+          {
+            alert: 'HostCPUStealNoisyNeighbor',
+            expr: |||
+              avg by(instance) (rate(node_cpu_seconds_total{mode="steal"}[5m])) * 100 > 10
+            ||| % $._config,
+            'for': '1m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'CPU steal is > 10%. A noisy neighbor is killing VM performances.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}.',
+              summary: 'Host CPU steal noisy neighbor (instance {{ $labels.instance }}).',
+            },
           },
         ],
       },
