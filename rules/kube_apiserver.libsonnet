@@ -4,7 +4,7 @@
     podLabel: 'pod',
     kubeApiserverReadSelector: 'verb=~"LIST|GET"',
     kubeApiserverWriteSelector: 'verb=~"POST|PUT|PATCH|DELETE"',
-    kubeApiserverNonProxySelector: 'subresource!="proxy"',
+    kubeApiserverNonStreamingSelector: 'subresource!~"proxy|attach|log|exec|portforward"',
     // These are buckets that exist on the apiserver_request_duration_seconds_bucket histogram.
     // They are what the Kubernetes SIG Scalability is using to measure availability of Kubernetes clusters.
     // If you want to change these, make sure the "le" buckets exist on the histogram!
@@ -31,30 +31,32 @@
               (
                 (
                   # too slow
-                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_count{%(kubeApiserverUbiquitousSelector)s}[%(window)s]))
+                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_count{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s}[%(window)s]))
                   -
                   (
                     (
-                      sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverUbiquitousSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(window)s]))
+                      sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(window)s]))
                       or
                       vector(0)
                     )
                     +
-                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverUbiquitousSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"}[%(window)s]))
+                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"}[%(window)s]))
                     +
-                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverUbiquitousSelector)s,scope="cluster",le="%(kubeApiserverReadClusterLatency)s"}[%(window)s]))
+                    sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope="cluster",le="%(kubeApiserverReadClusterLatency)s"}[%(window)s]))
                   )
                 )
                 +
                 # errors
-                sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverUbiquitousSelector)s,code=~"5.."}[%(window)s]))
+                sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,code=~"5.."}[%(window)s]))
               )
               /
-              sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverUbiquitousSelector)s}[%(window)s]))
+              sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s}[%(window)s]))
             ||| % {
               clusterLabel: $._config.clusterLabel,
               window: w,
-              kubeApiserverUbiquitousSelector: $._config.kubeApiserverSelector + ',' + $._config.kubeApiserverReadSelector + ',' + $._config.kubeApiserverNonProxySelector,
+              kubeApiserverSelector: $._config.kubeApiserverSelector,
+              kubeApiserverReadSelector: $._config.kubeApiserverReadSelector,
+              kubeApiserverNonStreamingSelector: $._config.kubeApiserverNonStreamingSelector,
               kubeApiserverReadResourceLatency: $._config.kubeApiserverReadResourceLatency,
               kubeApiserverReadNamespaceLatency: $._config.kubeApiserverReadNamespaceLatency,
               kubeApiserverReadClusterLatency: $._config.kubeApiserverReadClusterLatency,
@@ -77,19 +79,21 @@
               (
                 (
                   # too slow
-                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_count{%(kubeApiserverUbiquitousSelector)s}[%(window)s]))
+                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_count{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s,%(kubeApiserverNonStreamingSelector)s}[%(window)s]))
                   -
-                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverUbiquitousSelector)s,le="%(kubeApiserverWriteLatency)s"}[%(window)s]))
+                  sum by (%(clusterLabel)s) (rate(apiserver_request_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s,%(kubeApiserverNonStreamingSelector)s,le="%(kubeApiserverWriteLatency)s"}[%(window)s]))
                 )
                 +
-                sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverUbiquitousSelector)s,code=~"5.."}[%(window)s]))
+                sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s,code=~"5.."}[%(window)s]))
               )
               /
-              sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverUbiquitousSelector)s}[%(window)s]))
+              sum by (%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s,%(kubeApiserverWriteSelector)s}[%(window)s]))
             ||| % {
               clusterLabel: $._config.clusterLabel,
               window: w,
-              kubeApiserverUbiquitousSelector: $._config.kubeApiserverSelector + ',' + $._config.kubeApiserverWriteSelector + ',' + $._config.kubeApiserverNonProxySelector,
+              kubeApiserverSelector: $._config.kubeApiserverSelector,
+              kubeApiserverWriteSelector: $._config.kubeApiserverWriteSelector,
+              kubeApiserverNonStreamingSelector: $._config.kubeApiserverNonStreamingSelector,
               kubeApiserverWriteLatency: $._config.kubeApiserverWriteLatency,
             },
             labels: {
