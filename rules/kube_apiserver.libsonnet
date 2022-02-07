@@ -117,7 +117,7 @@
               record: 'cluster_quantile:apiserver_request_duration_seconds:histogram_quantile',
               expr: |||
                 histogram_quantile(0.99, sum by (%s, le, resource) (rate(apiserver_request_duration_seconds_bucket{%s}[5m]))) > 0
-              ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+              ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector, $._config.kubeApiserverNonStreamingSelector])],
               labels: {
                 verb: verb.type,
                 quantile: '0.99',
