@@ -322,7 +322,7 @@ local statPanel = grafana.statPanel;
           'instance',
           '$datasource',
           'label_values(up{%(kubeletSelector)s,%(clusterLabel)s="$cluster"}, instance)' % $._config,
-          label='Data Source',
+          label='instance',
           refresh='time',
           includeAll=true,
           sort=1,
