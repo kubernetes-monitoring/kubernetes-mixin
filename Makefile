@@ -14,7 +14,7 @@ JSONNETFMT_ARGS=-n 2 --max-blank-lines 2 --string-style s --comment-style s
 all: fmt generate lint test
 
 .PHONY: generate
-generate: prometheus_alerts.yaml prometheus_rules.yaml dashboards_out/.lint
+generate: prometheus_alerts.yaml prometheus_rules.yaml dashboards_out
 
 $(JSONNET_VENDOR): $(JB_BIN) jsonnetfile.json
 	$(JB_BIN) install
@@ -30,21 +30,29 @@ prometheus_alerts.yaml: $(JSONNET_BIN) mixin.libsonnet lib/alerts.jsonnet alerts
 prometheus_rules.yaml: $(JSONNET_BIN) mixin.libsonnet lib/rules.jsonnet rules/*.libsonnet
 	@$(JSONNET_BIN) -J vendor -S lib/rules.jsonnet > $@
 
-dashboards_out/.lint: $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
+dashboards_out: $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
 	@mkdir -p dashboards_out
 	@$(JSONNET_BIN) -J vendor -m dashboards_out lib/dashboards.jsonnet
-	@cp .lint $@
 
 .PHONY: lint
-lint: $(PROMTOOL_BIN) $(JSONNET_VENDOR) prometheus_alerts.yaml prometheus_rules.yaml dashboard_lint
-	find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print | \
+lint: jsonnet-lint alerts-lint dashboards-lint
+
+.PHONY: jsonnet-lint
+jsonnet-lint: $(JSONNETLINT_BIN) $(JSONNET_VENDOR)
+	@find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print | \
 		xargs -n 1 -- $(JSONNETLINT_BIN) -J vendor
 
+
+.PHONY: alerts-lint
+alerts-lint: $(PROMTOOL_BIN) prometheus_alerts.yaml prometheus_rules.yaml
 	@$(PROMTOOL_BIN) check rules prometheus_rules.yaml
 	@$(PROMTOOL_BIN) check rules prometheus_alerts.yaml
 
-.PHONY: dashboard_lint
-dashboard_lint: dashboards_out/.lint
+dashboards_out/.lint: dashboards_out
+	@cp .lint $@
+
+.PHONY: dashboards-lint
+dashboards-lint: $(GRAFANA_DASHBOARD_LINTER_BIN) dashboards_out/.lint
 	# Replace $$interval:$$resolution var with $$__rate_interval to make dashboard-linter happy.
 	@sed -i -e 's/$$interval:$$resolution/$$__rate_interval/g' dashboards_out/*.json
 	@find dashboards_out -name '*.json' -print0 | xargs -n 1 -0 $(GRAFANA_DASHBOARD_LINTER_BIN) lint --strict

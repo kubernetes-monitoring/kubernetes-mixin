@@ -16,7 +16,7 @@ jobs:
       with:
         go-version: ${{ env.golang-version }}
     - run: make --always-make generate && git diff --exit-code
-  lint:
+  jsonnet-lint:
     runs-on: ubuntu-latest
     name: Jsonnet linter
     steps:
@@ -26,7 +26,29 @@ jobs:
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ env.golang-version }}
-    - run: make --always-make lint
+    - run: make --always-make jsonnet-lint
+  dashboards-lint:
+    runs-on: ubuntu-latest
+    name: Grafana dashboard linter
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.golang-version }}
+    - run: make --always-make dashboards-lint
+  alerts-lint:
+    runs-on: ubuntu-latest
+    name: Alerts linter
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.golang-version }}
+    - run: make --always-make alerts-lint
   fmt:
     runs-on: ubuntu-latest
     name: Jsonnet formatter
