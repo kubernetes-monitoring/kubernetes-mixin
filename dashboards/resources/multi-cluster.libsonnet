@@ -22,7 +22,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
            })
           .addPanel(
             g.panel('CPU Utilisation') +
-            g.statPanel('cluster:node_cpu:ratio')
+            g.statPanel('cluster:node_cpu:ratio_rate5m')
           )
           .addPanel(
             g.panel('CPU Requests Commitment') +

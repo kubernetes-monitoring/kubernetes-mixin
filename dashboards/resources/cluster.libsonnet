@@ -140,7 +140,7 @@ local template = grafana.template;
          })
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.statPanel('cluster:node_cpu:ratio{%(clusterLabel)s="$cluster"}' % $._config)
+          g.statPanel('cluster:node_cpu:ratio_rate5m{%(clusterLabel)s="$cluster"}' % $._config)
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
