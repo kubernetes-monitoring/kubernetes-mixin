@@ -52,6 +52,14 @@
               ) by (%(clusterLabel)s)
             ||| % $._config,
           },
+          {
+            // This rule gives cpu utilization per cluster
+            record: 'cluster:node_cpu:ratio_rate5m',
+            expr: |||
+              sum(rate(node_cpu_seconds_total{%(nodeExporterSelector)s,mode!="idle",mode!="iowait",mode!="steal"}[5m])) /
+              count(sum(node_cpu_seconds_total{%(nodeExporterSelector)s}) by (%(clusterLabel)s, instance, cpu))
+            ||| % $._config,
+          },
         ],
       },
     ],

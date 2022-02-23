@@ -140,7 +140,7 @@ local template = grafana.template;
          })
         .addPanel(
           g.panel('CPU Utilisation') +
-          g.statPanel('1 - sum(avg by (mode) (rate(node_cpu_seconds_total{%(nodeExporterSelector)s, mode=~"idle|iowait|steal", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])))' % $._config)
+          g.statPanel('cluster:node_cpu:ratio_rate5m{%(clusterLabel)s="$cluster"}' % $._config)
         )
         .addPanel(
           g.panel('CPU Requests Commitment') +
