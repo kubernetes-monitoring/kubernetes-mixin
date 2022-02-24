@@ -235,9 +235,11 @@
             'for': '15m',
           },
           {
-            alert: 'KubeJobCompletion',
+            alert: 'KubeJobNotCompleted',
             expr: |||
-              kube_job_spec_completions{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_job_status_succeeded{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
+              time() - kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                and
+              kube_job_status_active{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
             ||| % $._config,
             'for': '12h',
             labels: {
