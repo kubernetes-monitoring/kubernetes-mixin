@@ -846,30 +846,22 @@ tests:
 - interval: 1m
   input_series:
   - series: 'kube_job_status_start_time{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
-    values: '0+0x740'
+    values: '0+0x200 _x500 0+0x40'
   - series: 'kube_job_status_active{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
-    values: '1+0x740'
-  promql_expr_test:
-  - eval_time: 12h
-    expr: time() - kube_job_status_start_time and kube_job_status_active > 0
-    exp_samples:
-    - value: 43200
-      labels: '{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '1x200 _x500 1x40'
   alert_rule_test:
   - eval_time: 6h
     alertname: KubeJobNotCompleted
-  - eval_time: 12h
+  - eval_time: 12h1m
     alertname: KubeJobNotCompleted
     exp_alerts:
     - exp_labels:
         namespace: ns1
         job_name: job1
         severity: warning
-        instance: instance1
-        job: kube-state-metrics
       exp_annotations:
         summary: "Job did not complete in time"
-        description: "Job ns1/job1 is taking more than 12 hours to complete."
+        description: "Job ns1/job1 is taking more than 12h 0m 0s to complete."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobnotcompleted"
 
 - interval: 1m

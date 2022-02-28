@@ -58,7 +58,7 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 
 ##### Alert Name: "KubeJobNotCompleted"
-+ *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12h to complete.`
++ *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than {{ "%(kubeJobTimeoutDuration)s" | humanizeDuration }} to complete.`
 + *Severity*: warning
 + *Action*: Check the job using `kubectl describe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
 

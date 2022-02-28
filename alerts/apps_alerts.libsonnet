@@ -1,6 +1,7 @@
 {
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
+    kubeJobTimeoutDuration: error 'must provide value for kubeJobTimeoutDuration',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
@@ -237,16 +238,15 @@
           {
             alert: 'KubeJobNotCompleted',
             expr: |||
-              time() - kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              time() - max by(namespace, job_name) (kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 and
-              kube_job_status_active{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
+              kube_job_status_active{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0) > %(kubeJobTimeoutDuration)s
             ||| % $._config,
-            'for': '12h',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12 hours to complete.',
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than {{ "%(kubeJobTimeoutDuration)s" | humanizeDuration }} to complete.' % $._config,
               summary: 'Job did not complete in time',
             },
           },

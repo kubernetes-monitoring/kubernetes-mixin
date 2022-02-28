@@ -106,5 +106,8 @@
     // so that specific storage alerts will not fire.With the default selector, adding a label `exclude-from-alerts: 'true'`
     // to the PVC will have the desired effect.
     pvExcludedSelector: 'label_excluded_from_alerts="true"',
+
+    // Default timeout value for k8s Jobs. The jobs which are active beyond this duration would trigger KubeJobNotCompleted alert.
+    kubeJobTimeoutDuration: 12 * 60 * 60,
   },
 }
