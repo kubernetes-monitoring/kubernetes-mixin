@@ -9,7 +9,10 @@ local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libso
     )
     .addThresholds([{ color: 'green' }, { color: 'red', value: 1 }])
     .addDataLink(
-      { title: 'Explore Namespace', url: '/d/c4cbf5e16859ad85ce39f8464478b279/explore-namespace?var-namespace=${__field.labels.namespace}' }
+      { 
+        title: 'Explore Namespace', 
+        url: '/d/%s/explore-namespace?var-namespace=${__field.labels.namespace}' % std.md5('model-namespace.json')
+      }
     )
     + { gridPos: { w: 24, h: 24 } },
 
