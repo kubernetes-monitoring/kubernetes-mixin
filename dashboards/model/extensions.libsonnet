@@ -1,6 +1,6 @@
 local c = import 'common.libsonnet';
 
-(import 'object-dashboard.libsonnet') {
+(import 'object-dashboard.libsonnet') + (import 'alerts-by-namespace.libsonnet') + {
   grafanaDashboards+:: {
     'model-pod.json':
       super['model-pod.json'].chain([
