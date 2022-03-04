@@ -7,13 +7,13 @@ local model = import 'model.libsonnet';
     g.dashboard.new(title='Explore / %s' % kind, refresh='5m', uid=std.md5(kind))
     .setTime(from='now-1h', to='now')
     .addTemplate(
-      g.template.datasource.new(name='datasource', query='prometheus')
+      g.template.datasource.new(name='datasource', query='prometheus', label='Data Source')
       .setCurrent(text='default', value='default')
     )
     .addTemplate(
       g.template.query.new(
         datasource='${datasource}',
-        label='cluster',
+        label='Cluster',
         name='cluster',
         query='label_values(up{%(kubeStateMetricsSelector)s}, cluster)' % config,
         refresh=1,
