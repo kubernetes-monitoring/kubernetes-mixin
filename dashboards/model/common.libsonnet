@@ -12,7 +12,7 @@ local model = import 'model.libsonnet';
     )
     .addTemplate(
       g.template.query.new(
-        datasource='${datasource}',
+        datasource='$datasource',
         label='Cluster',
         name='cluster',
         query='label_values(up{%(kubeStateMetricsSelector)s}, cluster)' % config,
@@ -42,7 +42,7 @@ local model = import 'model.libsonnet';
     function(d)
       d.addTemplate(
         g.template.query.new(
-          datasource='${datasource}',
+          datasource='$datasource',
           name=name,
           query='label_values(kube_%(name)s_created{%(kubeStateMetricsSelector)s, cluster="$cluster"}, %(name)s)' % { kubeStateMetricsSelector: config.kubeStateMetricsSelector, name: name },
           refresh=1,
@@ -54,7 +54,7 @@ local model = import 'model.libsonnet';
     function(d)
       d.addPanel({
         collapsed: false,
-        datasource: null,
+        datasource: '$datasource',
         gridPos: {
           h: 1,
           w: 24,
@@ -89,7 +89,7 @@ local model = import 'model.libsonnet';
           ||| % [icon, kind, text],
         },
         transparent: true,
-        datasource: null,
+        datasource: '$datasource',
       }),
 
   addTextPanel(text, width=8, height=2):
@@ -106,6 +106,7 @@ local model = import 'model.libsonnet';
           mode: 'markdown',
           content: '%s' % text,
         },
+        datasource: '$datasource',
       }),
 
   addLabelPanel(query, label, link=null):
