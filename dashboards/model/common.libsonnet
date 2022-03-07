@@ -435,7 +435,7 @@ local model = import 'model.libsonnet';
             },
           },
         ],
-        datasource: null,
+        datasource: '$datasource',
       }),
 
   addLogsPanel(query):

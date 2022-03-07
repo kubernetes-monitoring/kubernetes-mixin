@@ -23,7 +23,7 @@ local headerPanel(kind) =
         ||| % [icon, kind, kind, kindLabel],
       },
       transparent: true,
-      datasource: null,
+      datasource: '$datasource',
     });
 
 local infoPanel(kind, info) =
