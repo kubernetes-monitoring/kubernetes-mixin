@@ -11,7 +11,11 @@
           {
             alert: 'KubeVersionMismatch',
             expr: |||
-              count(count by (git_version) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*"))) > 1
+              count(
+                count by (git_version, %(clusterGroupLabelsStr)s) (
+                  label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*")
+                )
+              )  by (%(clusterGroupLabelsStr)s) > 1
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -28,11 +32,11 @@
             // this is normal and an expected error, therefore it should be
             // ignored in this alert.
             expr: |||
-              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job, namespace)
+              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job, %(clusterGroupLabelsStr)s)
                 /
-              sum(rate(rest_client_requests_total[5m])) by (instance, job, namespace))
+              sum(rate(rest_client_requests_total[5m])) by (instance, job, %(clusterGroupLabelsStr)s))
               > 0.01
-            |||,
+            ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
