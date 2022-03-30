@@ -28,11 +28,11 @@
             // this is normal and an expected error, therefore it should be
             // ignored in this alert.
             expr: |||
-              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job, namespace)
+              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (%(clusterLabel)s, instance, job, namespace)
                 /
-              sum(rate(rest_client_requests_total[5m])) by (instance, job, namespace))
+              sum(rate(rest_client_requests_total[5m])) by (%(clusterLabel)s, instance, job, namespace))
               > 0.01
-            |||,
+            ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',

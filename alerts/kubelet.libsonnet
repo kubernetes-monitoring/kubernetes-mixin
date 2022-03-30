@@ -52,11 +52,11 @@
             // Some node has a capacity of 1 like AWS's Fargate and only exists while a pod is running on it.
             // We have to ignore this special node in the KubeletTooManyPods alert.
             expr: |||
-              count by(node) (
-                (kube_pod_status_phase{%(kubeStateMetricsSelector)s,phase="Running"} == 1) * on(instance,pod,namespace,cluster) group_left(node) topk by(instance,pod,namespace,cluster) (1, kube_pod_info{%(kubeStateMetricsSelector)s})
+              count by(%(clusterLabel)s, node) (
+                (kube_pod_status_phase{%(kubeStateMetricsSelector)s,phase="Running"} == 1) * on(instance,pod,namespace,%(clusterLabel)s) group_left(node) topk by(instance,pod,namespace,%(clusterLabel)s) (1, kube_pod_info{%(kubeStateMetricsSelector)s})
               )
               /
-              max by(node) (
+              max by(%(clusterLabel)s, node) (
                 kube_node_status_capacity{%(kubeStateMetricsSelector)s,resource="pods"} != 1
               ) > 0.95
             ||| % $._config,
@@ -72,7 +72,7 @@
           {
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
-              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (node) > 2
+              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (%(clusterLabel)s, node) > 2
             ||| % $._config,
             'for': '15m',
             labels: {
