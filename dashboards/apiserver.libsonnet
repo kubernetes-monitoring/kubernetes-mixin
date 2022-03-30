@@ -82,7 +82,7 @@ local singlestat = grafana.singlestat;
           format='s',
           description='How many seconds is the 99th percentile for reading (LIST|GET) a given resource?',
         )
-        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="read", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
+        .addTarget(prometheus.target('cluster_quantile:apiserver_request_slo_duration_seconds:histogram_quantile{verb="read", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
 
       local writeAvailability =
         singlestat.new(
@@ -130,7 +130,7 @@ local singlestat = grafana.singlestat;
           format='s',
           description='How many seconds is the 99th percentile for writing (POST|PUT|PATCH|DELETE) a given resource?',
         )
-        .addTarget(prometheus.target('cluster_quantile:apiserver_request_duration_seconds:histogram_quantile{verb="write", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
+        .addTarget(prometheus.target('cluster_quantile:apiserver_request_slo_duration_seconds:histogram_quantile{verb="write", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
 
       local workQueueAddRate =
         graphPanel.new(
