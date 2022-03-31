@@ -2,6 +2,7 @@
 (import 'persistentvolumesusage.libsonnet') +
 (import 'resources.libsonnet') +
 (import 'apiserver.libsonnet') +
+(import 'client-go.libsonnet') +
 (import 'controller-manager.libsonnet') +
 (import 'scheduler.libsonnet') +
 (import 'proxy.libsonnet') +

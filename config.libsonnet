@@ -57,6 +57,7 @@
       'scheduler.json': '4uMPZ9jmwvYJcM5fcNcNrrt9Sf6ufQL4IKFri2Gp',
       'proxy.json': 'hhT4orXD1Ott4U1bNNps0R26EHTwMypdcaCjDRPM',
       'kubelet.json': 'B1azll2ETo7DTiM8CysrH6g4s5NCgkOz6ZdU8Q0j',
+      'client-go.json': 'e5c95198a9d311ecb429a8a1590cda29',
     },
 
     // Support for Grafana 7.2+ `$__rate_interval` instead of `$__interval`
