@@ -845,6 +845,39 @@ tests:
 
 - interval: 1m
   input_series:
+  - series: 'kube_job_status_start_time{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '0+0x200 _x500 0+0x40'
+  - series: 'kube_job_status_active{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '1x200 _x500 1x40'
+  alert_rule_test:
+  - eval_time: 6h
+    alertname: KubeJobNotCompleted
+  - eval_time: 12h1m
+    alertname: KubeJobNotCompleted
+    exp_alerts:
+    - exp_labels:
+        namespace: ns1
+        job_name: job1
+        severity: warning
+      exp_annotations:
+        summary: "Job did not complete in time"
+        description: "Job ns1/job1 is taking more than 12h 0m 0s to complete."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobnotcompleted"
+
+- interval: 1m
+  input_series:
+  - series: 'kube_job_status_start_time{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '0+0x740'
+  - series: 'kube_job_status_active{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '1+0x710 0x30'
+  alert_rule_test:
+  - eval_time: 6h
+    alertname: KubeJobNotCompleted
+  - eval_time: 12h
+    alertname: KubeJobNotCompleted
+
+- interval: 1m
+  input_series:
   - series: 'apiserver_request_terminations_total{job="kube-apiserver",apiserver="kube-apiserver"}'
     values: '1+1x10'
   - series: 'apiserver_request_total{job="kube-apiserver",apiserver="kube-apiserver"}'
