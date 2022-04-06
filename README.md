@@ -120,12 +120,11 @@ the kubernetes-mixin:
 $ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
 $ jb init
 $ jb install github.com/kausalco/public/prometheus-ksonnet
-
 ```
 
 Assuming you want to run in the default namespace ('environment' in ksonnet parlance), add the follow to the file `environments/default/main.jsonnet`:
 
-```
+```jsonnet
 local prometheus = import "prometheus-ksonnet/prometheus-ksonnet.libsonnet";
 
 prometheus {
@@ -149,7 +148,7 @@ TODO
 
 Kubernetes-mixin can support dashboards across multiple clusters. You need either a multi-cluster [Thanos](https://github.com/improbable-eng/thanos) installation with `external_labels` configured or a [Cortex](https://github.com/cortexproject/cortex) system where a cluster label exists. To enable this feature you need to configure the following:
 
-```
+```jsonnet
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: true,
     clusterLabel: '<your cluster label>',
@@ -163,7 +162,7 @@ names and add grafana tags.
 
 In a new directory, add a file `mixin.libsonnet`:
 
-```
+```jsonnet
 local kubernetes = import "kubernetes-mixin/mixin.libsonnet";
 
 kubernetes {
@@ -201,7 +200,7 @@ The steps described below extend on the existing mixin library without modifying
 
 In your working directory, create a new file `kubernetes_mixin_override.libsonnet` with the following:
 
-```
+```jsonnet
 local utils = import 'lib/utils.libsonnet';
 (import 'mixin.libsonnet') +
 (
@@ -226,7 +225,7 @@ local utils = import 'lib/utils.libsonnet';
 ```
 Create new file: `lib/kubernetes_customised_alerts.jsonnet` with the following:
 
-```
+```jsonnet
 std.manifestYamlDoc((import '../kubernetes_mixin_override.libsonnet').prometheusAlerts)
 ```
 Running `jsonnet -S lib/kubernetes_customised_alerts.jsonnet` will build the alerts with your customisations.
