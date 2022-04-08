@@ -15,6 +15,8 @@
     // See https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-can-i-configure-overprovisioning-with-cluster-autoscaler
     // for more details.
     ignoringOverprovisionedWorkloadSelector: '',
+    # Max evictions per second that will trigger an alert. The default value generally allows for only one pod occasionally being evicted. Any more evictions than that will trigger the alert.
+    highEvictionRateThreshold: 0.002,
   },
 
   prometheusAlerts+:: {
@@ -154,6 +156,20 @@
             annotations: {
               description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
               summary: 'Processes experience elevated CPU throttling.',
+            },
+          },
+          {
+            alert: 'KubePodEvictionRateHigh',
+            expr: |||
+              sum(rate(kubelet_evictions[15m])) > %(highEvictionRateThreshold)s
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            'for': '1m',
+            annotations: {
+              description: 'Pods are being evicted at an unexpectedly high rate of {{ $value }} pods per second. This is typically caused by pods frequently exceeding RAM/ephemeral-storage limits or by nodes being NotReady for extended periods.',
+              summary: 'Cluster is evicting pods at an unexpectedly high rate.',
             },
           },
         ],
