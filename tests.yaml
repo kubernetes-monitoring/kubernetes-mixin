@@ -5,6 +5,7 @@ rule_files:
 evaluation_interval: 1m
 
 tests:
+# PersistentVolume disk space
 - interval: 1m
   input_series:
   - series: 'kubelet_volume_stats_available_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
@@ -198,6 +199,201 @@ tests:
   alert_rule_test:
     - eval_time: 61m
       alertname: KubePersistentVolumeFillingUp
+
+# PersistentVolume inodes
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 512 64 16'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 1024 1024 1024'
+  - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '16 64 512 1024'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+    values: '1 1 1 1'
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 2m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 3m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 4m
+    alertname: KubePersistentVolumeInodesFillingUp
+    exp_alerts:
+    - exp_labels:
+        job: kubelet
+        namespace: monitoring
+        persistentvolumeclaim: somepvc
+        severity: critical
+      exp_annotations:
+        summary: "PersistentVolumeInodes are filling up."
+        description: 'The PersistentVolume claimed by somepvc in Namespace monitoring only has 1.562% free inodes.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeinodesfillingup
+
+# Don't alert when PVC access_mode is ReadOnlyMany
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 512 64 16'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 1024 1024 1024'
+  - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '16 64 512 1024'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadOnlyMany", service="kube-state-metrics"}'
+    values: '1 1 1 1'
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 2m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 3m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 4m
+    alertname: KubePersistentVolumeInodesFillingUp
+
+# Block volume mounts can report 0 for the kubelet_volume_stats_inodes_used metric but it shouldn't trigger the KubePersistentVolumeInodesFillingUp alert.
+# See https://github.com/kubernetes/kubernetes/commit/b997e0e4d6ccbead435a47d6ac75b0db3d17252f for details.
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 512 64 16'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024 1024 1024 1024'
+  - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '0 0 0 0'
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 2m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 3m
+    alertname: KubePersistentVolumeInodesFillingUp
+  - eval_time: 4m
+    alertname: KubePersistentVolumeInodesFillingUp
+
+  # Don't alert when PVC has been labelled as fully utilised
+- interval: 1m
+  input_series:
+    - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024 512 64 16'
+    - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024 1024 1024 1024'
+    - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '16 64 512 1024'
+    - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+      values: '1 1 1 1'
+    - series: 'kube_persistentvolumeclaim_labels{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc",label_excluded_from_alerts="true"}'
+      values: '1 1 1 1'
+  alert_rule_test:
+    - eval_time: 1m
+      alertname: KubePersistentVolumeInodesFillingUp
+    - eval_time: 2m
+      alertname: KubePersistentVolumeInodesFillingUp
+    - eval_time: 3m
+      alertname: KubePersistentVolumeInodesFillingUp
+    - eval_time: 4m
+      alertname: KubePersistentVolumeInodesFillingUp
+
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024-10x61'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '32768+0x61'
+  - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024+10x61'
+  alert_rule_test:
+  - eval_time: 1h
+    alertname: KubePersistentVolumeInodesFillingUp
+    exp_alerts:
+    - exp_labels:
+        job: kubelet
+        namespace: monitoring
+        persistentvolumeclaim: somepvc
+        severity: critical
+      exp_annotations:
+        summary: "PersistentVolumeInodes are filling up."
+        description: 'The PersistentVolume claimed by somepvc in Namespace monitoring only has 1.294% free inodes.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeinodesfillingup
+
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024-10x61'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '32768+0x61'
+  - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024+10x61'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+    values: '1x61'
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: KubePersistentVolumeInodesFillingUp
+    exp_alerts:
+    - exp_labels:
+        job: kubelet
+        namespace: monitoring
+        persistentvolumeclaim: somepvc
+        severity: warning
+      exp_annotations:
+        summary: "PersistentVolumeInodes are filling up."
+        description: 'Based on recent sampling, the PersistentVolume claimed by somepvc in Namespace monitoring is expected to run out of inodes within four days. Currently 1.263% of its inodes are free.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeinodesfillingup
+    - exp_labels:
+        job: kubelet
+        namespace: monitoring
+        persistentvolumeclaim: somepvc
+        severity: critical
+      exp_annotations:
+        summary: "PersistentVolumeInodes are filling up."
+        description: 'The PersistentVolume claimed by somepvc in Namespace monitoring only has 1.263% free inodes.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepersistentvolumeinodesfillingup
+
+# Block volume mounts can report 0 for the kubelet_volume_stats_inodes_used metric but it shouldn't trigger the KubePersistentVolumeInodesFillingUp alert.
+# See https://github.com/kubernetes/kubernetes/commit/b997e0e4d6ccbead435a47d6ac75b0db3d17252f for details.
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024-10x61'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '32768+0x61'
+  - series: 'kubelet_volume_stats_inodes_used{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '0x61'
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: KubePersistentVolumeInodesFillingUp
+
+# Don't alert when PVC access_mode is ReadOnlyMany
+- interval: 1m
+  input_series:
+  - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1024-10x61'
+  - series: 'kubelet_volume_stats_inodes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '32768+0x61'
+  - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+    values: '1x61'
+  - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadOnlyMany", service="kube-state-metrics"}'
+    values: '1x61'
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: KubePersistentVolumeInodesFillingUp
+
+- interval: 1m
+  input_series:
+    - series: 'kubelet_volume_stats_inodes_free{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024-10x61'
+    - series: 'kubelet_volume_stats_capacity_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '32768+0x61'
+    - series: 'kubelet_volume_stats_used_bytes{job="kubelet",namespace="monitoring",persistentvolumeclaim="somepvc"}'
+      values: '1024+10x61'
+    - series: 'kube_persistentvolumeclaim_access_mode{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc", access_mode="ReadWriteOnce", service="kube-state-metrics"}'
+      values: '1x61'
+    - series: 'kube_persistentvolumeclaim_labels{job="ksm",namespace="monitoring",persistentvolumeclaim="somepvc",label_excluded_from_alerts="true"}'
+      values: '1x61'
+  alert_rule_test:
+    - eval_time: 61m
+      alertname: KubePersistentVolumeInodesFillingUp
 
 - interval: 1m
   input_series:
