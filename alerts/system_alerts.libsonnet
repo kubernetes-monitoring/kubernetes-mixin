@@ -11,7 +11,7 @@
           {
             alert: 'KubeVersionMismatch',
             expr: |||
-              count(count by (git_version) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*"))) > 1
+              count(count by (git_version, %(clusterLabel)s) (label_replace(kubernetes_build_info{%(notKubeDnsCoreDnsSelector)s},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*")) > 1) > 1
             ||| % $._config,
             'for': '15m',
             labels: {
