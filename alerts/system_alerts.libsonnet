@@ -18,8 +18,8 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'There are {{ $value }} different semantic versions of Kubernetes components running.',
-              summary: 'Different semantic versions of Kubernetes components running.',
+              description: 'There are {{ $value }} clusters with different semantic versions of Kubernetes components running.',
+              summary: 'Clusters with different semantic versions of Kubernetes components running.',
             },
           },
           {
