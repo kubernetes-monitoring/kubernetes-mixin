@@ -16,17 +16,16 @@ local headerPanel(kind) =
         content: |||
           <div style="padding: 0px;">
               <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0px;">
-                  <img style="height: 48px; width: 48px; margin-right: 10px;" src="%s" alt="%s"/>
                   <h1 style="margin-top: 5px;">%s: $%s</h1>
               </div>
           </div>
-        ||| % [icon, kind, kind, kindLabel],
+        ||| % [kind, kindLabel],
       },
       transparent: true,
       datasource: '$datasource',
     });
 
-local infoPanel(kind, info) =
+local infoPanel(kind, info, gridPos) =
   local kindLabel = std.asciiLower(kind);
   local filters = [
     'cluster="$cluster"',
@@ -38,33 +37,29 @@ local infoPanel(kind, info) =
   local selector = std.join(',', [f for f in filters if f != null]);
   {
     datetime:
-      c.addDatetimePanel('%s{%s} * 1e3' % [info.metric, selector]),
+      c.addDatetimePanel(info.name, '%s{%s} * 1e3' % [info.metric, selector], gridPos),
     label:
       if 'value' in info
-      then c.addLabelPanel('%s{%s} == %d' % [info.metric, selector, info.value], info.label)
-      else c.addLabelPanel('%s{%s}' % [info.metric, selector], info.label),
+      then c.addLabelPanel(info.name, '%s{%s} == %d' % [info.metric, selector, info.value], info.label, gridPos)
+      else c.addLabelPanel(info.name, '%s{%s}' % [info.metric, selector], info.label, gridPos),
     number:
-      c.addNumberPanel('%s{%s}' % [info.metric, selector]),
+      c.addNumberPanel(info.name, '%s{%s}' % [info.metric, selector], gridPos),
   }[info.type];
 
 local infoRows(kind) =
   function(d)
+    local height = std.length(model.kinds[kind].info) * 2;
     local kindLabel = std.asciiLower(kind);
-    local d2 = d.chain([
-      c.nextRow,
-      c.addTextPanel('## Labels'),
-      c.addLabelTablePanel('kube_%s_labels{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], 'label_.+'),
-      c.nextRow,
-      c.addTextPanel('## Annotations'),
-      c.addLabelTablePanel('kube_%s_annotations{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], 'annotations_.+'),
-      c.nextRow,
-    ]);
-    std.foldl(function(d, i)
-      d.chain([
-        c.addTextPanel('## %s' % i.name),
-        infoPanel(kind, i),
-        c.nextRow,
-      ]), model.kinds[kind].info, d2);
+    local panels = std.mapWithIndex(function(idx, info) infoPanel(kind, info, { x: 0, y: 3 + (idx * 2), h: 2, w: 6 }), model.kinds[kind].info) +
+                   [
+                     c.addLabelTablePanel('Labels', 'kube_%s_labels{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], 'label_.+', { x: 6, y: 3, h: height, w: 9 }),
+                     c.addLabelTablePanel('Annotations', 'kube_%s_annotations{cluster="$cluster", %s="$%s"}' % [kindLabel, kindLabel, kindLabel], 'annotations_.+', { x: 15, y: 3, h: height, w: 9 }),
+                   ];
+    d.chain(panels);
+// std.foldl(function(d, i)
+//   d.chain([
+//     infoPanel(kind, i, {x: 0, y: 3 + (infoIdx * 2), h: 2, w: 6}),
+//   ]), model.kinds[kind].info, d2);
 
 // addRelationships adds rows (linking the current king to other kind) to d.
 //
@@ -82,6 +77,9 @@ local infoRows(kind) =
 // c. Many (non-namespaced) -> One (namespaced), eg ???
 // d. Many (non-namespaced) -> One (non-namespaced), eg ???
 local addRelationships(kind) =
+  local ycur = std.length(model.kinds[kind].info) * 2 +  // The height of info panels for this type
+               3;  // The height of the top label panel, and the info row
+  // c.setCursor(0, ycur);
 
   // addSingularLinks adds links from kinds on the 'many' side of a relationship
   // to kinds on the 'one' side of the relationship, eg links from pods -> nodes.
@@ -130,9 +128,8 @@ local addRelationships(kind) =
     local link = '/d/%s/explore-%s?%s' % [std.md5('model-%s.json' % oneVar), oneVar, std.join('&', linkVars)];
 
     d.chain([
-      c.addLinkPanel(r.one, r.one),
-      c.addLabelPanel(query, oneLabel, link=link),
-      c.nextRow,
+      c.addLabelPanel(r.one, query, oneLabel, { w: 6, h: 2 } + c.getCursor(), link=link),
+      c.advanceCursorX(6, 2),
     ]);
 
   // addListLinks adds links from kinds on the 'one' side of a relationship
@@ -181,10 +178,9 @@ local addRelationships(kind) =
     local link = '/d/%s/explore-%s?%s' % [std.md5('model-%s.json' % manyLabel), manyLabel, std.join('&', linkVars)];
 
     d.chain([
-      c.addLinkPanel(r.many, r.many + '(s)', height=4),
-      c.addTablePanel(query, manyLabel, link=link),
-      c.nextRow,
-    ]);
+      c.addTablePanel(r.many + '(s)', query, manyLabel, {w: 8, h: 4} + c.getCursor(), link=link),
+      c.advanceCursorX(8, 4),
+    ]);    
 
   function(d)
     d.chain([

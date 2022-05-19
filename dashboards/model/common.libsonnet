@@ -20,7 +20,7 @@ local model = import 'model.libsonnet';
         regex='',
       )
     )
-    + layout {
+    + {
       // To make building dashboards easier, we use monads(!).
       //
       // The idea is that you build a a list of monads to a dashboard by
@@ -36,6 +36,36 @@ local model = import 'model.libsonnet';
       //
       // This saves you having to nest the return value from each monad.
       chain(fs):: std.foldl(function(d, f) if f != null then f(d) else d, fs, self),
+    },
+
+  _cursor:: {
+    x: 0,
+    y: 0,
+  },
+
+  setCursor(x=null, y=null):
+    self { _cursor+:: {
+      x: if x then x else self._cursor.x,
+      y: if y then y else self._cursor.y,
+    } },
+
+  getCursor():
+    {
+      x: self._cursor.x,
+      y: self._cursor.y,
+    },
+
+  advanceCursorX(w, h):
+  self {
+        _cursor+:: if (self._cursor.x + w >= 24) then
+          { x: 0, y: self._cursor.y + h } else  // TODO: What if we want to set x back to some position greater than 0, like when we want to stack several panels in a "column", then place other panels "next to" that stack. :thinking:
+          { x+: w },
+      },
+      
+
+  advanceCursorY(h):
+    self {
+      _cursor+:: { x: 0, y+: h },
     },
 
   addTemplate(name, config):
@@ -63,10 +93,7 @@ local model = import 'model.libsonnet';
         panels: [],
         title: title,
         type: 'row',
-      })
-      .nextRow(),
-
-  nextRow(d): d.nextRow(),
+      }),
 
   addLinkPanel(kind, text, height=2):
     local icon = model.kinds[kind].icon;
@@ -109,14 +136,12 @@ local model = import 'model.libsonnet';
         datasource: '$datasource',
       }),
 
-  addLabelPanel(query, label, link=null):
+  addLabelPanel(title, query, label, gridPos, link=null):
     function(d)
       d.addPanel({
         type: 'stat',
-        gridPos: {
-          w: 16,
-          h: 2,
-        },
+        title: title,
+        gridPos: gridPos,
         transformations: [],
         datasource: '$datasource',
         targets: [
@@ -173,14 +198,12 @@ local model = import 'model.libsonnet';
         },
       }),
 
-  addNumberPanel(query):
+  addNumberPanel(title, query, gridPos):
     function(d)
       d.addPanel({
         type: 'stat',
-        gridPos: {
-          w: 16,
-          h: 2,
-        },
+        title: title,
+        gridPos: gridPos,
         transformations: [],
         datasource: '$datasource',
         targets: [
@@ -231,14 +254,12 @@ local model = import 'model.libsonnet';
         },
       }),
 
-  addDatetimePanel(query):
+  addDatetimePanel(title, query, gridPos):
     function(d)
       d.addPanel({
         type: 'stat',
-        gridPos: {
-          w: 16,
-          h: 2,
-        },
+        title: title,
+        gridPos: gridPos,
         transformations: [],
         datasource: '$datasource',
         targets: [
@@ -290,9 +311,10 @@ local model = import 'model.libsonnet';
         },
       }),
 
-  addTablePanel(query, label, link=null):
+  addTablePanel(title, query, label, gridPos, link=null):
     function(d)
       d.addPanel({
+        title: title,
         datasource: '$datasource',
         fieldConfig: {
           defaults: {
@@ -330,10 +352,7 @@ local model = import 'model.libsonnet';
           },
           overrides: [],
         },
-        gridPos: {
-          h: 4,
-          w: 16,
-        },
+        gridPos: gridPos,
         options: {
           showHeader: true,
         },
@@ -374,15 +393,12 @@ local model = import 'model.libsonnet';
         pluginVersion: '7.2.2',
       }),
 
-  addLabelTablePanel(query, prefix):
+  addLabelTablePanel(title, query, prefix, gridPos):
     function(d)
       d.addPanel({
         type: 'table',
-        title: '',
-        gridPos: {
-          w: 16,
-          h: 2,
-        },
+        title: title,
+        gridPos: gridPos,
         targets: [
           {
             expr: query,
