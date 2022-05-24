@@ -98,7 +98,7 @@
 
     // This list of disk device names is referenced in various expressions.
     diskDevices: ['mmcblk.p.+', 'nvme.+', 'rbd.+', 'sd.+', 'vd.+', 'xvd.+', 'dm-.+', 'dasd.+'],
-    diskDeviceSelector: 'device=~"%s"' % std.join('|', self.diskDevices),
+    diskDeviceSelector: 'device=~"(/dev.+)|%s"' % std.join('|', self.diskDevices),
 
     // Certain workloads (e.g. KubeVirt/CDI) will fully utilise the persistent volume they claim
     // the size of the PV will never grow since they consume the entirety of the volume by design.
