@@ -75,7 +75,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIErrors',
             expr: |||
-              sum by(name, namespace)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
+              sum by(name, namespace, %(clusterLabel)s)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -88,7 +88,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIDown',
             expr: |||
-              (1 - max by(name, namespace)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
+              (1 - max by(name, namespace, %(clusterLabel)s)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
             ||| % $._config,
             'for': '5m',
             labels: {

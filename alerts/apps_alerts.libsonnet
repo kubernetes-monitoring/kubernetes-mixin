@@ -27,15 +27,15 @@
           },
           {
             // We wrap kube_pod_owner with the topk() aggregator to ensure that
-            // every (namespace, pod) tuple is unique even if the "owner_kind"
+            // every (namespace, pod, %(clusterLabel)s) tuple is unique even if the "owner_kind"
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
             expr: |||
-              sum by (namespace, pod) (
-                max by(namespace, pod) (
+              sum by (namespace, pod, %(clusterLabel)s) (
+                max by(namespace, pod, %(clusterLabel)s) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}
-                ) * on(namespace, pod) group_left(owner_kind) topk by(namespace, pod) (
-                  1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+                ) * on(namespace, pod, %(clusterLabel)s) group_left(owner_kind) topk by(namespace, pod, %(clusterLabel)s) (
+                  1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
             ||| % $._config,
@@ -193,7 +193,7 @@
           },
           {
             expr: |||
-              sum by (namespace, pod, container) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
+              sum by (namespace, pod, container, %(clusterLabel)s) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -238,7 +238,7 @@
           {
             alert: 'KubeJobNotCompleted',
             expr: |||
-              time() - max by(namespace, job_name) (kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              time() - max by(namespace, job_name, %(clusterLabel)s) (kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 and
               kube_job_status_active{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0) > %(kubeJobTimeoutDuration)s
             ||| % $._config,
