@@ -19,6 +19,7 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 | release-0.8  | v1.20+             | v2.11.0+  | v2.0+ |
 | release-0.9  | v1.20+             | v2.11.0+  | v2.0+ |
 | release-0.10 | v1.20+             | v2.11.0+  | v2.0+ |
+| release-0.11 | v1.23+             | v2.11.0+  | v2.0+ |
 | master       | v1.23+             | v2.11.0+  | v2.0+ |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented.
@@ -26,7 +27,7 @@ Therefore v0.1.x of this repository is the last release to support Kubernetes 1.
 
 Some alerts now use Prometheus filters made available in Prometheus 2.11.0, which makes this version of Prometheus a dependency.
 
-Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings. 
+Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings.
 
 Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$__rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *_config*
 
@@ -250,5 +251,5 @@ While the community has not yet fully agreed on alert severities and their to be
 
 ## Note
 
-You can use the external tool call [prom-metrics-check](https://github.com/ContainerSolutions/prom-metrics-check) to validate the created dashboards. This tool allows you to check if the metrics installed and used in Grafana dashboards exist in the Prometheus instance. 
+You can use the external tool call [prom-metrics-check](https://github.com/ContainerSolutions/prom-metrics-check) to validate the created dashboards. This tool allows you to check if the metrics installed and used in Grafana dashboards exist in the Prometheus instance.
 Please have a look at https://github.com/ContainerSolutions/prom-metrics-check.
