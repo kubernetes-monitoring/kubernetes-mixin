@@ -285,7 +285,7 @@
             },
             annotations: {
               description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has not matched the desired number of replicas for longer than 15 minutes.',
-              summary: 'HPA has not matched descired number of replicas.',
+              summary: 'HPA has not matched desired number of replicas.',
             },
             'for': '15m',
             alert: 'KubeHpaReplicasMismatch',
