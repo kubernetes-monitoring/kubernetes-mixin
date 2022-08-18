@@ -33,7 +33,7 @@
             expr: |||
               sum by (namespace, pod, %(clusterLabel)s) (
                 max by(namespace, pod, %(clusterLabel)s) (
-                  kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}
+                  kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown|Failed"}
                 ) * on(namespace, pod, %(clusterLabel)s) group_left(owner_kind) topk by(namespace, pod, %(clusterLabel)s) (
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
