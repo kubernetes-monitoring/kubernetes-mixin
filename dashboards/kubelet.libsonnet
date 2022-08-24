@@ -122,7 +122,7 @@ local statPanel = grafana.statPanel;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(kubelet_pod_start_duration_seconds_count{%(clusterLabel)s="$cluster",%(kubeletSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (instance, le))' % $._config, legendFormat='{{instance}} pod'))
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(kubelet_pod_start_duration_seconds_bucket{%(clusterLabel)s="$cluster",%(kubeletSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (instance, le))' % $._config, legendFormat='{{instance}} pod'))
         .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(clusterLabel)s="$cluster",%(kubeletSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (instance, le))' % $._config, legendFormat='{{instance}} worker'));
 
       local storageOperationRate =
