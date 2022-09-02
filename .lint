@@ -1,5 +1,6 @@
 exclusions:
   template-job-rule:
+<<<<<<< HEAD
   template-instance-rule:
   target-job-rule:
   target-instance-rule:
@@ -7,3 +8,17 @@ exclusions:
   panel-units-rule:
   panel-datasource-rule:
     reason: The new Grafonnet promotes the use of datasources at the query level. This should probably end up in the linter as a valid option.
+=======
+    reason: Job is hardcoded in the mixin config.    
+  template-instance-rule:
+    reason: These dashboards are either cluster wide, or global. As such 'cluster' takes the place of 'instance', or no instance filtering is necessary.
+  target-job-rule:
+    reason: Job is hardcoded in the mixin config, and is therefore a =, not =~.
+  target-instance-rule:    
+    reason: These dashboards are either cluster wide, or global. As such 'cluster' takes the place of 'instance', or no instance filtering is necessary.
+
+  panel-units-rule:
+    reason: Maybe this should only warn, and maybe mixtool shouldn't consider warnings errors?
+  panel-title-description-rule:
+    reason: Maybe this should only warn, and maybe mixtool shouldn't consider warnings errors?
+>>>>>>> b06495f (Dashboard linting exclusions)
