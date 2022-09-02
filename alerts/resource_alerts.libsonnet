@@ -33,7 +33,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Cluster {{ $labels.cluster }} has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.',
+              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.' % $._config,
               summary: 'Cluster has overcommitted CPU resource requests.',
             },
             'for': '10m',
@@ -49,7 +49,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Cluster {{ $labels.cluster }} has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.',
+              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % $._config,
               summary: 'Cluster has overcommitted memory resource requests.',
             },
             'for': '10m',
@@ -66,7 +66,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Cluster {{ $labels.cluster }}  has overcommitted CPU resource requests for Namespaces.',
+              description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted CPU resource requests for Namespaces.' % $._config,
               summary: 'Cluster has overcommitted CPU resource requests.',
             },
             'for': '5m',
@@ -83,7 +83,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Cluster {{ $labels.cluster }}  has overcommitted memory resource requests for Namespaces.',
+              description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted memory resource requests for Namespaces.' % $._config,
               summary: 'Cluster has overcommitted memory resource requests.',
             },
             'for': '5m',
