@@ -1056,7 +1056,7 @@ tests:
         job_name: job1
         severity: warning
       exp_annotations:
-        summary: "Job did not complete in time"
+        summary: "Job did not complete in time."
         description: "Job ns1/job1 is taking more than 12h 0m 0s to complete."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobnotcompleted"
 
