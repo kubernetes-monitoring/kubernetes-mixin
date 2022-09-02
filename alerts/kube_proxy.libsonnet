@@ -11,6 +11,7 @@
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeProxy',
             selector:: $._config.kubeProxySelector,
+            clusterLabel:: $._config.clusterLabel,
           },
         ],
       },
