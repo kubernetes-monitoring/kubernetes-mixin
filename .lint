@@ -1,4 +1,7 @@
-exclusions:
+exclusions:    
+  panel-job-instance-rule:
+    reason: Poorly deprecated rule name for job, see target-job-rule and target-instance-rule below.
+    
   template-job-rule:
     reason: Job is hardcoded in the mixin config.    
   template-instance-rule:
