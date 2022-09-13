@@ -167,7 +167,7 @@
                    !=
                   0
                 ) or (
-                  kube_daemonset_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                  kube_daemonset_status_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                    !=
                   kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 ) or (
@@ -176,7 +176,7 @@
                   kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 )
               ) and (
-                changes(kube_daemonset_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
+                changes(kube_daemonset_status_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
                   ==
                 0
               )
