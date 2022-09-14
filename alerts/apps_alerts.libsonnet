@@ -9,14 +9,15 @@
   local wrap_expr_for_labels(type, expr) =
 
     local labels =
-      if type == 'pods' then { join_labels: $._config.pods_join_labels, on_labels: ['pod', 'namespace'] }
-      else if type == 'statefulsets' then { join_labels: $._config.statefuleset_join_labels, on_labels: ['statefulset', 'namespace'] }
-      else if type == 'deployments' then { join_labels: $._config.deployments_join_labels, on_labels: ['deployment', 'namespace'] }
+      if type == 'pods' then { join_labels: $._config.pods_join_labels, on_labels: ['pod', 'namespace'], metric: 'kube_pod_labels' }
+      else if type == 'statefulsets' then { join_labels: $._config.statefulsets_join_labels, on_labels: ['statefulset', 'namespace'], metric: 'kube_statefulset_labels' }
+      else if type == 'deployments' then { join_labels: $._config.deployments_join_labels, on_labels: ['deployment', 'namespace'], metric: 'kube_deployment_labels' }
+      else if type == 'daemonsets' then { join_labels: $._config.daemonsets_join_labels, on_labels: ['daemonset', 'namespace'], metric: 'kube_daemonset_labels' }
       else { join_labels: [], on_labels: [] };
 
     (if std.length(labels.join_labels) > 0 then '(' else '') +
     expr +
-    (if std.length(labels.join_labels) > 0 then ') * on (%s) group_left(%s) kube_pod_labels' % [std.join(',', labels.on_labels), std.join(',', labels.join_labels)] else ''),
+    (if std.length(labels.join_labels) > 0 then ') * on (%s) group_left(%s) %s' % [std.join(',', labels.on_labels), std.join(',', labels.join_labels), labels.metric] else ''),
 
 
   prometheusAlerts+:: {
@@ -43,7 +44,7 @@
             // every (namespace, pod, %(clusterLabel)s) tuple is unique even if the "owner_kind"
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
-            expr: |||
+            expr: wrap_expr_for_labels('pods', |||
               sum by (namespace, pod, %(clusterLabel)s) (
                 max by(namespace, pod, %(clusterLabel)s) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown|Failed"}
@@ -51,7 +52,7 @@
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
@@ -63,11 +64,11 @@
             alert: 'KubePodNotReady',
           },
           {
-            expr: |||
+            expr: wrap_expr_for_labels('deployments', |||
               kube_deployment_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
               kube_deployment_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
@@ -79,7 +80,7 @@
             alert: 'KubeDeploymentGenerationMismatch',
           },
           {
-            expr: |||
+            expr: wrap_expr_for_labels('deployments', |||
               (
                 kube_deployment_spec_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   >
@@ -89,7 +90,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
@@ -101,7 +102,7 @@
             alert: 'KubeDeploymentReplicasMismatch',
           },
           {
-            expr: |||
+            expr: wrap_expr_for_labels('statefulsets', |||
               (
                 kube_statefulset_status_replicas_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   !=
@@ -111,7 +112,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
@@ -123,11 +124,11 @@
             alert: 'KubeStatefulSetReplicasMismatch',
           },
           {
-            expr: |||
+            expr: wrap_expr_for_labels('statefulsets', |||
               kube_statefulset_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
               kube_statefulset_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
@@ -139,7 +140,7 @@
             alert: 'KubeStatefulSetGenerationMismatch',
           },
           {
-            expr: |||
+            expr: wrap_expr_for_labels('statefulsets', |||
               (
                 max without (revision) (
                   kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
@@ -157,7 +158,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
@@ -170,7 +171,7 @@
           },
           {
             alert: 'KubeDaemonSetRolloutStuck',
-            expr: |||
+            expr: wrap_expr_for_labels('daemonsets', |||
               (
                 (
                   kube_daemonset_status_current_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
@@ -194,7 +195,7 @@
                   ==
                 0
               )
-            ||| % $._config,
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },

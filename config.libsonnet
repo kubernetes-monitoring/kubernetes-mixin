@@ -33,9 +33,11 @@
     containerfsSelector: 'container!=""',
 
     // List of labels to join for different type of metrics
-    pods_join_labels: [],
-    deployments_join_labels: [],
-    statefulsets_join_labels: [],
+    common_join_labels: [],
+    pods_join_labels: $._config.common_join_labels,
+    deployments_join_labels: $._config.common_join_labels,
+    statefulsets_join_labels: $._config.common_join_labels,
+    daemonsets_join_labels: $._config.common_join_labels,
 
     // Grafana dashboard IDs are necessary for stable links for dashboards
     grafanaDashboardIDs: {
