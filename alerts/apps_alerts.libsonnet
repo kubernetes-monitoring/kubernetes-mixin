@@ -6,15 +6,28 @@
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
 
+  local wrap_expr_for_labels(type, expr) =
+
+    local labels =
+      if type == 'pods' then { join_labels: $._config.pods_join_labels, on_labels: ['pod', 'namespace'] }
+      else if type == 'statefulsets' then { join_labels: $._config.statefuleset_join_labels, on_labels: ['statefulset', 'namespace'] }
+      else if type == 'deployments' then { join_labels: $._config.deployments_join_labels, on_labels: ['deployment', 'namespace'] }
+      else { join_labels: [], on_labels: [] };
+
+    (if std.length(labels.join_labels) > 0 then '(' else '') +
+    expr +
+    (if std.length(labels.join_labels) > 0 then ') * on (%s) group_left(%s) kube_pod_labels' % [std.join(',', labels.on_labels), std.join(',', labels.join_labels)] else ''),
+
+
   prometheusAlerts+:: {
     groups+: [
       {
         name: 'kubernetes-apps',
         rules: [
           {
-            expr: (if std.length($._config.pods_join_labels) > 0 then '(' else '') + |||
+            expr: wrap_expr_for_labels('pods', |||
               max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) >= 1
-            ||| % $._config + (if std.length($._config.pods_join_labels) > 0 then ') * on (pod,namespace) group_left(%s) kube_pod_labels' % std.join(',', $._config.pods_join_labels) else ''),
+            ||| % $._config),
             labels: {
               severity: 'warning',
             },
