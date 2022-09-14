@@ -12,9 +12,9 @@
         name: 'kubernetes-apps',
         rules: [
           {
-            expr: |||
+            expr: (if std.length($._config.pods_join_labels) > 0 then '(' else '') + |||
               max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) >= 1
-            ||| % $._config,
+            ||| % $._config + (if std.length($._config.pods_join_labels) > 0 then ') * on (pod,namespace) group_left(%s) kube_pod_labels' % std.join(',', $._config.pods_join_labels) else ''),
             labels: {
               severity: 'warning',
             },
