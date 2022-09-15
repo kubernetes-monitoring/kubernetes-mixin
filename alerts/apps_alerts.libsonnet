@@ -17,7 +17,7 @@
       else if std.startsWith(rule.alert, 'KubeDaemon') then 'daemonset'
       else null;
 
-    local labels = { join_labels: $._config['%ss_join_labels' % std.toString(kind)], on_labels: [kind, 'namespace'], metric: 'kube_%s_labels' % kind };
+    local labels = { join_labels: $._config['%ss_join_labels' % std.toString(kind)], on_labels: [kind, 'namespace'], metric: 'kube_%s_labels' % std.toString(kind) };
 
     // Failed to identify kind - return raw rule
     if kind == null then rule
