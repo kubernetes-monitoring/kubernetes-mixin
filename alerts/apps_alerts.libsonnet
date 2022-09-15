@@ -10,7 +10,7 @@
   local wrap_rule_for_labels(rule) =
     // Detect Kind of rule from name unless hidden `kind field is passed in the rule`
     local kind =
-      if std.objectHas(rule, 'kind') then rule.kind
+      if 'kind' in rule then rule.kind
       else if std.startsWith(rule.alert, 'KubePod') then 'pod'
       else if std.startsWith(rule.alert, 'KubeStateful') then 'statefulset'
       else if std.startsWith(rule.alert, 'KubeDeploy') then 'deployment'
