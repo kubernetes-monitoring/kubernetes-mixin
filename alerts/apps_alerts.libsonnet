@@ -15,12 +15,12 @@
       else if std.startsWith(rule.alert, 'KubeStateful') then 'statefulset'
       else if std.startsWith(rule.alert, 'KubeDeploy') then 'deployment'
       else if std.startsWith(rule.alert, 'KubeDaemon') then 'daemonset'
-      else null;
+      else 'none';
 
-    local labels = { join_labels: $._config['%ss_join_labels' % std.toString(kind)], on_labels: [kind, 'namespace'], metric: 'kube_%s_labels' % std.toString(kind) };
+    local labels = { join_labels: $._config['%ss_join_labels' % kind], on_labels: [kind, 'namespace'], metric: 'kube_%s_labels' % kind };
 
     // Failed to identify kind - return raw rule
-    if kind == null then rule
+    if kind == 'none' then rule
     // No join labels passed in the config - return raw rule
     else if std.length(labels.join_labels) == 0 then rule
     // Wrap expr with join group left
