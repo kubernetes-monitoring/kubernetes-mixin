@@ -6,29 +6,40 @@
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
 
-  local wrap_expr_for_labels(type, expr) =
+  // TODO move into libs
+  local wrap_rule_for_labels(rule) =
+    // Detect Kind of rule from name unless hidden `kind field is passed in the rule`
+    local kind =
+      if std.objectHas(rule, 'kind') then rule.kind
+      else if std.startsWith(rule.alert, 'KubePod') then 'pod'
+      else if std.startsWith(rule.alert, 'KubeStateful') then 'statefulset'
+      else if std.startsWith(rule.alert, 'KubeDeploy') then 'deployment'
+      else if std.startsWith(rule.alert, 'KubeDaemon') then 'daemonset'
+      else null;
 
-    local labels =
-      if type == 'pods' then { join_labels: $._config.pods_join_labels, on_labels: ['pod', 'namespace'], metric: 'kube_pod_labels' }
-      else if type == 'statefulsets' then { join_labels: $._config.statefulsets_join_labels, on_labels: ['statefulset', 'namespace'], metric: 'kube_statefulset_labels' }
-      else if type == 'deployments' then { join_labels: $._config.deployments_join_labels, on_labels: ['deployment', 'namespace'], metric: 'kube_deployment_labels' }
-      else if type == 'daemonsets' then { join_labels: $._config.daemonsets_join_labels, on_labels: ['daemonset', 'namespace'], metric: 'kube_daemonset_labels' }
-      else { join_labels: [], on_labels: [] };
+    local labels = { join_labels: $._config['%ss_join_labels' % std.toString(kind)], on_labels: [kind, 'namespace'], metric: 'kube_%s_labels' % kind };
 
-    (if std.length(labels.join_labels) > 0 then '(' else '') +
-    expr +
-    (if std.length(labels.join_labels) > 0 then ') * on (%s) group_left(%s) %s' % [std.join(',', labels.on_labels), std.join(',', labels.join_labels), labels.metric] else ''),
-
+    // Failed to identify kind - return raw rule
+    if kind == null then rule
+    // No join labels passed in the config - return raw rule
+    else if std.length(labels.join_labels) == 0 then rule
+    // Wrap expr with join group left
+    else
+      rule {
+        expr: '(' + super.expr + ') * on (%s) group_left(%s) %s' % [std.join(',', labels.on_labels), std.join(',', labels.join_labels), labels.metric],
+      },
 
   prometheusAlerts+:: {
     groups+: [
       {
+        local group = self,
         name: 'kubernetes-apps',
-        rules: [
+        rules: [wrap_rule_for_labels(rule) for rule in group.rules_],
+        rules_:: [
           {
-            expr: wrap_expr_for_labels('pods', |||
+            expr: |||
               max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) >= 1
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -44,7 +55,7 @@
             // every (namespace, pod, %(clusterLabel)s) tuple is unique even if the "owner_kind"
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
-            expr: wrap_expr_for_labels('pods', |||
+            expr: |||
               sum by (namespace, pod, %(clusterLabel)s) (
                 max by(namespace, pod, %(clusterLabel)s) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown|Failed"}
@@ -52,7 +63,7 @@
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -64,11 +75,11 @@
             alert: 'KubePodNotReady',
           },
           {
-            expr: wrap_expr_for_labels('deployments', |||
+            expr: |||
               kube_deployment_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
               kube_deployment_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -80,7 +91,7 @@
             alert: 'KubeDeploymentGenerationMismatch',
           },
           {
-            expr: wrap_expr_for_labels('deployments', |||
+            expr: |||
               (
                 kube_deployment_spec_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   >
@@ -90,7 +101,7 @@
                   ==
                 0
               )
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -102,7 +113,7 @@
             alert: 'KubeDeploymentReplicasMismatch',
           },
           {
-            expr: wrap_expr_for_labels('statefulsets', |||
+            expr: |||
               (
                 kube_statefulset_status_replicas_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   !=
@@ -112,7 +123,7 @@
                   ==
                 0
               )
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -124,11 +135,11 @@
             alert: 'KubeStatefulSetReplicasMismatch',
           },
           {
-            expr: wrap_expr_for_labels('statefulsets', |||
+            expr: |||
               kube_statefulset_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
               kube_statefulset_metadata_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -140,7 +151,7 @@
             alert: 'KubeStatefulSetGenerationMismatch',
           },
           {
-            expr: wrap_expr_for_labels('statefulsets', |||
+            expr: |||
               (
                 max without (revision) (
                   kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
@@ -158,7 +169,7 @@
                   ==
                 0
               )
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
@@ -171,7 +182,7 @@
           },
           {
             alert: 'KubeDaemonSetRolloutStuck',
-            expr: wrap_expr_for_labels('daemonsets', |||
+            expr: |||
               (
                 (
                   kube_daemonset_status_current_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
@@ -195,7 +206,7 @@
                   ==
                 0
               )
-            ||| % $._config),
+            ||| % $._config,
             labels: {
               severity: 'warning',
             },
