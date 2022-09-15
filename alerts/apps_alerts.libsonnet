@@ -32,9 +32,8 @@
   prometheusAlerts+:: {
     groups+: [
       {
-        local group = self,
         name: 'kubernetes-apps',
-        rules: [wrap_rule_for_labels(rule) for rule in group.rules_],
+        rules: [wrap_rule_for_labels(rule) for rule in self.rules_],
         rules_:: [
           {
             expr: |||
