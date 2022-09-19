@@ -1,3 +1,5 @@
+local utils = import '../lib/utils.libsonnet';
+
 {
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
@@ -6,34 +8,11 @@
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
 
-  // TODO move into libs
-  local wrap_rule_for_labels(rule) =
-    // Detect Kind of rule from name unless hidden `kind field is passed in the rule`
-    local kind =
-      if 'kind' in rule then rule.kind
-      else if std.startsWith(rule.alert, 'KubePod') then 'pod'
-      else if std.startsWith(rule.alert, 'KubeStateful') then 'statefulset'
-      else if std.startsWith(rule.alert, 'KubeDeploy') then 'deployment'
-      else if std.startsWith(rule.alert, 'KubeDaemon') then 'daemonset'
-      else 'none';
-
-    local labels = { join_labels: $._config['%ss_join_labels' % kind], on_labels: [kind, 'namespace'], metric: 'kube_%s_labels' % kind };
-
-    // Failed to identify kind - return raw rule
-    if kind == 'none' then rule
-    // No join labels passed in the config - return raw rule
-    else if std.length(labels.join_labels) == 0 then rule
-    // Wrap expr with join group left
-    else
-      rule {
-        expr: '(' + super.expr + ') * on (%s) group_left(%s) %s' % [std.join(',', labels.on_labels), std.join(',', labels.join_labels), labels.metric],
-      },
-
   prometheusAlerts+:: {
     groups+: [
       {
         name: 'kubernetes-apps',
-        rules: [wrap_rule_for_labels(rule) for rule in self.rules_],
+        rules: [utils.wrap_rule_for_labels(rule, $._config) for rule in self.rules_],
         rules_:: [
           {
             expr: |||

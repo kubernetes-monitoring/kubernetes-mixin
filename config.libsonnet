@@ -38,6 +38,9 @@
     deployments_join_labels: $._config.common_join_labels,
     statefulsets_join_labels: $._config.common_join_labels,
     daemonsets_join_labels: $._config.common_join_labels,
+    horizontalpodautoscalers_join_labels: $._config.common_join_labels,
+    jobs_join_labels: $._config.common_join_labels,
+    persistentvolumeclaims_join_labels: $._config.common_join_labels,
 
     // Grafana dashboard IDs are necessary for stable links for dashboards
     grafanaDashboardIDs: {
