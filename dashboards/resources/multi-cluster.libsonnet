@@ -15,37 +15,6 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           '%(dashboardNamePrefix)sCompute Resources /  Multi-Cluster' % $._config.grafanaK8s,
           uid=($._config.grafanaDashboardIDs['k8s-resources-multicluster.json']),
         ).addRow(
-          (g.row('Headlines') +
-           {
-             height: '100px',
-             showTitle: false,
-           })
-          .addPanel(
-            g.panel('CPU Utilisation') +
-            g.statPanel('cluster:node_cpu:ratio_rate5m')
-          )
-          .addPanel(
-            g.panel('CPU Requests Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config)
-          )
-          .addPanel(
-            g.panel('CPU Limits Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config)
-          )
-          .addPanel(
-            g.panel('Memory Utilisation') +
-            g.statPanel('1 - sum(:node_memory_MemAvailable_bytes:sum) / sum(node_memory_MemTotal_bytes{%(nodeExporterSelector)s})' % $._config)
-          )
-          .addPanel(
-            g.panel('Memory Requests Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config)
-          )
-          .addPanel(
-            g.panel('Memory Limits Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config)
-          )
-        )
-        .addRow(
           g.row('CPU')
           .addPanel(
             g.panel('CPU Usage') +
