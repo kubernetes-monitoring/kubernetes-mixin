@@ -70,17 +70,17 @@
             annotations+: {
               description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % $._config,
             },
-          } else 
-          {
-            expr: |||
-              sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="memory"}) - max(kube_node_status_allocatable{resource="memory"})) > 0
-              and
-              (sum(kube_node_status_allocatable{resource="memory"}) - max(kube_node_status_allocatable{resource="memory"})) > 0
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.',
+          } else
+            {
+              expr: |||
+                sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="memory"}) - max(kube_node_status_allocatable{resource="memory"})) > 0
+                and
+                (sum(kube_node_status_allocatable{resource="memory"}) - max(kube_node_status_allocatable{resource="memory"})) > 0
+              ||| % $._config,
+              annotations+: {
+                description: 'Cluster has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.',
+              },
             },
-          },
           {
             alert: 'KubeCPUQuotaOvercommit',
             labels: {
@@ -101,18 +101,18 @@
             annotations+: {
               description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted CPU resource requests for Namespaces.' % $._config,
             },
-          } else 
-          {
-            expr: |||
-              sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(cpu|requests.cpu)"}))
-                /
-              sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})
-                > %(namespaceOvercommitFactor)s
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster has overcommitted CPU resource requests for Namespaces.',
+          } else
+            {
+              expr: |||
+                sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(cpu|requests.cpu)"}))
+                  /
+                sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})
+                  > %(namespaceOvercommitFactor)s
+              ||| % $._config,
+              annotations+: {
+                description: 'Cluster has overcommitted CPU resource requests for Namespaces.',
+              },
             },
-          },
           {
             alert: 'KubeMemoryQuotaOvercommit',
             labels: {
@@ -133,18 +133,18 @@
             annotations+: {
               description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted memory resource requests for Namespaces.' % $._config,
             },
-          } else 
-          {
-            expr: |||
-              sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(memory|requests.memory)"}))
-                /
-              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})
-                > %(namespaceOvercommitFactor)s
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster has overcommitted memory resource requests for Namespaces.',
+          } else
+            {
+              expr: |||
+                sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(memory|requests.memory)"}))
+                  /
+                sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})
+                  > %(namespaceOvercommitFactor)s
+              ||| % $._config,
+              annotations+: {
+                description: 'Cluster has overcommitted memory resource requests for Namespaces.',
+              },
             },
-          },
           {
             alert: 'KubeQuotaAlmostFull',
             expr: |||
