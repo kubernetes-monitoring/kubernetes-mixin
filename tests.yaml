@@ -1168,7 +1168,7 @@ tests:
     - exp_labels:
         severity: "warning"
       exp_annotations:
-        description: 'Cluster   has overcommitted CPU resource requests for Namespaces.'
+        description: 'Cluster has overcommitted CPU resource requests for Namespaces.'
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecpuquotaovercommit"
         summary: "Cluster has overcommitted CPU resource requests."
 
@@ -1211,6 +1211,6 @@ tests:
     - exp_labels:
         severity: "warning"
       exp_annotations:
-        description: 'Cluster   has overcommitted memory resource requests for Namespaces.'
+        description: 'Cluster has overcommitted memory resource requests for Namespaces.'
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubememoryquotaovercommit"
         summary: "Cluster has overcommitted memory resource requests."
