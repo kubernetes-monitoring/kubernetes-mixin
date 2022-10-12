@@ -192,6 +192,20 @@
             'for': '15m',
           },
           {
+            alert: 'KubeDaemonSetUnavailable',
+            expr: |||
+              kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} - kube_daemonset_status_number_available{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'A number of pods of daemonset {{ $labels.namespace }}/{{ $labels.daemonset }} have been unavailable for at least 5 minutes.',
+              summary: 'DaemonSet is partially unavailable.',
+            },
+            'for': '5m',
+          },
+          {
             expr: |||
               sum by (namespace, pod, container, %(clusterLabel)s) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
             ||| % $._config,
