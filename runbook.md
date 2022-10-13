@@ -57,6 +57,10 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are running where they are not supposed to run.`
 + *Severity*: warning
 
+##### Alert Name: "KubeDaemonSetUnavailable"
++ *Message*: `A number of pods of daemonset {{ $labels.namespace }}/{{ $labels.daemonset }} have been unavailable for at least 5 minutes.`
++ *Severity*: warning
+
 ##### Alert Name: "KubeJobNotCompleted"
 + *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than {{ "%(kubeJobTimeoutDuration)s" | humanizeDuration }} to complete.`
 + *Severity*: warning
