@@ -905,6 +905,37 @@ tests:
     alertname: KubeDaemonSetRolloutStuck
 
 - interval: 1m
+  # Pods in daemonset unavailable
+  input_series:
+  - series: 'kube_daemonset_status_number_available{job="kube-state-metrics",namespace="monitoring",daemonset="node-exporter"}'
+    values: '4 3 4 4 3 3 3 3 3 3 4 4'
+  - series: 'kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics",namespace="monitoring",daemonset="node-exporter"}'
+    values: '4 4 4 4 4 4 4 4 4 4 4 4'
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: KubeDaemonSetUnavailable
+  - eval_time: 5m
+    alertname: KubeDaemonSetUnavailable
+  - eval_time: 6m
+    alertname: KubeDaemonSetUnavailable
+  - eval_time: 7m
+    alertname: KubeDaemonSetUnavailable
+  - eval_time: 8m
+    alertname: KubeDaemonSetUnavailable
+  - eval_time: 9m
+    alertname: KubeDaemonSetUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: kube-state-metrics
+        namespace: monitoring
+        daemonset: node-exporter
+        severity: warning
+      exp_annotations:
+        summary: "DaemonSet is partially unavailable."
+        description: 'A number of pods of daemonset monitoring/node-exporter have been unavailable for at least 5 minutes.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetunavailable
+
+- interval: 1m
   input_series:
   - series: 'kubelet_certificate_manager_client_ttl_seconds{job="kubelet",namespace="monitoring",node="minikube"}'
     values: '86400-60x1'
