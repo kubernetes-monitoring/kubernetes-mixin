@@ -30,10 +30,12 @@
             // every (namespace, pod, %(clusterLabel)s) tuple is unique even if the "owner_kind"
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
+            // Unschedulable pods are excluded from this alert because no attempts are made to start it yet.
             expr: |||
               sum by (namespace, pod, %(clusterLabel)s) (
                 max by(namespace, pod, %(clusterLabel)s) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown|Failed"}
+                  unless ignoring(phase) (kube_pod_status_unschedulable{job="kube-state-metrics"} == 1)
                 ) * on(namespace, pod, %(clusterLabel)s) group_left(owner_kind) topk by(namespace, pod, %(clusterLabel)s) (
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
