@@ -50,6 +50,15 @@
             alert: 'KubePodNotReady',
           },
           {
+            expr: 'last_over_time(kube_pod_status_unschedulable[5m]) == 1',
+            'for': '30m',
+            alert: 'KubePodNotScheduled',
+            annotations: {
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} cannot be scheduled for longer than 30 minutes.',
+              summary: 'Pod cannot be scheduled.',
+            },
+          },
+          {
             expr: |||
               kube_deployment_status_observed_generation{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=
