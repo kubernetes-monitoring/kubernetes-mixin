@@ -38,7 +38,7 @@
             },
             annotations: {
               description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) got OOMKilled',
-              summary: 'Pod got OOMKilled.',
+              summary: 'Pod was OOMKilled.',
             },
             'for': '15m',
             alert: 'KubePodOOMKilled',
