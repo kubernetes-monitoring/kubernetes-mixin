@@ -37,7 +37,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) got OOMKilled',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) was OOMKilled',
               summary: 'Pod was OOMKilled.',
             },
             'for': '15m',
