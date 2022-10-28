@@ -30,6 +30,7 @@
     hostNetworkInterfaceSelector: 'device!~"veth.+"',
     hostMountpointSelector: 'mountpoint="/"',
     wmiExporterSelector: 'job="wmi-exporter"',
+    containerfsSelector: 'container!=""',
 
     // Grafana dashboard IDs are necessary for stable links for dashboards
     grafanaDashboardIDs: {
