@@ -4,6 +4,15 @@ local template = grafana.template;
 
 {
   grafanaDashboards+:: {
+    local datasource = template.datasource(
+      name='datasource',
+      query='prometheus',
+      current=$._config.datasourceName,
+      hide='',
+      label='Data Source',
+      regex=$._config.datasourceFilterRegex,
+      refresh=1,
+    ),
     local clusterTemplate =
       template.new(
         name='cluster',
@@ -364,8 +373,8 @@ local template = grafana.template;
           },
         )
       ) + {
-        templating+: {
-          list+: [clusterTemplate, namespaceTemplate],
+        templating: {
+          list+: [datasource, clusterTemplate, namespaceTemplate],
         },
       },
   },

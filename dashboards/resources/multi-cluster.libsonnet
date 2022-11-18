@@ -1,8 +1,19 @@
+local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libsonnet';
+local template = grafana.template;
 
 {
   grafanaDashboards+::
     if $._config.showMultiCluster then {
+      local datasource = template.datasource(
+        name='datasource',
+        query='prometheus',
+        current=$._config.datasourceName,
+        hide='',
+        label='Data Source',
+        regex=$._config.datasourceFilterRegex,
+        refresh=1,
+      ),
       'k8s-resources-multicluster.json':
         local tableStyles = {
           [$._config.clusterLabel]: {
@@ -100,6 +111,11 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
               'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
             })
           )
-        ),
+        )
+        + {
+          templating: {
+            list+: [datasource],
+          },
+        },
     } else {},
 }
