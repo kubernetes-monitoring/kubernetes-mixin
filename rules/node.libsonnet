@@ -30,11 +30,11 @@
             // This rule gives the number of CPUs per node.
             record: 'node:node_num_cpu:sum',
             expr: |||
-              count by (%(clusterLabel)s, node) (sum by (node, cpu) (
-                node_cpu_seconds_total{%(nodeExporterSelector)s}
-              * on (namespace, %(podLabel)s) group_left(node)
+              count by (%(clusterLabel)s, node) (
+                node_cpu_seconds_total{mode="idle",%(nodeExporterSelector)s}
+                * on (namespace, %(podLabel)s) group_left(node)
                 topk by(namespace, %(podLabel)s) (1, node_namespace_pod:kube_pod_info:)
-              ))
+              )
             ||| % $._config,
           },
           // Add separate rules for Available memory, so we can aggregate across clusters in dashboards.
@@ -53,11 +53,23 @@
             ||| % $._config,
           },
           {
+            // This rule gives cpu utilization per node.
+            record: 'node:node_cpu_utilization:ratio_rate5m',
+            expr: |||
+              avg by (%(clusterLabel)s, node) (
+                sum without (mode) (
+                  rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",%(nodeExporterSelector)s}[5m])
+                )
+              )
+            ||| % $._config,
+          },
+          {
             // This rule gives cpu utilization per cluster
             record: 'cluster:node_cpu:ratio_rate5m',
             expr: |||
-              sum(rate(node_cpu_seconds_total{%(nodeExporterSelector)s,mode!="idle",mode!="iowait",mode!="steal"}[5m])) /
-              count(sum(node_cpu_seconds_total{%(nodeExporterSelector)s}) by (%(clusterLabel)s, instance, cpu))
+              avg by (%(clusterLabel)s) (
+                node:node_cpu_utilization:ratio_rate5m
+              )
             ||| % $._config,
           },
         ],
