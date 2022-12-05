@@ -32,9 +32,9 @@ local singlestat = grafana.singlestat;
           format='percentunit',
           decimals=3,
           fill=10,
-          description='How much error budget is left looking at our %.3f%% availability guarantees?' % $._config.SLOs.apiserver.target,
+          description='How much error budget is left looking at our %.3f%% availability guarantees?' % (100 * $._config.SLOs.apiserver.target),
         )
-        .addTarget(prometheus.target('100 * (apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"} - %f)' % [$._config.SLOs.apiserver.days, $._config.clusterLabel, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
+        .addTarget(prometheus.target('(apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"} - %f) / (1 - %f)' % [$._config.SLOs.apiserver.days, $._config.clusterLabel, $._config.SLOs.apiserver.target, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
 
       local readAvailability =
         singlestat.new(
