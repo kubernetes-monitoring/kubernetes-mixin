@@ -34,7 +34,7 @@
           {
             record: 'node_namespace_pod_container:container_memory_rss',
             expr: |||
-              container_memory_rss{%(cadvisorSelector)s, image!=""}
+              topk by (pod, container) (1, container_memory_rss{%(cadvisorSelector)s, image!=""})
               * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
                 max by(namespace, pod, node) (kube_pod_info{node!=""})
               )
