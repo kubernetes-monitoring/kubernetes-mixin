@@ -265,6 +265,35 @@
             },
           },
           {
+            alert: 'KubeJobFailing',
+            expr: |||
+              clamp_max(
+                max(
+                  kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                  * ON(job_name,namespace) GROUP_RIGHT()
+                  kube_job_owner{owner_name!="",owner_name!="<none>"}
+                )
+                BY (job_name, owner_name, namespace)
+                == ON(owner_name) GROUP_LEFT()
+                max(
+                  kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                  * ON(job_name,namespace) GROUP_RIGHT()
+                  kube_job_owner{owner_name!="",owner_name!="<none>"}
+                )
+              BY (owner_name), 1)
+              * ON(job_name) GROUP_LEFT()
+              (kube_job_status_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0)
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is failing to complete.',
+              summary: 'Job is failing to complete.',
+            },
+          },
+          {
             expr: |||
               (kube_horizontalpodautoscaler_status_desired_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 !=

@@ -67,6 +67,11 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 + *Action*: Check the job using `kubectl describe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
 
+##### Alert Name: "KubeJobFailing"
++ *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} is failing to complete.`
++ *Severity*: warning
++ *Action*: Check the job using `kubectl describe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
+
 ### Group Name: "kubernetes-resources"
 ##### Alert Name: "KubeCPUOvercommit"
 + *Message*: `Cluster has overcommitted CPU resource requests for Pods and cannot tolerate node failure.`
