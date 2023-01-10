@@ -28,11 +28,11 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           )
           .addPanel(
             g.panel('CPU Requests Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config)
+            g.statPanel('sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="cpu"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config)
           )
           .addPanel(
             g.panel('CPU Limits Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config)
+            g.statPanel('sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="cpu"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config)
           )
           .addPanel(
             g.panel('Memory Utilisation') +
@@ -40,11 +40,11 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           )
           .addPanel(
             g.panel('Memory Requests Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config)
+            g.statPanel('sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="memory"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config)
           )
           .addPanel(
             g.panel('Memory Limits Commitment') +
-            g.statPanel('sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config)
+            g.statPanel('sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="memory"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config)
           )
         )
         .addRow(
@@ -61,10 +61,10 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
             g.panel('CPU Quota') +
             g.tablePanel([
               'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (%(clusterLabel)s)' % $._config,
-              'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
-              'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
-              'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
-              'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
+              'sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
+              'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (%(clusterLabel)s) / sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
+              'sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
+              'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (%(clusterLabel)s) / sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config,
             ], tableStyles {
               'Value #A': { alias: 'CPU Usage' },
               'Value #B': { alias: 'CPU Requests' },
@@ -90,10 +90,10 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
             g.tablePanel([
               // Not using container_memory_usage_bytes here because that includes page cache
               'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config,
-              'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
-              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
-              'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
-              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
+              'sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
+              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
+              'sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
+              'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config,
             ], tableStyles {
               'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
               'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
