@@ -1041,6 +1041,28 @@ tests:
 
 - interval: 1m
   input_series:
+  - series: 'kube_job_status_start_time{container="kube-rbac-proxy-main", endpoint="https-main", job="kube-state-metrics", job_name="job1", namespace="ns1", service="kube-state-metrics"}'
+    values: '1610638100+1x20'
+  - series: 'kube_job_owner{container="kube-rbac-proxy-main", endpoint="https-main", job="kube-state-metrics", job_name="job1", namespace="ns1", owner_is_controller="false", owner_kind="ConfigMap", owner_name="job1owner", service="kube-state-metrics"}'
+    values: '1+0x20'
+  - series: 'kube_job_status_failed{container="kube-rbac-proxy-main", endpoint="https-main", job="kube-state-metrics", job_name="job1", namespace="ns1", service="kube-state-metrics"}'
+    values: '1+0x20'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubeJobFailing
+    exp_alerts:
+    - exp_labels:
+        namespace: ns1
+        job_name: job1
+        owner_name: job1owner
+        severity: warning
+      exp_annotations:
+        summary: "Job is failing to complete."
+        description: "Job ns1/job1 is failing to complete."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobfailing"
+
+- interval: 1m
+  input_series:
   - series: 'kube_job_status_start_time{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
     values: '0+0x200 _x500 0+0x40'
   - series: 'kube_job_status_active{namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
