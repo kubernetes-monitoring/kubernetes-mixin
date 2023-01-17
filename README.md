@@ -191,9 +191,9 @@ $ jb install github.com/kubernetes-monitoring/kubernetes-mixin
 Generate the alerts, rules and dashboards:
 
 ```
-$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "mixin.libsonnet").prometheusAlerts)' > alerts.yml
-$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "mixin.libsonnet").prometheusRules)' >files/rules.yml
-$ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDashboards'
+$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "kubernetes-mixin/mixin.libsonnet").prometheusAlerts)' > alerts.yml
+$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "kubernetes-mixin/mixin.libsonnet").prometheusRules)' >files/rules.yml
+$ jsonnet -J vendor -m files/dashboards -e '(import "kubernetes-mixin/mixin.libsonnet").grafanaDashboards'
 ```
 
 ### Customising alert annotations
