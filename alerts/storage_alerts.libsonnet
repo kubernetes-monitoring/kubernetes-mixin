@@ -76,6 +76,8 @@
               ) < 0.03
               and
               kubelet_volume_stats_inodes_used{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
+              and
+              kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               unless on(namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
               unless on(namespace, persistentvolumeclaim)
