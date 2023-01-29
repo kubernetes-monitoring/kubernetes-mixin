@@ -1113,7 +1113,7 @@ tests:
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping"
         summary: "Pod is crash looping."
   - eval_time: 20m
-    alertname: KubePodCrashLooping   # alert fired for a period of 5 minutes after resolution because the alert looks back at the last 5 minutes of data and the range vector doesn't take stale samples into account 
+    alertname: KubePodCrashLooping   # alert fired for a period of 5 minutes after resolution because the alert looks back at the last 5 minutes of data and the range vector doesn't take stale samples into account
     exp_alerts:
       - exp_labels:
           severity: "warning"
@@ -1214,3 +1214,25 @@ tests:
         description: 'Cluster has overcommitted memory resource requests for Namespaces.'
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubememoryquotaovercommit"
         summary: "Cluster has overcommitted memory resource requests."
+
+- interval: 1m
+  input_series:
+  - series: 'container_oom_events_total{container="dbserver", namespace="default", pod="dbserver-128fnk319a-alq1x"}'
+    values: '0 0 0 0 0 0 0'
+  - series: 'container_oom_events_total{container="webserver", namespace="default", pod="webserver-69755ddb67-dn2v5"}'
+    values: '0 2 2 4 4 4 4'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: KubeContainerOOMEvents
+  - eval_time: 6m
+    alertname: KubeContainerOOMEvents
+    exp_alerts:
+    - exp_labels:
+        container: webserver
+        namespace: default
+        pod: webserver-69755ddb67-dn2v5
+        severity: warning
+      exp_annotations:
+        summary: Processes are being OOMKilled
+        description: Processes are being killed by the Out Of Memory (OOM) Killer inside the "webserver" container in pod default/webserver-69755ddb67-dn2v5.
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecontaineroomevents
