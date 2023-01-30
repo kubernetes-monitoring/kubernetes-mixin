@@ -16,11 +16,24 @@ local template = grafana.template;
         sort=1
       ),
 
+    local nodeRoleTemplate =
+      template.new(
+        name='role',
+        datasource='$datasource',
+        query='label_values(kube_node_role{%(clusterLabel)s="$cluster"}, role)' % $._config,
+        allValues='.+',
+        current='all',
+        hide='',
+        refresh=2,
+        includeAll=true,
+        sort=1
+      ),
+
     local nodeTemplate =
       template.new(
         name='node',
         datasource='$datasource',
-        query='label_values(kube_node_info{%(clusterLabel)s="$cluster"}, node)' % $._config,
+        query='label_values(kube_node_info{%(clusterLabel)s="$cluster"} * on (node) group_right kube_node_role{%(clusterLabel)s="$cluster", role=~"$role"}, node)' % $._config,
         current='',
         hide='',
         refresh=2,
@@ -145,7 +158,7 @@ local template = grafana.template;
         )
       ) + {
         templating+: {
-          list+: [clusterTemplate, nodeTemplate],
+          list+: [clusterTemplate, nodeRoleTemplate, nodeTemplate],
         },
       },
   },
