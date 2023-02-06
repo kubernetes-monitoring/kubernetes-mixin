@@ -9,12 +9,14 @@ JSONNETFMT_BIN=$(BIN_DIR)/jsonnetfmt
 PROMTOOL_BIN=$(BIN_DIR)/promtool
 TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(GRAFANA_DASHBOARD_LINTER_BIN)
 JSONNETFMT_ARGS=-n 2 --max-blank-lines 2 --string-style s --comment-style s
+SRC_DIR ?=dashboards
+OUT_DIR ?=dashboards_out
 
 .PHONY: all
 all: fmt generate lint test
 
 .PHONY: generate
-generate: prometheus_alerts.yaml prometheus_rules.yaml dashboards_out
+generate: prometheus_alerts.yaml prometheus_rules.yaml $(OUT_DIR)
 
 $(JSONNET_VENDOR): $(JB_BIN) jsonnetfile.json
 	$(JB_BIN) install
@@ -30,9 +32,9 @@ prometheus_alerts.yaml: $(JSONNET_BIN) mixin.libsonnet lib/alerts.jsonnet alerts
 prometheus_rules.yaml: $(JSONNET_BIN) mixin.libsonnet lib/rules.jsonnet rules/*.libsonnet
 	@$(JSONNET_BIN) -J vendor -S lib/rules.jsonnet > $@
 
-dashboards_out: $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.jsonnet dashboards/*.libsonnet
-	@mkdir -p dashboards_out
-	@$(JSONNET_BIN) -J vendor -m dashboards_out lib/dashboards.jsonnet
+$(OUT_DIR): $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.jsonnet $(SRC_DIR)/*.libsonnet
+	@mkdir -p $(OUT_DIR)
+	@$(JSONNET_BIN) -J vendor -m $(OUT_DIR) lib/dashboards.jsonnet
 
 .PHONY: lint
 lint: jsonnet-lint alerts-lint dashboards-lint
@@ -48,14 +50,14 @@ alerts-lint: $(PROMTOOL_BIN) prometheus_alerts.yaml prometheus_rules.yaml
 	@$(PROMTOOL_BIN) check rules prometheus_rules.yaml
 	@$(PROMTOOL_BIN) check rules prometheus_alerts.yaml
 
-dashboards_out/.lint: dashboards_out
+$(OUT_DIR)/.lint: $(OUT_DIR)
 	@cp .lint $@
 
 .PHONY: dashboards-lint
-dashboards-lint: $(GRAFANA_DASHBOARD_LINTER_BIN) dashboards_out/.lint
+dashboards-lint: $(GRAFANA_DASHBOARD_LINTER_BIN) $(OUT_DIR)/.lint
 	# Replace $$interval:$$resolution var with $$__rate_interval to make dashboard-linter happy.
-	@sed -i -e 's/$$interval:$$resolution/$$__rate_interval/g' dashboards_out/*.json
-	@find dashboards_out -name '*.json' -print0 | xargs -n 1 -0 $(GRAFANA_DASHBOARD_LINTER_BIN) lint --strict
+	@sed -i -e 's/$$interval:$$resolution/$$__rate_interval/g' $(OUT_DIR)/*.json
+	@find $(OUT_DIR) -name '*.json' -print0 | xargs -n 1 -0 $(GRAFANA_DASHBOARD_LINTER_BIN) lint --strict
 
 
 .PHONY: clean
