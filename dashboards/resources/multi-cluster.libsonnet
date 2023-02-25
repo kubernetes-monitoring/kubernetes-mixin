@@ -23,6 +23,19 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
           .addPanel(
             g.panel('CPU Utilisation') +
             g.statPanel('cluster:node_cpu:ratio_rate5m')
+            + {
+              transformations: [
+                {
+                  id: 'labelsToFields',
+                  options: {
+                    keepLabels: [
+                      '%(clusterLabel)s' % $._config,
+                    ],
+                    valueLabel: '%(clusterLabel)s' % $._config,
+                  },
+                },
+              ],
+            }
           )
           .addPanel(
             g.panel('CPU Requests Commitment') +
