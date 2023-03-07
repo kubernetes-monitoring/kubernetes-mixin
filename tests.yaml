@@ -679,6 +679,22 @@ tests:
         description: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready"
 
+# Don't alert if the pod was evicted
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",namespace="ns1",phase="Pending",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",namespace="ns1",owner_is_controller="false",owner_kind="<None>",owner_name="ds-7cc77d965f",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_status_reason{job="kube-state-metrics",namespace="ns1",pod="pod-ds-7cc77d965f-cgsdv",reason="Evicted"}'
+    values: '1+0x20'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubePodNotReady
+    exp_alerts: []
+
 - interval: 1m
   input_series:
   - series: 'container_cpu_usage_seconds_total{container="alertmanager",cpu="total",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",namespace="monitoring",pod="alertmanager-main-0",service="kubelet"}'

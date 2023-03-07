@@ -38,6 +38,7 @@
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
               ) > 0
+              unless (sum by (namespace, pod, %(clusterLabel)s) (kube_pod_status_reason{reason="Evicted"} > 0))
             ||| % $._config,
             labels: {
               severity: 'warning',
