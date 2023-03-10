@@ -34,9 +34,9 @@
           } +
           if $._config.showMultiCluster then {
             expr: |||
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s)) > 0
+              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(kubeStateMetricsSelector)s,%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
               and
-              (sum(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s)) > 0
+              (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
             ||| % $._config,
             annotations+: {
               description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.' % $._config,
