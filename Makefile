@@ -76,3 +76,9 @@ $(TOOLING): $(BIN_DIR)
 	@echo Installing tools from hack/tools.go
 	@cd scripts && go list -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o $(BIN_DIR) %
 
+########################################
+# "check-with-upstream" workflow checks.
+########################################
+
+check-selectors-ksm:
+	@./scripts/check-selectors-ksm.sh
