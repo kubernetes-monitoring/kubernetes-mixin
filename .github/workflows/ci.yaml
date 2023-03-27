@@ -51,3 +51,13 @@ jobs:
       with:
         persist-credentials: false
     - run: make --always-make test
+  pint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Run pint
+        uses: prymitive/pint-action@v1
+        with:
+          workdir: 'rules'
