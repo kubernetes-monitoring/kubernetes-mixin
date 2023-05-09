@@ -37,6 +37,9 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubeDeploymentReplicasMismatch"
 + *Message*: `Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica mismatch`
 + *Severity*: warning
+##### Alert Name: "KubeDeploymentRolloutStuck"
++ *Message*: `Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }} is not progressing`
++ *Severity*: warning
 ##### Alert Name: "KubeStatefulSetReplicasMismatch"
 + *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica mismatch`
 + *Severity*: warning
