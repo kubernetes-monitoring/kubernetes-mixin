@@ -813,6 +813,30 @@ tests:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
+# KubeDeploymentRolloutStuck
+- interval: 1m
+  input_series:
+  - series: 'kube_deployment_status_condition{job="kube-state-metrics",namespace="monitoring",deployment="stuck", condition="Progressing", status="false"}'
+    values: '1+0x17 0+0x5'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeDeploymentRolloutStuck
+  - eval_time: 16m
+    alertname: KubeDeploymentRolloutStuck
+    exp_alerts:
+    - exp_labels:
+        job: kube-state-metrics
+        namespace: monitoring
+        deployment: stuck
+        severity: warning
+        condition: Progressing
+        status: "false"
+      exp_annotations:
+        summary: 'Deployment rollout is not progressing.'
+        description: 'Rollout of deployment monitoring/stuck is not progressing for longer than 15 minutes.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedeploymentrolloutstuck
+  - eval_time: 18m
+    alertname: KubeDeploymentRolloutStuck
 - interval: 1m
   # Misscheduled is non zero.
   input_series:
