@@ -151,7 +151,7 @@
           {
             record: 'cluster_verb_scope:apiserver_request_slo_duration_seconds_count:increase1h',
             expr: |||
-              sum by (%(clusterLabel)s, verb, scope) (increase(apiserver_request_slo_duration_seconds_count[1h]))
+              sum by (%(clusterLabel)s, verb, scope) (increase(apiserver_request_slo_duration_seconds_count{%(kubeApiserverSelector)s}[1h]))
             ||| % $._config,
           },
           {
