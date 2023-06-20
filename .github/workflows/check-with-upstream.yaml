@@ -12,3 +12,13 @@ jobs:
       with:
         persist-credentials: false
     - run: make --always-make check-selectors-ksm
+$ etcdctl --endpoints=http://127.0.0.1:2379 member list
+10b576500ed3ae71: name=kube-etcd-1 peerURLs=https://10.0.0.1:2380 clientURLs=https://10.0.0.1:2379 isLeader=false
+30bcb5f2f4c17805: name=kube-etcd-2 peerURLs=https://10.0.0.2:2380 clientURLs=https://10.0.0.2:2379 isLeader=false
+a908b0f9f07a7127: name=kube-etcd-3 peerURLs=https://10.0.0.3:2380 clientURLs=https://10.0.0.3:2379 isLeader=true
+
+$ etcdctl --endpoints=http://127.0.0.1:2379 member remove 30bcb5f2f4c17805
+Removed member 30bcb5f2f4c17805 from cluster
+
+$ etcdctl member add kube-etcd-4 --peer-urls=http://[new node IP]:2380
+Member 2be1eb8f84b7f63e added to cluster ef37ad9dc622a7c4
