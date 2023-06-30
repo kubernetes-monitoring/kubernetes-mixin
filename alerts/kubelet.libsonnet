@@ -72,7 +72,7 @@
           {
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
-              sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (%(clusterLabel)s, node) > 2
+              sum(changes(kube_node_status_condition{%(kubeStateMetricsSelector)s,status="true",condition="Ready"}[15m])) by (%(clusterLabel)s, node) > 2
             ||| % $._config,
             'for': '15m',
             labels: {

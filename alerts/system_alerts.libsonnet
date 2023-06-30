@@ -1,6 +1,7 @@
 {
   _config+:: {
     notKubeDnsCoreDnsSelector: 'job!~"kube-dns|coredns"',
+    kubeApiserverSelector: 'job="kube-apiserver"',
   },
 
   prometheusAlerts+:: {
@@ -28,9 +29,9 @@
             // this is normal and an expected error, therefore it should be
             // ignored in this alert.
             expr: |||
-              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (%(clusterLabel)s, instance, job, namespace)
+              (sum(rate(rest_client_requests_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (%(clusterLabel)s, instance, job, namespace)
                 /
-              sum(rate(rest_client_requests_total[5m])) by (%(clusterLabel)s, instance, job, namespace))
+              sum(rate(rest_client_requests_total{%(kubeApiserverSelector)s}[5m])) by (%(clusterLabel)s, instance, job, namespace))
               > 0.01
             ||| % $._config,
             'for': '15m',

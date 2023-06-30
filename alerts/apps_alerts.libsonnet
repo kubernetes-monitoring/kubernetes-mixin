@@ -89,6 +89,21 @@
           },
           {
             expr: |||
+              kube_deployment_status_condition{condition="Progressing", status="false",%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              != 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }} is not progressing for longer than 15 minutes.',
+              summary: 'Deployment rollout is not progressing.',
+            },
+            'for': '15m',
+            alert: 'KubeDeploymentRolloutStuck',
+          },
+          {
+            expr: |||
               (
                 kube_statefulset_status_replicas_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   !=
