@@ -67,7 +67,7 @@ local utils = import '../lib/utils.libsonnet';
             ||| % $._config,
             'for': '5m',
             labels: {
-              severity: 'critical',
+              severity: 'warning',
             },
             annotations: {
               description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
