@@ -51,6 +51,7 @@ local utils = import '../lib/utils.libsonnet';
             expr: |||
               apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationWarningSeconds)s
             ||| % $._config,
+            'for': '5m',
             labels: {
               severity: 'warning',
             },
@@ -64,6 +65,7 @@ local utils = import '../lib/utils.libsonnet';
             expr: |||
               apiserver_client_certificate_expiration_seconds_count{%(kubeApiserverSelector)s} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{%(kubeApiserverSelector)s}[5m]))) < %(certExpirationCriticalSeconds)s
             ||| % $._config,
+            'for': '5m',
             labels: {
               severity: 'critical',
             },
@@ -75,7 +77,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIErrors',
             expr: |||
-              sum by(name, namespace, %(clusterLabel)s)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
+              sum by(name, namespace, %(clusterLabel)s)(increase(aggregator_unavailable_apiservice_total{%(kubeApiserverSelector)s}[10m])) > 4
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -88,7 +90,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIDown',
             expr: |||
-              (1 - max by(name, namespace, %(clusterLabel)s)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
+              (1 - max by(name, namespace, %(clusterLabel)s)(avg_over_time(aggregator_unavailable_apiservice{%(kubeApiserverSelector)s}[10m]))) * 100 < 85
             ||| % $._config,
             'for': '5m',
             labels: {

@@ -26,8 +26,8 @@
             record: 'node_namespace_pod_container:container_memory_working_set_bytes',
             expr: |||
               container_memory_working_set_bytes{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info{node!=""})
+              * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
+                max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -35,8 +35,8 @@
             record: 'node_namespace_pod_container:container_memory_rss',
             expr: |||
               container_memory_rss{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info{node!=""})
+              * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
+                max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -44,8 +44,8 @@
             record: 'node_namespace_pod_container:container_memory_cache',
             expr: |||
               container_memory_cache{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info{node!=""})
+              * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
+                max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
@@ -53,8 +53,8 @@
             record: 'node_namespace_pod_container:container_memory_swap',
             expr: |||
               container_memory_swap{%(cadvisorSelector)s, image!=""}
-              * on (namespace, pod) group_left(node) topk by(namespace, pod) (1,
-                max by(namespace, pod, node) (kube_pod_info{node!=""})
+              * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
+                max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
             ||| % $._config,
           },
