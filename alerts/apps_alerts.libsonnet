@@ -31,12 +31,10 @@
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
             expr: |||
-              sum by (namespace, pod, %(clusterLabel)s) (
+              sum by (namespace, controller, %(clusterLabel)s) (
                 max by(namespace, pod, %(clusterLabel)s) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown|Failed"}
-                ) * on(namespace, pod, %(clusterLabel)s) group_left(owner_kind) topk by(namespace, pod, %(clusterLabel)s) (
-                  1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
-                )
+                ) * on(namespace, pod, %(clusterLabel)s) group_left(controller) label_replace(kube_pod_owner,"controller","$1","owner_name","(.*)")
               ) > 0
             ||| % $._config,
             labels: {
