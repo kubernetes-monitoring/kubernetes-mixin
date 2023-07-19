@@ -119,7 +119,7 @@
             },
             annotations: {
               description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
-              summary: 'Deployment has not matched the expected number of replicas.',
+              summary: 'StatefulSet has not matched the expected number of replicas.',
             },
             'for': '15m',
             alert: 'KubeStatefulSetReplicasMismatch',
