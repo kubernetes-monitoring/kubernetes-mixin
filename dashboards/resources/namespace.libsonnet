@@ -103,17 +103,17 @@ local template = grafana.template;
         'Value #A': {
           alias: 'IOPS(Reads)',
           unit: 'short',
-          decimals: -1,
+          decimals: 'auto',
         },
         'Value #B': {
           alias: 'IOPS(Writes)',
           unit: 'short',
-          decimals: -1,
+          decimals: 'auto',
         },
         'Value #C': {
           alias: 'IOPS(Reads + Writes)',
           unit: 'short',
-          decimals: -1,
+          decimals: 'auto',
         },
         'Value #D': {
           alias: 'Throughput(Read)',
@@ -338,7 +338,7 @@ local template = grafana.template;
           g.panel('IOPS(Reads+Writes)') +
           g.queryPanel('ceil(sum by(pod) (rate(container_fs_reads_total{%(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{%(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s])))' % $._config, '{{pod}}') +
           g.stack +
-          { yaxes: g.yaxes('short'), decimals: -1 },
+          { yaxes: g.yaxes('short'), decimals: 'auto' },
 
         )
         .addPanel(

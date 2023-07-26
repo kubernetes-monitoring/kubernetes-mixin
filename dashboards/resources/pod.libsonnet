@@ -74,17 +74,17 @@ local template = grafana.template;
         'Value #A': {
           alias: 'IOPS(Reads)',
           unit: 'short',
-          decimals: -1,
+          decimals: 'auto',
         },
         'Value #B': {
           alias: 'IOPS(Writes)',
           unit: 'short',
-          decimals: -1,
+          decimals: 'auto',
         },
         'Value #C': {
           alias: 'IOPS(Reads + Writes)',
           unit: 'short',
-          decimals: -1,
+          decimals: 'auto',
         },
         'Value #D': {
           alias: 'Throughput(Read)',
@@ -304,7 +304,7 @@ local template = grafana.template;
           g.panel('IOPS') +
           g.queryPanel(['ceil(sum by(pod) (rate(container_fs_reads_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])))' % $._config, 'ceil(sum by(pod) (rate(container_fs_writes_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster",namespace="$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])))' % $._config], ['Reads', 'Writes']) +
           g.stack +
-          { yaxes: g.yaxes('short'), decimals: -1 },
+          { yaxes: g.yaxes('short'), decimals: 'auto' },
         )
         .addPanel(
           g.panel('ThroughPut') +
@@ -319,7 +319,7 @@ local template = grafana.template;
           g.panel('IOPS(Reads+Writes)') +
           g.queryPanel('ceil(sum by(container) (rate(container_fs_reads_total{%(cadvisorSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{%(cadvisorSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[%(grafanaIntervalVar)s])))' % $._config, '{{container}}') +
           g.stack +
-          { yaxes: g.yaxes('short'), decimals: -1 },
+          { yaxes: g.yaxes('short'), decimals: 'auto' },
         )
         .addPanel(
           g.panel('ThroughPut(Read+Write)') +
