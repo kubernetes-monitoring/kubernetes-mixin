@@ -234,6 +234,11 @@ Running `jsonnet -S lib/kubernetes_customised_alerts.jsonnet` will build the ale
 
 Same result can be achieved by modyfying the existing `config.libsonnet` with the content of `kubernetes_mixin_override.libsonnet`.
 
+### Loki logs dashboard
+
+Pod logs dashboard with loki datasource can be enabled/disabled with 
+`enableLokiLogs` option.
+
 ## Background
 
 ### Alert Severities
