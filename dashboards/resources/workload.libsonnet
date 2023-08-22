@@ -38,7 +38,7 @@ local template = grafana.template;
         hide='',
         refresh=2,
         includeAll=true,
-        sort=1
+        sort=0
       ),
 
     local workloadTemplate =

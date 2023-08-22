@@ -22,7 +22,7 @@ local template = grafana.template;
         name='type',
         datasource='$datasource',
         query='label_values(namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload=~".+"}, workload_type)' % $._config.clusterLabel,
-        current='deployment',
+        current='',
         hide='',
         refresh=2,
         includeAll=true,
