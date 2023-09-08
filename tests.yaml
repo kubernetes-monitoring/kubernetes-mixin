@@ -518,29 +518,29 @@ tests:
 - interval: 1m
   input_series:
   # Create a histogram where all of the last 10 samples are in the +Inf (> 10 seconds) bucket.
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.005", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.005", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.01", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.01", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.025", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.025", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.05", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.05", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.1", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.1", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.25", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.25", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="0.5", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="0.5", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="1", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="1", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="2.5", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="2.5", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="5", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="5", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="10", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="10", instance="10.0.2.15:10250"}'
     values: '1+0x10'
-  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kublet", le="+Inf", instance="10.0.2.15:10250"}'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="+Inf", instance="10.0.2.15:10250"}'
     values: '30+1x10'
   - series: 'kubelet_node_name{endpoint="https-metrics",instance="10.0.2.15:10250",job="kubelet",namespace="kube-system",node="minikube",service="kubelet"}'
     values: '1 1 1 1 1 1 1 1 1 1'
@@ -813,6 +813,30 @@ tests:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
+# KubeDeploymentRolloutStuck
+- interval: 1m
+  input_series:
+  - series: 'kube_deployment_status_condition{job="kube-state-metrics",namespace="monitoring",deployment="stuck", condition="Progressing", status="false"}'
+    values: '1+0x17 0+0x5'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeDeploymentRolloutStuck
+  - eval_time: 16m
+    alertname: KubeDeploymentRolloutStuck
+    exp_alerts:
+    - exp_labels:
+        job: kube-state-metrics
+        namespace: monitoring
+        deployment: stuck
+        severity: warning
+        condition: Progressing
+        status: "false"
+      exp_annotations:
+        summary: 'Deployment rollout is not progressing.'
+        description: 'Rollout of deployment monitoring/stuck is not progressing for longer than 15 minutes.'
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedeploymentrolloutstuck
+  - eval_time: 18m
+    alertname: KubeDeploymentRolloutStuck
 - interval: 1m
   # Misscheduled is non zero.
   input_series:

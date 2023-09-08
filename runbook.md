@@ -24,6 +24,10 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: KubeletDown
 + *Message*: `Kubelet has disappeared from Prometheus target discovery.`
 + *Severity*: critical
+##### Alert Name: KubeProxyDown
++ *Message*: `KubeProxy has disappeared from Prometheus target discovery`
++ *Severity*: critical
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeproxydown/)
 ### Group Name: kubernetes-apps
 ##### Alert Name: KubePodCrashLooping
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf \"%.2f\" $value }} / second`
@@ -36,6 +40,9 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 ##### Alert Name: "KubeDeploymentReplicasMismatch"
 + *Message*: `Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replica mismatch`
++ *Severity*: warning
+##### Alert Name: "KubeDeploymentRolloutStuck"
++ *Message*: `Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }} is not progressing`
 + *Severity*: warning
 ##### Alert Name: "KubeStatefulSetReplicasMismatch"
 + *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replica mismatch`
