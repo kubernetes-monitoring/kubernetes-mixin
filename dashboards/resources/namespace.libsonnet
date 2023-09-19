@@ -132,6 +132,7 @@ local template = grafana.template;
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-namespace.json']),
+        datasource_regex=$._config.datasourceFilterRegex,
       )
       .addRow(
         (g.row('Headlines') +
