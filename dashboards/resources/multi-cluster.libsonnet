@@ -14,6 +14,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         g.dashboard(
           '%(dashboardNamePrefix)sCompute Resources /  Multi-Cluster' % $._config.grafanaK8s,
           uid=($._config.grafanaDashboardIDs['k8s-resources-multicluster.json']),
+          datasource_regex=$._config.datasourceFilterRegex,
         ).addRow(
           (g.row('Headlines') +
            {
