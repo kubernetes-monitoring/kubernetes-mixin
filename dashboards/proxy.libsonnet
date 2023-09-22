@@ -142,7 +142,8 @@ local singlestat = grafana.singlestat;
       ).addTemplate(
         {
           current: {
-            text: 'default',
+            selected: true,
+            text: $._config.datasourceName,
             value: $._config.datasourceName,
           },
           hide: 0,

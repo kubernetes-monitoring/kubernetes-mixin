@@ -360,7 +360,8 @@ local annotation = grafana.annotation;
       .addTemplate(
         {
           current: {
-            text: 'default',
+            selected: true,
+            text: $._config.datasourceName,
             value: $._config.datasourceName,
           },
           hide: 0,
