@@ -149,7 +149,8 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       ).addTemplate(
         {
           current: {
-            text: 'default',
+            selected: true,
+            text: $._config.datasourceName,
             value: $._config.datasourceName,
           },
           hide: 0,

@@ -165,6 +165,7 @@ local template = grafana.template;
         '%(dashboardNamePrefix)sCompute Resources / Namespace (Workloads)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-workloads-namespace.json']),
         datasource_regex=$._config.datasourceFilterRegex,
+        datasource=$._config.datasourceName,
       )
       .addRow(
         g.row('CPU Usage')
