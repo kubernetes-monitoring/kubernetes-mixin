@@ -72,6 +72,13 @@
               )
             ||| % $._config,
           },
+          {
+            // This rule gives node high memory utilization
+            record: 'node:node_high_mem_utilization:ratio_rate5m',
+            expr: |||
+              (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 50) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
+            ||| % $._config,
+          }
         ],
       },
     ],
