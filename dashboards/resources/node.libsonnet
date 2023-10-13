@@ -40,6 +40,7 @@ local template = grafana.template;
         '%(dashboardNamePrefix)sCompute Resources / Node (Pods)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-node.json']),
         datasource_regex=$._config.datasourceFilterRegex,
+        datasource=$._config.datasourceName,
       )
       .addRow(
         g.row('CPU Usage')
