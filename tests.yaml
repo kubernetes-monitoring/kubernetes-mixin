@@ -674,6 +674,7 @@ tests:
         namespace: ns1
         pod: pod-ds-7cc77d965f-cgsdv
         severity: warning
+        job: kube-state-metrics
       exp_annotations:
         summary: "Pod has been in a non-ready state for more than 15 minutes."
         description: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
