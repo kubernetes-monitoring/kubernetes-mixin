@@ -1238,3 +1238,22 @@ tests:
         description: 'Cluster has overcommitted memory resource requests for Namespaces.'
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubememoryquotaovercommit"
         summary: "Cluster has overcommitted memory resource requests."
+
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_container_status_waiting_reason{namespace="ns1", container="web", pod="pod-7fc866c4d6-8xtzh", reason="PodInitializing", job="kube-state-metrics"}'
+    values: '1x61'
+  alert_rule_test:
+  - eval_time: 1h
+    alertname: KubeContainerWaiting
+    exp_alerts:
+    - exp_labels:
+        namespace: ns1
+        container: web
+        pod: pod-7fc866c4d6-8xtzh
+        severity: warning
+        job: kube-state-metrics
+      exp_annotations:
+        summary: "Pod container waiting longer than 1 hour."
+        description: 'pod/pod-7fc866c4d6-8xtzh in namespace ns1 on container web has been in waiting state for longer than 1 hour.'
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecontainerwaiting"
