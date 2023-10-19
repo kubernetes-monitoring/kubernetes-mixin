@@ -30,6 +30,7 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `KubeProxy has disappeared from Prometheus target discovery`
 + *Severity*: critical
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeproxydown/)
+
 ### Group Name: kubernetes-apps
 ##### Alert Name: KubePodCrashLooping
 + *Message*: `{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf \"%.2f\" $value }} / second`
@@ -70,17 +71,26 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are not scheduled.`
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedaemonsetnotscheduled/)
-
+##### Alert Name: "KubeStatefulSetUpdateNotRolledOut"
++ *Message*: `StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubestatefulsetupdatenotrolledout/)
+##### Alert Name: "KubeHpaReplicasMismatch"
++ *Message*: `'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has not matched the desired number of replicas for longer than 15 minutes.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubehpareplicasmismatch/)
+##### Alert Name: "KubeHpaMaxedOut"
++ *Message*: `HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has been running at max replicas for longer than 15 minutes.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubehpamaxedout/)
 ##### Alert Name: "KubeDaemonSetMisScheduled"
 + *Message*: `A number of pods of daemonset {{$labels.namespace}}/{{$labels.daemonset}} are running where they are not supposed to run.`
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedaemonsetmisscheduled/)
-
 ##### Alert Name: "KubeJobNotCompleted"
 + *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than {{ "%(kubeJobTimeoutDuration)s" | humanizeDuration }} to complete.`
 + *Severity*: warning
 + *Action*: Check the job using `kubectl describe job <job>` and look at the pod logs using `kubectl logs <pod>` for further information.
-
 ##### Alert Name: "KubeJobFailed"
 + *Message*: `Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.`
 + *Severity*: warning
@@ -114,6 +124,11 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `{{ $value | humanizePercentage }} usage of {{ $labels.resource }} in namespace {{ $labels.namespace }}.`
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubequotaexceeded/)
+##### Alert Name: "CPUThrottlingHigh"
++ *Message*: `Processes experience elevated CPU throttling.`
++ *Severity*: info
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/cputhrottlinghigh/)
+
 ### Group Name: "kubernetes-storage"
 ##### Alert Name: "KubePersistentVolumeFillingUp"
 + *Message*: `The persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has {{ $value | humanizePercentage }} free.`
@@ -123,6 +138,13 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `Based on recent sampling, the persistent volume claimed by {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is expected to fill up within four days.`
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup/)
+##### Alert Name: "KubePersistentVolumeInodesFillingUp"
++ *Message*: `PersistentVolume is filling up.`
+##### Alert Name: "KubePersistentVolumeErrors"
++ *Message*: `PersistentVolume is having issues with provisioning.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeerrors/)
+
 ### Group Name: "kubernetes-system"
 ##### Alert Name: "KubeNodeNotReady"
 + *Message*: `{{ $labels.node }} has been unready for more than 15 minutes."`
@@ -193,6 +215,20 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 + *Action*: Use the `apiserver_flowcontrol_rejected_requests_total` metric to determine which flow schema is throttling the traffic to the API Server. The flow schema also provides information on the affected resources and subjects.
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapiterminatedrequests/)
+##### Alert Name: "KubeAggregatedAPIErrors"
++ *Message*: `Kubernetes aggregated API has reported errors.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeaggregatedapierrors/)
+##### Alert Name: "KubeAggregatedAPIDown"
++ *Message*: `Kubernetes aggregated API is down.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeaggregatedapidown/)
+
+### Group Name: "kube-apiserver-slos"
+##### Alert Name: "KubeAPIErrorBudgetBurn"
++ *Message*: `The API server is burning too much error budget.`
++ *Severity*: warning
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapierrorbudgetburn/)
 
 ## Other Kubernetes Runbooks and troubleshooting
 + [Troubleshoot Clusters](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/)
