@@ -58,6 +58,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_resource',
+        rules: [
           {
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests',
             expr: |||
@@ -150,6 +155,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.pod_owner',
+        rules: [
           // workload aggregation for deployments
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
