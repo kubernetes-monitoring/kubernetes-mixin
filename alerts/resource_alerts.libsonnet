@@ -206,23 +206,13 @@
               description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
               summary: 'Processes experience elevated CPU throttling.',
             },
-            } +
-            if $._config.showMultiCluster then {
-              expr: |||
-                sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace, %(clusterLabel)s)
-                  /
-                sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace, %(clusterLabel)s)
-                  > ( %(cpuThrottlingPercent)s / 100 )
-              ||| % $._config,
-            } else
-	      {
-                expr: |||
-                  sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
-                    /
-                  sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
-                    > ( %(cpuThrottlingPercent)s / 100 )
-                ||| % $._config,
-              },
+            expr: |||
+              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
+                /
+              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace, %(clusterLabel)s)
+                > ( %(cpuThrottlingPercent)s / 100 )
+            ||| % $._config,
+	    }
         ],
       },
     ],
