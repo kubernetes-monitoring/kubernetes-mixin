@@ -209,7 +209,7 @@
             expr: |||
               sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
                 /
-              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace, %(clusterLabel)s)
+              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
                 > ( %(cpuThrottlingPercent)s / 100 )
             ||| % $._config,
 	    }
