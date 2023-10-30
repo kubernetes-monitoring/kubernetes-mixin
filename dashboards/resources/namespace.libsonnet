@@ -102,18 +102,18 @@ local template = grafana.template;
         },
         'Value #A': {
           alias: 'IOPS(Reads)',
-          unit: 'short',
-          decimals: -1,
+          unit: 'iops',
+          decimals: 3,
         },
         'Value #B': {
           alias: 'IOPS(Writes)',
-          unit: 'short',
-          decimals: -1,
+          unit: 'iops',
+          decimals: 3,
         },
         'Value #C': {
           alias: 'IOPS(Reads + Writes)',
-          unit: 'short',
-          decimals: -1,
+          unit: 'iops',
+          decimals: 3,
         },
         'Value #D': {
           alias: 'Throughput(Read)',
