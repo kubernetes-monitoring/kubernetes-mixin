@@ -194,6 +194,7 @@
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'Kubelet',
             selector:: $._config.kubeletSelector,
+            clusterLabel:: $._config.clusterLabel,
           },
         ],
       },

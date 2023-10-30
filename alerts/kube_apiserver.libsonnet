@@ -35,7 +35,7 @@ local utils = import '../lib/utils.libsonnet';
               long: '%(long)s' % w,
             },
             annotations: {
-              description: 'The API server is burning too much error budget.',
+              description: 'The API server in Cluster {{ $labels.%(clusterLabel)s }}, is burning too much error budget.' % $._config,
               summary: 'The API server is burning too much error budget.',
             },
             'for': '%(for)s' % w,
@@ -56,7 +56,7 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+              description: 'A client certificate used to authenticate to kubernetes apiserver in Cluster {{ $labels.%s }}, is expiring in less than %s.' % [$._config.clusterLabel, (utils.humanizeSeconds($._config.certExpirationWarningSeconds))],
               summary: 'Client certificate is about to expire.',
             },
           },
@@ -70,7 +70,7 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'critical',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+              description: 'A client certificate used to authenticate to kubernetes apiserver in Cluster {{ $labels.%(clusterLabel)s }}, is expiring in less than %s.' % [$._config.clusterLabel, (utils.humanizeSeconds($._config.certExpirationWarningSeconds))],
               summary: 'Client certificate is about to expire.',
             },
           },
@@ -104,6 +104,7 @@ local utils = import '../lib/utils.libsonnet';
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeAPI',
             selector:: $._config.kubeApiserverSelector,
+            clusterLabel:: $._config.clusterLabel,
           },
           {
             alert: 'KubeAPITerminatedRequests',
@@ -114,8 +115,8 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
-              summary: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
+              description: 'The kubernetes apiserver in Cluster {{ $labels.%(clusterLabel)s }}, has terminated {{ $value | humanizePercentage }} of its incoming requests.' % $._config,
+              summary: 'The kubernetes apiserver has terminated more than 20% of its incoming requests.',
             },
             'for': '5m',
           },

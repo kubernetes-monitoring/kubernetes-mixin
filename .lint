@@ -1,3 +1,17 @@
-exclusions:
- template-job-rule:
- panel-job-instance-rule:
+exclusions:    
+  panel-job-instance-rule:
+    reason: Poorly deprecated rule name for job, see target-job-rule and target-instance-rule below.
+    
+  template-job-rule:
+    reason: Job is hardcoded in the mixin config.    
+  template-instance-rule:
+    reason: These dashboards are either cluster wide, or global. As such 'cluster' takes the place of 'instance', or no instance filtering is necessary.
+  target-job-rule:
+    reason: Job is hardcoded in the mixin config, and is therefore a =, not =~.
+  target-instance-rule:    
+    reason: These dashboards are either cluster wide, or global. As such 'cluster' takes the place of 'instance', or no instance filtering is necessary.
+
+  panel-units-rule:
+    reason: Maybe this should only warn, and maybe mixtool shouldn't consider warnings errors?
+  panel-title-description-rule:
+    reason: Maybe this should only warn, and maybe mixtool shouldn't consider warnings errors?
