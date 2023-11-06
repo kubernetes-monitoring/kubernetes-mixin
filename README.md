@@ -248,7 +248,7 @@ While the community has not yet fully agreed on alert severities and their to be
 
 * For more motivation, see
 "[The RED Method: How to instrument your services](https://kccncna17.sched.com/event/CU8K/the-red-method-how-to-instrument-your-services-b-tom-wilkie-kausal?iframe=no&w=100%&sidebar=yes&bg=no)" talk from CloudNativeCon Austin.
-* For more information about monitoring mixins, see this [design doc](https://docs.google.com/document/d/1A9xvzwqnFVSOZ5fD3blKODXfsat5fg6ZhnKu9LK3lB4/edit#).
+* For more information about monitoring mixins, see this [design doc](DESIGN.md).
 
 ## Note
 
