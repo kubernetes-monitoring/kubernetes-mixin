@@ -1080,7 +1080,7 @@ tests:
         job_name: job1
         severity: warning
       exp_annotations:
-        summary: "Job did not complete in time"
+        summary: "Job did not complete in time."
         description: "Job ns1/job1 is taking more than 12h 0m 0s to complete."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubejobnotcompleted"
 
@@ -1111,8 +1111,8 @@ tests:
     - exp_labels:
         severity: warning
       exp_annotations:
-        summary: "The kubernetes apiserver has terminated 33.33% of its incoming requests."
-        description: "The kubernetes apiserver has terminated 33.33% of its incoming requests."
+        summary: "The kubernetes apiserver has terminated more than 20% of its incoming requests."
+        description: "The kubernetes apiserver in Cluster , has terminated 33.33% of its incoming requests."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiterminatedrequests"
 
 - interval: 1m

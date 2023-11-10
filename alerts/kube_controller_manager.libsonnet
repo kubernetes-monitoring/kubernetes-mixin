@@ -11,6 +11,7 @@
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeControllerManager',
             selector:: $._config.kubeControllerManagerSelector,
+            clusterLabel:: $._config.clusterLabel,
           },
         ],
       },

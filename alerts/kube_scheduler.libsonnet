@@ -11,6 +11,7 @@
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeScheduler',
             selector:: $._config.kubeSchedulerSelector,
+            clusterLabel:: $._config.clusterLabel,
           },
         ],
       },
