@@ -207,7 +207,7 @@ local singlestat = grafana.singlestat;
           style=newStyle(
             alias='Pod',
             link=true,
-            linkUrl='d/7a18067ce943a40ae25454675c19ff5c/kubernetes-networking-pod?orgId=1&refresh=30s&var-namespace=$namespace&var-pod=$__cell'
+            linkUrl='d/7a18067ce943a40ae25454675c19ff5c/kubernetes-networking-pod?orgId=1&refresh=30s&var-namespace=$namespace&var-pod=${__value.text}'
           ),
         ) + {
 

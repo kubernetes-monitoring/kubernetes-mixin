@@ -217,7 +217,7 @@ local annotation = grafana.annotation;
           style=newStyle(
             alias='Namespace',
             link=true,
-            linkUrl='d/8b7a8b326d7a6f1f04244066368c67af/kubernetes-networking-namespace-pods?orgId=1&refresh=30s&var-namespace=$__cell',
+            linkUrl='d/8b7a8b326d7a6f1f04244066368c67af/kubernetes-networking-namespace-pods?orgId=1&refresh=30s&var-namespace=${__value.text}',
           ),
         ) + {
 

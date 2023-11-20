@@ -210,7 +210,7 @@ local annotation = grafana.annotation;
           style=newStyle(
             alias='Workload',
             link=true,
-            linkUrl='d/728bf77cc1166d2f3133bf25846876cc/kubernetes-networking-workload?orgId=1&refresh=30s&var-namespace=$namespace&var-type=$type&var-workload=$__cell'
+            linkUrl='d/728bf77cc1166d2f3133bf25846876cc/kubernetes-networking-workload?orgId=1&refresh=30s&var-namespace=$namespace&var-type=$type&var-workload=${__value.text}'
           ),
         ) + {
 

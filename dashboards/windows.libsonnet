@@ -11,12 +11,12 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-namespace.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?var-datasource=$datasource&var-namespace=${__value.text}' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-namespace.json') },
         },
       };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sCompute Resources / Cluster(Windows)' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sCompute Resources / Cluster (Windows)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-windows-cluster.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
@@ -138,12 +138,12 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=${__value.text}' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-pod.json') },
         },
       };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sCompute Resources / Namespace(Windows)' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sCompute Resources / Namespace (Windows)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-windows-namespace.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
@@ -247,7 +247,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sCompute Resources / Pod(Windows)' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sCompute Resources / Pod (Windows)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-windows-pod.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
@@ -378,7 +378,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       local legendLink = '%(prefix)s/d/%(uid)s/k8s-windows-node-rsrc-use' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-windows-node-rsrc-use.json') };
 
       dashboard.new(
-        '%(dashboardNamePrefix)sUSE Method / Cluster(Windows)' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sUSE Method / Cluster (Windows)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-windows-cluster-rsrc-use.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
@@ -473,7 +473,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
 
     'k8s-windows-node-rsrc-use.json':
       dashboard.new(
-        '%(dashboardNamePrefix)sUSE Method / Node(Windows)' % $._config.grafanaK8s,
+        '%(dashboardNamePrefix)sUSE Method / Node (Windows)' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-windows-node-rsrc-use.json']),
         tags=($._config.grafanaK8s.dashboardTags),
       ).addTemplate(
