@@ -165,21 +165,22 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       )
       .addTemplate(
         template.new(
-          'namespace',
-          '$datasource',
-          'label_values(windows_pod_container_available, namespace)',
-          label='Namespace',
-          refresh='time',
-          sort=1,
-        )
-      ).addTemplate(
-        template.new(
           'cluster',
           '$datasource',
           'label_values(up{%(windowsExporterSelector)s}, %(clusterLabel)s)' % $._config,
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
+        )
+      )
+      .addTemplate(
+        template.new(
+          'namespace',
+          '$datasource',
+          'label_values(windows_pod_container_available{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
+          label='Namespace',
+          refresh='time',
           sort=1,
         )
       )
@@ -268,9 +269,20 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       )
       .addTemplate(
         template.new(
+          'cluster',
+          '$datasource',
+          'label_values(up{%(windowsExporterSelector)s}, %(clusterLabel)s)' % $._config,
+          label='cluster',
+          refresh='time',
+          hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
+        )
+      )
+      .addTemplate(
+        template.new(
           'namespace',
           '$datasource',
-          'label_values(windows_pod_container_available, namespace)',
+          'label_values(windows_pod_container_available{%(clusterLabel)s="$cluster"}, namespace)' % $._config,
           label='Namespace',
           refresh='time',
           sort=1,
@@ -280,19 +292,9 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
         template.new(
           'pod',
           '$datasource',
-          'label_values(windows_pod_container_available{namespace="$namespace"}, pod)',
+          'label_values(windows_pod_container_available{%(clusterLabel)s="$cluster",namespace="$namespace"}, pod)' % $._config,
           label='Pod',
           refresh='time',
-          sort=1,
-        )
-      ).addTemplate(
-        template.new(
-          'cluster',
-          '$datasource',
-          'label_values(up{%(windowsExporterSelector)s}, %(clusterLabel)s)' % $._config,
-          label='cluster',
-          refresh='time',
-          hide=if $._config.showMultiCluster then '' else 'variable',
           sort=1,
         )
       )
@@ -494,21 +496,22 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       )
       .addTemplate(
         template.new(
-          'instance',
-          '$datasource',
-          'label_values(windows_system_system_up_time, instance)',
-          label='Instance',
-          refresh='time',
-          sort=1,
-        )
-      ).addTemplate(
-        template.new(
           'cluster',
           '$datasource',
           'label_values(up{%(windowsExporterSelector)s}, %(clusterLabel)s)' % $._config,
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
+          sort=1,
+        )
+      )
+      .addTemplate(
+        template.new(
+          'instance',
+          '$datasource',
+          'label_values(windows_system_system_up_time{%(clusterLabel)s="$cluster"}, instance)' % $._config,
+          label='Instance',
+          refresh='time',
           sort=1,
         )
       )
