@@ -426,6 +426,7 @@ tests:
     alertname: KubeletTooManyPods
     exp_alerts:
     - exp_labels:
+        cluster: kubernetes
         node: minikube
         severity: info
       exp_annotations:
@@ -550,7 +551,7 @@ tests:
     values: '1+0x10'
   - series: 'kubelet_pleg_relist_duration_seconds_bucket{job="kubelet", le="+Inf", cluster="kubernetes",instance="10.0.2.15:10250"}'
     values: '30+1x10'
-  - series: 'kubelet_node_name{endpoint="https-metrics",cluster="kubernetes",instance="10.0.2.15:10250",job="kubelet",,namespace="kube-system",node="minikube",service="kubelet"}'
+  - series: 'kubelet_node_name{endpoint="https-metrics",cluster="kubernetes",instance="10.0.2.15:10250",job="kubelet",namespace="kube-system",node="minikube",service="kubelet"}'
     values: '1 1 1 1 1 1 1 1 1 1'
   alert_rule_test:
   - eval_time: 10m
@@ -569,7 +570,7 @@ tests:
 
 - interval: 1m
   input_series:
-  - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",,namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
+  - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
     values: '1 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1'
   alert_rule_test:
   - eval_time: 18m
