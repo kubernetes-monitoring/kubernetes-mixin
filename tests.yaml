@@ -480,48 +480,48 @@ tests:
 
 - interval: 1m
   input_series:
-  - series: 'kube_pod_container_resource_requests{resource="cpu",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_container_resource_requests{resource="cpu",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '0.15+0x10'
-  - series: 'kube_pod_container_resource_requests{resource="cpu",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm",cluster="test"}'
+  - series: 'kube_pod_container_resource_requests{resource="cpu",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm"}'
     values: '0.15+0x10'
-  - series: 'kube_pod_container_resource_requests{resource="cpu",container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_container_resource_requests{resource="cpu",container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '0.1+0x10'
-  - series: 'kube_pod_container_resource_requests{resource="memory",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_container_resource_requests{resource="memory",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '1E9+0x10'
-  - series: 'kube_pod_container_resource_requests{resource="memory",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm",cluster="test"}'
+  - series: 'kube_pod_container_resource_requests{resource="memory",container="kube-apiserver-67",endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-2",service="ksm"}'
     values: '1E9+0x10'
-  - series: 'kube_pod_container_resource_requests{resource="memory",container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_container_resource_requests{resource="memory",container="kube-apiserver-67",endpoint="https-main",instance="ksm-2",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",node="node-1",pod="pod-1",service="ksm"}'
     values: '0.5E9+0x10'
   # Duplicate kube_pod_status_phase timeseries for the same pod.
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Running",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Running",pod="pod-1",service="ksm"}'
     values: '1 stale'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Pending",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Pending",pod="pod-1",service="ksm"}'
     values: '1+0x10'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Completed",pod="pod-2",service="ksm",cluster="test"}'
+  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-1",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Completed",pod="pod-2",service="ksm"}'
     values: '1+0x10'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-2",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Running",pod="pod-1",service="ksm",cluster="test"}'
+  - series: 'kube_pod_status_phase{endpoint="https-main",instance="ksm-2",job="kube-state-metrics",cluster="kubernetes",namespace="kube-apiserver",phase="Running",pod="pod-1",service="ksm"}'
     values: '1+0x10'
   promql_expr_test:
   - eval_time: 0m
     expr: namespace_cpu:kube_pod_container_resource_requests:sum
     exp_samples:
     - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver",cluster="test"}'
+      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 0m
     expr: namespace_memory:kube_pod_container_resource_requests:sum
     exp_samples:
     - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver",cluster="test"}'
+      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 1m
     expr: namespace_cpu:kube_pod_container_resource_requests:sum
     exp_samples:
     - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver",cluster="test"}'
+      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 1m
     expr: namespace_memory:kube_pod_container_resource_requests:sum
     exp_samples:
     - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver",cluster="test"}'
+      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
 
 - interval: 1m
   input_series:
@@ -680,6 +680,7 @@ tests:
     alertname: KubePodNotReady
     exp_alerts:
     - exp_labels:
+        cluster: kubernetes
         namespace: ns1
         pod: pod-ds-7cc77d965f-cgsdv
         severity: warning
@@ -1098,6 +1099,7 @@ tests:
     alertname: KubeJobNotCompleted
     exp_alerts:
     - exp_labels:
+        cluster: "kubernetes"
         namespace: ns1
         job_name: job1
         severity: warning
@@ -1151,6 +1153,7 @@ tests:
         severity: "warning"
         container: "script"
         job: "kube-state-metrics"
+        cluster: "kubernetes"
         namespace: "test"
         pod: "static-web"
         reason: "CrashLoopBackOff"
