@@ -32,6 +32,16 @@
     windowsExporterSelector: 'job="kubernetes-windows-exporter"',
     containerfsSelector: 'container!=""',
 
+    // List of labels to join for different type of metrics
+    common_join_labels: [],
+    pods_join_labels: $._config.common_join_labels,
+    deployments_join_labels: $._config.common_join_labels,
+    statefulsets_join_labels: $._config.common_join_labels,
+    daemonsets_join_labels: $._config.common_join_labels,
+    horizontalpodautoscalers_join_labels: $._config.common_join_labels,
+    jobs_join_labels: $._config.common_join_labels,
+    persistentvolumeclaims_join_labels: $._config.common_join_labels,
+
     // Grafana dashboard IDs are necessary for stable links for dashboards
     grafanaDashboardIDs: {
       'k8s-resources-multicluster.json': '1gBgaexoVZ4TpBNAt2eGRsc4LNjNhdjcZd6cqU6S',
