@@ -37,7 +37,7 @@
                     (
                       sum by (%(clusterLabel)s) (rate(apiserver_request_sli_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(window)s]))
                       or
-                      vector(0)
+                      (min(apiserver_current_inflight_requests{%(kubeApiserverSelector)s}) by (%(clusterLabel)s) * 0)
                     )
                     +
                     sum by (%(clusterLabel)s) (rate(apiserver_request_sli_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"}[%(window)s]))
@@ -190,7 +190,7 @@
                     (
                       sum by (%(clusterLabel)s) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%(SLODays)s{%(kubeApiserverReadSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"})
                       or
-                      vector(0)
+                      (min(apiserver_current_inflight_requests{%(kubeApiserverSelector)s}) by (%(clusterLabel)s) * 0)
                     )
                     +
                     sum by (%(clusterLabel)s) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%(SLODays)s{%(kubeApiserverReadSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"})
@@ -199,7 +199,7 @@
                   )
                 ) +
                 # errors
-                sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{code=~"5.."} or vector(0))
+                sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{code=~"5.."} or (min(apiserver_current_inflight_requests{%(kubeApiserverSelector)s}) by (%(clusterLabel)s) * 0))
               )
               /
               sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s)
@@ -219,7 +219,7 @@
                   (
                     sum by (%(clusterLabel)s) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%(SLODays)s{%(kubeApiserverReadSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"})
                     or
-                    vector(0)
+                    (min(apiserver_current_inflight_requests{%(kubeApiserverSelector)s}) by (%(clusterLabel)s) * 0)
                   )
                   +
                   sum by (%(clusterLabel)s) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%(SLODays)s{%(kubeApiserverReadSelector)s,scope="namespace",le="%(kubeApiserverReadNamespaceLatency)s"})
@@ -228,7 +228,7 @@
                 )
                 +
                 # errors
-                sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="read",code=~"5.."} or vector(0))
+                sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="read",code=~"5.."} or (min(apiserver_current_inflight_requests{%(kubeApiserverSelector)s}) by (%(clusterLabel)s) * 0))
               )
               /
               sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="read"})
@@ -249,7 +249,7 @@
                 )
                 +
                 # errors
-                sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="write",code=~"5.."} or vector(0))
+                sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="write",code=~"5.."} or (min(apiserver_current_inflight_requests{%(kubeApiserverSelector)s}) by (%(clusterLabel)s) * 0))
               )
               /
               sum by (%(clusterLabel)s) (code:apiserver_request_total:increase%(SLODays)s{verb="write"})
