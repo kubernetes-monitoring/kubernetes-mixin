@@ -268,7 +268,9 @@
           {
             alert: 'KubeJobFailed',
             expr: |||
-              kube_job_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}  > 0
+              sum without (instance) (
+                kube_job_failed{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              )  > 0
             ||| % $._config,
             'for': '15m',
             labels: {
