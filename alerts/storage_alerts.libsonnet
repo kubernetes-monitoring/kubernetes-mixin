@@ -36,7 +36,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} on Cluster {{ $labels.%(clusterLabel)s }} is only {{ $value | humanizePercentage }} free.' % $._config,
+              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} is only {{ $value | humanizePercentage }} free.' % $._config,
               summary: 'PersistentVolume is filling up.',
             },
           },
@@ -62,7 +62,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} on Cluster {{ $labels.%(clusterLabel)s }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.' % $._config,
+              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.' % $._config,
               summary: 'PersistentVolume is filling up.',
             },
           },
@@ -86,7 +86,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} on Cluster {{ $labels.%(clusterLabel)s }} only has {{ $value | humanizePercentage }} free inodes.' % $._config,
+              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} only has {{ $value | humanizePercentage }} free inodes.' % $._config,
               summary: 'PersistentVolumeInodes are filling up.',
             },
           },
@@ -112,7 +112,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} on Cluster {{ $labels.%(clusterLabel)s }} is expected to run out of inodes within four days. Currently {{ $value | humanizePercentage }} of its inodes are free.' % $._config,
+              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} is expected to run out of inodes within four days. Currently {{ $value | humanizePercentage }} of its inodes are free.' % $._config,
               summary: 'PersistentVolumeInodes are filling up.',
             },
           },
@@ -126,7 +126,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'The persistent volume {{ $labels.persistentvolume }} on Cluster {{ $labels.%(clusterLabel)s }} has status {{ $labels.phase }}.' % $._config,
+              description: 'The persistent volume {{ $labels.persistentvolume }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} has status {{ $labels.phase }}.' % $._config,
               summary: 'PersistentVolume is having issues with provisioning.',
             },
           },
