@@ -3,3 +3,5 @@ exclusions:
  template-instance-rule:
  target-job-rule:
  target-instance-rule:
+ panel-title-description-rule:
+ panel-units-rule:
