@@ -5,4 +5,3 @@ exclusions:
  target-instance-rule:
  panel-title-description-rule:
  panel-units-rule:
- template-datasource-rule:

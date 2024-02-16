@@ -365,7 +365,7 @@ local annotation = grafana.annotation;
             value: $._config.datasourceName,
           },
           hide: 0,
-          label: 'Data Source',
+          label: 'Data source',
           name: 'datasource',
           options: [],
           query: 'prometheus',
