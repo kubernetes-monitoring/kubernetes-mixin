@@ -1,287 +1,349 @@
-local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
-local dashboard = grafana.dashboard;
-local row = grafana.row;
-local prometheus = grafana.prometheus;
-local template = grafana.template;
-local graphPanel = grafana.graphPanel;
-local singlestat = grafana.singlestat;
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
+local var = g.dashboard.variable;
+local stat = g.panel.stat;
+local ts = g.panel.timeSeries;
+local override = ts.standardOptions.override;
 
 {
   _config+:: {
     kubeApiserverSelector: 'job="kube-apiserver"',
   },
 
+  local timeSeries =
+    g.panel.timeSeries {
+      new(title):
+        ts.new(title)
+        + ts.options.legend.withShowLegend()
+        + ts.options.legend.withAsTable()
+        + ts.options.legend.withPlacement('right')
+        + ts.options.tooltip.withMode('single')
+        + ts.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval),
+    },
+
+  local mystatpanel(title, description, query) =
+    stat.new(title)
+    + stat.panelOptions.withDescription(description)
+    + stat.panelOptions.withGridPos(w=6)
+    + stat.standardOptions.withUnit('percentunit')
+    + stat.standardOptions.withDecimals(3)
+    + stat.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
+    + stat.queryOptions.withTargets([
+      g.query.prometheus.new(
+        '${datasource}',
+        query,
+      ),
+    ]),
+
+  local myrequestspanel(title, description, query) =
+    timeSeries.new(title)
+    + timeSeries.panelOptions.withDescription(description)
+    + timeSeries.panelOptions.withGridPos(w=6)
+    + timeSeries.standardOptions.withUnit('reqps')
+    + timeSeries.fieldConfig.defaults.custom.withFillOpacity(100)
+    + timeSeries.fieldConfig.defaults.custom.stacking.withMode('normal')
+    + timeSeries.standardOptions.withOverrides([
+      override.byRegexp.new('/2../i') + override.byRegexp.withProperty('color', '#56A64B'),
+      override.byRegexp.new('/3../i') + override.byRegexp.withProperty('color', '#F2CC0C'),
+      override.byRegexp.new('/4../i') + override.byRegexp.withProperty('color', '#3274D9'),
+      override.byRegexp.new('/5../i') + override.byRegexp.withProperty('color', '#E02F44'),
+    ])
+    + timeSeries.queryOptions.withTargets([
+      g.query.prometheus.new(
+        '${datasource}',
+        query
+      )
+      + g.query.prometheus.withLegendFormat('{{ code }}'),
+    ]),
+
+  local myerrorpanel(title, description, query) =
+    timeSeries.new(title)
+    + timeSeries.panelOptions.withDescription(description)
+    + timeSeries.panelOptions.withGridPos(w=6)
+    + timeSeries.standardOptions.withUnit('percentunit')
+    + timeSeries.standardOptions.withMin(0)
+    + timeSeries.queryOptions.withTargets([
+      g.query.prometheus.new(
+        '${datasource}',
+        query
+      )
+      + g.query.prometheus.withLegendFormat('{{ resource }}'),
+    ]),
+
+  local mydurationpanel(title, description, query) =
+    timeSeries.new(title)
+    + timeSeries.panelOptions.withDescription(description)
+    + timeSeries.panelOptions.withGridPos(w=6)
+    + timeSeries.standardOptions.withUnit('s')
+    + timeSeries.queryOptions.withTargets([
+      g.query.prometheus.new(
+        '${datasource}',
+        query
+      )
+      + g.query.prometheus.withLegendFormat('{{ resource }}'),
+    ]),
+
   grafanaDashboards+:: {
     'apiserver.json':
-      local availability1d =
-        singlestat.new(
-          'Availability (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
-          datasource='$datasource',
-          span=4,
-          format='percentunit',
-          decimals=3,
-          description='How many percent of requests (both read and write) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
-        )
-        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]));
+      local panels = {
+        notice:
+          g.panel.text.new('Notice')
+          + g.panel.text.options.withContent('The SLO (service level objective) and other metrics displayed on this dashboard are for informational purposes only.')
+          + g.panel.text.panelOptions.withDescription('The SLO (service level objective) and other metrics displayed on this dashboard are for informational purposes only.')
+          + g.panel.text.panelOptions.withGridPos(2, 24, 0, 0),
 
-      local errorBudget =
-        graphPanel.new(
-          'ErrorBudget (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target],
-          datasource='$datasource',
-          span=8,
-          format='percentunit',
-          decimals=3,
-          fill=10,
-          description='How much error budget is left looking at our %.3f%% availability guarantees?' % $._config.SLOs.apiserver.target,
-        )
-        .addTarget(prometheus.target('100 * (apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"} - %f)' % [$._config.SLOs.apiserver.days, $._config.clusterLabel, $._config.SLOs.apiserver.target], legendFormat='errorbudget'));
+        availability1d:
+          mystatpanel(
+            'Availability (%dd) > %.3f%%' % [
+              $._config.SLOs.apiserver.days,
+              100 * $._config.SLOs.apiserver.target,
+            ],
+            'How many percent of requests (both read and write) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
+            'apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel],
+          )
+          + stat.panelOptions.withGridPos(w=8),
 
-      local readAvailability =
-        singlestat.new(
-          'Read Availability (%dd)' % $._config.SLOs.apiserver.days,
-          datasource='$datasource',
-          span=3,
-          format='percentunit',
-          decimals=3,
-          description='How many percent of read requests (LIST,GET) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
-        )
-        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="read", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]));
+        errorBudget:
+          timeSeries.new('ErrorBudget (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target])
+          + timeSeries.panelOptions.withDescription('How much error budget is left looking at our %.3f%% availability guarantees?' % $._config.SLOs.apiserver.target)
+          + timeSeries.panelOptions.withGridPos(w=16)
+          + timeSeries.standardOptions.withUnit('percentunit')
+          + timeSeries.standardOptions.withDecimals(3)
+          + timeSeries.fieldConfig.defaults.custom.withFillOpacity(100)
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              '100 * (apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"} - %f)' % [$._config.SLOs.apiserver.days, $._config.clusterLabel, $._config.SLOs.apiserver.target],
+            )
+            + g.query.prometheus.withLegendFormat('errorbudget'),
+          ]),
 
-      local readRequests =
-        graphPanel.new(
-          'Read SLI - Requests',
-          datasource='$datasource',
-          span=3,
-          format='reqps',
-          stack=true,
-          fill=10,
-          description='How many read requests (LIST,GET) per second do the apiservers get by code?',
-        )
-        .addSeriesOverride({ alias: '/2../i', color: '#56A64B' })
-        .addSeriesOverride({ alias: '/3../i', color: '#F2CC0C' })
-        .addSeriesOverride({ alias: '/4../i', color: '#3274D9' })
-        .addSeriesOverride({ alias: '/5../i', color: '#E02F44' })
-        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="read", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ code }}'));
+        readAvailability:
+          mystatpanel(
+            'Read Availability (%dd)' % $._config.SLOs.apiserver.days,
+            'How many percent of read requests (LIST,GET) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
+            'apiserver_request:availability%dd{verb="read", %(clusterLabel)s="$cluster"}' % [
+              $._config.SLOs.apiserver.days,
+              $._config.clusterLabel,
+            ]
+          ),
 
-      local readErrors =
-        graphPanel.new(
-          'Read SLI - Errors',
-          datasource='$datasource',
-          min=0,
-          span=3,
-          format='percentunit',
-          description='How many percent of read requests (LIST,GET) per second are returned with errors (5xx)?',
-        )
-        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read",code=~"5..", %(clusterLabel)s="$cluster"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ resource }}'));
+        readRequests:
+          myrequestspanel(
+            'Read SLI - Requests',
+            'How many read requests (LIST,GET) per second do the apiservers get by code?',
+            'sum by (code) (code_resource:apiserver_request_total:rate5m{verb="read", %(clusterLabel)s="$cluster"})' % $._config,
+          ),
 
-      local readDuration =
-        graphPanel.new(
-          'Read SLI - Duration',
-          datasource='$datasource',
-          span=3,
-          format='s',
-          description='How many seconds is the 99th percentile for reading (LIST|GET) a given resource?',
-        )
-        .addTarget(prometheus.target('cluster_quantile:apiserver_request_sli_duration_seconds:histogram_quantile{verb="read", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
+        readErrors:
+          myerrorpanel(
+            'Read SLI - Errors',
+            'How many percent of read requests (LIST,GET) per second are returned with errors (5xx)?',
+            'sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read",code=~"5..", %(clusterLabel)s="$cluster"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="read", %(clusterLabel)s="$cluster"})' % $._config
+          ),
 
-      local writeAvailability =
-        singlestat.new(
-          'Write Availability (%dd)' % $._config.SLOs.apiserver.days,
-          datasource='$datasource',
-          span=3,
-          format='percentunit',
-          decimals=3,
-          description='How many percent of write requests (POST|PUT|PATCH|DELETE) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
-        )
-        .addTarget(prometheus.target('apiserver_request:availability%dd{verb="write", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]));
+        readDuration:
+          mydurationpanel(
+            'Read SLI - Duration',
+            'How many seconds is the 99th percentile for reading (LIST|GET) a given resource?',
+            'cluster_quantile:apiserver_request_sli_duration_seconds:histogram_quantile{verb="read", %(clusterLabel)s="$cluster"}' % $._config
+          ),
 
-      local writeRequests =
-        graphPanel.new(
-          'Write SLI - Requests',
-          datasource='$datasource',
-          span=3,
-          format='reqps',
-          stack=true,
-          fill=10,
-          description='How many write requests (POST|PUT|PATCH|DELETE) per second do the apiservers get by code?',
-        )
-        .addSeriesOverride({ alias: '/2../i', color: '#56A64B' })
-        .addSeriesOverride({ alias: '/3../i', color: '#F2CC0C' })
-        .addSeriesOverride({ alias: '/4../i', color: '#3274D9' })
-        .addSeriesOverride({ alias: '/5../i', color: '#E02F44' })
-        .addTarget(prometheus.target('sum by (code) (code_resource:apiserver_request_total:rate5m{verb="write", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ code }}'));
+        writeAvailability:
+          mystatpanel(
+            'Write Availability (%dd)' % $._config.SLOs.apiserver.days,
+            'How many percent of write requests (POST|PUT|PATCH|DELETE) in %d days have been answered successfully and fast enough?' % $._config.SLOs.apiserver.days,
+            'apiserver_request:availability%dd{verb="write", %(clusterLabel)s="$cluster"}' % [$._config.SLOs.apiserver.days, $._config.clusterLabel]
+          ),
 
-      local writeErrors =
-        graphPanel.new(
-          'Write SLI - Errors',
-          datasource='$datasource',
-          min=0,
-          span=3,
-          format='percentunit',
-          description='How many percent of write requests (POST|PUT|PATCH|DELETE) per second are returned with errors (5xx)?',
-        )
-        .addTarget(prometheus.target('sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write",code=~"5..", %(clusterLabel)s="$cluster"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write", %(clusterLabel)s="$cluster"})' % $._config, legendFormat='{{ resource }}'));
+        writeRequests:
+          myrequestspanel(
+            'Write SLI - Requests',
+            'How many write requests (POST|PUT|PATCH|DELETE) per second do the apiservers get by code?',
+            'sum by (code) (code_resource:apiserver_request_total:rate5m{verb="write", %(clusterLabel)s="$cluster"})' % $._config
+          ),
 
-      local writeDuration =
-        graphPanel.new(
-          'Write SLI - Duration',
-          datasource='$datasource',
-          span=3,
-          format='s',
-          description='How many seconds is the 99th percentile for writing (POST|PUT|PATCH|DELETE) a given resource?',
-        )
-        .addTarget(prometheus.target('cluster_quantile:apiserver_request_sli_duration_seconds:histogram_quantile{verb="write", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{ resource }}'));
+        writeErrors:
+          myerrorpanel(
+            'Write SLI - Errors',
+            'How many percent of write requests (POST|PUT|PATCH|DELETE) per second are returned with errors (5xx)?',
+            'sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write",code=~"5..", %(clusterLabel)s="$cluster"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb="write", %(clusterLabel)s="$cluster"})' % $._config
+          ),
 
-      local workQueueAddRate =
-        graphPanel.new(
-          'Work Queue Add Rate',
-          datasource='$datasource',
-          span=6,
-          format='ops',
-          legend_show=false,
-          min=0,
-        )
-        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
+        writeDuration:
+          mydurationpanel(
+            'Write SLI - Duration',
+            'How many seconds is the 99th percentile for writing (POST|PUT|PATCH|DELETE) a given resource?',
+            'cluster_quantile:apiserver_request_sli_duration_seconds:histogram_quantile{verb="write", %(clusterLabel)s="$cluster"}' % $._config
+          ),
 
-      local workQueueDepth =
-        graphPanel.new(
-          'Work Queue Depth',
-          datasource='$datasource',
-          span=6,
-          format='short',
-          legend_show=false,
-          min=0,
-        )
-        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
+        workQueueAddRate:
+          timeSeries.new('Work Queue Add Rate')
+          + timeSeries.panelOptions.withGridPos(w=12)
+          + timeSeries.standardOptions.withUnit('ops')
+          + timeSeries.standardOptions.withMin(0)
+          + timeSeries.options.legend.withShowLegend(false)
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              'sum(rate(workqueue_adds_total{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])) by (instance, name)' % $._config,
+            )
+            + g.query.prometheus.withLegendFormat('{{instance}} {{name}}'),
+          ]),
 
+        workQueueDepth:
+          timeSeries.new('Work Queue Depth')
+          + timeSeries.panelOptions.withGridPos(w=12)
+          + timeSeries.standardOptions.withUnit('short')
+          + timeSeries.standardOptions.withMin(0)
+          + timeSeries.options.legend.withShowLegend(false)
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              'sum(rate(workqueue_depth{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])) by (instance, name)' % $._config
+            )
+            + g.query.prometheus.withLegendFormat('{{instance}} {{name}}'),
+          ]),
 
-      local workQueueLatency =
-        graphPanel.new(
-          'Work Queue Latency',
-          datasource='$datasource',
-          span=12,
-          format='s',
-          legend_show=true,
-          legend_values=true,
-          legend_current=true,
-          legend_alignAsTable=true,
-          legend_rightSide=true,
-        )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
+        workQueueLatency:
+          timeSeries.new('Work Queue Latency')
+          + timeSeries.panelOptions.withGridPos(w=24)
+          + timeSeries.standardOptions.withUnit('s')
+          + timeSeries.standardOptions.withMin(0)
+          + timeSeries.options.legend.withShowLegend()
+          + timeSeries.options.legend.withAsTable()
+          + timeSeries.options.legend.withPlacement('right')
+          + timeSeries.options.legend.withCalcs(['lastNotNull'])
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              'histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(kubeApiserverSelector)s, instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])) by (instance, name, le))' % $._config,
+            )
+            + g.query.prometheus.withLegendFormat('{{instance}} {{name}}'),
+          ]),
 
-      local memory =
-        graphPanel.new(
-          'Memory',
-          datasource='$datasource',
-          span=4,
-          format='bytes',
-        )
-        .addTarget(prometheus.target('process_resident_memory_bytes{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{instance}}'));
+        memory:
+          timeSeries.new('Memory')
+          + timeSeries.panelOptions.withGridPos(w=8)
+          + timeSeries.standardOptions.withUnit('bytes')
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              'process_resident_memory_bytes{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config,
+            )
+            + g.query.prometheus.withLegendFormat('{{instance}}'),
+          ]),
 
-      local cpu =
-        graphPanel.new(
-          'CPU usage',
-          datasource='$datasource',
-          span=4,
-          format='short',
-          min=0,
-        )
-        .addTarget(prometheus.target('rate(process_cpu_seconds_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])' % $._config, legendFormat='{{instance}}'));
+        cpu:
+          timeSeries.new('CPU usage')
+          + timeSeries.panelOptions.withGridPos(w=8)
+          + timeSeries.standardOptions.withUnit('short')
+          + timeSeries.standardOptions.withMin(0)
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              'rate(process_cpu_seconds_total{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])' % $._config
+            )
+            + g.query.prometheus.withLegendFormat('{{instance}}'),
+          ]),
 
-      local goroutines =
-        graphPanel.new(
-          'Goroutines',
-          datasource='$datasource',
-          span=4,
-          format='short',
-        )
-        .addTarget(prometheus.target('go_goroutines{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config, legendFormat='{{instance}}'));
+        goroutines:
+          timeSeries.new('Goroutines')
+          + timeSeries.panelOptions.withGridPos(w=8)
+          + timeSeries.standardOptions.withUnit('short')
+          + timeSeries.queryOptions.withTargets([
+            g.query.prometheus.new(
+              '${datasource}',
+              'go_goroutines{%(kubeApiserverSelector)s,instance=~"$instance", %(clusterLabel)s="$cluster"}' % $._config
+            )
+            + g.query.prometheus.withLegendFormat('{{instance}}'),
+          ]),
 
-      dashboard.new(
-        '%(dashboardNamePrefix)sAPI server' % $._config.grafanaK8s,
-        time_from='now-1h',
-        uid=($._config.grafanaDashboardIDs['apiserver.json']),
-        tags=($._config.grafanaK8s.dashboardTags),
-      ).addTemplate(
-        {
-          current: {
-            selected: true,
-            text: $._config.datasourceName,
-            value: $._config.datasourceName,
+      };
+
+      local variables = {
+        datasource:
+          var.datasource.new('datasource', 'prometheus')
+          + var.datasource.withRegex($._config.datasourceFilterRegex)
+          + var.datasource.generalOptions.showOnDashboard.withLabelAndValue()
+          + var.datasource.generalOptions.withLabel('Data source')
+          + {
+            // FIXME: upstream a fix for this
+            // withCurrent doesn't seem to work well with datasource variable
+            //var.datasource.generalOptions.withCurrent($._config.datasourceName)
+            current: {
+              selected: true,
+              text: $._config.datasourceName,
+              value: $._config.datasourceName,
+            },
           },
-          hide: 0,
-          label: 'Data source',
-          name: 'datasource',
-          options: [],
-          query: 'prometheus',
-          refresh: 1,
-          regex: $._config.datasourceFilterRegex,
-          type: 'datasource',
-        },
-      )
-      .addTemplate(
-        template.new(
-          'cluster',
-          '$datasource',
-          'label_values(up{%(kubeApiserverSelector)s}, %(clusterLabel)s)' % $._config,
-          label='cluster',
-          refresh='time',
-          hide=if $._config.showMultiCluster then '' else 'variable',
-          sort=1,
+
+        cluster:
+          var.query.new('cluster')
+          + var.query.withDatasourceFromVariable(self.datasource)
+          + var.query.queryTypes.withLabelValues(
+            $._config.clusterLabel,
+            'up{%(kubeApiserverSelector)s}' % $._config,
+          )
+          + var.query.generalOptions.withLabel('cluster')
+          + var.query.refresh.onTime()
+          + (
+            if $._config.showMultiCluster
+            then var.query.generalOptions.showOnDashboard.withLabelAndValue()
+            else var.query.generalOptions.showOnDashboard.withNothing()
+                 + var.list.withHide()
+          )
+          + var.query.withSort(type='alphabetical'),
+
+        instance:
+          var.query.new('instance')
+          + var.query.withDatasourceFromVariable(self.datasource)
+          + var.query.queryTypes.withLabelValues(
+            'instance',
+            'up{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"}' % $._config,
+          )
+          + var.query.refresh.onTime()
+          + var.query.selectionOptions.withIncludeAll()
+          + var.query.generalOptions.showOnDashboard.withLabelAndValue()
+          + var.query.withSort(type='alphabetical'),
+      };
+
+      g.dashboard.new('%(dashboardNamePrefix)sAPI server' % $._config.grafanaK8s)
+      + g.dashboard.withEditable(false)
+      + g.dashboard.time.withFrom('now-1h')
+      + g.dashboard.time.withTo('now')
+      + g.dashboard.withVariables([
+        variables.datasource,
+        variables.cluster,
+        variables.instance,
+      ])
+      + g.dashboard.withPanels(
+        [panels.notice]
+        + g.util.grid.wrapPanels(  // calculates the xy and sets the height
+          [
+            panels.availability1d,
+            panels.errorBudget,
+
+            panels.readAvailability,
+            panels.readRequests,
+            panels.readErrors,
+            panels.readDuration,
+
+            panels.writeAvailability,
+            panels.writeRequests,
+            panels.writeErrors,
+            panels.writeDuration,
+
+            panels.workQueueAddRate,
+            panels.workQueueDepth,
+            panels.workQueueLatency,
+
+            panels.memory,
+            panels.cpu,
+            panels.goroutines,
+          ],
+          panelHeight=7,
+          startY=2,
         )
-      )
-      .addTemplate(
-        template.new(
-          'instance',
-          '$datasource',
-          'label_values(up{%(kubeApiserverSelector)s, %(clusterLabel)s="$cluster"}, instance)' % $._config,
-          refresh='time',
-          includeAll=true,
-          sort=1,
-        )
-      )
-      .addPanel(
-        grafana.text.new(
-          title='Notice',
-          content='The SLO (service level objective) and other metrics displayed on this dashboard are for informational purposes only.',
-          description='The SLO (service level objective) and other metrics displayed on this dashboard are for informational purposes only.',
-          span=12,
-        ),
-        gridPos={
-          h: 2,
-          w: 24,
-          x: 0,
-          y: 0,
-        },
-      )
-      .addRow(
-        row.new()
-        .addPanel(availability1d)
-        .addPanel(errorBudget)
-      )
-      .addRow(
-        row.new()
-        .addPanel(readAvailability)
-        .addPanel(readRequests)
-        .addPanel(readErrors)
-        .addPanel(readDuration)
-      )
-      .addRow(
-        row.new()
-        .addPanel(writeAvailability)
-        .addPanel(writeRequests)
-        .addPanel(writeErrors)
-        .addPanel(writeDuration)
-      ).addRow(
-        row.new()
-        .addPanel(workQueueAddRate)
-        .addPanel(workQueueDepth)
-        .addPanel(workQueueLatency)
-      ).addRow(
-        row.new()
-        .addPanel(memory)
-        .addPanel(cpu)
-        .addPanel(goroutines)
       ),
   },
 }

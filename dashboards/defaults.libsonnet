@@ -11,7 +11,7 @@
       refresh: kubernetesMixin._config.grafanaK8s.refresh,
       tags: kubernetesMixin._config.grafanaK8s.dashboardTags,
 
-      rows: [
+      [if 'rows' in super then 'rows']: [
         row {
           panels: [
             panel {
