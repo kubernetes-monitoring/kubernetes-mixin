@@ -290,7 +290,6 @@ local override = ts.standardOptions.override;
             if $._config.showMultiCluster
             then var.query.generalOptions.showOnDashboard.withLabelAndValue()
             else var.query.generalOptions.showOnDashboard.withNothing()
-                 + var.list.withHide()
           )
           + var.query.withSort(type='alphabetical'),
 
