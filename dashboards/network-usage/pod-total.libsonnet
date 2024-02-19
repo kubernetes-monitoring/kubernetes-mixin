@@ -261,7 +261,7 @@ local singlestat = grafana.singlestat;
             value: $._config.datasourceName,
           },
           hide: 0,
-          label: 'Data Source',
+          label: 'Data source',
           name: 'datasource',
           options: [],
           query: 'prometheus',
