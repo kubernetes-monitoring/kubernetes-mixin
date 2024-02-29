@@ -197,7 +197,7 @@ local template = grafana.template;
         .addPanel(
           g.panel('Memory Usage (w/o cache)') +
           // Not using container_memory_usage_bytes here because that includes page cache
-          g.queryPanel('sum(container_memory_rss{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", container!=""}) by (namespace)' % $._config, '{{namespace}}') +
+          g.queryPanel('sum(container_memory_rss{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", container!="", namespace!=""}) by (namespace)' % $._config, '{{namespace}}') +
           g.stack +
           { yaxes: g.yaxes('bytes') },
         )
