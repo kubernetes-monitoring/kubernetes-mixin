@@ -44,6 +44,7 @@
       'nodes.json': 'kcb9C2QDe4IYcjiTOmYyfhsImuzxRcvwWC3YLJPS',
       'persistentvolumesusage.json': 'AhCeikee0xoa6faec0Weep2nee6shaiquigahw8b',
       'pods.json': 'AMK9hS0rSbSz7cKjPHcOtk6CGHFjhSHwhbQ3sedK',
+      'pods-logs.json': 'add79da23c2c11eebe560242ac120002',
       'statefulset.json': 'dPiBt0FRG5BNYo0XJ4L0Meoc7DWs9eL40c1CRc1g',
       'k8s-resources-windows-cluster.json': '4d08557fd9391b100730f2494bccac68',
       'k8s-resources-windows-namespace.json': '490b402361724ab1d4c45666c1fa9b6f',
@@ -109,5 +110,13 @@
 
     // Default timeout value for k8s Jobs. The jobs which are active beyond this duration would trigger KubeJobNotCompleted alert.
     kubeJobTimeoutDuration: 12 * 60 * 60,
+
+    // Enable pod logs dashboard (loki datasource)
+    enableLokiLogs: false,
+
+    // Application label (used in logs selector)
+    applicationLabel: 'app',
+    logsVolumeGroupBy: self.applicationLabel,
+    showLogsVolume: true,
   },
 }
