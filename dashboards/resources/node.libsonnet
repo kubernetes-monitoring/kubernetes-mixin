@@ -48,9 +48,11 @@ local template = grafana.template;
           g.panel('CPU Usage') +
           g.queryPanel([
             'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", node=~"$node", resource="cpu"})' % $._config,
+            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", node=~"$node", resource="cpu"})' % $._config,
             'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config,
           ], [
             'max capacity',
+            'max allocatable',
             '{{pod}}',
           ]) +
           g.stack +
@@ -59,6 +61,17 @@ local template = grafana.template;
               {
                 alias: 'max capacity',
                 color: '#F2495C',
+                fill: 0,
+                hideTooltip: true,
+                legend: true,
+                linewidth: 2,
+                stack: false,
+                hiddenSeries: true,
+                dashes: true,
+              },
+              {
+                alias: 'max allocatable',
+                color: '#4AF2F2',
                 fill: 0,
                 hideTooltip: true,
                 legend: true,
@@ -97,9 +110,11 @@ local template = grafana.template;
           // Like above, without page cache
           g.queryPanel([
             'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", node=~"$node", resource="memory"})' % $._config,
+            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", node=~"$node", resource="memory"})' % $._config,
             'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node", container!=""}) by (pod)' % $._config,
           ], [
             'max capacity',
+            'max allocatable',
             '{{pod}}',
           ]) +
           g.stack +
@@ -109,6 +124,17 @@ local template = grafana.template;
               {
                 alias: 'max capacity',
                 color: '#F2495C',
+                fill: 0,
+                hideTooltip: true,
+                legend: true,
+                linewidth: 2,
+                stack: false,
+                hiddenSeries: true,
+                dashes: true,
+              },
+              {
+                alias: 'max allocatable',
+                color: '#4AF2F2',
                 fill: 0,
                 hideTooltip: true,
                 legend: true,
