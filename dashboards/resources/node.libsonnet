@@ -120,6 +120,16 @@ local template = grafana.template;
             ],
           },
         )
+        .addPanel(
+          g.panel('Cache Usage') +
+          g.queryPanel([
+            'sum(node_namespace_pod_container:container_memory_cache{%(clusterLabel)s="$cluster", node=~"$node", container!=""}) by (pod)' % $._config,
+          ], [
+            '{{pod}}',
+          ]) +
+          g.stack +
+          { yaxes: g.yaxes('bytes') },
+        )
       )
       .addRow(
         g.row('Memory Quota')
