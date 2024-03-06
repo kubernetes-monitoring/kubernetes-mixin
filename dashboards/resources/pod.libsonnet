@@ -51,7 +51,7 @@ local template = grafana.template;
       local cpuRequestsQuery = |||
         sum(
             kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", resource="cpu"}
-        )
+        ) by (container)
       ||| % $._config;
 
       local cpuLimitsQuery = std.strReplace(cpuRequestsQuery, 'requests', 'limits');
@@ -117,14 +117,14 @@ local template = grafana.template;
               cpuLimitsQuery,
             ], [
               '{{container}}',
-              'requests',
-              'limits',
+              'requests {{container}}',
+              'limits {{container}}',
             ],
           ) +
           g.stack + {
             seriesOverrides: [
               {
-                alias: 'requests',
+                alias: '/requests.*/',
                 color: '#F2495C',
                 fill: 0,
                 hideTooltip: true,
@@ -133,7 +133,7 @@ local template = grafana.template;
                 stack: false,
               },
               {
-                alias: 'limits',
+                alias: '/limits.*/',
                 color: '#FF9830',
                 fill: 0,
                 hideTooltip: true,
@@ -199,15 +199,15 @@ local template = grafana.template;
             memLimitsQuery,
           ], [
             '{{container}}',
-            'requests',
-            'limits',
+            'requests {{container}}',
+            'limits {{container}}',
           ]) +
           g.stack +
           {
             yaxes: g.yaxes('bytes'),
             seriesOverrides: [
               {
-                alias: 'requests',
+                alias: '/requests.*/',
                 color: '#F2495C',
                 dashes: true,
                 fill: 0,
@@ -217,7 +217,7 @@ local template = grafana.template;
                 stack: false,
               },
               {
-                alias: 'limits',
+                alias: '/limits.*/',
                 color: '#FF9830',
                 dashes: true,
                 fill: 0,
