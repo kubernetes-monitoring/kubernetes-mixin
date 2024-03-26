@@ -1125,9 +1125,9 @@ tests:
 
 - interval: 1m
   input_series:
-  - series: 'apiserver_request_terminations_total{job="kube-apiserver",apiserver="kube-apiserver"}'
+  - series: 'apiserver_request_terminations_total{cluster="kubernetes",job="kube-apiserver",apiserver="kube-apiserver"}'
     values: '1+1x10'
-  - series: 'apiserver_request_total{job="kube-apiserver",apiserver="kube-apiserver"}'
+  - series: 'apiserver_request_total{cluster="kubernetes",job="kube-apiserver",apiserver="kube-apiserver"}'
     values: '1+2x10'
   alert_rule_test:
   - eval_time: 5m    # alert hasn't fired
@@ -1137,6 +1137,7 @@ tests:
     exp_alerts:
     - exp_labels:
         severity: warning
+        cluster: "kubernetes"
       exp_annotations:
         summary: "The kubernetes apiserver has terminated 33.33% of its incoming requests."
         description: "The kubernetes apiserver has terminated 33.33% of its incoming requests."
