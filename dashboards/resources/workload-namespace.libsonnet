@@ -52,7 +52,7 @@ local template = grafana.template;
       local tableStyles = {
         workload: {
           alias: 'Workload',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$__cell_2' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$__cell_2' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.get($._config.grafanaDashboardIDs, 'k8s-resources-workload.json', default=std.md5('k8s-resources-workload.json')) },
         },
         workload_type: {
           alias: 'Workload Type',
@@ -95,7 +95,7 @@ local template = grafana.template;
       local networkTableStyles = {
         workload: {
           alias: 'Workload',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$type' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-workload.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-workload?var-datasource=$datasource&var-cluster=$cluster&var-namespace=$namespace&var-workload=$__cell&var-type=$type' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.get($._config.grafanaDashboardIDs, 'k8s-resources-workload.json', default=std.md5('k8s-resources-workload.json')) },
           linkTooltip: 'Drill down to pods',
         },
         workload_type: {

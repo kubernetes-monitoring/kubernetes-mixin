@@ -11,7 +11,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       local tableStyles = {
         namespace: {
           alias: 'Namespace',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-namespace.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?var-datasource=$datasource&var-namespace=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.get($._config.grafanaDashboardIDs, 'k8s-resources-windows-namespace.json', default=std.md5('k8s-resources-windows-namespace.json')) },
         },
       };
 
@@ -138,7 +138,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       local tableStyles = {
         pod: {
           alias: 'Pod',
-          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-resources-windows-pod.json') },
+          link: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?var-datasource=$datasource&var-namespace=$namespace&var-pod=$__cell' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.get($._config.grafanaDashboardIDs, 'k8s-resources-windows-pod.json', default=std.md5('k8s-resources-windows-pod.json')) },
         },
       };
 
@@ -377,7 +377,7 @@ local g = import 'github.com/grafana/jsonnet-libs/grafana-builder/grafana.libson
       ),
 
     'k8s-windows-cluster-rsrc-use.json':
-      local legendLink = '%(prefix)s/d/%(uid)s/k8s-windows-node-rsrc-use' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.md5('k8s-windows-node-rsrc-use.json') };
+      local legendLink = '%(prefix)s/d/%(uid)s/k8s-windows-node-rsrc-use' % { prefix: $._config.grafanaK8s.linkPrefix, uid: std.get($._config.grafanaDashboardIDs, 'k8s-windows-node-rsrc-use.json', default=std.md5('k8s-windows-node-rsrc-use.json')) };
 
       dashboard.new(
         '%(dashboardNamePrefix)sUSE Method / Cluster(Windows)' % $._config.grafanaK8s,
