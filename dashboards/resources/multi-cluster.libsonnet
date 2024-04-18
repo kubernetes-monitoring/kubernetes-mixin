@@ -63,7 +63,7 @@ local var = g.dashboard.variable;
             statPanel(
               'CPU Utilisation',
               'none',
-              'cluster:node_cpu:ratio_rate5m'
+              'sum(cluster:node_cpu:ratio_rate5m) / count(cluster:node_cpu:ratio_rate5m)'
             ),
 
             statPanel(
