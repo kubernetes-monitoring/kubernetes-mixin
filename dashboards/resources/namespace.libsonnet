@@ -121,6 +121,7 @@ local var = g.dashboard.variable;
         + stat.gridPos.withH(3),
 
         tsPanel.new('CPU Usage')
+        + tsPanel.gridPos.withW(24)
         + tsPanel.standardOptions.withUnit('ops')
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
@@ -195,6 +196,7 @@ local var = g.dashboard.variable;
         ]),
 
         table.new('CPU Quota')
+        + table.gridPos.withW(24)
         + table.queryOptions.withTargets([
           prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{%(clusterLabel)s="$cluster", namespace="$namespace"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
@@ -281,6 +283,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Memory Usage (w/o cache)')
+        + tsPanel.gridPos.withW(24)
         + tsPanel.standardOptions.withUnit('bytes')
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
@@ -355,6 +358,7 @@ local var = g.dashboard.variable;
         ]),
 
         table.new('Memory Quota')
+        + table.gridPos.withW(24)
         + table.standardOptions.withUnit('bytes')
         + table.queryOptions.withTargets([
           prometheus.new('${datasource}', 'sum(container_memory_working_set_bytes{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace",container!="", image!=""}) by (pod)' % $._config)
@@ -463,6 +467,7 @@ local var = g.dashboard.variable;
         ]),
 
         table.new('Current Network Usage')
+        + table.gridPos.withW(24)
         + table.queryOptions.withTargets([
           prometheus.new('${datasource}', 'sum(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace"}[%(grafanaIntervalVar)s])) by (pod)' % $._config)
           + prometheus.withInstant(true)
@@ -654,6 +659,7 @@ local var = g.dashboard.variable;
         ]),
 
         table.new('Current Storage IO')
+        + table.gridPos.withW(24)
         + table.queryOptions.withTargets([
           prometheus.new('${datasource}', 'sum by(pod) (rate(container_fs_reads_total{%(cadvisorSelector)s, %(diskDeviceSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace"}[%(grafanaIntervalVar)s]))' % $._config)
           + prometheus.withInstant(true)
@@ -773,6 +779,6 @@ local var = g.dashboard.variable;
       + g.dashboard.time.withTo('now')
       + g.dashboard.withRefresh($._config.grafanaK8s.refresh)
       + g.dashboard.withVariables([variables.datasource, variables.cluster, variables.namespace])
-      + g.dashboard.withPanels(g.util.grid.wrapPanels(panels, panelWidth=24, panelHeight=7)),
+      + g.dashboard.withPanels(g.util.grid.wrapPanels(panels, panelWidth=12, panelHeight=7)),
   },
 }
