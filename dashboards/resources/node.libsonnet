@@ -205,6 +205,94 @@ local var = g.dashboard.variable;
           + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: true, legend: false })
           + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
         ]),
+
+        table.new('Memory Quota')
+        + table.standardOptions.withUnit('bytes')
+        + table.queryOptions.withTargets([
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_rss{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_cache{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_swap{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config)
+          + prometheus.withInstant(true)
+          + prometheus.withFormat('table'),
+        ])
+        + table.queryOptions.withTransformations([
+          table.queryOptions.transformation.withId('joinByField')
+          + table.queryOptions.transformation.withOptions({
+            byField: 'pod',
+            mode: 'outer',
+          }),
+
+          table.queryOptions.transformation.withId('organize')
+          + table.queryOptions.transformation.withOptions({
+            renameByName: {
+              pod: 'Pod',
+              'Value #A': 'Memory Usage',
+              'Value #B': 'Memory Requests',
+              'Value #C': 'Memory Requests %',
+              'Value #D': 'Memory Limits',
+              'Value #E': 'Memory Limits %',
+              'Value #F': 'Memory Usage (RSS)',
+              'Value #G': 'Memory Usage (Cache)',
+              'Value #H': 'Memory Usage (Swap)',
+            },
+            excludeByName: {
+              Time: true,
+              'Time 1': true,
+              'Time 2': true,
+              'Time 3': true,
+              'Time 4': true,
+              'Time 5': true,
+              'Time 6': true,
+              'Time 7': true,
+              'Time 8': true,
+            },
+          }),
+        ])
+        + table.standardOptions.withOverrides([
+          {
+            matcher: {
+              id: 'byRegexp',
+              options: '/%/',
+            },
+            properties: [
+              {
+                id: 'unit',
+                value: 'percentunit',
+              },
+            ],
+          },
+          {
+            matcher: {
+              id: 'byName',
+              options: 'Pod',
+            },
+            properties: [
+              {
+                id: 'links',
+                value: [links.pod],
+              },
+            ],
+          },
+        ]),
       ];
 
       g.dashboard.new('%(dashboardNamePrefix)sCompute Resources / Node (Pods)' % $._config.grafanaK8s)
@@ -216,48 +304,5 @@ local var = g.dashboard.variable;
       + g.dashboard.withRefresh($._config.grafanaK8s.refresh)
       + g.dashboard.withVariables([variables.datasource, variables.cluster, variables.node])
       + g.dashboard.withPanels(g.util.grid.wrapPanels(panels, panelWidth=24, panelHeight=6)),
-
-
-    // local tableStyles = {
-    //   pod: {
-    //     alias: 'Pod',
-    //   },
-    // };
-
-    // g.dashboard(
-    //   '%(dashboardNamePrefix)sCompute Resources / Node (Pods)' % $._config.grafanaK8s,
-    //   uid=($._config.grafanaDashboardIDs['k8s-resources-node.json']),
-    //   datasource_regex=$._config.datasourceFilterRegex,
-    //   datasource=$._config.datasourceName,
-    // )
-    // .addRow(
-    //   g.row('Memory Quota')
-    //   .addPanel(
-    //     g.panel('Memory Quota') +
-    //     g.tablePanel([
-    //       'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config,
-    //       'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config,
-    //       'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config,
-    //       'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config,
-    //       'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config,
-    //       'sum(node_namespace_pod_container:container_memory_rss{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config,
-    //       'sum(node_namespace_pod_container:container_memory_cache{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config,
-    //       'sum(node_namespace_pod_container:container_memory_swap{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config,
-    //     ], tableStyles {
-    //       'Value #A': { alias: 'Memory Usage', unit: 'bytes' },
-    //       'Value #B': { alias: 'Memory Requests', unit: 'bytes' },
-    //       'Value #C': { alias: 'Memory Requests %', unit: 'percentunit' },
-    //       'Value #D': { alias: 'Memory Limits', unit: 'bytes' },
-    //       'Value #E': { alias: 'Memory Limits %', unit: 'percentunit' },
-    //       'Value #F': { alias: 'Memory Usage (RSS)', unit: 'bytes' },
-    //       'Value #G': { alias: 'Memory Usage (Cache)', unit: 'bytes' },
-    //       'Value #H': { alias: 'Memory Usage (Swap)', unit: 'bytes' },
-    //     })
-    //   )
-    // ) + {
-    //   templating+: {
-    //     list+: [clusterTemplate, nodeTemplate],
-    //   },
-    // },
   },
 }
