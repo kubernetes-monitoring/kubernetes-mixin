@@ -127,6 +127,7 @@ local var = g.dashboard.variable;
           g.panel.table.queryOptions.transformation.withId('organize')
           + g.panel.table.queryOptions.transformation.withOptions({
             excludeByName: {
+              Time: true,
               'Time 1': true,
               'Time 2': true,
               'Time 3': true,
