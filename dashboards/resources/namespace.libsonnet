@@ -122,7 +122,6 @@ local var = g.dashboard.variable;
 
         tsPanel.new('CPU Usage')
         + tsPanel.gridPos.withW(24)
-        + tsPanel.standardOptions.withUnit('ops')
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
