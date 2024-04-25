@@ -99,9 +99,7 @@ local var = g.dashboard.variable;
             + timeSeries.standardOptions.color.withFixedColor('red')
           )
           + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
-          // This effectively "hides" max capacity from the panel. It shows only in the legend, showing the max capacity. In the "legacy" graph panel
-          // the max capacity could be reselected and thus shown on the timeseries with a dotted line. This is no longer possible.
-          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: true, legend: false })
+          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
           + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
         ]),
 
@@ -200,9 +198,7 @@ local var = g.dashboard.variable;
             + timeSeries.standardOptions.color.withFixedColor('red')
           )
           + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
-          // This effectively "hides" max capacity from the panel. It shows only in the legend, showing the max capacity. In the "legacy" graph panel
-          // the max capacity could be reselected and thus shown on the timeseries with a dotted line. This is no longer possible.
-          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: true, legend: false })
+          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
           + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
         ]),
 
