@@ -2,7 +2,6 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 
 local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
-local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
 local var = g.dashboard.variable;
 
