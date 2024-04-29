@@ -1,21 +1,10 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local prometheus = g.query.prometheus;
-local stat = g.panel.stat;
 local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
 local var = g.dashboard.variable;
 
 {
-  local statPanel(title, unit, query) =
-    stat.new(title)
-    + stat.options.withColorMode('none')
-    + stat.standardOptions.withUnit(unit)
-    + stat.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
-    + stat.queryOptions.withTargets([
-      prometheus.new('${datasource}', query)
-      + prometheus.withInstant(true),
-    ]),
-
   local tsPanel =
     timeSeries {
       new(title):
