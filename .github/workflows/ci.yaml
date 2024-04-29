@@ -3,51 +3,28 @@ on:
   - push
   - pull_request
 jobs:
-  generate:
+  matrix:
     runs-on: ubuntu-latest
-    name: Generate yaml
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Alerts linter
+            run: make --always-make alerts-lint
+          - name: Generate yaml
+            run: make --always-make generate && git diff --exit-code
+          - name: Grafana dashboard linter
+            run: make --always-make dashboards-lint
+          - name: Jsonnet formatter
+            run: make --always-make fmt && git diff --exit-code
+          - name: Jsonnet linter
+            run: make --always-make jsonnet-lint
+          - name: Unit tests
+            run: make --always-make test
+
     steps:
-    - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - run: make --always-make generate && git diff --exit-code
-  jsonnet-lint:
-    runs-on: ubuntu-latest
-    name: Jsonnet linter
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - run: make --always-make jsonnet-lint
-  dashboards-lint:
-    runs-on: ubuntu-latest
-    name: Grafana dashboard linter
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - run: make --always-make dashboards-lint
-  alerts-lint:
-    runs-on: ubuntu-latest
-    name: Alerts linter
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - run: make --always-make alerts-lint
-  fmt:
-    runs-on: ubuntu-latest
-    name: Jsonnet formatter
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - run: make --always-make fmt && git diff --exit-code
-  unit-tests:
-    runs-on: ubuntu-latest
-    name: Unit tests
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - run: make --always-make test
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: ${{ matrix.run }}
