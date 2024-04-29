@@ -351,8 +351,8 @@ local var = g.dashboard.variable;
             panels.tsMemory,
             panels.tsCpu,
             panels.tsGoRoutines,
-          ]
-        }
+          ],
+        },
       ];
 
       local rowfunc(row) = [] + g.util.grid.wrapPanels(
