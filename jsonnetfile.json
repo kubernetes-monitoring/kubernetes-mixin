@@ -26,7 +26,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "master"
+      "version": "02db06f540086fa3f67d487bd01e1b314853fb8f"
     }
   ],
   "legacyImports": false
