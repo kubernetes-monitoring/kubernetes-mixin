@@ -1,7 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local gauge = g.panel.gauge;
 local prometheus = g.query.prometheus;
-local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
 local var = g.dashboard.variable;
 
