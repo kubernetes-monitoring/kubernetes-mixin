@@ -186,7 +186,7 @@ local var = g.dashboard.variable;
       };
 
       g.dashboard.new('%(dashboardNamePrefix)sPersistent Volumes' % $._config.grafanaK8s)
-      + g.dashboard.withUid($._config.grafanaDashboardIDs['kubelet.json'])
+      + g.dashboard.withUid($._config.grafanaDashboardIDs['persistentvolumesusage.json'])
       + g.dashboard.withTags($._config.grafanaK8s.dashboardTags)
       + g.dashboard.withEditable(false)
       + g.dashboard.time.withFrom('now-1h')
