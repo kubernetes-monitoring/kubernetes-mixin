@@ -67,7 +67,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config
+            'sum by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -77,7 +77,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config
+            'sum by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -85,35 +85,35 @@ local var = g.dashboard.variable;
         table.new('Current Status')
         + table.gridPos.withW(24)
         + table.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'avg by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'avg by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'avg by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'avg by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
         ])
@@ -214,7 +214,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'avg by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config
+            'avg by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -224,7 +224,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'avg by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config
+            'avg by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -234,7 +234,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config
+            'sum by (namespace) (rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -244,7 +244,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config
+            'sum by (namespace) (rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -252,42 +252,42 @@ local var = g.dashboard.variable;
         tsPanel.new('Rate of Received Packets')
         + tsPanel.standardOptions.withUnit('pps')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Rate of Transmitted Packets')
         + tsPanel.standardOptions.withUnit('pps')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Rate of Received Packets Dropped')
         + tsPanel.standardOptions.withUnit('pps')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Rate of Transmitted Packets Dropped')
         + tsPanel.standardOptions.withUnit('pps')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (namespace) (rate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace!=""}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Rate of TCP Retransmits out of all sent segments')
         + tsPanel.standardOptions.withUnit('percentunit')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (instance) (rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_OutSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (instance) (rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_OutSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Rate of TCP SYN Retransmits out of all retransmits')
         + tsPanel.standardOptions.withUnit('percentunit')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (instance) (rate(node_netstat_TcpExt_TCPSynRetrans{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]))' % $._config)
+          prometheus.new('${datasource}', 'sum by (instance) (rate(node_netstat_TcpExt_TCPSynRetrans{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
           + prometheus.withLegendFormat('__auto'),
         ]),
       ];
