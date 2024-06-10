@@ -208,13 +208,13 @@
           },
           {
             expr: |||
-              sum by (namespace, pod, container, %(clusterLabel)s) (kube_pod_container_status_waiting_reason{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}) > 0
+              kube_pod_container_status_waiting_reason{reason!="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
+              description: 'pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour. (reason: "{{ $labels.reason }}").',
               summary: 'Pod container waiting longer than 1 hour',
             },
             'for': '1h',
