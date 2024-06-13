@@ -1,9 +1,9 @@
 {
-  _config+:: {
-    cadvisorSelector: 'job="cadvisor"',
-    kubeStateMetricsSelector: 'job="kube-state-metrics"',
+  local config = {
+    clusterLabel: $._config.clusterLabel,
+    cadvisorSelector: if $._config.cadvisorSelector != '' then '%s, ' % $._config.cadvisorSelector else '',
+    kubeStateMetricsSelector: $._config.kubeStateMetricsSelector,
   },
-
   prometheusRules+:: {
     groups+: [
       {
@@ -16,11 +16,11 @@
             record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate',
             expr: |||
               sum by (%(clusterLabel)s, namespace, pod, container) (
-                irate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!=""}[5m])
+                irate(container_cpu_usage_seconds_total{%(cadvisorSelector)simage!=""}[5m])
               ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
                 1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % config,
           },
         ],
       },
@@ -30,11 +30,11 @@
           {
             record: 'node_namespace_pod_container:container_memory_working_set_bytes',
             expr: |||
-              container_memory_working_set_bytes{%(cadvisorSelector)s, image!=""}
+              container_memory_working_set_bytes{%(cadvisorSelector)simage!=""}
               * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
                 max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % config,
           },
         ],
       },
@@ -44,11 +44,11 @@
           {
             record: 'node_namespace_pod_container:container_memory_rss',
             expr: |||
-              container_memory_rss{%(cadvisorSelector)s, image!=""}
+              container_memory_rss{%(cadvisorSelector)simage!=""}
               * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
                 max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % config,
           },
         ],
       },
@@ -58,11 +58,11 @@
           {
             record: 'node_namespace_pod_container:container_memory_cache',
             expr: |||
-              container_memory_cache{%(cadvisorSelector)s, image!=""}
+              container_memory_cache{%(cadvisorSelector)simage!=""}
               * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
                 max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % config,
           },
         ],
       },
@@ -72,11 +72,11 @@
           {
             record: 'node_namespace_pod_container:container_memory_swap',
             expr: |||
-              container_memory_swap{%(cadvisorSelector)s, image!=""}
+              container_memory_swap{%(cadvisorSelector)simage!=""}
               * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by(%(clusterLabel)s, namespace, pod) (1,
                 max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
-            ||| % $._config,
+            ||| % config,
           },
         ],
       },
@@ -90,7 +90,7 @@
               group_left() max by (namespace, pod, %(clusterLabel)s) (
                 (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'namespace_memory:kube_pod_container_resource_requests:sum',
@@ -104,7 +104,7 @@
                       )
                   )
               )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests',
@@ -113,7 +113,7 @@
               group_left() max by (namespace, pod, %(clusterLabel)s) (
                 (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'namespace_cpu:kube_pod_container_resource_requests:sum',
@@ -127,7 +127,7 @@
                       )
                   )
               )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_limits',
@@ -136,7 +136,7 @@
               group_left() max by (namespace, pod, %(clusterLabel)s) (
                 (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'namespace_memory:kube_pod_container_resource_limits:sum',
@@ -150,7 +150,7 @@
                       )
                   )
               )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits',
@@ -159,7 +159,7 @@
               group_left() max by (namespace, pod, %(clusterLabel)s) (
                (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
                )
-            ||| % $._config,
+            ||| % config,
           },
           {
             record: 'namespace_cpu:kube_pod_container_resource_limits:sum',
@@ -173,7 +173,7 @@
                       )
                   )
               )
-            ||| % $._config,
+            ||| % config,
           },
         ],
       },
@@ -197,7 +197,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % config,
             labels: {
               workload_type: 'deployment',
             },
@@ -211,7 +211,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % config,
             labels: {
               workload_type: 'daemonset',
             },
@@ -225,7 +225,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % config,
             labels: {
               workload_type: 'statefulset',
             },
@@ -239,7 +239,7 @@
                   "workload", "$1", "owner_name", "(.*)"
                 )
               )
-            ||| % $._config,
+            ||| % config,
             labels: {
               workload_type: 'job',
             },
