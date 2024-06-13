@@ -7,15 +7,7 @@ local timeSeries = g.panel.timeSeries;
 local var = g.dashboard.variable;
 
 {
-  local config = {
-    clusterLabel: $._config.clusterLabel,
-    namespaceLabel: $._config.namespaceLabel,
-    grafanaIntervalVar: $._config.grafanaIntervalVar,
-    diskDeviceSelector: $._config.diskDeviceSelector,
-    containerfsSelector: $._config.containerfsSelector,
-    upCadvisorSelector: $._config.cadvisorSelector,  // in up{} queries cadvisor is the only selector used (no need for comma)
-    cadvisorSelector: if $._config.cadvisorSelector != '' then '%s, ' % $._config.cadvisorSelector else '',
-  },
+  local config = (import '../../lib/utils.libsonnet').processConfig($._config),
 
   local statPanel(title, unit, query) =
     stat.new(title)

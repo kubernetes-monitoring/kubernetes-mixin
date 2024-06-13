@@ -1,9 +1,6 @@
 {
-  local config = {
-    clusterLabel: $._config.clusterLabel,
-    cadvisorSelector: if $._config.cadvisorSelector != '' then '%s, ' % $._config.cadvisorSelector else '',
-    kubeStateMetricsSelector: $._config.kubeStateMetricsSelector,
-  },
+  local config = (import '../lib/utils.libsonnet').processConfig($._config),
+
   prometheusRules+:: {
     groups+: [
       {

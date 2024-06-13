@@ -6,12 +6,7 @@ local timeSeries = g.panel.timeSeries;
 local var = g.dashboard.variable;
 
 {
-  local config = {
-    clusterLabel: $._config.clusterLabel,
-    namespaceLabel: $._config.namespaceLabel,
-    kubeStateMetricsSelector: $._config.kubeStateMetricsSelector,
-    cadvisorSelector: if $._config.cadvisorSelector != '' then '%s, ' % $._config.cadvisorSelector else '',
-  },
+  local config = (import '../../lib/utils.libsonnet').processConfig($._config),
 
   local statPanel(title, unit, query) =
     stat.new(title)
