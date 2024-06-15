@@ -10,6 +10,17 @@
       timezone: kubernetesMixin._config.grafanaK8s.grafanaTimezone,
       refresh: kubernetesMixin._config.grafanaK8s.refresh,
       tags: kubernetesMixin._config.grafanaK8s.dashboardTags,
+      links: [
+        {
+          asDropdown: true,
+          includeVars: true,
+          keepTime: true,
+          tags: kubernetesMixin._config.grafanaK8s.dashboardTags,
+          targetBlank: false,
+          title: 'Kubernetes',
+          type: 'dashboards',
+        },
+      ],
 
       [if 'rows' in super then 'rows']: [
         row {
