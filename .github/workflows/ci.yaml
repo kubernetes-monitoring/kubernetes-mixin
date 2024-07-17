@@ -10,23 +10,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Alerts linter
+          - name: Lint Alerts
             run: make --always-make alerts-lint
-          - name: Generate yaml
+          - name: Generate YAML
             run: make --always-make generate && git diff --exit-code
-          - name: Grafana dashboard linter
+          - name: Lint Grafana Dashboards
             run: make --always-make dashboards-lint
-          - name: Jsonnet formatter
-            run: make --always-make fmt && git diff --exit-code
-          - name: Markdown formatter
-            run: make --always-make markdownfmt && git diff --exit-code
-          - name: Markdown linter
-            run: make --always-make vale && git diff --exit-code
-          - name: Jsonnet linter
+          - name: Format JSONNET
+            run: make --always-make jsonnet-fmt && git diff --exit-code
+          - name: Lint JSONNET
             run: make --always-make jsonnet-lint
-          - name: YAML linter (Pint)
+          - name: Format MD
+            run: make --always-make markdownfmt && git diff --exit-code
+          - name: Lint MD
+            run: make --always-make vale && git diff --exit-code
+          - name: Lint YAML
             run: make --always-make pint-lint
-          - name: Unit tests
+          - name: Run unit tests
             run: make --always-make test
 
     steps:
