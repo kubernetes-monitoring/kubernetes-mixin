@@ -18,6 +18,10 @@ jobs:
             run: make --always-make dashboards-lint
           - name: Jsonnet formatter
             run: make --always-make fmt && git diff --exit-code
+          - name: Markdown formatter
+            run: make --always-make markdownfmt && git diff --exit-code
+          - name: Markdown linter
+            run: make --always-make vale && git diff --exit-code
           - name: Jsonnet linter
             run: make --always-make jsonnet-lint
           - name: Unit tests
