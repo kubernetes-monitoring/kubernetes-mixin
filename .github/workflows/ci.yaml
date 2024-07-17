@@ -24,6 +24,8 @@ jobs:
             run: make --always-make vale && git diff --exit-code
           - name: Jsonnet linter
             run: make --always-make jsonnet-lint
+          - name: YAML linter (Pint)
+            run: make --always-make pint-lint
           - name: Unit tests
             run: make --always-make test
 

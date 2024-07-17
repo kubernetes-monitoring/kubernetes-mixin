@@ -7,6 +7,7 @@ package tools
 
 import (
 	_ "github.com/Kunde21/markdownfmt/v3/cmd/markdownfmt"
+	_ "github.com/cloudflare/pint/cmd/pint"
 	_ "github.com/errata-ai/vale/v3/cmd/vale"
 	_ "github.com/google/go-jsonnet/cmd/jsonnet"
 	_ "github.com/google/go-jsonnet/cmd/jsonnet-lint"
