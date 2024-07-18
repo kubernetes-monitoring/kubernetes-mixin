@@ -10,7 +10,8 @@ MD_FILES = $(shell find . \( -type d -name '.vale' -o -type d -name 'vendor' \) 
 MARKDOWNFMT_BIN=$(BIN_DIR)/markdownfmt
 VALE_BIN=$(BIN_DIR)/vale
 PROMTOOL_BIN=$(BIN_DIR)/promtool
-TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(GRAFANA_DASHBOARD_LINTER_BIN) $(MARKDOWNFMT_BIN) $(VALE_BIN)
+PINT_BIN=$(BIN_DIR)/pint
+TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(GRAFANA_DASHBOARD_LINTER_BIN) $(MARKDOWNFMT_BIN) $(VALE_BIN) $(PINT_BIN)
 JSONNETFMT_ARGS=-n 2 --max-blank-lines 2 --string-style s --comment-style s
 SRC_DIR ?=dashboards
 OUT_DIR ?=dashboards_out
@@ -44,7 +45,7 @@ $(OUT_DIR): $(JSONNET_BIN) $(JSONNET_VENDOR) mixin.libsonnet lib/dashboards.json
 	@$(JSONNET_BIN) -J vendor -m $(OUT_DIR) lib/dashboards.jsonnet
 
 .PHONY: lint
-lint: jsonnet-lint alerts-lint dashboards-lint vale
+lint: jsonnet-lint alerts-lint dashboards-lint vale pint-lint
 
 .PHONY: jsonnet-lint
 jsonnet-lint: $(JSONNETLINT_BIN) $(JSONNET_VENDOR)
@@ -67,9 +68,17 @@ dashboards-lint: $(GRAFANA_DASHBOARD_LINTER_BIN) $(OUT_DIR)/.lint
 
 .PHONY: vale
 vale: $(VALE_BIN)
-	@echo $(MD_FILES)
 	@$(VALE_BIN) sync && \
 		$(VALE_BIN) $(MD_FILES)
+
+.PHONY: pint-lint
+pint-lint: generate $(PINT_BIN)
+	@# Pint will not exit with a non-zero status code if there are linting issues.
+	@output=$$($(PINT_BIN) -n -o -l WARN lint prometheus_alerts.yaml prometheus_rules.yaml 2>&1); \
+	if [ -n "$$output" ]; then \
+		echo "\n$$output"; \
+		exit 1; \
+	fi
 
 .PHONY: clean
 clean:
