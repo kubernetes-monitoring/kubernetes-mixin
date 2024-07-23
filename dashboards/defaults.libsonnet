@@ -6,12 +6,12 @@
   // of the file name and set the timezone to be 'default'.
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
-      uid: std.md5(filename),
+      uid: std.get(kubernetesMixin._config.grafanaDashboardIDs, filename, default=std.md5(filename)),
       timezone: kubernetesMixin._config.grafanaK8s.grafanaTimezone,
       refresh: kubernetesMixin._config.grafanaK8s.refresh,
       tags: kubernetesMixin._config.grafanaK8s.dashboardTags,
 
-      rows: [
+      [if 'rows' in super then 'rows']: [
         row {
           panels: [
             panel {
