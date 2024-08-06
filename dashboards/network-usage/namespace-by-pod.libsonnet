@@ -149,7 +149,7 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-              ||| % $._config
+            ||| % $._config
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -167,7 +167,8 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-            ||| % $._config)
+            ||| % $._config
+          )
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
@@ -181,7 +182,8 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-            ||| % $._config)
+            ||| % $._config
+          )
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
@@ -195,7 +197,8 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-            ||| % $._config)
+            ||| % $._config
+          )
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
@@ -209,7 +212,8 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-            ||| % $._config)
+            ||| % $._config
+          )
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
@@ -223,7 +227,8 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-            ||| % $._config)
+            ||| % $._config
+          )
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
 
@@ -237,7 +242,8 @@ local var = g.dashboard.variable;
                     max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
                   )
               )
-            ||| % $._config)
+            ||| % $._config
+          )
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
         ])
