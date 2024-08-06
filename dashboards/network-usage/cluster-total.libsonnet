@@ -436,14 +436,36 @@ local var = g.dashboard.variable;
         tsPanel.new('Rate of TCP Retransmits out of all sent segments')
         + tsPanel.standardOptions.withUnit('percentunit')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (instance) (rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_OutSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
+          prometheus.new(
+            '${datasource}', |||
+              sum by (instance) (
+                  rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_OutSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])
+                * on (%(clusterLabel)s,namespace,pod) group_left ()
+                  topk by (%(clusterLabel)s,namespace,pod) (
+                    1,
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  )
+              )
+            ||| % $._config
+          )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Rate of TCP SYN Retransmits out of all retransmits')
         + tsPanel.standardOptions.withUnit('percentunit')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum by (instance) (rate(node_netstat_TcpExt_TCPSynRetrans{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) * on (%(clusterLabel)s,namespace,pod) kube_pod_info{host_network="false"})' % $._config)
+          prometheus.new(
+            '${datasource}', |||
+              sum by (instance) (
+                  rate(node_netstat_TcpExt_TCPSynRetrans{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s]) / rate(node_netstat_Tcp_RetransSegs{%(clusterLabel)s="$cluster"}[%(grafanaIntervalVar)s])
+                * on (%(clusterLabel)s,namespace,pod) group_left ()
+                  topk by (%(clusterLabel)s,namespace,pod) (
+                    1,
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  )
+              )
+            ||| % $._config
+          )
           + prometheus.withLegendFormat('__auto'),
         ]),
       ];
