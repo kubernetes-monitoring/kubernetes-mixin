@@ -1,0 +1,49 @@
+name: Check whether issues or PRs need attention
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 0 * * *"
+permissions:
+  issues: write
+  pull-requests: write
+jobs:
+  needs-attention:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 30
+          days-before-close: -1 # never close automatically
+          stale-issue-message: >
+            This issue has not had any activity in the past 30 days, so the
+            `needs-attention` label has been added to it.
+
+            If the opened issue is a bug, check to see if a newer release fixed
+            your issue. If it is no longer relevant, please feel free to close
+            this issue.
+
+            The `needs-attention` label signals to maintainers that something
+            has fallen through the cracks. No action is needed by you; your issue
+            will be kept open and you do not have to respond to this comment. The
+            label will be removed the next time this job runs if there is new
+            activity.
+
+            Thank you for your contributions!
+          stale-pr-message: >
+            This PR has not had any activity in the past 30 days, so the
+            `needs-attention` label has been added to it.
+
+            If you do not have enough time to follow up on this PR or you think
+            it's no longer relevant, consider closing it.
+
+            The `needs-attention` label signals to maintainers that something
+            has fallen through the cracks. No action is needed by you; your PR
+            will be kept open and you do not have to respond to this comment.
+            The label will be removed the next time this job runs if there is
+            new activity.
+
+            Thank you for your contributions!
+          stale-issue-label: needs-attention
+          stale-pr-label: needs-attention
+          exempt-issue-labels: keepalive
+          exempt-pr-labels: keepalive
