@@ -81,7 +81,7 @@
         ],
       },
       {
-        name: 'k8s.rules.container_resource',
+        name: 'k8s.rules.container_memory_requests',
         rules: [
           {
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests',
@@ -106,6 +106,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_cpu_requests',
+        rules: [
           {
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests',
             expr: |||
@@ -129,6 +134,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_limits',
+        rules: [
           {
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_limits',
             expr: |||
@@ -152,6 +162,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_cpu_limits',
+        rules: [
           {
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits',
             expr: |||
