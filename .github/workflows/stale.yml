@@ -7,43 +7,32 @@ permissions:
   issues: write
   pull-requests: write
 jobs:
-  needs-attention:
+  stale:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v9
         with:
           days-before-stale: 30
-          days-before-close: -1 # never close automatically
+          days-before-close: 7
           stale-issue-message: >
             This issue has not had any activity in the past 30 days, so the
-            `needs-attention` label has been added to it.
+            `stale` label has been added to it.
 
-            If the opened issue is a bug, check to see if a newer release fixed
-            your issue. If it is no longer relevant, please feel free to close
-            this issue.
-
-            The `needs-attention` label signals to maintainers that something
-            has fallen through the cracks. No action is needed by you; your issue
-            will be kept open and you do not have to respond to this comment. The
-            label will be removed the next time this job runs if there is new
-            activity.
+            * The `stale` label will be removed if there is new activity
+            * The issue will be closed in 2 days if there is no new activity
+            * Add the `keepalive` label to exempt this issue from the stale check action
 
             Thank you for your contributions!
           stale-pr-message: >
-            This PR has not had any activity in the past 30 days, so the
-            `needs-attention` label has been added to it.
+            This PR has been automatically marked as stale because it has not
+            had any activity in the past 30 days.
 
-            If you do not have enough time to follow up on this PR or you think
-            it's no longer relevant, consider closing it.
-
-            The `needs-attention` label signals to maintainers that something
-            has fallen through the cracks. No action is needed by you; your PR
-            will be kept open and you do not have to respond to this comment.
-            The label will be removed the next time this job runs if there is
-            new activity.
+            The next time this stale check runs, the stale label will be
+            removed if there is new activity. The issue will be closed in 7
+            days if there is no new activity.
 
             Thank you for your contributions!
-          stale-issue-label: needs-attention
-          stale-pr-label: needs-attention
+          stale-issue-label: stale
+          stale-pr-label: stale
           exempt-issue-labels: keepalive
           exempt-pr-labels: keepalive
