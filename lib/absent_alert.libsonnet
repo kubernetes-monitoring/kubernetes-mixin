@@ -12,7 +12,7 @@
     severity: 'critical',
   },
   annotations: {
-    description: '%(componentName)s in Cluster {{ $labels.%(clusterLabel)s }}, has disappeared from Prometheus target discovery.' % absentAlert,
+    description: '%s has disappeared from Prometheus target discovery.' % absentAlert.componentName,
     summary: 'Target disappeared from Prometheus target discovery.',
   },
 }

@@ -122,7 +122,6 @@ local utils = import '../lib/utils.libsonnet';
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeAPI',
             selector:: $._config.kubeApiserverSelector,
-            clusterLabel:: $._config.clusterLabel,
           },
           {
             alert: 'KubeAPITerminatedRequests',
