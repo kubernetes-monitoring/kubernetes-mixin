@@ -143,7 +143,7 @@
           {
             expr: |||
               (
-                max by(namespace, statefulset) (
+                max by(namespace, statefulset, job, %(clusterLabel)s) (
                   kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                     unless
                   kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
