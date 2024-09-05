@@ -18,9 +18,9 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAPIErrorBudgetBurn',
             expr: |||
-              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+              sum by (%(clusterLabel)s) (apiserver_request:burnrate%s) > (%.2f * %.5f)
               and
-              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+              sum by (%(clusterLabel)s) (apiserver_request:burnrate%s) > (%.2f * %.5f)
             ||| % [
               w.long,
               w.factor,
