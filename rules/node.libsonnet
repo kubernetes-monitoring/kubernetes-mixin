@@ -32,8 +32,8 @@
             expr: |||
               count by (%(clusterLabel)s, node) (
                 node_cpu_seconds_total{mode="idle",%(nodeExporterSelector)s}
-                * on (namespace, %(podLabel)s) group_left(node)
-                topk by(namespace, %(podLabel)s) (1, node_namespace_pod:kube_pod_info:)
+                * on (%(clusterLabel)s, namespace, %(podLabel)s) group_left(node)
+                topk by(%(clusterLabel)s, namespace, %(podLabel)s) (1, node_namespace_pod:kube_pod_info:)
               )
             ||| % $._config,
           },

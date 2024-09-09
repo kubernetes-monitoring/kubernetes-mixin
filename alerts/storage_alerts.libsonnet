@@ -26,9 +26,9 @@
               ) < 0.03
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_labels{%(prefixedNamespaceSelector)s%(pvExcludedSelector)s} == 1
             ||| % $._config,
             'for': '1m',
@@ -36,7 +36,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is only {{ $value | humanizePercentage }} free.',
+              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} is only {{ $value | humanizePercentage }} free.' % $._config,
               summary: 'PersistentVolume is filling up.',
             },
           },
@@ -52,9 +52,9 @@
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
               predict_linear(kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_labels{%(prefixedNamespaceSelector)s%(pvExcludedSelector)s} == 1
             ||| % $._config,
             'for': '1h',
@@ -62,7 +62,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.',
+              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} is expected to fill up within four days. Currently {{ $value | humanizePercentage }} is available.' % $._config,
               summary: 'PersistentVolume is filling up.',
             },
           },
@@ -76,9 +76,9 @@
               ) < 0.03
               and
               kubelet_volume_stats_inodes_used{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_labels{%(prefixedNamespaceSelector)s%(pvExcludedSelector)s} == 1
             ||| % $._config,
             'for': '1m',
@@ -86,7 +86,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} only has {{ $value | humanizePercentage }} free inodes.',
+              description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} only has {{ $value | humanizePercentage }} free inodes.' % $._config,
               summary: 'PersistentVolumeInodes are filling up.',
             },
           },
@@ -102,9 +102,9 @@
               kubelet_volume_stats_inodes_used{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
               predict_linear(kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s}[%(volumeFullPredictionSampleTime)s], 4 * 24 * 3600) < 0
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
-              unless on(namespace, persistentvolumeclaim)
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
               kube_persistentvolumeclaim_labels{%(prefixedNamespaceSelector)s%(pvExcludedSelector)s} == 1
             ||| % $._config,
             'for': '1h',
@@ -112,7 +112,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to run out of inodes within four days. Currently {{ $value | humanizePercentage }} of its inodes are free.',
+              description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} is expected to run out of inodes within four days. Currently {{ $value | humanizePercentage }} of its inodes are free.' % $._config,
               summary: 'PersistentVolumeInodes are filling up.',
             },
           },
@@ -126,7 +126,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.',
+              description: 'The persistent volume {{ $labels.persistentvolume }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} has status {{ $labels.phase }}.' % $._config,
               summary: 'PersistentVolume is having issues with provisioning.',
             },
           },

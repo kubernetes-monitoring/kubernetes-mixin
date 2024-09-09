@@ -7,7 +7,7 @@
   prometheusRules+:: {
     groups+: [
       {
-        name: 'k8s.rules',
+        name: 'k8s.rules.container_cpu_usage_seconds_total',
         rules: [
           {
             // Reduces cardinality of this timeseries by #cores, which makes it
@@ -22,6 +22,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_working_set_bytes',
+        rules: [
           {
             record: 'node_namespace_pod_container:container_memory_working_set_bytes',
             expr: |||
@@ -31,6 +36,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_rss',
+        rules: [
           {
             record: 'node_namespace_pod_container:container_memory_rss',
             expr: |||
@@ -40,6 +50,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_cache',
+        rules: [
           {
             record: 'node_namespace_pod_container:container_memory_cache',
             expr: |||
@@ -49,6 +64,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_swap',
+        rules: [
           {
             record: 'node_namespace_pod_container:container_memory_swap',
             expr: |||
@@ -58,6 +78,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_requests',
+        rules: [
           {
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests',
             expr: |||
@@ -81,6 +106,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_cpu_requests',
+        rules: [
           {
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests',
             expr: |||
@@ -104,6 +134,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_memory_limits',
+        rules: [
           {
             record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_limits',
             expr: |||
@@ -127,6 +162,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.container_cpu_limits',
+        rules: [
           {
             record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits',
             expr: |||
@@ -150,6 +190,11 @@
               )
             ||| % $._config,
           },
+        ],
+      },
+      {
+        name: 'k8s.rules.pod_owner',
+        rules: [
           // workload aggregation for deployments
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',

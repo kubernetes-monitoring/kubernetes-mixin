@@ -34,7 +34,7 @@
           } +
           if $._config.showMultiCluster then {
             expr: |||
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(kubeStateMetricsSelector)s,%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
+              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
               and
               (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
             ||| % $._config,
@@ -199,9 +199,9 @@
           {
             alert: 'CPUThrottlingHigh',
             expr: |||
-              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
+              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
                 /
-              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
+              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
                 > ( %(cpuThrottlingPercent)s / 100 )
             ||| % $._config,
             'for': '15m',
