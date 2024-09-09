@@ -15,6 +15,8 @@
     // See https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-can-i-configure-overprovisioning-with-cluster-autoscaler
     // for more details.
     ignoringOverprovisionedWorkloadSelector: '',
+    // Maximum rate of OOMKiller events that is considered normal for any single container
+    maxOOMKillRate: 0,
   },
 
   prometheusAlerts+:: {
@@ -211,6 +213,21 @@
             annotations: {
               description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
               summary: 'Processes experience elevated CPU throttling.',
+            },
+          },
+          {
+            alert: 'KubeContainerOOMEvents',
+            expr: |||
+              sum by (namespace, pod, container, %(clusterLabel)s)
+              (rate(container_oom_events_total[5m])) > %(maxOOMKillRate)s
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            'for': '5m',
+            annotations: {
+              description: 'Processes are being killed by the Out Of Memory (OOM) Killer inside the "{{ $labels.container}}" container in pod {{ $labels.namespace }}/{{ $labels.pod }}.',
+              summary: 'Processes are being OOMKilled',
             },
           },
         ],
