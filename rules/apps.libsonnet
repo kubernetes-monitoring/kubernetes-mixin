@@ -116,6 +116,24 @@
               )
             ||| % $._config,
           },
+          {
+            record: 'cluster:namespace:pod_memory:active:kube_pod_resource_request_or_kube_pod_container_resource_requests',
+            expr: |||
+              (kube_pod_resource_request{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum',
+            expr: |||
+              sum by (namespace, %(clusterLabel)s) (
+                  sum by (namespace, pod, %(clusterLabel)s) (
+                      max by (namespace, pod, container, %(clusterLabel)s) (
+                        kube_pod_resource_request{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}
+                      )
+                  )
+              )
+            ||| % $._config,
+          },
         ],
       },
       {
@@ -139,6 +157,24 @@
                         kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}
                       ) * on(namespace, pod, %(clusterLabel)s) group_left() max by (namespace, pod, %(clusterLabel)s) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
+                      )
+                  )
+              )
+            ||| % $._config,
+          },
+          {
+            record: 'cluster:namespace:pod_cpu:active:kube_pod_resource_request_or_kube_pod_container_resource_requests',
+            expr: |||
+              (kube_pod_resource_request{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum',
+            expr: |||
+              sum by (namespace, %(clusterLabel)s) (
+                  sum by (namespace, pod, %(clusterLabel)s) (
+                      max by (namespace, pod, container, %(clusterLabel)s) (
+                        kube_pod_resource_request{resource="cpu",%(kubeSchedulerSelector)s} or kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}
                       )
                   )
               )
@@ -172,6 +208,24 @@
               )
             ||| % $._config,
           },
+          {
+            record: 'cluster:namespace:pod_memory:active:kube_pod_resource_limit_or_kube_pod_container_resource_limits',
+            expr: |||
+              (kube_pod_resource_limit{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: 'namespace_memory:kube_pod_resource_limit_or_kube_pod_container_resource_limits:sum',
+            expr: |||
+              sum by (namespace, %(clusterLabel)s) (
+                  sum by (namespace, pod, %(clusterLabel)s) (
+                      max by (namespace, pod, container, %(clusterLabel)s) (
+                        kube_pod_resource_limit{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s}
+                      )
+                  )
+              )
+            ||| % $._config,
+          },
         ],
       },
       {
@@ -195,6 +249,24 @@
                         kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}
                       ) * on(namespace, pod, %(clusterLabel)s) group_left() max by (namespace, pod, %(clusterLabel)s) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
+                      )
+                  )
+              )
+            ||| % $._config,
+          },
+          {
+            record: 'cluster:namespace:pod_cpu:active:kube_pod_resource_limit_or_kube_pod_container_resource_limits',
+            expr: |||
+              (kube_pod_resource_limit{resource="cpu",%(kubeSchedulerSelector)s} or kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s})
+            ||| % $._config,
+          },
+          {
+            record: 'namespace_cpu:kube_pod_resource_limit_or_kube_pod_container_resource_limits:sum',
+            expr: |||
+              sum by (namespace, %(clusterLabel)s) (
+                  sum by (namespace, pod, %(clusterLabel)s) (
+                      max by (namespace, pod, container, %(clusterLabel)s) (
+                        kube_pod_resource_limit{resource="cpu",%(kubeSchedulerSelector)s} or kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}
                       )
                   )
               )

@@ -68,13 +68,13 @@ local var = g.dashboard.variable;
             statPanel(
               'CPU Requests Commitment',
               'percentunit',
-              'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config
+              'sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="cpu"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config
             ),
 
             statPanel(
               'CPU Limits Commitment',
               'percentunit',
-              'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config
+              'sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="cpu"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="cpu"})' % $._config
             ),
 
             statPanel(
@@ -86,13 +86,13 @@ local var = g.dashboard.variable;
             statPanel(
               'Memory Requests Commitment',
               'percentunit',
-              'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config
+              'sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="memory"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config
             ),
 
             statPanel(
               'Memory Limits Commitment',
               'percentunit',
-              'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config
+              'sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) / sum(kube_node_status_allocatable{%(kubeSchedulerSelector)s, resource="memory"} or kube_node_status_allocatable{%(kubeStateMetricsSelector)s, resource="memory"})' % $._config
             ),
           ],
 
@@ -110,16 +110,16 @@ local var = g.dashboard.variable;
               prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s) / sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s) / sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="cpu"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
             ])
@@ -209,16 +209,16 @@ local var = g.dashboard.variable;
               prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_resource_request{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_resource_limit{%(kubeSchedulerSelector)s, resource="memory"} or kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
             ])
