@@ -81,7 +81,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster",%(kubeStateMetricsSelector)s, node=~"$node", resource="cpu"})' % $._config,
+            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="cpu"})' % $._config,
           )
           + prometheus.withLegendFormat('max capacity'),
 
@@ -180,7 +180,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster",%(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
+            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
           )
           + prometheus.withLegendFormat('max capacity'),
 
