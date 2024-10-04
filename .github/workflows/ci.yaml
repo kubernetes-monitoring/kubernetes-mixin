@@ -28,6 +28,8 @@ jobs:
             run: make --always-make pint-lint
           - name: Run unit tests
             run: make --always-make test
+          - name: Build
+            run: make dashboards_out
 
     steps:
       - uses: actions/checkout@v4
