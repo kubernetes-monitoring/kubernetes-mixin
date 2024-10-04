@@ -1,0 +1,35 @@
+name: build
+on:
+ workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      environment:
+        description: 'Environment to deploy'
+        required: false
+        default: 'staging'
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Build
+            run: make dashboards_out
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: scripts/go.mod
+          cache-dependency-path: scripts/go.sum
+      - run: ${{ matrix.run }}
+      - uses: actions/download-artifact@v4
+      - name: Display structure of downloaded files
+        run: ls -R      
