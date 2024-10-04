@@ -87,7 +87,7 @@
     namespaceLabel: 'namespace',
 
     // Default datasource name
-    datasourceName: 'default',
+    datasourceName: 'Prometheus',
 
     // Datasource instance filter regex
     datasourceFilterRegex: '',
