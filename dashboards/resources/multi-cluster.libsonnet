@@ -126,7 +126,7 @@ local var = g.dashboard.variable;
             + g.panel.table.queryOptions.withTransformations([
               g.panel.table.queryOptions.transformation.withId('joinByField')
               + g.panel.table.queryOptions.transformation.withOptions({
-                byField: 'cluster',
+                byField: std.format('%s', $._config.clusterLabel),
                 mode: 'outer',
               }),
 
@@ -225,7 +225,7 @@ local var = g.dashboard.variable;
             + g.panel.table.queryOptions.withTransformations([
               g.panel.table.queryOptions.transformation.withId('joinByField')
               + g.panel.table.queryOptions.transformation.withOptions({
-                byField: 'cluster',
+                byField: std.format('%s', $._config.clusterLabel),
                 mode: 'outer',
               }),
 
