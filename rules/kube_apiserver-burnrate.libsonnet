@@ -14,7 +14,7 @@
                   -
                   (
                     (
-                      sum by (%(clusterLabel)s) (rate(apiserver_request_sli_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope=~"resource|",le="%(kubeApiserverReadResourceLatency)s"}[%(window)s]))
+                      sum by (%(clusterLabel)s) (rate(apiserver_request_sli_duration_seconds_bucket{%(kubeApiserverSelector)s,%(kubeApiserverReadSelector)s,%(kubeApiserverNonStreamingSelector)s,scope="resource",le="%(kubeApiserverReadResourceLatency)s"}[%(window)s]))
                       or
                       vector(0)
                     )
