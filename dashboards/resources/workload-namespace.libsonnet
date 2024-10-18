@@ -99,7 +99,7 @@ local var = g.dashboard.variable;
 
       local cpuRequestsQuery = |||
         sum(
-          kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}
+          (kube_pod_resource_request{%(kubeSchedulerSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"} or kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})
         * on(namespace,pod)
           group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload_type=~"$type"}
         ) by (workload, workload_type)

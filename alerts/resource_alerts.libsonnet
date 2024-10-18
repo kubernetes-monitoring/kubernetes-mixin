@@ -34,7 +34,7 @@
           } +
           if $._config.showMultiCluster then {
             expr: |||
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
+              sum(namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
               and
               (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
             ||| % $._config,
@@ -43,7 +43,7 @@
             },
           } else {
             expr: |||
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) - max(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})) > 0
+              sum(namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) - max(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})) > 0
               and
               (sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) - max(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})) > 0
             ||| % $._config,
@@ -63,7 +63,7 @@
           } +
           if $._config.showMultiCluster then {
             expr: |||
-              sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)) > 0
+              sum(namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)) > 0
               and
               (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)) > 0
             ||| % $._config,
@@ -73,7 +73,7 @@
           } else
             {
               expr: |||
-                sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) - max(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})) > 0
+                sum(namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) - max(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})) > 0
                 and
                 (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) - max(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})) > 0
               ||| % $._config,

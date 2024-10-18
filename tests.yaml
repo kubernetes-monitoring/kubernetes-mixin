@@ -459,25 +459,15 @@ tests:
     values: '1+0x10'
   promql_expr_test:
   - eval_time: 0m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 0m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 1m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 1m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
 
 - interval: 1m
   input_series:
@@ -504,25 +494,15 @@ tests:
     values: '1+0x10'
   promql_expr_test:
   - eval_time: 0m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 0m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 1m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 1m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
 
 - interval: 1m
   input_series:

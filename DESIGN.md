@@ -54,7 +54,7 @@ Jsonnet offers the ability to parameterise configuration, allowing for basic cus
           alert: "KubePodNotReady", 
           expr: ||| 
             sum by (namespace, pod) ( 
-              kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase!~"Running|Succeeded"} 
+              kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase!~"Running"} 
             ) > $(allowedNotReadyPods)s 
           ||| % $._config, 
           "for": "1h", 
