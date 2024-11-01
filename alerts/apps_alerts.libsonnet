@@ -1,3 +1,5 @@
+local utils = import '../lib/utils.libsonnet';
+
 {
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
@@ -10,7 +12,8 @@
     groups+: [
       {
         name: 'kubernetes-apps',
-        rules: [
+        rules: [utils.wrap_rule_for_labels(rule, $._config) for rule in self.rules_],
+        rules_:: [
           {
             expr: |||
               max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) >= 1
@@ -143,7 +146,7 @@
           {
             expr: |||
               (
-                max without (revision) (
+                max by(namespace, statefulset, job, %(clusterLabel)s) (
                   kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                     unless
                   kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}

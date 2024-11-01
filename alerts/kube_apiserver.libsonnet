@@ -4,8 +4,6 @@ local utils = import '../lib/utils.libsonnet';
   _config+:: {
     kubeApiserverSelector: error 'must provide selector for kube-apiserver',
 
-    kubeAPILatencyWarningSeconds: 1,
-
     certExpirationWarningSeconds: 7 * 24 * 3600,
     certExpirationCriticalSeconds: 1 * 24 * 3600,
   },
@@ -18,13 +16,16 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAPIErrorBudgetBurn',
             expr: |||
-              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
-              and
-              sum(apiserver_request:burnrate%s) > (%.2f * %.5f)
+              sum by(%s) (apiserver_request:burnrate%s) > (%.2f * %.5f)
+              and on(%s)
+              sum by(%s) (apiserver_request:burnrate%s) > (%.2f * %.5f)
             ||| % [
+              $._config.clusterLabel,
               w.long,
               w.factor,
               (1 - $._config.SLOs.apiserver.target),
+              $._config.clusterLabel,
+              $._config.clusterLabel,
               w.short,
               w.factor,
               (1 - $._config.SLOs.apiserver.target),
@@ -112,7 +113,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAPITerminatedRequests',
             expr: |||
-              sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m]))  / (  sum(rate(apiserver_request_total{%(kubeApiserverSelector)s}[10m])) + sum(rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) ) > 0.20
+              sum by(%(clusterLabel)s) (rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) / ( sum by(%(clusterLabel)s) (rate(apiserver_request_total{%(kubeApiserverSelector)s}[10m])) + sum by(%(clusterLabel)s) (rate(apiserver_request_terminations_total{%(kubeApiserverSelector)s}[10m])) ) > 0.20
             ||| % $._config,
             labels: {
               severity: 'warning',

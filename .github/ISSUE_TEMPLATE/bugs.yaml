@@ -1,0 +1,49 @@
+name: Bug Report
+description: Report a bug in the existing codebase.
+title: '[Bug]: '
+labels: ['kind/bug', 'pending-triage']
+body:
+    - type: markdown
+      attributes:
+        value: |
+              Please use this template while reporting a bug and provide as much information as possible. If the matter is security related, please disclose it privately, see the project [security policy](https://github.com/kubernetes-monitoring/kubernetes-mixin/blob/main/SECURITY.md).
+    - type: textarea
+      id: cause
+      attributes:
+        label: What happened?
+        description: A clear and concise description of what the bug is. Screenshots and screencasts are highly encouraged and helpful during triage, so please provide them if you can.
+        placeholder: Describe the bug you encountered. Please do not paste any snippets here, use the next field instead.
+      validations:
+        required: true
+    - type: textarea
+      id: snippet
+      attributes:
+        label: Please provide any helpful snippets.
+        description: If applicable, add code snippet(s) to help explain or reproduce the problem. This will be automatically formatted into code, so no need for backticks. Separate snippets using comments.
+        render: jsonnet
+    - type: dropdown
+      id: contamination
+      attributes:
+        label: What parts of the codebase are affected?
+        description: Select all that apply.
+        multiple: true
+        options:
+          - Alerts
+          - Dashboards
+          - Rules
+          - Other
+      validations:
+        required: true
+    - type: checkboxes
+      id: terms
+      attributes:
+        label: "I agree to the following terms:"
+        options:
+        - label: I agree to follow this project's [Code of Conduct](../../CODE_OF_CONDUCT.md).
+          required: true
+        - label: I have filled out all the required information above to the best of my ability.
+          required: true
+        - label: I have searched the issues of this repository and believe that this is not a duplicate.
+          required: true
+        - label: I have confirmed this bug exists in the default branch of the repository, as of the latest commit at the time of submission.
+          required: true

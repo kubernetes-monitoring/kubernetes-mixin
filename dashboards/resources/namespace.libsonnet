@@ -131,13 +131,13 @@ local var = g.dashboard.variable;
 
           prometheus.new(
             '${datasource}',
-            'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"})' % $._config
+            'scalar(max(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.cpu"}))' % $._config
           )
           + prometheus.withLegendFormat('quota - requests'),
 
           prometheus.new(
             '${datasource}',
-            'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="limits.cpu"})' % $._config
+            'scalar(max(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="limits.cpu"}))' % $._config
           )
           + prometheus.withLegendFormat('quota - limits'),
         ])
@@ -293,13 +293,13 @@ local var = g.dashboard.variable;
 
           prometheus.new(
             '${datasource}',
-            'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.memory"})' % $._config
+            'scalar(max(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="requests.memory"}))' % $._config
           )
           + prometheus.withLegendFormat('quota - requests'),
 
           prometheus.new(
             '${datasource}',
-            'scalar(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="limits.memory"})' % $._config
+            'scalar(max(kube_resourcequota{%(clusterLabel)s="$cluster", namespace="$namespace", type="hard",resource="limits.memory"}))' % $._config
           )
           + prometheus.withLegendFormat('quota - limits'),
         ])

@@ -79,7 +79,7 @@ local var = g.dashboard.variable;
       local panels = [
         statPanel(
           'CPU Utilisation',
-          'none',
+          'percentunit',
           'cluster:node_cpu:ratio_rate5m{%(clusterLabel)s="$cluster"}' % $._config
         )
         + stat.gridPos.withW(4)

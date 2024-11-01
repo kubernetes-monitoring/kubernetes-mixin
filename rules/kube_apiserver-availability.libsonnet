@@ -30,18 +30,6 @@
           for verb in verbs
         ] + [
           {
-            record: 'cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h',
-            expr: |||
-              sum by (%(clusterLabel)s, verb, scope) (increase(apiserver_request_sli_duration_seconds_count{%(kubeApiserverSelector)s}[1h]))
-            ||| % $._config,
-          },
-          {
-            record: 'cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase%s' % SLODays,
-            expr: |||
-              sum by (%s, verb, scope) (avg_over_time(cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h[%s]) * 24 * %s)
-            ||| % [$._config.clusterLabel, SLODays, $._config.SLOs.apiserver.days],
-          },
-          {
             record: 'cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h',
             expr: |||
               sum by (%(clusterLabel)s, verb, scope, le) (increase(apiserver_request_sli_duration_seconds_bucket[1h]))
@@ -51,6 +39,18 @@
             record: 'cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%s' % SLODays,
             expr: |||
               sum by (%s, verb, scope, le) (avg_over_time(cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h[%s]) * 24 * %s)
+            ||| % [$._config.clusterLabel, SLODays, $._config.SLOs.apiserver.days],
+          },
+          {
+            record: 'cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase1h',
+            expr: |||
+              sum by (%(clusterLabel)s, verb, scope) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase1h{le="+Inf"})
+            ||| % $._config,
+          },
+          {
+            record: 'cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase%s' % SLODays,
+            expr: |||
+              sum by (%s, verb, scope) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%s{le="+Inf"} * 24 * %s)
             ||| % [$._config.clusterLabel, SLODays, $._config.SLOs.apiserver.days],
           },
           {
