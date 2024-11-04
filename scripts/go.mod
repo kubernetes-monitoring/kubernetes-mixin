@@ -261,3 +261,6 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+// TODO: This could be removed after https://github.com/mholt/archiver/pull/396 merged
+replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
