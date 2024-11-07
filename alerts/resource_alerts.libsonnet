@@ -199,9 +199,9 @@
           {
             alert: 'CPUThrottlingHigh',
             expr: |||
-              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
+              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cadvisorSelector)s, %(cpuThrottlingSelector)s}[5m])) without (id, metrics_path, name, image, endpoint, job, node)
                 /
-              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (%(clusterLabel)s, container, pod, namespace)
+              sum(increase(container_cpu_cfs_periods_total{%(cadvisorSelector)s, %(cpuThrottlingSelector)s}[5m])) without (id, metrics_path, name, image, endpoint, job, node)
                 > ( %(cpuThrottlingPercent)s / 100 )
             ||| % $._config,
             'for': '15m',
