@@ -59,7 +59,10 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s%s.' % [
+                (utils.humanizeSeconds($._config.certExpirationWarningSeconds)),
+                utils.ifClusterLabelSet($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Client certificate is about to expire.',
             },
           },
@@ -75,7 +78,10 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'critical',
             },
             annotations: {
-              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s.' % (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+              description: 'A client certificate used to authenticate to kubernetes apiserver is expiring in less than %s%s.' % [
+                (utils.humanizeSeconds($._config.certExpirationCriticalSeconds)),
+                utils.ifClusterLabelSet($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Client certificate is about to expire.',
             },
           },

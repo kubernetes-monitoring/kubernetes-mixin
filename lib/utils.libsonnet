@@ -56,4 +56,8 @@
           metric: labels.metric,
         },
       },
+
+  // if clusterLabel is set, return the string, otherwise return an empty string
+  ifClusterLabelSet(config, string)::
+    if std.length(config.clusterLabel) > 0 then string else '',
 }
