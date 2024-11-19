@@ -57,7 +57,7 @@
         },
       },
 
-  // if clusterLabel is set, return the string, otherwise return an empty string
-  ifClusterLabelSet(config, string)::
-    if std.length(config.clusterLabel) > 0 then string else '',
+  // if showMultiCluster is true in config, return the string, otherwise return an empty string
+  ifShowMultiCluster(config, string)::
+    if config.showMultiCluster then string else '',
 }
