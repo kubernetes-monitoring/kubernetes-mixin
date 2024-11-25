@@ -56,4 +56,8 @@
           metric: labels.metric,
         },
       },
+
+  // if showMultiCluster is true in config, return the string, otherwise return an empty string
+  ifShowMultiCluster(config, string)::
+    if config.showMultiCluster then string else '',
 }
