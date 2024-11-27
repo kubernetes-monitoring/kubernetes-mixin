@@ -4,6 +4,7 @@ local utils = import '../lib/utils.libsonnet';
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeJobTimeoutDuration: error 'must provide value for kubeJobTimeoutDuration',
+    kubeDaemonSetRolloutStuckFor: '15m',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
@@ -204,10 +205,10 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least 15 minutes.',
+              description: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least %(kubeDaemonSetRolloutStuckFor)s.' % $._config,
               summary: 'DaemonSet rollout is stuck.',
             },
-            'for': '15m',
+            'for': $._config.kubeDaemonSetRolloutStuckFor,
           },
           {
             expr: |||

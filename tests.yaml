@@ -822,7 +822,7 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
@@ -878,7 +878,7 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
@@ -909,7 +909,7 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
@@ -940,7 +940,7 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 36m
     alertname: KubeDaemonSetRolloutStuck
