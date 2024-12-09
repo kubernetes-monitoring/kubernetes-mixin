@@ -95,7 +95,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. It has appeared unavailable {{ $value | humanize }} times averaged over the past 10m.',
+              description: 'Kubernetes aggregated API {{ $labels.instance }}/{{ $labels.name }} has reported {{ $labels.reason }} errors%s.' % [
+                (utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Kubernetes aggregated API has reported errors.',
             },
           },
