@@ -88,13 +88,16 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeAggregatedAPIErrors',
             expr: |||
-              sum by(name, namespace, %(clusterLabel)s)(increase(aggregator_unavailable_apiservice_total{%(kubeApiserverSelector)s}[10m])) > 4
+              sum by(%(clusterLabel)s, instance, name, reason)(increase(aggregator_unavailable_apiservice_total{%(kubeApiserverSelector)s}[1m])) > 0
             ||| % $._config,
+            'for': '10m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. It has appeared unavailable {{ $value | humanize }} times averaged over the past 10m.',
+              description: 'Kubernetes aggregated API {{ $labels.instance }}/{{ $labels.name }} has reported {{ $labels.reason }} errors%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Kubernetes aggregated API has reported errors.',
             },
           },
