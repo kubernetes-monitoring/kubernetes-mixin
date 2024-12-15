@@ -50,7 +50,7 @@
           {
             record: 'cluster_verb_scope:apiserver_request_sli_duration_seconds_count:increase%s' % SLODays,
             expr: |||
-              sum by (%s, verb, scope) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%s{le="+Inf"} * 24 * %s)
+              sum by (%s, verb, scope) (cluster_verb_scope_le:apiserver_request_sli_duration_seconds_bucket:increase%s{le="+Inf"})
             ||| % [$._config.clusterLabel, SLODays, $._config.SLOs.apiserver.days],
           },
           {
