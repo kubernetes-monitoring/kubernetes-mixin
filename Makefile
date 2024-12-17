@@ -90,7 +90,7 @@ clean:
 
 .PHONY: test
 test: $(PROMTOOL_BIN) prometheus_alerts.yaml prometheus_rules.yaml
-	@$(PROMTOOL_BIN) test rules tests.yaml
+	@$(PROMTOOL_BIN) test rules tests/*.yaml
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
