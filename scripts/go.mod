@@ -1,13 +1,12 @@
 module _
 
 go 1.23.0
-
 toolchain go1.23.4
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
 	github.com/cloudflare/pint v0.69.1
-	github.com/errata-ai/vale/v3 v3.6.1
+	github.com/errata-ai/vale/v3 v3.9.1
 	github.com/google/go-jsonnet v0.20.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
 	github.com/jsonnet-bundler/jsonnet-bundler v0.6.0
@@ -132,6 +131,7 @@ require (
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/ionos-cloud/sdk-go/v6 v6.2.1 // indirect
+	github.com/jdkato/go-tree-sitter-julia v0.1.0 // indirect
 	github.com/jdkato/twine v0.10.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
