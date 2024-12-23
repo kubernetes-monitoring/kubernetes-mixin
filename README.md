@@ -23,11 +23,14 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 | release-0.11   | v1.23+                   | v2.11.0+                 | v2.0+                            |
 | release-0.12   | v1.23+                   | v2.11.0+                 | v2.0+                            |
 | release-0.13   | v1.23+                   | v2.11.0+                 | v2.0+                            |
-| master         | v1.26+                   | v2.11.0+                 | v2.0+                            |
+| master         | v1.26+                   | v3.0.0+                  | v2.0+                            |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented. Therefore v0.1.x of this repository is the last release to support Kubernetes 1.13 and previous version on a best effort basis.
 
 Some alerts now use Prometheus filters made available in Prometheus 2.11.0, which makes this version of Prometheus a dependency.
+
+With Prometheus v3, [histograms are normalized](https://prometheus.io/docs/prometheus/latest/migration/#le-and-quantile-label-values)
+This breaks some of the recording rules that select on the `le` label.
 
 Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings.
 
