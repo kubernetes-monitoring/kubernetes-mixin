@@ -151,9 +151,9 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="POST"}[%(grafanaIntervalVar)s])) by (verb, url, le))' % $._config
+            'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="POST"}[%(grafanaIntervalVar)s])) by (verb, le))' % $._config
           )
-          + prometheus.withLegendFormat('{{verb}} {{url}}'),
+          + prometheus.withLegendFormat('{{verb}}'),
         ]),
 
         tsPanel.new('Get Request Latency 99th Quantile')
@@ -161,9 +161,9 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="GET"}[%(grafanaIntervalVar)s])) by (verb, url, le))' % $._config
+            'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance", verb="GET"}[%(grafanaIntervalVar)s])) by (verb, le))' % $._config
           )
-          + prometheus.withLegendFormat('{{verb}} {{url}}'),
+          + prometheus.withLegendFormat('{{verb}}'),
         ]),
 
         tsPanel.new('Memory')
