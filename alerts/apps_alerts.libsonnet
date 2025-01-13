@@ -23,7 +23,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is in waiting state (reason: "CrashLoopBackOff").',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is in waiting state (reason: "CrashLoopBackOff")%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Pod is crash looping.',
             },
             'for': '15m',
@@ -47,7 +49,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Pod has been in a non-ready state for more than 15 minutes.',
             },
             'for': '15m',
@@ -63,7 +67,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.',
+              description: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Deployment generation mismatch due to possible roll-back',
             },
             'for': '15m',
@@ -85,7 +91,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 15 minutes.',
+              description: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 15 minutes%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Deployment has not matched the expected number of replicas.',
             },
             'for': '15m',
@@ -100,7 +108,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }} is not progressing for longer than 15 minutes.',
+              description: 'Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }} is not progressing for longer than 15 minutes%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Deployment rollout is not progressing.',
             },
             'for': '15m',
@@ -122,7 +132,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes.',
+              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'StatefulSet has not matched the expected number of replicas.',
             },
             'for': '15m',
@@ -138,7 +150,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.',
+              description: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'StatefulSet generation mismatch due to possible roll-back',
             },
             'for': '15m',
@@ -168,7 +182,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.',
+              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'StatefulSet update has not been rolled out.',
             },
             'for': '15m',
@@ -205,7 +221,10 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least %(kubeDaemonSetRolloutStuckFor)s.' % $._config,
+              description: 'DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least %s%s.' % [
+                $._config.kubeDaemonSetRolloutStuckFor,
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'DaemonSet rollout is stuck.',
             },
             'for': $._config.kubeDaemonSetRolloutStuckFor,
@@ -218,7 +237,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour. (reason: "{{ $labels.reason }}").',
+              description: 'pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour. (reason: "{{ $labels.reason }}")%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Pod container waiting longer than 1 hour',
             },
             'for': '1h',
@@ -235,7 +256,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.',
+              description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'DaemonSet pods are not scheduled.',
             },
             'for': '10m',
@@ -249,7 +272,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.',
+              description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'DaemonSet pods are misscheduled.',
             },
             'for': '15m',
@@ -265,7 +290,10 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than {{ "%(kubeJobTimeoutDuration)s" | humanizeDuration }} to complete.' % $._config,
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than {{ "%s" | humanizeDuration }} to complete%s.' % [
+                $._config.kubeJobTimeoutDuration,
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Job did not complete in time',
             },
           },
@@ -279,7 +307,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete. Removing failed job after investigation should clear this alert.',
+              description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete. Removing failed job after investigation should clear this alert%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Job failed to complete.',
             },
           },
@@ -303,7 +333,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has not matched the desired number of replicas for longer than 15 minutes.',
+              description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has not matched the desired number of replicas for longer than 15 minutes%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'HPA has not matched desired number of replicas.',
             },
             'for': '15m',
@@ -319,7 +351,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has been running at max replicas for longer than 15 minutes.',
+              description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has been running at max replicas for longer than 15 minutes%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'HPA is running at max replicas',
             },
             'for': '15m',
