@@ -221,6 +221,24 @@ local utils = import '../lib/utils.libsonnet';
               summary: 'Kubelet has failed to renew its server certificate.',
             },
           },
+          {
+            alert: 'KubeletEvictingPods',
+            expr: |||
+              changes(kubelet_evictions{%(kubeletSelector)s}[10m]) > 0
+              and
+              resets(kubelet_evictions{%(kubeletSelector)s}[10m]) == 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            'for': '2m',
+            annotations: {
+              description: 'Kubelet on node {{ $labels.node }} is evicting pods due to resource pressure.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Kubelet is evicting pods.',
+            },
+          },
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'Kubelet',
             selector:: $._config.kubeletSelector,
