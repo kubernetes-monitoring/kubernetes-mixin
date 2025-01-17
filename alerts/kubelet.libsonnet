@@ -22,6 +22,8 @@ local utils = import '../lib/utils.libsonnet';
           {
             expr: |||
               kube_node_status_condition{%(kubeStateMetricsSelector)s,condition="Ready",status="true"} == 0
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -30,7 +32,7 @@ local utils = import '../lib/utils.libsonnet';
               description: '{{ $labels.node }} has been unready for more than 15 minutes%s.' % [
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
-              summary: 'Node is not ready.',
+              summary: 'Schedulable Node is not ready.',
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
@@ -85,6 +87,8 @@ local utils = import '../lib/utils.libsonnet';
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
               sum(changes(kube_node_status_condition{%(kubeStateMetricsSelector)s,status="true",condition="Ready"}[15m])) by (%(clusterLabel)s, node) > 2
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -94,7 +98,7 @@ local utils = import '../lib/utils.libsonnet';
               description: 'The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes%s.' % [
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
-              summary: 'Node readiness status is flapping.',
+              summary: 'Schedulable Node readiness status is flapping.',
             },
           },
           {
