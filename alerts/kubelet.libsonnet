@@ -233,7 +233,7 @@ local utils = import '../lib/utils.libsonnet';
             },
             'for': '2m',
             annotations: {
-              description: 'Kubelet on node {{ $labels.node }} is evicting pods due to resource pressure.' % [
+              description: 'Kubelet on node {{ $labels.node }} is evicting pods due to resource pressure.%s' % [
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
               summary: 'Kubelet is evicting pods.',
