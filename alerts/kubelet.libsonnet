@@ -32,7 +32,7 @@ local utils = import '../lib/utils.libsonnet';
               description: '{{ $labels.node }} has been unready for more than 15 minutes%s.' % [
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
-              summary: 'Schedulable Node is not ready.',
+              summary: 'Node is not ready.',
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
@@ -98,7 +98,7 @@ local utils = import '../lib/utils.libsonnet';
               description: 'The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes%s.' % [
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
-              summary: 'Schedulable Node readiness status is flapping.',
+              summary: 'Node readiness status is flapping.',
             },
           },
           {
