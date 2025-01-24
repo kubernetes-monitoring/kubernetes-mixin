@@ -228,7 +228,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeEvictionRateHigh',
             expr: |||
-              sum(rate(kubelet_evictions[15m])) by (%(clusterLabel)s) > %(highEvictionRateThreshold)s
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by (%(clusterLabel)s) > %(highEvictionRateThreshold)s
             ||| % $._config,
             labels: {
               severity: 'warning',
