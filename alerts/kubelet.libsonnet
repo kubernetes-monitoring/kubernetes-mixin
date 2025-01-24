@@ -22,6 +22,8 @@ local utils = import '../lib/utils.libsonnet';
           {
             expr: |||
               kube_node_status_condition{%(kubeStateMetricsSelector)s,condition="Ready",status="true"} == 0
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
             ||| % $._config,
             labels: {
               severity: 'warning',
@@ -85,6 +87,8 @@ local utils = import '../lib/utils.libsonnet';
             alert: 'KubeNodeReadinessFlapping',
             expr: |||
               sum(changes(kube_node_status_condition{%(kubeStateMetricsSelector)s,status="true",condition="Ready"}[15m])) by (%(clusterLabel)s, node) > 2
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
             ||| % $._config,
             'for': '15m',
             labels: {
