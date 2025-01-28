@@ -206,8 +206,8 @@ local var = g.dashboard.variable;
           tsPanel.new('Request duration 99th quantile')
           + tsPanel.standardOptions.withUnit('s')
           + tsPanel.queryOptions.withTargets([
-            prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster",%(kubeletSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (instance, verb, url, le))' % $._config)
-            + prometheus.withLegendFormat('{{instance}} {{verb}} {{url}}'),
+            prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster",%(kubeletSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (instance, verb, le))' % $._config)
+            + prometheus.withLegendFormat('{{instance}} {{verb}}'),
           ]),
         tsMemory:
           tsPanel.new('Memory')

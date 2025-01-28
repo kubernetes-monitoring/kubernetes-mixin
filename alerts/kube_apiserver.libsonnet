@@ -36,7 +36,9 @@ local utils = import '../lib/utils.libsonnet';
               long: '%(long)s' % w,
             },
             annotations: {
-              description: 'The API server is burning too much error budget.',
+              description: 'The API server is burning too much error budget%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'The API server is burning too much error budget.',
             },
             'for': '%(for)s' % w,
@@ -111,7 +113,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 10m.',
+              description: 'Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}%% available over the last 10m%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Kubernetes aggregated API is down.',
             },
           },
@@ -128,7 +132,9 @@ local utils = import '../lib/utils.libsonnet';
               severity: 'warning',
             },
             annotations: {
-              description: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
+              description: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.',
             },
             'for': '5m',
