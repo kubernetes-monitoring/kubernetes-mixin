@@ -5,7 +5,8 @@ rule_files:
 evaluation_interval: 1m
 
 tests:
-- interval: 1m
+- name: apiserver-availability-test-increase1h
+  interval: 1m
   input_series:
   # 100 requests in the overall interval, 99 successful and 1 error
   - series: 'apiserver_request_total{job="kube-apiserver",verb="GET",code="200"}'
