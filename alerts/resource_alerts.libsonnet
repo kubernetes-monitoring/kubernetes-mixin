@@ -235,8 +235,8 @@ local utils = import '../lib/utils.libsonnet';
             },
             'for': '1m',
             annotations: {
-              description: 'The cluster is evicting Pods at an unexpectedly high rate. This is typically caused by pods frequently exceeding RAM/ephemeral-storage limits or by nodes being NotReady for extended periods.%s' % [
-                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              description: 'The cluster%s is evicting Pods at an unexpectedly high rate. This is typically caused by pods frequently exceeding RAM/ephemeral-storage limits or by nodes being NotReady for extended periods.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
               summary: 'Cluster is evicting pods at an unexpectedly high rate.',
             },
