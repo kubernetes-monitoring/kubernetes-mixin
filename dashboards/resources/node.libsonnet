@@ -81,7 +81,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", node=~"$node", resource="cpu"})' % $._config,
+            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="cpu"})' % $._config,
           )
           + prometheus.withLegendFormat('max capacity'),
 
@@ -175,18 +175,45 @@ local var = g.dashboard.variable;
           },
         ]),
 
-        tsPanel.new('Memory Usage (w/o cache)')
+        tsPanel.new('Memory Usage (w/cache)')
         + tsPanel.standardOptions.withUnit('bytes')
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", node=~"$node", resource="memory"})' % $._config,
+            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
           )
           + prometheus.withLegendFormat('max capacity'),
 
           prometheus.new(
             '${datasource}',
             'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node", container!=""}) by (pod)' % $._config,
+          )
+          + prometheus.withLegendFormat('{{pod}}'),
+        ])
+        + tsPanel.fieldConfig.defaults.custom.withStacking({ mode: 'normal' })
+        + tsPanel.standardOptions.withOverrides([
+          fieldOverride.byName.new('max capacity')
+          + fieldOverride.byName.withPropertiesFromOptions(
+            timeSeries.standardOptions.color.withMode('fixed')
+            + timeSeries.standardOptions.color.withFixedColor('red')
+          )
+          + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
+          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
+          + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
+        ]),
+
+        tsPanel.new('Memory Usage (w/o cache)')
+        + tsPanel.standardOptions.withUnit('bytes')
+        + tsPanel.queryOptions.withTargets([
+          prometheus.new(
+            '${datasource}',
+            'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
+          )
+          + prometheus.withLegendFormat('max capacity'),
+
+          prometheus.new(
+            '${datasource}',
+            'sum(node_namespace_pod_container:container_memory_rss{%(clusterLabel)s="$cluster", node=~"$node", container!=""}) by (pod)' % $._config,
           )
           + prometheus.withLegendFormat('{{pod}}'),
         ])

@@ -137,16 +137,16 @@ local var = g.dashboard.variable;
         + tsPanel.gridPos.withW(16)
         + tsPanel.standardOptions.withUnit('ops')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance", verb="POST"}[%(grafanaIntervalVar)s])) by (verb, url, le))' % $._config)
-          + prometheus.withLegendFormat('{{verb}} {{url}}'),
+          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance", verb="POST"}[%(grafanaIntervalVar)s])) by (verb, le))' % $._config)
+          + prometheus.withLegendFormat('{{verb}}'),
         ]),
 
         tsPanel.new('Get Request Latency 99th Quantile')
         + tsPanel.gridPos.withW(24)
         + tsPanel.standardOptions.withUnit('s')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance", verb="GET"}[%(grafanaIntervalVar)s])) by (verb, url, le))' % $._config)
-          + prometheus.withLegendFormat('{{verb}} {{url}}'),
+          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance", verb="GET"}[%(grafanaIntervalVar)s])) by (verb, le))' % $._config)
+          + prometheus.withLegendFormat('{{verb}}'),
         ]),
 
 

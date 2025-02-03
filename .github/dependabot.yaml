@@ -9,3 +9,7 @@ updates:
     directory: /
     schedule:
       interval: monthly
+  - package-ecosystem: gomod
+    directory: /scripts
+    schedule:
+      interval: monthly
