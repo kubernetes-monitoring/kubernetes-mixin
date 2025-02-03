@@ -72,8 +72,7 @@ local var = g.dashboard.variable;
       )
       + var.query.generalOptions.withLabel('instance')
       + var.query.refresh.onTime()
-      + var.query.generalOptions.showOnDashboard.withLabelAndValue()
-      + var.query.selectionOptions.withMulti(true),
+      + var.query.generalOptions.showOnDashboard.withLabelAndValue(),
 
     namespace:
       var.query.new('namespace')
@@ -124,7 +123,7 @@ local var = g.dashboard.variable;
         statPanel(
           'CPU Utilisation',
           'none',
-          '1 - avg(rate(windows_cpu_time_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, mode="idle"}[1m]))' % $._config
+          '1 - avg(rate(windows_cpu_time_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, mode="idle"}[%(grafanaIntervalVar)s]))' % $._config
         )
         + stat.gridPos.withW(4)
         + stat.gridPos.withH(3),
@@ -830,13 +829,13 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sort_desc(sum by (container) (rate(windows_container_network_received_bytes_total{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[1m])))' % $._config
+            'sort_desc(sum by (container) (rate(windows_container_network_received_bytes_total{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[%(grafanaIntervalVar)s])))' % $._config
           )
           + prometheus.withLegendFormat('Received : {{ container }}'),
 
           prometheus.new(
             '${datasource}',
-            'sort_desc(sum by (container) (rate(windows_container_network_transmitted_bytes_total{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[1m])))' % $._config
+            'sort_desc(sum by (container) (rate(windows_container_network_transmitted_bytes_total{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}[%(grafanaIntervalVar)s])))' % $._config
           )
           + prometheus.withLegendFormat('Transmitted : {{ container }}'),
         ]),
@@ -1025,19 +1024,19 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'max(rate(windows_logical_disk_read_bytes_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, instance="$instance"}[2m]))' % $._config
+            'max(rate(windows_logical_disk_read_bytes_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, instance="$instance"}[%(grafanaIntervalVar)s]))' % $._config
           )
           + prometheus.withLegendFormat('read'),
 
           prometheus.new(
             '${datasource}',
-            'max(rate(windows_logical_disk_write_bytes_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, instance="$instance"}[2m]))' % $._config
+            'max(rate(windows_logical_disk_write_bytes_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, instance="$instance"}[%(grafanaIntervalVar)s]))' % $._config
           )
           + prometheus.withLegendFormat('written'),
 
           prometheus.new(
             '${datasource}',
-            'max(rate(windows_logical_disk_read_seconds_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s,  instance="$instance"}[2m]) + rate(windows_logical_disk_write_seconds_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, instance="$instance"}[2m]))' % $._config
+            'max(rate(windows_logical_disk_read_seconds_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s,  instance="$instance"}[%(grafanaIntervalVar)s]) + rate(windows_logical_disk_write_seconds_total{%(clusterLabel)s="$cluster", %(windowsExporterSelector)s, instance="$instance"}[%(grafanaIntervalVar)s]))' % $._config
           )
           + prometheus.withLegendFormat('io time'),
         ])
