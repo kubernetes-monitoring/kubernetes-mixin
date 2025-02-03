@@ -76,7 +76,7 @@
     // Config for the Grafana dashboards in the Kubernetes Mixin
     grafanaK8s: {
       dashboardNamePrefix: 'Kubernetes / ',
-      dashboardTags: ['kubernetes-mixin'],
+      dashboardTags: ['kubernetes-mixin', 'kubernetes', 'infra'],
 
       // For links between grafana dashboards, you need to tell us if your grafana
       // servers under some non-root path.
@@ -97,7 +97,7 @@
     namespaceLabel: 'namespace',
 
     // Default datasource name
-    datasourceName: 'Prometheus',
+    datasourceName: 'prometheus-openshift-infra',
 
     // Datasource instance filter regex
     datasourceFilterRegex: '',
