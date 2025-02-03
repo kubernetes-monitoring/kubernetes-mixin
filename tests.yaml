@@ -403,11 +403,13 @@ tests:
     - eval_time: 61m
       alertname: KubePersistentVolumeInodesFillingUp
 
-- name: KubeletTooManyPods alert (single-node)
+- name: KubeletTooManyPods alert (single-node with instance as IP address)
   interval: 1m
   input_series:
-  - series: 'kubelet_running_pods{cluster="kubernetes", instance="node0", job="kubelet"}'
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="10.0.0.0", job="kubelet"}'
     values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="10.0.0.0", node="node0", job="kubelet"}'
+    values: '1x15'
   - series: 'kube_node_status_capacity{cluster="kubernetes", node="node0", job="kube-state-metrics", resource="pods", unit="integer"}'
     values: '3x15'
   alert_rule_test:
@@ -418,6 +420,7 @@ tests:
     exp_alerts:
     - exp_labels:
         cluster: kubernetes
+        instance: 10.0.0.0
         node: node0
         severity: info
       exp_annotations:
@@ -425,15 +428,19 @@ tests:
         description: "Kubelet 'node0' is running at 100% of its Pod capacity."
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods
 
-- name: KubeletTooManyPods alert (multi-node)
+- name: KubeletTooManyPods alert (multi-node with instance as node name)
   interval: 1m
   input_series:
   - series: 'kubelet_running_pods{cluster="kubernetes", instance="node0", job="kubelet"}'
     values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="node0", node="node0", job="kubelet"}'
+    values: '1x15'
   - series: 'kube_node_status_capacity{cluster="kubernetes", node="node0", job="kube-state-metrics", resource="pods", unit="integer"}'
     values: '6x15'
   - series: 'kubelet_running_pods{cluster="kubernetes", instance="node1", job="kubelet"}'
     values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="node1", node="node1", job="kubelet"}'
+    values: '1x15'
   - series: 'kube_node_status_capacity{cluster="kubernetes", node="node1", job="kube-state-metrics", resource="pods", unit="integer"}'
     values: '3x15'
   alert_rule_test:
@@ -444,6 +451,7 @@ tests:
     exp_alerts:
     - exp_labels:
         cluster: kubernetes
+        instance: node1
         node: node1
         severity: info
       exp_annotations:
