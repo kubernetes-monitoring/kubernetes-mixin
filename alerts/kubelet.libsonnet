@@ -60,12 +60,8 @@ local utils = import '../lib/utils.libsonnet';
             // Some node has a capacity of 1 like AWS's Fargate and only exists while a pod is running on it.
             // We have to ignore this special node in the KubeletTooManyPods alert.
             expr: |||
-              count by (%(clusterLabel)s, node) (
-                (kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase="Running"} == 1)
-                * on (%(clusterLabel)s, namespace, pod) group_left (node)
-                group by (%(clusterLabel)s, namespace, pod, node) (
-                  kube_pod_info{%(kubeStateMetricsSelector)s}
-                )
+              max by (cluster, node) (
+                label_replace(kubelet_running_pods{%(kubeletSelector)s} > 1, "node", "$1", "instance", "(.*)")
               )
               /
               max by (%(clusterLabel)s, node) (
