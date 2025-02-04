@@ -5,7 +5,7 @@ name: Release
 on:
   push:
     tags:
-      - "release-*"
+      - "release-*" # Run workflow on version tags, e.g., release-0.1
 
 jobs:
   release:
