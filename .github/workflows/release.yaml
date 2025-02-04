@@ -1,0 +1,29 @@
+# This GitHub Action automates the process of building Grafana plugins.
+# (For more information, see https://github.com/grafana/plugin-actions/blob/main/build-plugin/README.md)
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+        github-tag:
+            description: 'GitHub tag'
+            required: true
+            default: 'release-0.0'
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      repository-projects: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replace Changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "# Changelog for version ${{ github.event.inputs.github-tag }}" > CHANGELOG.md
+          gh release view "${{ github.ref_name }}" --json body --jq '.body' >> CHANGELOG.md
