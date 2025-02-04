@@ -23,5 +23,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "# Changelog for version ${{ github.event.inputs.github-tag }}" > CHANGELOG.md
+          echo "# Changelog for version ${{ github.ref_name }}" > CHANGELOG.md
           gh release view "${{ github.ref_name }}" --json body --jq '.body' >> CHANGELOG.md
