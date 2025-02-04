@@ -3,12 +3,10 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-        github-tag:
-            description: 'GitHub tag'
-            required: true
-            default: 'release-0.0'
+  push:
+    tags:
+      - "release-*"
+
 jobs:
   release:
     name: Release
