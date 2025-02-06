@@ -773,10 +773,10 @@ tests:
     values: '1+0x5'
   promql_expr_test:
   - eval_time: 5m
-    expr: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
+    expr: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate
     exp_samples:
     - value: 5.0e-2
-      labels: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{cluster="kubernetes",namespace="monitoring", pod="alertmanager-main-0", container="alertmanager",node="node1"}'
+      labels: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster="kubernetes",namespace="monitoring", pod="alertmanager-main-0", container="alertmanager",node="node1"}'
 
 - interval: 1m
   input_series:
