@@ -182,9 +182,15 @@ This page collects this repositories alerts and begins the process of describing
 ### Group Name: "kubernetes-system"
 
 ##### Alert Name: "KubeNodeNotReady"
-+ *Message*: `{{ $labels.node }} has been unready for more than 15 minutes."`
++ *Message*: `{{ $labels.node }} has been unready for more than 15 minutes.`
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodenotready/)
+
+##### Alert Name: "KubeNodePressure"
++ *Message*: `{{ $labels.node }} has active Condition {{ $labels.condition }}. This is caused by resource usage exceeding eviction thresholds.`
++ *Severity*: info
++ *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodepressure/)
+# If soft thresholds are crossed, pods will be evicted respecting TerminationGracePeriod.  If Hard thresholds are crossed grace period will be ignored.
 
 ##### Alert Name: "KubeNodeUnreachable"
 + *Message*: `{{ $labels.node }} is unreachable and some workloads may be rescheduled.`
@@ -200,6 +206,11 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.`
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodereadinessflapping/)
+
+##### Alert Name: "KubeNodeEvictions"
++ *Message*: `Node {{ $labels.node }} is evicting Pods due to {{ $labels.eviction_signal }}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.`
++ *Severity*: info
++ *Runbook*: [Link](https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeevictions)
 
 ##### Alert Name: "KubeletPlegDurationHigh"
 + *Message*: `The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.`

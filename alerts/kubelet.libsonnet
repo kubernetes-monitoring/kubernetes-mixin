@@ -123,19 +123,19 @@ local utils = import '../lib/utils.libsonnet';
             },
           },
           {
-            alert: 'KubeEvictions',
+            alert: 'KubeNodeEvictions',
             expr: |||
-              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal) > %(evictionRateThreshold)s
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, node) > %(evictionRateThreshold)s
             ||| % $._config,
             labels: {
               severity: 'info',
             },
             'for': '0s',
             annotations: {
-              description: 'The%s cluster is evicting Pods. This is caused by conditions such as MemoryPressure, DiskPressure, or PIDPressure.  These are typically caused by Pods exceeding RAM/ephemeral-storage limits.' % [
-                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              description: 'Node {{ $labels.node }}%s is evicting Pods due to {{ $labels.eviction_signal }}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.' % [
+                utils.ifShowMultiCluster($._config, ' in {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
-              summary: 'Cluster is evicting pods due to {{ $labels.eviction_signal }}.',
+              summary: 'Node is evicting pods.',
             },
           },
           {
