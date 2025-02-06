@@ -264,6 +264,3 @@ require (
 
 // TODO: This could be removed after https://github.com/mholt/archiver/pull/396 merged
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
-
-// https://pkg.go.dev/vuln/GO-2024-3333
-replace golang.org/x/net => golang.org/x/net v0.33.0
