@@ -12,6 +12,9 @@ local utils = import '../lib/utils.libsonnet';
 
     kubeletCertExpirationWarningSeconds: 7 * 24 * 3600,
     kubeletCertExpirationCriticalSeconds: 1 * 24 * 3600,
+
+    // Evictions per second that will trigger an alert. The default value will trigger on any evictions.
+    evictionRateThreshold: 0.0,
   },
 
   prometheusAlerts+:: {
@@ -36,6 +39,24 @@ local utils = import '../lib/utils.libsonnet';
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
+          },
+          {
+            alert: 'KubeNodePressure',
+            expr: |||
+              kube_node_status_condition{%(kubeStateMetricsSelector)s,condition=~".+Pressure",status="true"} == 1
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
+            ||| % $._config,
+            labels: {
+              severity: 'info',
+            },
+            'for': '10m',
+            annotations: {
+              description: '{{ $labels.node }}%s has active Condition {{ $labels.condition }}. This is caused by resource usage exceeding eviction thresholds.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Node has as active Condition.',
+            },
           },
           {
             expr: |||
@@ -99,6 +120,22 @@ local utils = import '../lib/utils.libsonnet';
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
               summary: 'Node readiness status is flapping.',
+            },
+          },
+          {
+            alert: 'KubeEvictions',
+            expr: |||
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal) > %(evictionRateThreshold)s
+            ||| % $._config,
+            labels: {
+              severity: 'info',
+            },
+            'for': '0s',
+            annotations: {
+              description: 'The%s cluster is evicting Pods. This is caused by conditions such as MemoryPressure, DiskPressure, or PIDPressure.  These are typically caused by Pods exceeding RAM/ephemeral-storage limits.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Cluster is evicting pods due to {{ $labels.eviction_signal }}.',
             },
           },
           {
