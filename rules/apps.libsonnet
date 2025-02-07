@@ -13,10 +13,20 @@
             // Reduces cardinality of this timeseries by #cores, which makes it
             // more useable in dashboards.  Also, allows us to do things like
             // quantile_over_time(...) which would otherwise not be possible.
-            record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
+            record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m',
             expr: |||
               sum by (%(clusterLabel)s, namespace, pod, container) (
                 rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!=""}[5m])
+              ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
+                1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
+              )
+            ||| % $._config,
+          },
+          {
+            record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate',
+            expr: |||
+              sum by (%(clusterLabel)s, namespace, pod, container) (
+                irate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!=""}[5m])
               ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
                 1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
