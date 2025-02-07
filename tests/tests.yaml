@@ -403,22 +403,15 @@ tests:
     - eval_time: 61m
       alertname: KubePersistentVolumeInodesFillingUp
 
-- interval: 1m
+- name: KubeletTooManyPods alert (single-node with instance as IP address)
+  interval: 1m
   input_series:
-  - series: 'kube_node_status_capacity{resource="pods",instance="172.17.0.5:8443",cluster="kubernetes",node="minikube",job="kube-state-metrics",namespace="kube-system"}'
-    values: '3+0x15'
-  - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",node="minikube",pod="pod-1",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",phase="Running",pod="pod-1",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",node="minikube",pod="pod-2",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",phase="Running",pod="pod-2",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",node="minikube",pod="pod-3",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",phase="Running",pod="pod-3",service="kube-state-metrics"}'
-    values: '1+0x15'
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="10.0.0.0", job="kubelet"}'
+    values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="10.0.0.0", node="node0", job="kubelet"}'
+    values: '1x15'
+  - series: 'kube_node_status_capacity{cluster="kubernetes", node="node0", job="kube-state-metrics", resource="pods", unit="integer"}'
+    values: '3x15'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeletTooManyPods
@@ -427,11 +420,43 @@ tests:
     exp_alerts:
     - exp_labels:
         cluster: kubernetes
-        node: minikube
+        instance: 10.0.0.0
+        node: node0
         severity: info
       exp_annotations:
         summary: "Kubelet is running at capacity."
-        description: "Kubelet 'minikube' is running at 100% of its Pod capacity."
+        description: "Kubelet 'node0' is running at 100% of its Pod capacity."
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods
+
+- name: KubeletTooManyPods alert (multi-node with instance as node name)
+  interval: 1m
+  input_series:
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="node0", job="kubelet"}'
+    values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="node0", node="node0", job="kubelet"}'
+    values: '1x15'
+  - series: 'kube_node_status_capacity{cluster="kubernetes", node="node0", job="kube-state-metrics", resource="pods", unit="integer"}'
+    values: '6x15'
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="node1", job="kubelet"}'
+    values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="node1", node="node1", job="kubelet"}'
+    values: '1x15'
+  - series: 'kube_node_status_capacity{cluster="kubernetes", node="node1", job="kube-state-metrics", resource="pods", unit="integer"}'
+    values: '3x15'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeletTooManyPods
+  - eval_time: 15m
+    alertname: KubeletTooManyPods
+    exp_alerts:
+    - exp_labels:
+        cluster: kubernetes
+        instance: node1
+        node: node1
+        severity: info
+      exp_annotations:
+        summary: "Kubelet is running at capacity."
+        description: "Kubelet 'node1' is running at 100% of its Pod capacity."
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods
 
 - interval: 1m
