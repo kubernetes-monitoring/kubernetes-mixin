@@ -43,7 +43,7 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeNodePressure',
             expr: |||
-              kube_node_status_condition{%(kubeStateMetricsSelector)s,condition=!"Ready",status="true"} == 1
+              kube_node_status_condition{%(kubeStateMetricsSelector)s,condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1
               and on (%(clusterLabel)s, node)
               kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
             ||| % $._config,
