@@ -622,7 +622,7 @@ tests:
         status: "true"
         cluster: kubernetes
         node: minikube
-        severity: warning
+        severity: info
         endpoint: https-main
         instance: 10.0.2.15:10250
         job: kube-state-metrics
@@ -663,7 +663,7 @@ tests:
   input_series:
   # This metric only appears with non-zero values, meaning the transition from 0 --> 1 doesn't trigger an alert
   # However, since that's undesired behavior it'd be kinda pointless to test for it, even though it's expected.
-  - series: 'kubelet_evictions{eviction_signal="memory.available",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+  - series: 'kubelet_evictions{eviction_signal="memory.available",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kubelet",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
     values: '1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 3 3 3 3 3'
   alert_rule_test:
   - eval_time: 18m
@@ -673,10 +673,10 @@ tests:
         eviction_signal: memory.available
         cluster: kubernetes
         node: minikube
-        severity: warning
+        severity: info
         endpoint: https-main
         instance: 10.0.2.15:10250
-        job: kube-state-metrics
+        job: kubelet
         namespace: monitoring
         pod: kube-state-metrics-b894d84cc-d6htw
         service: kube-state-metrics
