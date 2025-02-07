@@ -133,7 +133,7 @@ local utils = import '../lib/utils.libsonnet';
             'for': '0s',
             annotations: {
               description: 'Node {{ $labels.node }}%s is evicting Pods due to {{ $labels.eviction_signal }}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.' % [
-                utils.ifShowMultiCluster($._config, ' in {{ $labels.%(clusterLabel)s }}' % $._config),
+                utils.ifShowMultiCluster($._config, ' on {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
               summary: 'Node is evicting pods.',
             },
