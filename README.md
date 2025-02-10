@@ -49,7 +49,7 @@ Maintainers can trigger the [release workflow](.github/workflows/release.yaml) b
     ```
 
 #### Decisions on backfilling releases
-We wanted to backfill `release-0.1` to `release-0.12` to have a changelog, but we were not able to use a github action in a newer commit to trigger a release that generates a changelog on older commits. We have also tried adding a github action in existing release branches to trigger a release with changelog when a tag is created and pushed in a branch, but the generated changelog was empty as there were no previous releases. Since `release-0.12` was updated 3 years ago, we decided to start release and changelog from `version-0.13.0`
+We wanted to backfill `release-0.1` to `release-0.12` to have a changelog, but we were not able to use a GitHub action in a newer commit to trigger a release that generates a changelog on older commits. See #489 for full discussion.
 
 ## How to use
 
