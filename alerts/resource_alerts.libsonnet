@@ -37,9 +37,9 @@ local utils = import '../lib/utils.libsonnet';
           if $._config.showMultiCluster then {
             expr: |||
               (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
-              0.85 * sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) > 0
+              sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) > 0
               and
-              count by (cluster) (max by (cluster, node) (kube_node_info)) == 1)
+              count by (%(clusterLabel)s) (max by (%(clusterLabel)s, node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3)
               or
               (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
               (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) -
@@ -54,9 +54,9 @@ local utils = import '../lib/utils.libsonnet';
           } else {
             expr: |||
               (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
-              0.85 * sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) > 0
+              sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) > 0
               and
-              count(max by (node) (kube_node_info)) == 1)
+              count(max by (node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3)
               or
               (sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
               (sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) -
@@ -82,9 +82,9 @@ local utils = import '../lib/utils.libsonnet';
           if $._config.showMultiCluster then {
             expr: |||
               (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
-              0.85 * sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) > 0
+              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) > 0
               and
-              count by (cluster) (max by (cluster, node) (kube_node_info)) == 1)
+              count by (%(clusterLabel)s) (max by (%(clusterLabel)s, node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3)
               or
               (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) -
               (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s) -
@@ -99,9 +99,9 @@ local utils = import '../lib/utils.libsonnet';
           } else {
             expr: |||
               (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
-              0.85 * sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) > 0
+              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) > 0
               and
-              count(max by (node) (kube_node_info)) == 1)
+              count(max by (node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3)
               or
               (sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) -
               (sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) -
