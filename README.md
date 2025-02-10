@@ -36,7 +36,7 @@ Warning: By default the expressions will generate *grafana 7.2+* compatible rule
 
 ### Release steps
 
-Maintainers can run release when it's time to do so. 
+Maintainers can trigger the [release workflow](.github/workflows/release.yaml) by pushing a git tag that matches the pattern: `version-*`.
 
 1. Checkout `master` branch and pull for latest.
     ```bash
