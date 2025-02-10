@@ -44,7 +44,8 @@ Maintainers can run release when it's time to do so.
     ```
 2. Create a tag following sem-ver versioning for the version and trigger release. 
     ```bash
-    tag=version=${x.x.x}; git tag $tag && git push origin $tag
+	# replace MAJOR.MINOR.PATCH with e.g. 1.2.3
+    tag=version-MAJOR.MINOR.PATCH; git tag $tag && git push origin $tag
     ```
 
 #### Decisions on backfilling releases
