@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "version-*" # Trigger the workflow on push events to version-* tags
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release on kubernetes-mixin
+        uses: softprops/action-gh-release@v2
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          repository: kubernetes-monitoring/kubernetes-mixin
+          generate_release_notes: true

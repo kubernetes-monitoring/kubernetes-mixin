@@ -7,6 +7,7 @@
 A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 
 ## Releases
+> Note: Releases up until `release-0.12` are changes in their own branches. There are changelogs in releases starting from `version-0.13.0`. 
 
 | Release branch | Kubernetes Compatibility | Prometheus Compatibility | Kube-state-metrics Compatibility |
 |----------------|--------------------------|--------------------------|----------------------------------|
@@ -32,6 +33,22 @@ Some alerts now use Prometheus filters made available in Prometheus 2.11.0, whic
 Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings.
 
 Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$__rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *_config*
+
+### Release steps
+
+Maintainers can run release when it's time to do so. 
+
+1. Checkout `master` branch and pull for latest.
+    ```bash
+    git checkout master
+    ```
+2. Create a tag following sem-ver versioning for the version and trigger release. 
+    ```bash
+    tag=version=${x.x.x}; git tag $tag && git push origin $tag
+    ```
+
+#### Decisions on backfilling releases
+We wanted to backfill `release-0.1` to `release-0.12` to have a changelog, but we were not able to use a github action in a newer commit to trigger a release that generates a changelog on older commits. We have also tried adding a github action in existing release branches to trigger a release with changelog when a tag is created and pushed in a branch, but the generated changelog was empty as there were no previous releases. Since `release-0.12` was updated 3 years ago, we decided to start release and changelog from `version-0.13.0`
 
 ## How to use
 
