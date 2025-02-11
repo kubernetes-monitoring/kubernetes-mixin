@@ -44,7 +44,7 @@ Maintainers can trigger the [release workflow](.github/workflows/release.yaml) b
     ```
 2. Create a tag following sem-ver versioning for the version and trigger release. 
     ```bash
-	# replace MAJOR.MINOR.PATCH with e.g. 1.2.3
+	  # replace MAJOR.MINOR.PATCH with e.g. 1.2.3
     tag=version-MAJOR.MINOR.PATCH; git tag $tag && git push origin $tag
     ```
 
