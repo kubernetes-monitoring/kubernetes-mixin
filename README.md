@@ -7,6 +7,7 @@
 A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 
 ## Releases
+
 > Note: Releases up until `release-0.12` are changes in their own branches. Changelogs are included in releases starting from [version-0.13.0](https://github.com/kubernetes-monitoring/kubernetes-mixin/releases/tag/version-0.13.0).
 
 | Release branch | Kubernetes Compatibility | Prometheus Compatibility | Kube-state-metrics Compatibility |
@@ -39,16 +40,18 @@ Warning: By default the expressions will generate *grafana 7.2+* compatible rule
 Maintainers can trigger the [release workflow](.github/workflows/release.yaml) by pushing a git tag that matches the pattern: `version-*`.
 
 1. Checkout `master` branch and pull for latest.
-    ```bash
-    git checkout master
-    ```
+   ```bash
+   git checkout master
+   ```
+
 2. Create a tag following sem-ver versioning for the version and trigger release. 
-    ```bash
-    # replace MAJOR.MINOR.PATCH with e.g. 1.2.3
-    tag=version-MAJOR.MINOR.PATCH; git tag $tag && git push origin $tag
-    ```
+   ```bash
+   # replace MAJOR.MINOR.PATCH with e.g. 1.2.3
+   tag=version-MAJOR.MINOR.PATCH; git tag $tag && git push origin $tag
+   ```
 
 #### Decisions on backfilling releases
+
 We wanted to backfill `release-0.1` to `release-0.12` to have a changelog, but we were not able to use a GitHub action in a newer commit to trigger a release that generates a changelog on older commits. See #489 for full discussion.
 
 ## How to use
