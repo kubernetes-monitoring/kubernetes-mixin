@@ -45,7 +45,7 @@ Maintainers can trigger the [release workflow](.github/workflows/release.yaml) b
    git checkout master
    ```
 
-3. Create a tag following sem-ver versioning for the version and trigger release.
+2. Create a tag following sem-ver versioning for the version and trigger release.
 
    ```bash
    # replace MAJOR.MINOR.PATCH with e.g. 1.2.3
