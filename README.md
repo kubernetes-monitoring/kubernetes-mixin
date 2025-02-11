@@ -7,7 +7,7 @@
 A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 
 ## Releases
-> Note: Releases up until `release-0.12` are changes in their own branches. There are changelogs in releases starting from [version-0.13.0](https://github.com/kubernetes-monitoring/kubernetes-mixin/releases/tag/version-0.13.0).
+> Note: Releases up until `release-0.12` are changes in their own branches. Changelogs are included in releases starting from [version-0.13.0](https://github.com/kubernetes-monitoring/kubernetes-mixin/releases/tag/version-0.13.0).
 
 | Release branch | Kubernetes Compatibility | Prometheus Compatibility | Kube-state-metrics Compatibility |
 |----------------|--------------------------|--------------------------|----------------------------------|
