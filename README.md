@@ -40,11 +40,13 @@ Warning: By default the expressions will generate *grafana 7.2+* compatible rule
 Maintainers can trigger the [release workflow](.github/workflows/release.yaml) by pushing a git tag that matches the pattern: `version-*`.
 
 1. Checkout `master` branch and pull for latest.
+
    ```bash
    git checkout master
    ```
 
-2. Create a tag following sem-ver versioning for the version and trigger release. 
+3. Create a tag following sem-ver versioning for the version and trigger release.
+
    ```bash
    # replace MAJOR.MINOR.PATCH with e.g. 1.2.3
    tag=version-MAJOR.MINOR.PATCH; git tag $tag && git push origin $tag
