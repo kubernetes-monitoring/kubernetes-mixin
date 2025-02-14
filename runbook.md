@@ -190,7 +190,8 @@ This page collects this repositories alerts and begins the process of describing
 + *Message*: `{{ $labels.node }} has active Condition {{ $labels.condition }}. This is caused by resource usage exceeding eviction thresholds.`
 + *Severity*: info
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodepressure/)
-# If soft thresholds are crossed, pods will be evicted respecting TerminationGracePeriod.  If Hard thresholds are crossed grace period will be ignored.
+
+# If soft thresholds are crossed, pods will be evicted respecting TerminationGracePeriod. If Hard thresholds are crossed grace period will be ignored.
 
 ##### Alert Name: "KubeNodeUnreachable"
 + *Message*: `{{ $labels.node }} is unreachable and some workloads may be rescheduled.`
@@ -208,7 +209,7 @@ This page collects this repositories alerts and begins the process of describing
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodereadinessflapping/)
 
 ##### Alert Name: "KubeNodeEvictions"
-+ *Message*: `Node {{ $labels.node }} is evicting Pods due to {{ $labels.eviction_signal }}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.`
++ *Message*: `Node {{ $labels.node }} is evicting Pods due to {{ $labels.eviction_signal }}. Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.`
 + *Severity*: info
 + *Runbook*: [Link](https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeevictions)
 
