@@ -781,7 +781,7 @@ tests:
     expr: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
     exp_samples:
     - value: 5.0e-2
-      labels: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster="kubernetes",namespace="monitoring", pod="alertmanager-main-0", container="alertmanager",node="node1"}'
+      labels: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster="kubernetes",namespace="monitoring", pod="alertmanager-main-0", container="alertmanager",node="node1"}'
 
 - interval: 1m
   input_series:
