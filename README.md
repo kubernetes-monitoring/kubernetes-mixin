@@ -62,12 +62,13 @@ The following recording rule is marked deprecated. They will be removed in v2.0.
    ```bash
    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
    ```
-It will be replaced by the following recording rule to
-- use `rate` over `irate` in favour of preserving more points of data
-- add `5m` in recording rule name to indicate rate
+It will be replaced by the following recording rule
    ```bash
    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
    ```
+Reasons for replacement:
+- use `rate` over `irate` in favour of preserving more points of data
+- add `5m` in recording rule name to indicate rate
 
 ## How to use
 
