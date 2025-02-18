@@ -191,8 +191,6 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: info
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodepressure/)
 
-# If soft thresholds are crossed, pods will be evicted respecting TerminationGracePeriod. If Hard thresholds are crossed grace period will be ignored.
-
 ##### Alert Name: "KubeNodeUnreachable"
 + *Message*: `{{ $labels.node }} is unreachable and some workloads may be rescheduled.`
 + *Severity*: warning
@@ -208,10 +206,10 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: warning
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodereadinessflapping/)
 
-##### Alert Name: "KubeNodeEvictions"
+##### Alert Name: "KubeNodeEviction"
 + *Message*: `Node {{ $labels.node }} is evicting Pods due to {{ $labels.eviction_signal }}. Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.`
 + *Severity*: info
-+ *Runbook*: [Link](https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeevictions)
++ *Runbook*: [Link](https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeeviction)
 
 ##### Alert Name: "KubeletPlegDurationHigh"
 + *Message*: `The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{ $value }} seconds on node {{ $labels.node }}.`

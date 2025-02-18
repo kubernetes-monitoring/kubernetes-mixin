@@ -14,7 +14,7 @@ local utils = import '../lib/utils.libsonnet';
     kubeletCertExpirationCriticalSeconds: 1 * 24 * 3600,
 
     // Evictions per second that will trigger an alert. The default value will trigger on any evictions.
-    evictionRateThreshold: 0.0,
+    KubeNodeEvictionRateThreshold: 0.0,
   },
 
   prometheusAlerts+:: {
@@ -125,9 +125,13 @@ local utils = import '../lib/utils.libsonnet';
             },
           },
           {
-            alert: 'KubeNodeEvictions',
+            alert: 'KubeNodeEviction',
             expr: |||
-              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, node) > %(evictionRateThreshold)s
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, instance) > %(KubeNodeEvictionRateThreshold)s
+              * on (%(clusterLabel)s, instance) group_left(node)
+              max by (%(clusterLabel)s, instance, node) (
+                kubelet_node_name{%(kubeletSelector)s}
+              )
             ||| % $._config,
             labels: {
               severity: 'info',

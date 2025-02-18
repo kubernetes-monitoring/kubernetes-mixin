@@ -696,23 +696,17 @@ tests:
     values: '1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 3 3 3 3 3'
   alert_rule_test:
   - eval_time: 18m
-    alertname: KubeNodeEvictions
+    alertname: KubeNodeEviction
     exp_alerts:
     - exp_labels:
         eviction_signal: memory.available
         cluster: kubernetes
         node: minikube
         severity: info
-        endpoint: https-main
-        instance: 10.0.2.15:10250
-        job: kubelet
-        namespace: monitoring
-        pod: kube-state-metrics-b894d84cc-d6htw
-        service: kube-state-metrics
       exp_annotations:
         summary: "Node is evicting pods."
         description: 'Node minikube is evicting Pods due to memory.available.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.'
-        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeevictions'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeeviction'
 
 # Verify that node:node_num_cpu:sum triggers no many-to-many errors.
 - interval: 1m
