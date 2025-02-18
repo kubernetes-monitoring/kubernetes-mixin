@@ -58,11 +58,14 @@ We wanted to backfill `release-0.1` to `release-0.12` to have a changelog, but w
 
 ## Metrics Deprecation
 
-The following recording rule is marked deprecated. They will be removed in v2.0.0.
+The following recording rule is marked deprecated. It will be removed in v2.0.0.
+
 ```bash
 node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
 ```
+
 It will be replaced by the following recording rule to preserve data points using `rate` and add `5m` to indicate the range of the rate query in the recording rule name.
+
 ```bash
 node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
 ```
