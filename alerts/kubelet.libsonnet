@@ -127,7 +127,12 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeNodeEviction',
             expr: |||
-              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, node) > %(KubeNodeEvictionRateThreshold)s
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, instance)
+              * on (%(clusterLabel)s, instance) group_left(node)
+              max by (%(clusterLabel)s, instance, node) (
+                kubelet_node_name{%(kubeletSelector)s}
+              )
+              > %(KubeNodeEvictionRateThreshold)s
             ||| % $._config,
             labels: {
               severity: 'info',
