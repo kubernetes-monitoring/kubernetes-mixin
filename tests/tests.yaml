@@ -694,6 +694,8 @@ tests:
   # However, since that's undesired behavior it'd be kinda pointless to test for it, even though it's expected.
   - series: 'kubelet_evictions{eviction_signal="memory.available",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kubelet",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
     values: '1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 3 3 3 3 3'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="10.0.2.15:10250", node="minikube", job="kubelet"}'
+    values: '1x20'
   alert_rule_test:
   - eval_time: 18m
     alertname: KubeNodeEviction
