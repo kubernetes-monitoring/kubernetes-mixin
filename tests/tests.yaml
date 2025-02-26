@@ -704,6 +704,7 @@ tests:
         eviction_signal: memory.available
         cluster: kubernetes
         node: minikube
+        instance: 10.0.2.15:10250
         severity: info
       exp_annotations:
         summary: "Node is evicting pods."
