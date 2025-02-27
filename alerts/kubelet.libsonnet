@@ -12,6 +12,9 @@ local utils = import '../lib/utils.libsonnet';
 
     kubeletCertExpirationWarningSeconds: 7 * 24 * 3600,
     kubeletCertExpirationCriticalSeconds: 1 * 24 * 3600,
+
+    // Evictions per second that will trigger an alert. The default value will trigger on any evictions.
+    KubeNodeEvictionRateThreshold: 0.0,
   },
 
   prometheusAlerts+:: {
@@ -36,6 +39,24 @@ local utils = import '../lib/utils.libsonnet';
             },
             'for': '15m',
             alert: 'KubeNodeNotReady',
+          },
+          {
+            alert: 'KubeNodePressure',
+            expr: |||
+              kube_node_status_condition{%(kubeStateMetricsSelector)s,condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
+            ||| % $._config,
+            labels: {
+              severity: 'info',
+            },
+            'for': '10m',
+            annotations: {
+              description: '{{ $labels.node }}%s has active Condition {{ $labels.condition }}. This is caused by resource usage exceeding eviction thresholds.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Node has as active Condition.',
+            },
           },
           {
             expr: |||
@@ -101,6 +122,27 @@ local utils = import '../lib/utils.libsonnet';
                 utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
               ],
               summary: 'Node readiness status is flapping.',
+            },
+          },
+          {
+            alert: 'KubeNodeEviction',
+            expr: |||
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, instance)
+              * on (%(clusterLabel)s, instance) group_left(node)
+              max by (%(clusterLabel)s, instance, node) (
+                kubelet_node_name{%(kubeletSelector)s}
+              )
+              > %(KubeNodeEvictionRateThreshold)s
+            ||| % $._config,
+            labels: {
+              severity: 'info',
+            },
+            'for': '0s',
+            annotations: {
+              description: 'Node {{ $labels.node }}%s is evicting Pods due to {{ $labels.eviction_signal }}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.' % [
+                utils.ifShowMultiCluster($._config, ' on {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Node is evicting pods.',
             },
           },
           {

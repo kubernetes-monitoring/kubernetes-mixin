@@ -629,6 +629,43 @@ tests:
 - interval: 1m
   input_series:
   # node=minikube is uncordoned so we expect the alert to fire
+  - series: 'kube_node_status_condition{condition="MemoryPressure",status="true",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  # node=minikube2 is cordoned so we expect the alert to not fire
+  - series: 'kube_node_status_condition{condition="MemoryPressure",status="true",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  # does not meet 'for: 10m' threshold
+  - eval_time: 12m
+    alertname: KubeNodePressure
+    exp_alerts: []
+  - eval_time: 15m
+    alertname: KubeNodePressure
+    exp_alerts:
+    - exp_labels:
+        condition: MemoryPressure
+        status: "true"
+        cluster: kubernetes
+        node: minikube
+        severity: info
+        endpoint: https-main
+        instance: 10.0.2.15:10250
+        job: kube-state-metrics
+        namespace: monitoring
+        pod: kube-state-metrics-b894d84cc-d6htw
+        service: kube-state-metrics
+      exp_annotations:
+        summary: "Node has as active Condition."
+        description: 'minikube has active Condition MemoryPressure. This is caused by resource usage exceeding eviction thresholds.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodepressure'
+
+- interval: 1m
+  input_series:
+  # node=minikube is uncordoned so we expect the alert to fire
   - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
     values: '1 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1'
   - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
@@ -650,6 +687,29 @@ tests:
         summary: "Node readiness status is flapping."
         description: 'The readiness status of node minikube has changed 9 times in the last 15 minutes.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodereadinessflapping'
+
+- interval: 1m
+  input_series:
+  # This metric only appears with non-zero values, meaning the transition from 0 --> 1 doesn't trigger an alert
+  # However, since that's undesired behavior it'd be kinda pointless to test for it, even though it's expected.
+  - series: 'kubelet_evictions{eviction_signal="memory.available",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kubelet",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 3 3 3 3 3'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="10.0.2.15:10250", node="minikube", job="kubelet"}'
+    values: '1x20'
+  alert_rule_test:
+  - eval_time: 18m
+    alertname: KubeNodeEviction
+    exp_alerts:
+    - exp_labels:
+        eviction_signal: memory.available
+        cluster: kubernetes
+        node: minikube
+        instance: 10.0.2.15:10250
+        severity: info
+      exp_annotations:
+        summary: "Node is evicting pods."
+        description: 'Node minikube is evicting Pods due to memory.available.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeeviction'
 
 # Verify that node:node_num_cpu:sum triggers no many-to-many errors.
 - interval: 1m
