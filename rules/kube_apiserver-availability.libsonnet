@@ -8,7 +8,30 @@
 
     groups+: [
       {
-        name: 'kube-apiserver-availability.rules',
+        name: 'kube-apiserver-availability.rules apiserver_request_total',
+        interval: '3m',
+        rules: [
+          {
+            record: 'code_resource:apiserver_request_total:rate5m',
+            expr: |||
+              sum by (%s,code,resource) (rate(apiserver_request_total{%s}[5m]))
+            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
+            labels: {
+              verb: verb.type,
+            },
+          }
+          for verb in verbs
+        ] + [
+          {
+            record: 'code_verb:apiserver_request_total:increase1h',
+            expr: |||
+              sum by (%s, verb) (increase(apiserver_request_total{%s}[1h]))
+            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector],
+          },
+        ],
+      },
+      {
+        name: 'kube-apiserver-availability.rules SLIs',
         interval: '3m',
         rules: [
           {
@@ -139,25 +162,6 @@
               verb: 'write',
             },
           },
-        ] + [
-          {
-            record: 'code_resource:apiserver_request_total:rate5m',
-            expr: |||
-              sum by (%s,code,resource) (rate(apiserver_request_total{%s}[5m]))
-            ||| % [$._config.clusterLabel, std.join(',', [$._config.kubeApiserverSelector, verb.selector])],
-            labels: {
-              verb: verb.type,
-            },
-          }
-          for verb in verbs
-        ] + [
-          {
-            record: 'code_verb:apiserver_request_total:increase1h',
-            expr: |||
-              sum by (%s, code, verb) (increase(apiserver_request_total{%s,verb=~"LIST|GET|POST|PUT|PATCH|DELETE",code=~"%s"}[1h]))
-            ||| % [$._config.clusterLabel, $._config.kubeApiserverSelector, code],
-          }
-          for code in ['2..', '3..', '4..', '5..']
         ],
       },
     ],
