@@ -1,3 +1,0 @@
-checks {
-  disabled = ["promql/fragile"]
-}
