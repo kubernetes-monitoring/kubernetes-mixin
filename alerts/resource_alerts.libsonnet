@@ -1,3 +1,5 @@
+local utils = import '../lib/utils.libsonnet';
+
 {
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
@@ -158,7 +160,9 @@
               severity: 'info',
             },
             annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Namespace quota is going to be full.',
             },
           },
@@ -175,7 +179,9 @@
               severity: 'info',
             },
             annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Namespace quota is fully used.',
             },
           },
@@ -192,7 +198,9 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Namespace quota has exceeded the limits.',
             },
           },
@@ -209,7 +217,9 @@
               severity: 'info',
             },
             annotations: {
-              description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
+              description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Processes experience elevated CPU throttling.',
             },
           },

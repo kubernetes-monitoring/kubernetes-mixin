@@ -1,6 +1,6 @@
 rule_files:
-  - prometheus_alerts.yaml
-  - prometheus_rules.yaml
+- ../prometheus_alerts.yaml
+- ../prometheus_rules.yaml
 
 evaluation_interval: 1m
 
@@ -403,22 +403,15 @@ tests:
     - eval_time: 61m
       alertname: KubePersistentVolumeInodesFillingUp
 
-- interval: 1m
+- name: KubeletTooManyPods alert (single-node with instance as IP address)
+  interval: 1m
   input_series:
-  - series: 'kube_node_status_capacity{resource="pods",instance="172.17.0.5:8443",cluster="kubernetes",node="minikube",job="kube-state-metrics",namespace="kube-system"}'
-    values: '3+0x15'
-  - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",node="minikube",pod="pod-1",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",phase="Running",pod="pod-1",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",node="minikube",pod="pod-2",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",phase="Running",pod="pod-2",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_info{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",node="minikube",pod="pod-3",service="kube-state-metrics"}'
-    values: '1+0x15'
-  - series: 'kube_pod_status_phase{endpoint="https-main",instance="172.17.0.5:8443",job="kube-state-metrics",cluster="kubernetes",namespace="kube-system",phase="Running",pod="pod-3",service="kube-state-metrics"}'
-    values: '1+0x15'
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="10.0.0.0", job="kubelet"}'
+    values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="10.0.0.0", node="node0", job="kubelet"}'
+    values: '1x15'
+  - series: 'kube_node_status_capacity{cluster="kubernetes", node="node0", job="kube-state-metrics", resource="pods", unit="integer"}'
+    values: '3x15'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeletTooManyPods
@@ -427,11 +420,43 @@ tests:
     exp_alerts:
     - exp_labels:
         cluster: kubernetes
-        node: minikube
+        instance: 10.0.0.0
+        node: node0
         severity: info
       exp_annotations:
         summary: "Kubelet is running at capacity."
-        description: "Kubelet 'minikube' is running at 100% of its Pod capacity."
+        description: "Kubelet 'node0' is running at 100% of its Pod capacity."
+        runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods
+
+- name: KubeletTooManyPods alert (multi-node with instance as node name)
+  interval: 1m
+  input_series:
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="node0", job="kubelet"}'
+    values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="node0", node="node0", job="kubelet"}'
+    values: '1x15'
+  - series: 'kube_node_status_capacity{cluster="kubernetes", node="node0", job="kube-state-metrics", resource="pods", unit="integer"}'
+    values: '6x15'
+  - series: 'kubelet_running_pods{cluster="kubernetes", instance="node1", job="kubelet"}'
+    values: '3x15'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="node1", node="node1", job="kubelet"}'
+    values: '1x15'
+  - series: 'kube_node_status_capacity{cluster="kubernetes", node="node1", job="kube-state-metrics", resource="pods", unit="integer"}'
+    values: '3x15'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeletTooManyPods
+  - eval_time: 15m
+    alertname: KubeletTooManyPods
+    exp_alerts:
+    - exp_labels:
+        cluster: kubernetes
+        instance: node1
+        node: node1
+        severity: info
+      exp_annotations:
+        summary: "Kubelet is running at capacity."
+        description: "Kubelet 'node1' is running at 100% of its Pod capacity."
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubelettoomanypods
 
 - interval: 1m
@@ -570,8 +595,86 @@ tests:
 
 - interval: 1m
   input_series:
+  # node=minikube is uncordoned so we expect the alert to fire
+  - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
+    values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
+    values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  # node=minikube2 is cordoned so we expect the alert to not fire
+  - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-f5e9f",service="kube-state-metrics"}'
+    values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-f5e9f",service="kube-state-metrics"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 18m
+    alertname: KubeNodeNotReady
+    exp_alerts:
+    - exp_labels:
+        cluster: kubernetes
+        node: minikube
+        severity: warning
+        condition: Ready
+        endpoint: https-main
+        instance: 10.0.2.15:10250
+        job: kube-state-metrics
+        namespace: monitoring
+        pod: kube-state-metrics-b894d84cc-d6htw
+        service: kube-state-metrics
+        status: "true"
+      exp_annotations:
+        summary: "Node is not ready."
+        description: 'minikube has been unready for more than 15 minutes.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodenotready'
+
+- interval: 1m
+  input_series:
+  # node=minikube is uncordoned so we expect the alert to fire
+  - series: 'kube_node_status_condition{condition="MemoryPressure",status="true",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  # node=minikube2 is cordoned so we expect the alert to not fire
+  - series: 'kube_node_status_condition{condition="MemoryPressure",status="true",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  # does not meet 'for: 10m' threshold
+  - eval_time: 12m
+    alertname: KubeNodePressure
+    exp_alerts: []
+  - eval_time: 15m
+    alertname: KubeNodePressure
+    exp_alerts:
+    - exp_labels:
+        condition: MemoryPressure
+        status: "true"
+        cluster: kubernetes
+        node: minikube
+        severity: info
+        endpoint: https-main
+        instance: 10.0.2.15:10250
+        job: kube-state-metrics
+        namespace: monitoring
+        pod: kube-state-metrics-b894d84cc-d6htw
+        service: kube-state-metrics
+      exp_annotations:
+        summary: "Node has as active Condition."
+        description: 'minikube has active Condition MemoryPressure. This is caused by resource usage exceeding eviction thresholds.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodepressure'
+
+- interval: 1m
+  input_series:
+  # node=minikube is uncordoned so we expect the alert to fire
   - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
     values: '1 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics",status="true"}'
+    values: '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  # node=minikube2 is cordoned so we expect the alert to not fire
+  - series: 'kube_node_status_condition{condition="Ready",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-f5e9f",service="kube-state-metrics",status="true"}'
+    values: '1 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1'
+  - series: 'kube_node_spec_unschedulable{endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kube-state-metrics",namespace="monitoring",node="minikube2",pod="kube-state-metrics-b894d84cc-f5e9f",service="kube-state-metrics"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
   alert_rule_test:
   - eval_time: 18m
     alertname: KubeNodeReadinessFlapping
@@ -582,8 +685,31 @@ tests:
         severity: warning
       exp_annotations:
         summary: "Node readiness status is flapping."
-        description: 'The readiness status of node minikube has changed 10 times in the last 15 minutes.'
+        description: 'The readiness status of node minikube has changed 9 times in the last 15 minutes.'
         runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodereadinessflapping'
+
+- interval: 1m
+  input_series:
+  # This metric only appears with non-zero values, meaning the transition from 0 --> 1 doesn't trigger an alert
+  # However, since that's undesired behavior it'd be kinda pointless to test for it, even though it's expected.
+  - series: 'kubelet_evictions{eviction_signal="memory.available",endpoint="https-main",cluster="kubernetes",instance="10.0.2.15:10250",job="kubelet",namespace="monitoring",node="minikube",pod="kube-state-metrics-b894d84cc-d6htw",service="kube-state-metrics"}'
+    values: '1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 3 3 3 3 3'
+  - series: 'kubelet_node_name{cluster="kubernetes", instance="10.0.2.15:10250", node="minikube", job="kubelet"}'
+    values: '1x20'
+  alert_rule_test:
+  - eval_time: 18m
+    alertname: KubeNodeEviction
+    exp_alerts:
+    - exp_labels:
+        eviction_signal: memory.available
+        cluster: kubernetes
+        node: minikube
+        instance: 10.0.2.15:10250
+        severity: info
+      exp_annotations:
+        summary: "Node is evicting pods."
+        description: 'Node minikube is evicting Pods due to memory.available.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.'
+        runbook_url: 'https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubenodeeviction'
 
 # Verify that node:node_num_cpu:sum triggers no many-to-many errors.
 - interval: 1m
@@ -795,8 +921,9 @@ tests:
     exp_samples:
     - value: 1.0e+3
       labels: 'node_namespace_pod_container:container_memory_swap{container="alertmanager",endpoint="https",id="/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod3426a9c5_53d6_4736_9ca8_f575828e3e4b.slice/crio-f0d7fb2c909605aad16946ff065a42b25cdcdb812459e712ecdd6bce8a3ed6cb.scope",image="quay.io/prometheus/alertmanager:latest",instance="instance1",job="cadvisor",name="name1",cluster="kubernetes",namespace="monitoring",node="node1",pod="alertmanager-main-0",service="kubelet"}'
-- interval: 1m
-  # Current unequal desired and not progressing.
+
+- name: Current unequal desired and not progressing
+  interval: 1m
   input_series:
   - series: 'kube_daemonset_status_current_number_scheduled{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 4 3 4 4 4 3 4 4 4 3 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4'
@@ -809,9 +936,9 @@ tests:
   - series: 'kube_daemonset_status_number_available{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 3 3 3 4 3 3 3 4 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4'
   alert_rule_test:
-  - eval_time: 32m
+  - eval_time: 31m
     alertname: KubeDaemonSetRolloutStuck
-  - eval_time: 33m
+  - eval_time: 32m
     alertname: KubeDaemonSetRolloutStuck
     exp_alerts:
     - exp_labels:
@@ -822,9 +949,9 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
-  - eval_time: 34m
+  - eval_time: 35m
     alertname: KubeDaemonSetRolloutStuck
 # KubeDeploymentRolloutStuck
 - interval: 1m
@@ -851,8 +978,9 @@ tests:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedeploymentrolloutstuck
   - eval_time: 18m
     alertname: KubeDeploymentRolloutStuck
-- interval: 1m
-  # Misscheduled is non zero.
+
+- name: Misscheduled is non zero
+  interval: 1m
   input_series:
   - series: 'kube_daemonset_status_current_number_scheduled{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 4 3 4 4 4 3 4 4 4 3 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4'
@@ -865,9 +993,9 @@ tests:
   - series: 'kube_daemonset_status_number_available{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 3 3 3 4 3 3 3 4 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4'
   alert_rule_test:
-  - eval_time: 32m
+  - eval_time: 31m
     alertname: KubeDaemonSetRolloutStuck
-  - eval_time: 33m
+  - eval_time: 32m
     alertname: KubeDaemonSetRolloutStuck
     exp_alerts:
     - exp_labels:
@@ -878,12 +1006,13 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
-- interval: 1m
-  # Updated number unequal desired.
+
+- name: Updated number unequal desired
+  interval: 1m
   input_series:
   - series: 'kube_daemonset_status_current_number_scheduled{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 4 3 4 4 4 3 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4'
@@ -896,9 +1025,9 @@ tests:
   - series: 'kube_daemonset_status_number_available{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 3 3 3 4 3 3 3 4 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4'
   alert_rule_test:
-  - eval_time: 32m
+  - eval_time: 31m
     alertname: KubeDaemonSetRolloutStuck
-  - eval_time: 33m
+  - eval_time: 32m
     alertname: KubeDaemonSetRolloutStuck
     exp_alerts:
     - exp_labels:
@@ -909,12 +1038,13 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
-- interval: 1m
-  # Number available unequal desired.
+
+- name: Number available unequal desired
+  interval: 1m
   input_series:
   - series: 'kube_daemonset_status_current_number_scheduled{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 4 3 4 4 4 3 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4'
@@ -927,9 +1057,9 @@ tests:
   - series: 'kube_daemonset_status_number_available{job="kube-state-metrics",cluster="kubernetes",namespace="monitoring",daemonset="node-exporter"}'
     values: '4 4 4 3 3 3 4 3 3 3 4 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4'
   alert_rule_test:
-  - eval_time: 34m
+  - eval_time: 33m
     alertname: KubeDaemonSetRolloutStuck
-  - eval_time: 35m
+  - eval_time: 34m
     alertname: KubeDaemonSetRolloutStuck
     exp_alerts:
     - exp_labels:
@@ -940,7 +1070,7 @@ tests:
         severity: warning
       exp_annotations:
         summary: "DaemonSet rollout is stuck."
-        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15 minutes.'
+        description: 'DaemonSet monitoring/node-exporter has not finished or progressed for at least 15m.'
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedaemonsetrolloutstuck
   - eval_time: 36m
     alertname: KubeDaemonSetRolloutStuck
@@ -1148,9 +1278,9 @@ tests:
   - series: 'kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff",cluster="kubernetes",namespace="test",pod="static-web",container="script",job="kube-state-metrics"}'
     values: '1 1 stale _x3 1 1 stale _x2 1+0x4 stale'
   alert_rule_test:
-  - eval_time: 10m    # alert hasn't fired
+  - eval_time: 14m
     alertname: KubePodCrashLooping
-  - eval_time: 16m   # alert fired
+  - eval_time: 15m
     alertname: KubePodCrashLooping
     exp_alerts:
     - exp_labels:
@@ -1166,21 +1296,6 @@ tests:
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping"
         summary: "Pod is crash looping."
   - eval_time: 20m
-    alertname: KubePodCrashLooping   # alert fired for a period of 5 minutes after resolution because the alert looks back at the last 5 minutes of data and the range vector doesn't take stale samples into account
-    exp_alerts:
-      - exp_labels:
-          severity: "warning"
-          container: "script"
-          job: "kube-state-metrics"
-          cluster: "kubernetes"
-          namespace: "test"
-          pod: "static-web"
-          reason: "CrashLoopBackOff"
-        exp_annotations:
-          description: 'Pod test/static-web (script) is in waiting state (reason: "CrashLoopBackOff").'
-          runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping"
-          summary: "Pod is crash looping."
-  - eval_time: 21m    # alert recovers
     alertname: KubePodCrashLooping
 
 # When ResourceQuota has both cpu and requests.cpu, min value of those will be taken into account for quota calculation.
@@ -1268,3 +1383,62 @@ tests:
         description: 'Cluster has overcommitted memory resource requests for Namespaces.'
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubememoryquotaovercommit"
         summary: "Cluster has overcommitted memory resource requests."
+
+# Verify KubeStatefulSetReplicasMismatch fires, when no replicas could be created
+- interval: 1m
+  name: StatefulSet replicas not created
+  input_series:
+  - series: 'kube_statefulset_replicas{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '3x15'
+  - series: 'kube_statefulset_status_replicas{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '0x15'
+  - series: 'kube_statefulset_status_replicas_ready{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '0x15'
+  - series: 'kube_statefulset_status_replicas_updated{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '0x15'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeStatefulSetReplicasMismatch
+  - eval_time: 15m
+    alertname: KubeStatefulSetReplicasMismatch
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kube-state-metrics"
+        cluster: "kubernetes"
+        namespace: "test"
+        statefulset: "sts"
+      exp_annotations:
+        description: "StatefulSet test/sts has not matched the expected number of replicas for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubestatefulsetreplicasmismatch"
+        summary: "StatefulSet has not matched the expected number of replicas."
+
+# Verify KubeStatefulSetReplicasMismatch fires, when replicas could be created but are not ready
+- interval: 1m
+  name: StatefulSet replicas created but not ready
+  input_series:
+  - series: 'kube_statefulset_replicas{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '3x15'
+  - series: 'kube_statefulset_status_replicas{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '3x15'
+  - series: 'kube_statefulset_status_replicas_ready{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '0x15'
+  - series: 'kube_statefulset_status_replicas_updated{cluster="kubernetes",namespace="test",job="kube-state-metrics",statefulset="sts"}'
+    values: '0x15'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeStatefulSetReplicasMismatch
+  - eval_time: 15m
+    alertname: KubeStatefulSetReplicasMismatch
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kube-state-metrics"
+        cluster: "kubernetes"
+        namespace: "test"
+        statefulset: "sts"
+      exp_annotations:
+        description: "StatefulSet test/sts has not matched the expected number of replicas for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubestatefulsetreplicasmismatch"
+        summary: "StatefulSet has not matched the expected number of replicas."
+
