@@ -9,6 +9,7 @@
     groups+: [
       {
         name: 'kube-apiserver-availability.rules',
+        source_tenants: $._config['sourceTenants'],
         interval: '3m',
         rules: [
           {

@@ -7,6 +7,7 @@
     groups+: [
       {
         name: 'kubelet.rules',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             record: 'node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile',

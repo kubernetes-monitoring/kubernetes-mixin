@@ -10,6 +10,7 @@ local utils = import '../lib/utils.libsonnet';
     groups+: [
       {
         name: 'kubernetes-system',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             alert: 'KubeVersionMismatch',

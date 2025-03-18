@@ -23,6 +23,7 @@ local utils = import '../lib/utils.libsonnet';
     groups+: [
       {
         name: 'kubernetes-resources',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             alert: 'KubeCPUOvercommit',

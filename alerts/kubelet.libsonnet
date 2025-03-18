@@ -21,6 +21,7 @@ local utils = import '../lib/utils.libsonnet';
     groups+: [
       {
         name: 'kubernetes-system-kubelet',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             expr: |||

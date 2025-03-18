@@ -3,6 +3,7 @@
     groups+: [
       {
         name: 'kube-apiserver-burnrate.rules',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             record: 'apiserver_request:burnrate%(window)s' % w,
