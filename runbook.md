@@ -122,11 +122,7 @@ This page collects this repositories alerts and begins the process of describing
 ##### Alert Name: "KubePdbNotEnoughHealthyPods"
 + *Message*: `PDB {{ $labels.namespace }}/{{ $labels.poddisruptionbudget }} expects {{ $value }} more healthy pods. The desired number of healthy pods has not been met for at least 15m.`
 + *Severity*: warning
-+ *Action*: Check the status of the PDB using
-`kubectl get poddisruptionbudgets <pdb> -o yaml` and
-compare `status.currentHealthy` with `status.desiredHealthy`.
-Check the Kubernetes documentation for more information about
-[pod distruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/).
++ *Action*: Check the status of the PDB using `kubectl get poddisruptionbudgets <pdb> -o yaml` and compare `status.currentHealthy` with `status.desiredHealthy`. Check the Kubernetes documentation for more information about [pod distruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/).
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepdbnotenoughhealthypods/)
 
 ### Group Name: "kubernetes-resources"
