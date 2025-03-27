@@ -12,6 +12,7 @@ local utils = import '../lib/utils.libsonnet';
     groups+: [
       {
         name: 'kube-apiserver-slos',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             alert: 'KubeAPIErrorBudgetBurn',

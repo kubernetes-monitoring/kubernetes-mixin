@@ -8,6 +8,7 @@
     groups+: [
       {
         name: 'kube-apiserver-histogram.rules',
+        source_tenants: $._config['sourceTenants'],
         rules:
           [
             {
