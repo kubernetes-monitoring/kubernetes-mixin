@@ -2,11 +2,11 @@ module _
 
 go 1.23.2
 
-toolchain go1.23.4
+toolchain go1.24.1
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
-	github.com/cloudflare/pint v0.71.5
+	github.com/cloudflare/pint v0.71.8
 	github.com/errata-ai/vale/v3 v3.9.6
 	github.com/google/go-jsonnet v0.20.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
@@ -214,7 +214,7 @@ require (
 	github.com/yuin/goldmark v1.7.8 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
 	github.com/zeitlinger/conflate v0.0.0-20230622100834-279724abda8c // indirect
-	gitlab.com/gitlab-org/api/client-go v0.124.0 // indirect
+	gitlab.com/gitlab-org/api/client-go v0.126.0 // indirect
 	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
@@ -246,7 +246,7 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/api v0.218.0 // indirect
 	google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1 // indirect
