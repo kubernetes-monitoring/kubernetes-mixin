@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
 	github.com/cloudflare/pint v0.71.8
-	github.com/errata-ai/vale/v3 v3.9.6
+	github.com/errata-ai/vale/v3 v3.10.0
 	github.com/google/go-jsonnet v0.20.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
 	github.com/jsonnet-bundler/jsonnet-bundler v0.6.0
@@ -38,6 +38,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
+	github.com/adrg/frontmatter v0.2.0 // indirect
 	github.com/adrg/strutil v0.3.1 // indirect
 	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
