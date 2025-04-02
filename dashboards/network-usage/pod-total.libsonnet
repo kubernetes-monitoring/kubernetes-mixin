@@ -101,6 +101,7 @@ local var = g.dashboard.variable;
             value: 7000000000,  // 7GBs
           },
         ])
+        + gauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -131,6 +132,7 @@ local var = g.dashboard.variable;
             value: 7000000000,  // 7GBs
           },
         ])
+        + gauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
