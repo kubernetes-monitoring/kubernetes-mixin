@@ -100,6 +100,7 @@ local var = g.dashboard.variable;
             value: 7000000000,  // 7GBs
           },
         ])
+        + gauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||
@@ -121,6 +122,7 @@ local var = g.dashboard.variable;
         + gauge.standardOptions.withUnit('Bps')
         + gauge.standardOptions.withMin(0)
         + gauge.standardOptions.withMax(10000000000)  // 10GBs
+        + gauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + gauge.standardOptions.thresholds.withSteps([
           {
             color: 'dark-green',

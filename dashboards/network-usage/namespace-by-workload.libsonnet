@@ -150,6 +150,7 @@ local var = g.dashboard.variable;
         + barGauge.standardOptions.withUnit('Bps')
         + barGauge.standardOptions.color.withMode('fixed')
         + barGauge.standardOptions.color.withFixedColor('green')
+        + barGauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + barGauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -173,6 +174,7 @@ local var = g.dashboard.variable;
         + barGauge.standardOptions.withUnit('Bps')
         + barGauge.standardOptions.color.withMode('fixed')
         + barGauge.standardOptions.color.withFixedColor('green')
+        + barGauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + barGauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
