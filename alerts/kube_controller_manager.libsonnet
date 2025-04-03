@@ -7,6 +7,7 @@
     groups+: [
       {
         name: 'kubernetes-system-controller-manager',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           (import '../lib/absent_alert.libsonnet') {
             componentName:: 'KubeControllerManager',

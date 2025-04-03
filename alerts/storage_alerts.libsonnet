@@ -15,6 +15,7 @@
     groups+: [
       {
         name: 'kubernetes-storage',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             alert: 'KubePersistentVolumeFillingUp',

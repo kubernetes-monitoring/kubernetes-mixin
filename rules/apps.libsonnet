@@ -8,6 +8,7 @@
     groups+: [
       {
         name: 'k8s.rules.container_cpu_usage_seconds_total',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             // Reduces cardinality of this timeseries by #cores, which makes it

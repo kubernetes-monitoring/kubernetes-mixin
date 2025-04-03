@@ -14,6 +14,7 @@ local utils = import '../lib/utils.libsonnet';
       {
         name: 'kubernetes-apps',
         rules: [utils.wrap_rule_for_labels(rule, $._config) for rule in self.rules_],
+        source_tenants: $._config['sourceTenants'],
         rules_:: [
           {
             expr: |||

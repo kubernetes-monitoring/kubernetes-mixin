@@ -119,5 +119,8 @@
 
     // Default timeout value for k8s Jobs. The jobs which are active beyond this duration would trigger KubeJobNotCompleted alert.
     kubeJobTimeoutDuration: 12 * 60 * 60,
+
+    // Source tenants parameter for Grafana Mimir
+    sourceTenants: []
   },
 }

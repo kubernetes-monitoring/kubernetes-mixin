@@ -8,6 +8,7 @@
     groups+: [
       {
         name: 'kube-scheduler.rules',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             record: 'cluster_quantile:%s:histogram_quantile' % metric,

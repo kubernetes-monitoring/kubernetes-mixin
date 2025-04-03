@@ -9,6 +9,7 @@
     groups+: [
       {
         name: 'node.rules',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             // This rule results in the tuples (node, namespace, instance) => 1.

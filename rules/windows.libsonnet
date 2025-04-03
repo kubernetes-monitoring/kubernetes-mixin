@@ -3,6 +3,7 @@
     groups+: [
       {
         name: 'windows.node.rules',
+        source_tenants: $._config['sourceTenants'],
         rules: [
           {
             // This rule gives the number of windows nodes
