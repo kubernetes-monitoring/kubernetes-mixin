@@ -9,7 +9,7 @@
             record: 'node:windows_node:sum',
             expr: |||
               count by (%(clusterLabel)s) (
-                windows_system_system_up_time{%(windowsExporterSelector)s}
+                windows_system_boot_time_timestamp_seconds{%(windowsExporterSelector)s}
               )
             ||| % $._config,
           },
