@@ -41,7 +41,7 @@ local utils = import '../lib/utils.libsonnet';
               (sum(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="cpu"}) by (%(clusterLabel)s)) > 0
             ||| % $._config,
             annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.' % $._config,
+              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted CPU resource requests for Pods by {{ printf "%%.2f" $value }} CPU shares and cannot tolerate node failure.' % $._config,
             },
           } else {
             expr: |||
@@ -133,7 +133,7 @@ local utils = import '../lib/utils.libsonnet';
                 > %(namespaceOvercommitFactor)s
             ||| % $._config,
             annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted memory resource requests for Namespaces.' % $._config,
+              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted memory resource requests for Namespaces.' % $._config,
             },
           } else
             {
