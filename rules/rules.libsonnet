@@ -2,5 +2,4 @@
 (import 'apps.libsonnet') +
 (import 'kube_scheduler.libsonnet') +
 (import 'node.libsonnet') +
-(import 'kubelet.libsonnet') +
-(import 'windows.libsonnet')
+(import 'kubelet.libsonnet')
