@@ -5,6 +5,7 @@ local utils = import '../lib/utils.libsonnet';
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeJobTimeoutDuration: error 'must provide value for kubeJobTimeoutDuration',
     kubeDaemonSetRolloutStuckFor: '15m',
+    kubePdbNotEnoughHealthyPodsFor: '15m',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
@@ -358,6 +359,28 @@ local utils = import '../lib/utils.libsonnet';
             },
             'for': '15m',
             alert: 'KubeHpaMaxedOut',
+          },
+          {
+            expr: |||
+              (
+                kube_poddisruptionbudget_status_desired_healthy{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                -
+                kube_poddisruptionbudget_status_current_healthy{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              )
+              > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'PDB %s{{ $labels.namespace }}/{{ $labels.poddisruptionbudget }} expects {{ $value }} more healthy pods. The desired number of healthy pods has not been met for at least %s.' % [
+                utils.ifShowMultiCluster($._config, '{{ $labels.%(clusterLabel)s }}/' % $._config),
+                $._config.kubePdbNotEnoughHealthyPodsFor,
+              ],
+              summary: 'PDB does not have enough healthy pods.',
+            },
+            'for': $._config.kubePdbNotEnoughHealthyPodsFor,
+            alert: 'KubePdbNotEnoughHealthyPods',
           },
         ],
       },
