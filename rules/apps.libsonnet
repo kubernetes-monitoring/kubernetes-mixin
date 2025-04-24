@@ -322,117 +322,22 @@
               workload_type: 'staticpod',
             },
           },
-          // workload aggregation for StrimziPodSet
+          // workload aggregation for non-standard workloads
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="StrimziPodSet"}
-                ), "workload", "$1", "pod", "(.+)"
+              max by(%(clusterLabel)s, namespace, workload, pod, workload_type) (
+                label_join(
+                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!~"ReplicaSet|Deployment|DaemonSet|StatefulSet|Job||Node"},
+                  "workload_type", "", "owner_kind"
+                )
+                or
+                label_join(
+                  kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind!~"Deployment"},
+                  "workload_type", "", "owner_kind"
+                )
               )
             ||| % $._config,
-            labels: {
-              workload_type: 'strimzipodset',
-            },
-          },
-          // workload aggregation for Rollout
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Rollout"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'rollout',
-            },
-          },
-          // workload aggregation for CatalogSource
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="CatalogSource"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'catalogsource',
-            },
-          },
-          // workload aggregation for ClusterPolicy
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ClusterPolicy"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'clusterpolicy',
-            },
-          },
-          // workload aggregation for ConfigMap
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ConfigMap"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'configmap',
-            },
-          },
-          // workload aggregation for EphemeralRunner
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="EphemeralRunner"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'ephemeralrunner',
-            },
-          },  
-          // workload aggregation for AutoscalingListener
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="AutoscalingListener"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'autoscalinglistener',
-            },
-          },
-          // workload aggregation for Workflow
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Workflow"}
-                ), "workload", "$1", "pod", "(.+)"
-              )
-            ||| % $._config,
-            labels: {
-              workload_type: 'workflow',
-            },
           },
         ],
       },
