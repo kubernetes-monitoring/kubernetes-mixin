@@ -224,7 +224,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'deployment',
+              workload_type: 'replicaset',
             },
           },
           // workload aggregation for deployments
