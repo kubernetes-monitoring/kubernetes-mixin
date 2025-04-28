@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
 	github.com/cloudflare/pint v0.73.5
-	github.com/errata-ai/vale/v3 v3.10.0
+	github.com/errata-ai/vale/v3 v3.11.2
 	github.com/google/go-jsonnet v0.20.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
 	github.com/jsonnet-bundler/jsonnet-bundler v0.6.0
