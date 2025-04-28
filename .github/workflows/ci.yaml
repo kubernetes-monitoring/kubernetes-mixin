@@ -1,4 +1,5 @@
 name: ci
+permissions: {}
 on:
   push:
     branches:
