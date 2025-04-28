@@ -1,14 +1,19 @@
 name: check-with-upstream
 # Run every Monday.
 on:
+  push:
+    branches:
+      - main
+  pull_request:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: "0 0 * * 1"
 jobs:
   check-selectors-ksm:
     runs-on: ubuntu-latest
     name: Check if KSM selectors are present on applicable metrics.
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      with:
-        persist-credentials: false
-    - run: make --always-make check-selectors-ksm
+      - uses: GitHubSecurityLab/actions-permissions/monitor@v1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - run: make --always-make check-selectors-ksm
