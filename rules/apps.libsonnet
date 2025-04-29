@@ -298,10 +298,8 @@
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod) (
-                label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
-                ), "workload", "$1", "barepod", "(.+)"
+              max by(%(clusterLabel)s, namespace, pod) (
+                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="", owner_name=""}
               )
             ||| % $._config,
             labels: {
@@ -326,16 +324,13 @@
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
-              max by(%(clusterLabel)s, namespace, workload, pod, workload_type) (
-                label_join(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!~"ReplicaSet|Deployment|DaemonSet|StatefulSet|Job||Node"},
-                  "workload_type", "", "owner_kind"
-                )
-                or
-                label_join(
-                  kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind!~"Deployment"},
-                  "workload_type", "", "owner_kind"
-                )
+              label_replace(
+                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!~"ReplicaSet|Deployment|DaemonSet|StatefulSet|Job|Node|"}
+                , "replicaset", "$1", "owner_name", "(.+)"
+              )
+              * on(%(clusterLabels)s, namespace, replicaset) group_left(owner_kind)
+              group by(%(clusterLabels)s, namespace, replicaset, owner_kind) (
+                kube_replicaset_owner{job!="", owner_kind!~"Deployment|"}
               )
             ||| % $._config,
           },
