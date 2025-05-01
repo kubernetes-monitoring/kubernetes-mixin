@@ -330,7 +330,7 @@
               )
               * on(%(clusterLabels)s, namespace, replicaset) group_left(owner_kind)
               group by(%(clusterLabels)s, namespace, replicaset, owner_kind) (
-                kube_replicaset_owner{job!="", owner_kind!~"Deployment|"}
+                kube_replicaset_owner{job!="", owner_kind!="Deployment", owner_kind!=""}
               )
             ||| % $._config,
           },
