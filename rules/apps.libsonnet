@@ -325,7 +325,7 @@
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
               label_replace(
-                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!~"Deployment|DaemonSet|StatefulSet|Job|Node|"}
+                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!="Deployment", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
                 , "replicaset", "$1", "owner_name", "(.+)"
               )
               * on(%(clusterLabels)s, namespace, replicaset) group_left(owner_kind)
