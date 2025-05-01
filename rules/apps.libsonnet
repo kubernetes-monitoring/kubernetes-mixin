@@ -214,7 +214,7 @@
                   label_replace(
                     kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
                     "replicaset", "$1", "owner_name", "(.*)"
-                  ) * on(replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
+                  ) * on (%(clusterLabel), replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
                     1, max by (%(clusterLabel)s, replicaset, namespace, owner_name) (
                       kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
                     )
