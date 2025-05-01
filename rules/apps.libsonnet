@@ -299,7 +299,10 @@
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
               max by(%(clusterLabel)s, namespace, pod) (
-                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="", owner_name=""}
+                label_replace(
+                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="", owner_name=""},
+                  "workload", "$1", "pod", "(.+)"
+                )
               )
             ||| % $._config,
             labels: {
@@ -312,8 +315,9 @@
             expr: |||
               max by(%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
-                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Node"}
-                ), "workload", "$1", "pod", "(.+)"
+                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Node"},
+                  "workload", "$1", "pod", "(.+)"
+                )
               )
             ||| % $._config,
             labels: {
