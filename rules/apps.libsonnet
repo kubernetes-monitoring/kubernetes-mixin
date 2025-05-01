@@ -331,30 +331,25 @@
               max by (%(clusterLabel)s, namespace, pod, workload, workload_type) (
                 label_replace(
                   label_replace(
-                    kube_pod_owner{job!="", owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
-                  , "workload", "$1", "owner_name", "(.+)")
-                  * on(%(clusterLabel)s, namespace, replicaset) group_left(owner_kind)
+                    kube_pod_owner{job!="", owner_kind="ReplicaSet"}
+                    , "workload", "$1", "owner_name", "(.+)"
+                  )
+                  * on(%(clusterLabel)s, namespace, workload) group_left(owner_kind)
                   label_replace(
-                    group by (%(clusterLabel)s, namespace, replicaset, owner_kind) (
+                    group by (%(clusterLabel)s, namespace, replicaset, owner_kind, owner_name) (
                       kube_replicaset_owner{job!="", owner_kind!="Deployment", owner_kind!=""}
                     )
-                  , "workload", "$1", "replicaset", "(.+)")
-                , "workload_type", "$1", "owner_kind", "(.+)")
-              )
-            ||| % $._config,
-          },
-          // workload aggregation for non-standard workloads for CRDs
-          {
-            record: 'namespace_workload_pod:kube_pod_owner:relabel',
-            expr: |||
-              max by (%(clusterLabel)s, namespace, pod, workload, workload_type) (
-                label_replace(
+                    , "workload", "$1", "replicaset", "(.+)"
+                  )
+                  OR
                   label_replace(
-                    group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
+                    group by (cluster, namespace, pod, owner_name, owner_kind) (
                       kube_pod_owner{ owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
                     )
-                  , "workload", "$1", "owner_name", "(.+)")
-                , "workload_type", "$1", "owner_kind", "(.+)")
+                    , "workload", "$1", "owner_name", "(.+)"
+                  )
+                  , "workload_type", "$1", "owner_kind", "(.+)"
+                )
               )
             ||| % $._config,
           },
