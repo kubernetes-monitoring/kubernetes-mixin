@@ -324,13 +324,24 @@
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
-              label_replace(
-                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!="Deployment", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
-                , "replicaset", "$1", "owner_name", "(.+)"
-              )
-              * on(%(clusterLabels)s, namespace, replicaset) group_left(owner_kind)
-              group by(%(clusterLabels)s, namespace, replicaset, owner_kind) (
-                kube_replicaset_owner{job!="", owner_kind!="Deployment", owner_kind!=""}
+              max by (%(clusterLabel)s, namespace, pod, workload, workload_type) (
+                label_replace(
+                  label_replace(
+                    kube_pod_owner{job!="", owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
+                  , "workload", "$1", "owner_name", "(.+)")
+                  * on(%(clusterLabel)s, namespace, replicaset) group_left(owner_kind)
+                  label_replace(
+                    group by (%(clusterLabel)s, namespace, replicaset, owner_kind) (
+                      kube_replicaset_owner{job!="", owner_kind!="Deployment", owner_kind!=""}
+                    )
+                  , "workload", "$1", "replicaset", "(.+)")
+                  OR
+                  label_replace(
+                    group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
+                      kube_pod_owner{ owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
+                    )
+                  , "workload", "$1", "owner_name", "(.+)")
+                , "workload_type", "$1", "owner_kind", "(.+)")
               )
             ||| % $._config,
           },
