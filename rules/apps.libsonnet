@@ -324,7 +324,7 @@
               workload_type: 'staticpod',
             },
           },
-          // workload aggregation for non-standard workloads
+          // workload aggregation for non-standard workloads for replicaset
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
@@ -339,7 +339,16 @@
                       kube_replicaset_owner{job!="", owner_kind!="Deployment", owner_kind!=""}
                     )
                   , "workload", "$1", "replicaset", "(.+)")
-                  OR
+                , "workload_type", "$1", "owner_kind", "(.+)")
+              )
+            ||| % $._config,
+          },
+          // workload aggregation for non-standard workloads for CRDs
+          {
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
+            expr: |||
+              max by (%(clusterLabel)s, namespace, pod, workload, workload_type) (
+                label_replace(
                   label_replace(
                     group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
                       kube_pod_owner{ owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
