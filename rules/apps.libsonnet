@@ -205,6 +205,28 @@
       {
         name: 'k8s.rules.pod_owner',
         rules: [
+          // workload aggregation for replicasets
+          {
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
+            expr: |||
+              max by (%(clusterLabel)s, namespace, workload, pod) (
+                label_replace(
+                  label_replace(
+                    kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
+                    "replicaset", "$1", "owner_name", "(.*)"
+                  ) * on (%(clusterLabel), replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
+                    1, max by (%(clusterLabel)s, replicaset, namespace, owner_name) (
+                      kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
+                    )
+                  ),
+                  "workload", "$1", "owner_name", "(.*)"
+                )
+              )
+            ||| % $._config,
+            labels: {
+              workload_type: 'replicaset',
+            },
+          },
           // workload aggregation for deployments
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
@@ -214,9 +236,9 @@
                   label_replace(
                     kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
                     "replicaset", "$1", "owner_name", "(.*)"
-                  ) * on(replicaset, namespace) group_left(owner_name) topk by(replicaset, namespace) (
-                    1, max by (replicaset, namespace, owner_name) (
-                      kube_replicaset_owner{%(kubeStateMetricsSelector)s}
+                  ) * on(replicaset, namespace, %(clusterLabel)s) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
+                    1, max by (%(clusterLabel)s, replicaset, namespace, owner_name) (
+                      kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind="Deployment"}
                     )
                   ),
                   "workload", "$1", "owner_name", "(.*)"
@@ -227,6 +249,7 @@
               workload_type: 'deployment',
             },
           },
+          // workload aggregation for daemonsets
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
@@ -241,6 +264,7 @@
               workload_type: 'daemonset',
             },
           },
+          // workload aggregation for statefulsets
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
@@ -255,6 +279,7 @@
               workload_type: 'statefulset',
             },
           },
+          // workload aggregation for jobs
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
@@ -268,6 +293,65 @@
             labels: {
               workload_type: 'job',
             },
+          },
+          // workload aggregation for barepods
+          {
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
+            expr: |||
+              max by(%(clusterLabel)s, namespace, pod, workload) (
+                label_replace(
+                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="", owner_name=""},
+                  "workload", "$1", "pod", "(.+)"
+                )
+              )
+            ||| % $._config,
+            labels: {
+              workload_type: 'barepod',
+            },
+          },
+          // workload aggregation for staticpods
+          {
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
+            expr: |||
+              max by(%(clusterLabel)s, namespace, workload, pod) (
+                label_replace(
+                  kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Node"},
+                  "workload", "$1", "owner_name", "(.+)"
+                )
+              )
+            ||| % $._config,
+            labels: {
+              workload_type: 'staticpod',
+            },
+          },
+          // workload aggregation for non-standard workloads for replicaset
+          {
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
+            expr: |||
+              max by (%(clusterLabel)s, namespace, pod, workload, workload_type) (
+                label_replace(
+                  label_replace(
+                    kube_pod_owner{job!="", owner_kind="ReplicaSet"}
+                    , "workload", "$1", "owner_name", "(.+)"
+                  )
+                  * on(%(clusterLabel)s, namespace, workload) group_left(owner_kind)
+                  label_replace(
+                    group by (%(clusterLabel)s, namespace, replicaset, owner_kind, owner_name) (
+                      kube_replicaset_owner{job!="", owner_kind!="Deployment", owner_kind!=""}
+                    )
+                    , "workload", "$1", "replicaset", "(.+)"
+                  )
+                  OR
+                  label_replace(
+                    group by (cluster, namespace, pod, owner_name, owner_kind) (
+                      kube_pod_owner{ owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
+                    )
+                    , "workload", "$1", "owner_name", "(.+)"
+                  )
+                  , "workload_type", "$1", "owner_kind", "(.+)"
+                )
+              )
+            ||| % $._config,
           },
         ],
       },
