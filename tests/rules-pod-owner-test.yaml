@@ -22,3 +22,57 @@ rules_files:
     exp_samples:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
+
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="",owner_name="bare-pod-xyz123",pod="bare-pod-xyz123",service="ksm"}'
+    values: '1 1'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="false",owner_kind="",owner_name="bare-pod-xyz123",pod="bare-pod-xyz123",service="ksm"}'
+    values: '1 stale'
+  promql_expr_test:
+  - eval_time: 0m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="bare-pod-xyz123", workload="bare-pod-xyz123", workload_type="barepod"}'
+  - eval_time: 1m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="bare-pod-xyz123", workload="bare-pod-xyz123", workload_type="barepod"}'
+
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Node",owner_name="etcd-node1",pod="etcd-node1",service="ksm"}'
+    values: '1 1'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="true",owner_kind="Node",owner_name="etcd-node1",pod="etcd-node1",service="ksm"}'
+    values: '1 stale'
+  promql_expr_test:
+  - eval_time: 0m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="etcd-node1", workload="etcd-node1", workload_type="staticpod"}'
+  - eval_time: 1m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="etcd-node1", workload="etcd-node1", workload_type="staticpod"}'
+
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="CustomController",owner_name="myapp-controller",pod="myapp-controller-abc123",service="ksm"}'
+    values: '1 1'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="CustomController",owner_name="myapp-controller",pod="myapp-controller-abc123",service="ksm"}'
+    values: '1 stale'
+  promql_expr_test:
+  - eval_time: 0m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="myapp-controller-abc123", workload="myapp-controller", workload_type="customcontroller"}'
+  - eval_time: 1m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="myapp-controller-abc123", workload="myapp-controller", workload_type="customcontroller"}'
