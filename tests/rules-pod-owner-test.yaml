@@ -1,4 +1,5 @@
-rules_files:
+rule_files:
+- ../prometheus_alerts.yaml
 - ../prometheus_rules.yaml
 
 evaluation_interval: 1m
@@ -26,56 +27,62 @@ tests:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
 
+# bare pod
 - interval: 1m
   input_series:
-  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="",owner_name="bare-pod-xyz123",pod="bare-pod-xyz123",service="ksm"}'
-    values: '1 1'
-  - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="false",owner_kind="",owner_name="bare-pod-xyz123",pod="bare-pod-xyz123",service="ksm"}'
-    values: '1 stale'
+  - series: 'kube_pod_owner{owner_kind="", cluster="openshift", namespace="default", pod="nginx", job="integrations/kubernetes/kube-state-metrics", instance="10.128.0.135:8443"}'
+    values: '1'
+  - series: 'kube_pod_owner{owner_kind="", cluster="openshift", namespace="default", pod="nginx", job="kube-state-metrics", instance="10.128.0.135:8443"}'
+    values: '1'
   promql_expr_test:
-  - eval_time: 0m
-    expr: namespace_workload_pod:kube_pod_owner:relabel
-    exp_samples:
-    - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="bare-pod-xyz123", workload="bare-pod-xyz123", workload_type="barepod"}'
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="bare-pod-xyz123", workload="bare-pod-xyz123", workload_type="barepod"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="openshift", namespace="default", pod="nginx", workload="nginx", workload_type="barepod"}'
 
+# static pod
 - interval: 1m
   input_series:
-  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Node",owner_name="etcd-node1",pod="etcd-node1",service="ksm"}'
-    values: '1 1'
-  - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="true",owner_kind="Node",owner_name="etcd-node1",pod="etcd-node1",service="ksm"}'
-    values: '1 stale'
+  - series: 'kube_pod_owner{instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080",job="integrations/kubernetes/kube-state-metrics2",cluster="duplicate",namespace="kube-system",owner_is_controller="true",owner_kind="Node",owner_name="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+    values: '1'
+  - series: 'kube_pod_owner{instance="grafana-k8s-monitoring-opencost.monitoring.svc:9003",job="kube-state-metrics",cluster="duplicate",namespace="kube-system",owner_is_controller="true",owner_kind="Node",owner_name="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+    values: '1'
   promql_expr_test:
-  - eval_time: 0m
-    expr: namespace_workload_pod:kube_pod_owner:relabel
-    exp_samples:
-    - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="etcd-node1", workload="etcd-node1", workload_type="staticpod"}'
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="etcd-node1", workload="etcd-node1", workload_type="staticpod"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="staticpod"}'
 
+# replicaset
 - interval: 1m
   input_series:
-  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="CustomController",owner_name="myapp-controller",pod="myapp-controller-abc123",service="ksm"}'
-    values: '1 1'
-  - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="CustomController",owner_name="myapp-controller",pod="myapp-controller-abc123",service="ksm"}'
-    values: '1 stale'
+  - series: 'kube_pod_owner{owner_kind="ReplicaSet", cluster="duplicate", namespace="kube-system", pod="kube-dns-9db7cdc57-26g7k", owner_name="kube-dns-9db7cdc57", job="integrations/kubernetes/kube-state-metrics", instance="10.128.0.135:8443"}'
+    values: '1'
+  - series: 'kube_pod_owner{owner_kind="ReplicaSet", cluster="duplicate", namespace="kube-system", pod="kube-dns-9db7cdc57-26g7k", owner_name="kube-dns-9db7cdc57", job="kube-state-metrics", instance="10.128.0.135:8443"}'
+    values: '1'
+  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",replicaset="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+    values: '1'
   promql_expr_test:
-  - eval_time: 0m
-    expr: namespace_workload_pod:kube_pod_owner:relabel
-    exp_samples:
-    - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="myapp-controller-abc123", workload="myapp-controller", workload_type="customcontroller"}'
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="myapp-controller-abc123", workload="myapp-controller", workload_type="customcontroller"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="kube-system", pod="kube-dns-9db7cdc57-26g7k", workload="kube-dns-9db7cdc57", workload_type="ReplicaSet"}'
+
+# non-standard replicaset
+# - interval: 1m
+#   input_series:
+#   - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="custom-controller",pod="custom-controller-abc123",service="ksm"}'
+#     values: '1 1'
+#   - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Deployment",owner_name="replicaset-123",pod="replicaset-123",service="ksm"}'
+#     values: '1 stale'
+#   - series: 'kube_replicaset_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="CustomController",owner_name="custom-controller",pod="custom-controller-abc123",replicaset="custom-controller",service="ksm"}'
+#     values: '1 1'
+#   promql_expr_test:
+#   - eval_time: 1m
+#     expr: namespace_workload_pod:kube_pod_owner:relabel
+#     exp_samples:
+#     - value: 1
+#       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="custom-controller-abc123", workload="custom-controller", workload_type="customcontroller"}'

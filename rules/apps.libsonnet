@@ -205,7 +205,7 @@
       {
         name: 'k8s.rules.pod_owner',
         rules: [
-          // workload aggregation for replicasets
+          // // workload aggregation for replicasets
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
@@ -214,7 +214,7 @@
                   label_replace(
                     kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
                     "replicaset", "$1", "owner_name", "(.*)"
-                  ) * on (%(clusterLabel), replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
+                  ) * on (%(clusterLabel)s, replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
                     1, max by (%(clusterLabel)s, replicaset, namespace, owner_name) (
                       kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
                     )
