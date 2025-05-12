@@ -1,6 +1,9 @@
 rules_files:
 - ../prometheus_rules.yaml
 
+evaluation_interval: 1m
+
+tests:
 - interval: 1m
   input_series:
   - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="ds-7cc77d965f-cgsdv",service="ksm"}'
