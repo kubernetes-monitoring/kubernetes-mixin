@@ -279,7 +279,30 @@
               workload_type: 'statefulset',
             },
           },
-          // workload aggregation for jobs
+          // workload aggregation for jobs (cronjobs, jobs, etc)
+          {
+            record: 'namespace_workload_pod:kube_pod_owner:relabel',
+            expr: |||
+              group by(%(clusterLabel)s, namespace, workload, workload_type, pod) (
+                label_join(
+                  label_join(
+                    group by (%(clusterLabel)s, namespace, job_name, pod) (label_join(
+                        kube_pod_owner{%(kubeStateMetricsSelector)s,job!="", owner_kind="Job"}
+                    , "job_name", "", "owner_name"))
+                    * on (%(clusterLabel)s, namespace, job_name) group_left(owner_kind, owner_name)
+                    group by (%(clusterLabel)s, namespace, job_name, owner_kind, owner_name) (
+                        kube_job_owner{%(kubeStateMetricsSelector)s,job!="", owner_kind!="Pod", owner_kind!=""}
+                    )
+                    OR on (%(clusterLabel)s, namespace, pod)
+                    group by (%(clusterLabel)s, namespace, owner_name, owner_kind, pod) (
+                        kube_pod_owner{%(kubeStateMetricsSelector)s, job!="", owner_kind="Job"}
+                    )
+                  , "workload", "", "owner_name")
+                , "workload_type", "", "owner_kind")
+              )
+            ||| % $._config,
+          }
+          // backwards compatibility for jobs
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
