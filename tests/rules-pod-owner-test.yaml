@@ -145,7 +145,7 @@ tests:
   input_series:
   - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="custom-controller",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
     values: '1'
-  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CustomController",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",replicaset="custom-controller"}'
+  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CustomController", owner_name="custom-controller", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",replicaset="custom-controller"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
