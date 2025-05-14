@@ -205,7 +205,7 @@
       {
         name: 'k8s.rules.pod_owner',
         rules: [
-          // // workload aggregation for replicasets
+          // workload aggregation for replicasets
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||

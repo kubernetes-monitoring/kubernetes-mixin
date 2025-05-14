@@ -70,19 +70,19 @@ tests:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="statefulset"}'
 
-# # daemonset
-# - interval: 1m
-#   input_series:
-#   - series: 'kube_pod_owner{instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080",job="integrations/kubernetes/kube-state-metrics2",cluster="duplicate",namespace="kube-system",owner_is_controller="true",owner_kind="Daemonset",owner_name="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
-#     values: '1'
-#   - series: 'kube_pod_owner{instance="grafana-k8s-monitoring-opencost.monitoring.svc:9003",job="kube-state-metrics",cluster="duplicate",namespace="kube-system",owner_is_controller="true",owner_kind="Daemonset",owner_name="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
-#     values: '1'
-#   promql_expr_test:
-#   - eval_time: 1m
-#     expr: namespace_workload_pod:kube_pod_owner:relabel
-#     exp_samples:
-#     - value: 1
-#       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="daemonset"}'
+# daemonset
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_owner{instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080",job="integrations/kubernetes/kube-state-metrics2",cluster="duplicate",namespace="kube-system",owner_is_controller="true",owner_kind="DaemonSet",owner_name="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+    values: '1'
+  - series: 'kube_pod_owner{instance="grafana-k8s-monitoring-opencost.monitoring.svc:9003",job="kube-state-metrics",cluster="duplicate",namespace="kube-system",owner_is_controller="true",owner_kind="DaemonSet",owner_name="gke-duplicate-default-pool-e20e250a-kx2v",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+    values: '1'
+  promql_expr_test:
+  - eval_time: 1m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="daemonset"}'
 
 # replicaset
 - interval: 1m
