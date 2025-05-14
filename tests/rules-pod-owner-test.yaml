@@ -103,9 +103,9 @@ tests:
 # CronJob
 - interval: 1m
   input_series:
-  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CronJob",owner_name="custom-job123",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="cron-job-1234",pod="cron-job-1243-abcd"}'
     values: '1'
-  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CronJob",owner_name="custom-job123", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",job_name="custom-job"}'
+  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CronJob",owner_name="cron-job",job_name="cron-job-1234"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
