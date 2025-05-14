@@ -117,7 +117,7 @@ tests:
 # ScaledJob
 - interval: 1m
   input_series:
-  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ScaledJob",owner_name="custom-job123",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="custom-job123",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
     values: '1'
   - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ScaledJob",owner_name="custom-job123", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",job_name="custom-job"}'
     values: '1'
