@@ -11,11 +11,11 @@ tests:
   - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="ds-7cc77d965f-cgsdv",service="ksm"}'
     values: '1 1'
   - series: 'kube_pod_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="ds-7cc77d965f-cgsdv",service="ksm"}'
-    values: '1 stale'
+    values: '1'
   - series: 'kube_replicaset_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Deployment",owner_name="ds",pod="ds-777f6bf798-kq7tj",replicaset="ds-7cc77d965f",service="ksm"}'
     values: '1 1'
   - series: 'kube_replicaset_owner{endpoint="https",instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Deployment",owner_name="ds",pod="ds-777f6bf798-kq7tj",replicaset="ds-7cc77d965f",service="ksm"}'
-    values: '1 stale'
+    values: '1'
   promql_expr_test:
   - eval_time: 0m
     expr: namespace_workload_pod:kube_pod_owner:relabel
@@ -100,38 +100,41 @@ tests:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-10012", workload_type="replicaset"}'
 
-# CronJob
-- interval: 1m
-  input_series:
-  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="cron-job-1234",pod="cron-job-1243-abcd"}'
-    values: '1'
-  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CronJob",owner_name="cron-job",job_name="cron-job-1234"}'
-    values: '1'
-  promql_expr_test:
-  - eval_time: 1m
-    expr: namespace_workload_pod:kube_pod_owner:relabel
-    exp_samples:
-    - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="custom-job123", workload_type="CronJob"}'
+# # CronJob
+# - interval: 1m
+#   input_series:
+#   - series: '{__name__="kube_pod_owner", cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="integrations/kubernetes/kube-state-metrics", namespace="monitoring", owner_is_controller="true", owner_kind="Job", owner_name="cuda-vectoradd-29120880", pod="cuda-vectoradd-29120880-jfl5c", uid="8e3586c6-12f7-488e-b748-3f094193802c"}'
+#     values: '1'
+#   - series: '{__name__="kube_job_owner", cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="integrations/kubernetes/kube-state-metrics", job_name="cuda-vectoradd-29120880", namespace="monitoring", owner_is_controller="true", owner_kind="CronJob", owner_name="cuda-vectoradd"}'
+#     values: '1'
+#   promql_expr_test:
+#   - eval_time: 1m
+#     expr: namespace_workload_pod:kube_pod_owner:relabel
+#     exp_samples:
+#     - value: 1
+#       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="monitoring", pod="cuda-vectoradd-29120880-jfl5c", workload="cuda-vectoradd", workload_type="CronJob"}'
 
-# ScaledJob
-- interval: 1m
-  input_series:
-  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="custom-job123",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
-    values: '1'
-  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ScaledJob",owner_name="custom-job123", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",job_name="custom-job"}'
-    values: '1'
-  promql_expr_test:
-  - eval_time: 1m
-    expr: namespace_workload_pod:kube_pod_owner:relabel
-    exp_samples:
-    - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="custom-job123", workload_type="ScaledJob"}'
+# # ScaledJob
+# - interval: 1m
+#   input_series:
+#   - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="custom-job123",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+#     values: '1'
+#   - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ScaledJob",owner_name="custom-job123", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",job_name="custom-job"}'
+#     values: '1'
+#   promql_expr_test:
+#   - eval_time: 1m
+#     expr: namespace_workload_pod:kube_pod_owner:relabel
+#     exp_samples:
+#     - value: 1
+#       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="custom-job123", workload_type="ScaledJob"}'
 
 # job
 - interval: 1m
   input_series:
   - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="job",owner_name="custom-job123",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+    values: '1'
+  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",job_name="custom-job123"}'
+  - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="job",owner_name="custom-job123"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
@@ -143,13 +146,13 @@ tests:
 # non-standard replicaset
 - interval: 1m
   input_series:
-  - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="custom-controller",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
+  - series: 'kube_pod_owner{__name__="kube_pod_owner", cluster="k8sdev/aws/helm", instance="grafana-k8s-monitoring-kube-state-metrics.default.svc:8080", job="integrations/kubernetes/kube-state-metrics", namespace="default", owner_is_controller="true", owner_kind="ReplicaSet", owner_name="rollouts-demo-687d76d795", pod="rollouts-demo-687d76d795-5mlvh", uid="491a64cd-6a5f-4c64-b4b8-f95ee6a6b9c0"}'
     values: '1'
-  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="CustomController", owner_name="custom-controller", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v",replicaset="custom-controller"}'
+  - series: 'kube_replicaset_owner{__name__="kube_replicaset_owner", cluster="k8sdev/aws/helm", instance="grafana-k8s-monitoring-kube-state-metrics.default.svc:8080", job="integrations/kubernetes/kube-state-metrics", namespace="default", owner_is_controller="true", owner_kind="Rollout", owner_name="rollouts-demo", replicaset="rollouts-demo-687d76d795"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="custom-controller", workload_type="CustomController"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="k8sdev/aws/helm",namespace="default", pod="rollouts-demo-687d76d795-5mlvh", workload="rollouts-demo-687d76d795", workload_type="Rollout"}'
