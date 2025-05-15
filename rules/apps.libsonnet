@@ -212,11 +212,11 @@
               max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   label_replace(
-                    kube_pod_owner{%(kubeStateMetricsSelector)s, job!="", owner_kind="ReplicaSet"},
+                    kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"},
                     "replicaset", "$1", "owner_name", "(.*)"
                   ) * on (%(clusterLabel)s, replicaset, namespace) group_left(owner_name) topk by(%(clusterLabel)s, replicaset, namespace) (
                     1, max by (%(clusterLabel)s, replicaset, namespace, owner_name) (
-                      kube_replicaset_owner{%(kubeStateMetricsSelector)s, job!="", owner_kind=""}
+                      kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
                     )
                   ),
                   "workload", "$1", "replicaset", "(.*)"
@@ -367,7 +367,7 @@
                     OR
                     label_replace(
                     group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
-                        kube_pod_owner{ owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
+                        kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
                     )
                     , "workload", "$1", "owner_name", "(.+)"
                     )
