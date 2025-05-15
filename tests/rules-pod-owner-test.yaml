@@ -136,6 +136,8 @@ tests:
     values: '1'
   - series: 'kube_job_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",job_name="kube-proxy-gke-duplicate-default-pool-a24e250a"}'
     values: '1'
+  - series: 'kube_job_owner{cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="kube-state-metrics", job_name="cuda-vectoradd-29120880", namespace="monitoring", owner_is_controller="true", owner_kind="CronJob", owner_name="cuda-vectoradd"}'
+    values: '1'
   promql_expr_test:
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
