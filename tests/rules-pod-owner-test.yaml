@@ -89,6 +89,8 @@ tests:
     values: '1'
   - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10012",replicaset="gke-duplicate-default-pool-10012"}'
     values: '1'
+  # - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10012",replicaset="gke-duplicate-default-pool-10012"}'
+  #   values: '1'
   promql_expr_test:
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
@@ -103,27 +105,29 @@ tests:
     values: '1'
   - series: 'kube_job_owner{cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="kube-state-metrics", job_name="cuda-vectoradd-29120880", namespace="monitoring", owner_is_controller="true", owner_kind="CronJob", owner_name="cuda-vectoradd"}'
     values: '1'
-#   - series: 'kube_pod_owner{cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="kube-state-metrics", namespace="monitoring", owner_is_controller="true", owner_kind="Job", owner_name="cuda-vectoradd-29120881", pod="cuda-vectoradd-29120881-jfl4c", uid="8e3586c6-12f7-488e-b748-3f094193802c"}'
-#     values: '1'
-#   - series: 'kube_job_owner{cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="kube-state-metrics", job_name="cuda-vectoradd-29120881", namespace="monitoring", owner_is_controller="true", owner_kind="ScaledJob", owner_name="cuda-vectoradd"}'
-#     values: '1'
+  - series: 'kube_pod_owner{cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="kube-state-metrics", namespace="monitoring", owner_is_controller="true", owner_kind="Job", owner_name="cuda-vectoradd-29120881", pod="cuda-vectoradd-29120881-dka0c", uid="8e3586c6-12f7-488e-b748-4f096192802m"}'
+    values: '1'
+  - series: 'kube_job_owner{cluster="duplicate", instance="grafana-k8s-monitoring-kube-state-metrics.monitoring.svc:8080", job="kube-state-metrics", job_name="cuda-vectoradd-29120881", namespace="monitoring", owner_is_controller="true", owner_kind="ScaledJob", owner_name="cuda-vectoradd"}'
+    values: '1'
   promql_expr_test:
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="monitoring", pod="cuda-vectoradd-29120880-jfl5c", workload="cuda-vectoradd", workload_type="CronJob"}'
-#     - value: 1
-#       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="monitoring", pod="cuda-vectoradd-29120881-jfl4c", workload="cuda-vectoradd", workload_type="ScaledJob"}'
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="monitoring", pod="cuda-vectoradd-29120881-dka0c", workload="cuda-vectoradd", workload_type="ScaledJob"}'
 
 # job
 - interval: 1m
   input_series:
   - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="kube-proxy-gke-duplicate-default-pool-e20e250a",pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v"}'
     values: '1'
+  - series: 'kube_pod_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="kube-proxy-gke-duplicate-default-pool-f72d976h",pod="kube-proxy-gke-duplicate-default-pool-f72d976h-632a"}'
+    values: '1'
   - series: 'kube_job_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",job_name="kube-proxy-gke-duplicate-default-pool-e20e250a"}'
     values: '1'
-  - series: 'kube_job_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",job_name="kube-proxy-gke-duplicate-default-pool-a24e250a"}'
+  - series: 'kube_job_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",job_name="kube-proxy-gke-duplicate-default-pool-f72d976h"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
@@ -131,6 +135,8 @@ tests:
     exp_samples:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="kube-proxy-gke-duplicate-default-pool-e20e250a", workload_type="job"}'
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-f72d976h-632a", workload="kube-proxy-gke-duplicate-default-pool-f72d976h", workload_type="job"}'
 
 # non-standard replicaset
 - interval: 1m
