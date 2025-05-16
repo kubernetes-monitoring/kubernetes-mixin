@@ -283,7 +283,7 @@
           {
             record: 'namespace_workload_pod:kube_pod_owner:relabel',
             expr: |||
-              group by(%(clusterLabel)s, namespace, workload, workload_type, pod) (
+              group by(%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   label_join(
                     group by (%(clusterLabel)s, namespace, job_name, pod, owner_name) (
@@ -353,25 +353,25 @@
                 , "workload_type", "", "owner_kind")
                 OR
                 label_replace(
+                  label_replace(
                     label_replace(
-                    kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"}
-                    , "workload", "$1", "owner_name", "(.+)"
+                      kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="ReplicaSet"}
+                      , "replicaset", "$1", "owner_name", "(.+)"
                     )
-                    * on(%(clusterLabel)s, namespace, workload) group_left(owner_kind, owner_name)
-                    label_replace(
+                    * on(%(clusterLabel)s, namespace, replicaset) group_left(owner_kind, owner_name)
                     group by (%(clusterLabel)s, namespace, replicaset, owner_kind, owner_name) (
-                        kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind!="Deployment", owner_kind!=""}
-                    )
-                    , "workload", "$1", "replicaset", "(.+)"
-                    )
-                    OR
-                    label_replace(
-                    group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
-                        kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
+                      kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind!="Deployment", owner_kind!=""}
                     )
                     , "workload", "$1", "owner_name", "(.+)"
+                  )
+                  OR
+                  label_replace(
+                    group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
+                      kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!="ReplicaSet", owner_kind!="DaemonSet", owner_kind!="StatefulSet", owner_kind!="Job", owner_kind!="Node", owner_kind!=""}
                     )
-                    , "workload_type", "$1", "owner_kind", "(.+)"
+                    , "workload", "$1", "owner_name", "(.+)"
+                  )
+                  , "workload_type", "$1", "owner_kind", "(.+)"
                 )
               )
             ||| % $._config
