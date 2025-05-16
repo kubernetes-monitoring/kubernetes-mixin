@@ -85,18 +85,20 @@ tests:
   input_series:
   - series: 'kube_pod_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="gke-duplicate-default-pool-10012",pod="gke-duplicate-default-pool-10012-kx2v"}'
     values: '1 '
-  - series: 'kube_pod_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="gke-duplicate-default-pool-10012",pod="gke-duplicate-default-pool-10012-kx2v"}'
+  - series: 'kube_pod_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="gke-duplicate-default-pool-10013",pod="gke-duplicate-default-pool-10013-na4g"}'
     values: '1'
   - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10012",replicaset="gke-duplicate-default-pool-10012"}'
     values: '1'
-  # - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10012",replicaset="gke-duplicate-default-pool-10012"}'
-  #   values: '1'
+  - series: 'kube_replicaset_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10013",replicaset="gke-duplicate-default-pool-10013"}'
+    values: '1'
   promql_expr_test:
   - eval_time: 1m
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="gke-duplicate-default-pool-10012-kx2v", workload="gke-duplicate-default-pool-10012", workload_type="replicaset"}'
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="gke-duplicate-default-pool-10013-na4g", workload="gke-duplicate-default-pool-10013", workload_type="replicaset"}'
 
 # non-standard job
 - interval: 1m
