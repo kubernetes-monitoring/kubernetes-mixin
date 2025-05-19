@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
-	github.com/cloudflare/pint v0.73.6
+	github.com/cloudflare/pint v0.73.7
 	github.com/errata-ai/vale/v3 v3.11.2
 	github.com/google/go-jsonnet v0.21.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
@@ -205,7 +205,7 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/tomwright/dasel/v2 v2.8.1 // indirect
-	github.com/urfave/cli/v3 v3.3.2 // indirect
+	github.com/urfave/cli/v3 v3.3.3 // indirect
 	github.com/vultr/govultr/v2 v2.17.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
@@ -244,7 +244,7 @@ require (
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/oauth2 v0.29.0 // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
