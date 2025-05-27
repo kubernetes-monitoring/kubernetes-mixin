@@ -271,8 +271,7 @@
               max by (%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="StatefulSet"},
-                  "workload", "$1", "owner_name", "(.*)"
-                )
+                "workload", "$1", "owner_name", "(.*)")
               )
             ||| % $._config,
             labels: {
@@ -293,7 +292,7 @@
                     )
                     * on (%(clusterLabel)s, namespace, job_name) group_left()
                     group by (%(clusterLabel)s, namespace, job_name) (
-                      kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
+                      kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind=~"Pod|"}
                     )
                   , "workload", "", "owner_name")
                 , "workload_type", "job", "", "")
@@ -310,8 +309,7 @@
               max by(%(clusterLabel)s, namespace, pod, workload) (
                 label_replace(
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="", owner_name=""},
-                  "workload", "$1", "pod", "(.+)"
-                )
+                "workload", "$1", "pod", "(.+)")
               )
             ||| % $._config,
             labels: {
@@ -325,8 +323,7 @@
               max by(%(clusterLabel)s, namespace, workload, pod) (
                 label_replace(
                   kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Node"},
-                  "workload", "$1", "owner_name", "(.+)"
-                )
+                "workload", "$1", "owner_name", "(.+)")
               )
             ||| % $._config,
             labels: {
@@ -339,19 +336,21 @@
             expr: |||
               group by(%(clusterLabel)s, namespace, workload, workload_type, pod) (
                 label_join(
-                    label_join(
-                        group by (%(clusterLabel)s, namespace, job_name, pod) (
-                            label_join(
-                                kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Job"}
-                            , "job_name", "", "owner_name")
-                        )
-                        * on (%(clusterLabel)s, namespace, job_name) group_left(owner_kind, owner_name)
-                        group by (%(clusterLabel)s, namespace, job_name, owner_kind, owner_name) (
-                            kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind!="Pod", owner_kind!=""}
-                        )
-                    , "workload", "", "owner_name")
+                  label_join(
+                    group by (%(clusterLabel)s, namespace, job_name, pod) (
+                      label_join(
+                        kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind="Job"}
+                      , "job_name", "", "owner_name")
+                    )
+                    * on (%(clusterLabel)s, namespace, job_name) group_left(owner_kind, owner_name)
+                    group by (%(clusterLabel)s, namespace, job_name, owner_kind, owner_name) (
+                      kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind!="Pod", owner_kind!=""}
+                    )
+                  , "workload", "", "owner_name")
                 , "workload_type", "", "owner_kind")
+                
                 OR
+
                 label_replace(
                   label_replace(
                     label_replace(
@@ -362,8 +361,7 @@
                     group by (%(clusterLabel)s, namespace, replicaset, owner_kind, owner_name) (
                       kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind!="Deployment", owner_kind!=""}
                     )
-                    , "workload", "$1", "owner_name", "(.+)"
-                  )
+                  , "workload", "$1", "owner_name", "(.+)")
                   OR
                   label_replace(
                     group by (%(clusterLabel)s, namespace, pod, owner_name, owner_kind) (
@@ -371,8 +369,7 @@
                     )
                     , "workload", "$1", "owner_name", "(.+)"
                   )
-                  , "workload_type", "$1", "owner_kind", "(.+)"
-                )
+                , "workload_type", "$1", "owner_kind", "(.+)")
               )
             ||| % $._config
           }
