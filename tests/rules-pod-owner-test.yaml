@@ -11,9 +11,9 @@ tests:
     values: '1 1'
   - series: 'kube_pod_owner{instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="ds-7cc77d965f-cgsdv",service="ksm"}'
     values: '1'
-  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Deployment",owner_name="ds",pod="ds-777f6bf798-kq7tj",replicaset="ds-7cc77d965f",service="ksm"}'
+  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="Deployment",owner_name="ds",replicaset="ds-7cc77d965f",service="ksm"}'
     values: '1 1'
-  - series: 'kube_replicaset_owner{instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="true",owner_kind="Deployment",owner_name="ds",pod="ds-777f6bf798-kq7tj",replicaset="ds-7cc77d965f",service="ksm"}'
+  - series: 'kube_replicaset_owner{instance="instance2",job="kube-state-metrics",cluster="kubernetes",namespace="ns2",owner_is_controller="true",owner_kind="Deployment",owner_name="ds",replicaset="ds-7cc77d965f",service="ksm"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
@@ -87,9 +87,9 @@ tests:
     values: '1 '
   - series: 'kube_pod_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="gke-duplicate-default-pool-10013",pod="gke-duplicate-default-pool-10013-na4g"}'
     values: '1'
-  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10012",replicaset="gke-duplicate-default-pool-10012"}'
+  - series: 'kube_replicaset_owner{instance="instance1",job="kube-state-metrics",cluster="duplicate",namespace="default",replicaset="gke-duplicate-default-pool-10012"}'
     values: '1'
-  - series: 'kube_replicaset_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",owner_is_controller="true",owner_kind="",owner_name="gke-duplicate-default-pool-10013",replicaset="gke-duplicate-default-pool-10013"}'
+  - series: 'kube_replicaset_owner{instance="instance2",job="kube-state-metrics",cluster="duplicate",namespace="default",replicaset="gke-duplicate-default-pool-10013"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
@@ -156,8 +156,6 @@ tests:
   - series: 'kube_pod_owner{cluster="k8sdev/aws/helm", instance="grafana-k8s-monitoring-kube-state-metrics.default.svc:8080", job="kube-state-metrics", namespace="default", owner_is_controller="true", owner_kind="ReplicaSet", owner_name="configmap-demo-687d76d795", pod="configmap-demo-687d76d795-5mlvh", uid="491a64cd-6a5f-4c64-b4b8-f95ee6a6b9c0"}'
     values: '1'
   - series: 'kube_replicaset_owner{cluster="k8sdev/aws/helm", instance="grafana-k8s-monitoring-kube-state-metrics.default.svc:8080", job="kube-state-metrics", namespace="default", owner_is_controller="true", owner_kind="ConfigMap", owner_name="configmap-demo", replicaset="configmap-demo-687d76d795"}'
-    values: '1'
-  - series: 'kube_pod_owner{asserts_env="prod-us-east-0",cluster="k8sdev/aws/helm",instance="kube-state-metrics-3:kube-state-metrics:ksm",job="kube-state-metrics",namespace="default",owner_is_controller="true",owner_kind="Job",owner_name="scripts-to-archive-job-4692020",pod="scripts-to-archive-job-4692020-rlfft",uid="8298b6f3-c7c0-496c-bff3-1f1092d0683f"}'
     values: '1'
   promql_expr_test:
   - eval_time: 1m
