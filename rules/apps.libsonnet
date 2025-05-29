@@ -369,8 +369,8 @@
                   )
                 , "workload_type", "$1", "owner_kind", "(.+)")
               )
-            ||| % $._config
-          }
+            ||| % $._config,
+          },
         ],
       },
     ],
