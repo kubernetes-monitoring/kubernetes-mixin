@@ -52,6 +52,18 @@ tests:
     - value: 1
       labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a", workload_type="staticpod"}'
 
+# non-standard pod
+- interval: 1m
+  input_series:
+  - series: 'kube_pod_owner{cluster="k8sdev/aws/helm",instance="grafana-k8s-monitoring-kube-state-metrics.default.svc:8080",job="kube-state-metrics",namespace="kafka",owner_is_controller="true",owner_kind="StrimziPodSet",owner_name="my-cluster-dual-role",pod="my-cluster-dual-role-0",uid="ebe1ec7b-febd-479d-b55f-bf55138871b8"}'
+    values: '1'
+  promql_expr_test:
+  - eval_time: 1m
+    expr: namespace_workload_pod:kube_pod_owner:relabel
+    exp_samples:
+    - value: 1
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="k8sdev/aws/helm", namespace="kafka", pod="my-cluster-dual-role-0", workload="my-cluster-dual-role", workload_type="StrimziPodSet"}'
+
 # statefulset
 - interval: 1m
   input_series:
