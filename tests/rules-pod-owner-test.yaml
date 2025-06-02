@@ -50,7 +50,7 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a", workload_type="staticpod"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="staticpod"}'
 
 # non-standard pod
 - interval: 1m
