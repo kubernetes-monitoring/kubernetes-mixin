@@ -167,13 +167,13 @@ local utils = import '../lib/utils.libsonnet';
                     unless
                   kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 )
-                  *
+                  * on(namespace, statefulset, job, %(clusterLabel)s)
                 (
                   kube_statefulset_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                     !=
                   kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 )
-              )  and (
+              )  and on(namespace, statefulset, job, %(clusterLabel)s) (
                 changes(kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
                   ==
                 0
