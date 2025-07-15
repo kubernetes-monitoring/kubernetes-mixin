@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
-	github.com/cloudflare/pint v0.74.3
+	github.com/cloudflare/pint v0.74.4
 	github.com/errata-ai/vale/v3 v3.12.0
 	github.com/google/go-jsonnet v0.21.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
@@ -101,7 +101,7 @@ require (
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/go-github/v72 v72.0.0 // indirect
+	github.com/google/go-github/v73 v73.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad // indirect
@@ -120,7 +120,7 @@ require (
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/golang-lru v0.6.0 // indirect
@@ -220,7 +220,7 @@ require (
 	github.com/yuin/goldmark v1.7.8 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	github.com/zeitlinger/conflate v0.0.0-20230622100834-279724abda8c // indirect
-	gitlab.com/gitlab-org/api/client-go v0.130.1 // indirect
+	gitlab.com/gitlab-org/api/client-go v0.133.0 // indirect
 	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
@@ -258,7 +258,7 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
-	golang.org/x/time v0.11.0 // indirect
+	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/api v0.230.0 // indirect
 	google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1 // indirect
