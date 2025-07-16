@@ -20,9 +20,9 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes",namespace="ns1", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="Deployment"}'
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes", namespace="ns2", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="deployment"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="kubernetes", namespace="ns2", pod="ds-7cc77d965f-cgsdv", workload="ds", workload_type="Deployment"}'
 
 # bare pod
 - interval: 1m
@@ -36,7 +36,7 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="openshift", namespace="default", pod="nginx", workload="nginx", workload_type="barepod"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="openshift", namespace="default", pod="nginx", workload="nginx", workload_type="BarePod"}'
 
 # static pod
 - interval: 1m
@@ -50,7 +50,7 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="staticpod"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a-kx2v", workload_type="StaticPod"}'
 
 # non-standard pod
 - interval: 1m
@@ -76,7 +76,7 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a", workload_type="statefulset"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a", workload_type="StatefulSet"}'
 
 # daemonset
 - interval: 1m
@@ -90,7 +90,7 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a", workload_type="daemonset"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate", namespace="kube-system", pod="gke-duplicate-default-pool-e20e250a-kx2v", workload="gke-duplicate-default-pool-e20e250a", workload_type="DaemonSet"}'
 
 # replicaset
 - interval: 1m
@@ -108,9 +108,9 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="gke-duplicate-default-pool-10012-kx2v", workload="gke-duplicate-default-pool-10012", workload_type="replicaset"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="gke-duplicate-default-pool-10012-kx2v", workload="gke-duplicate-default-pool-10012", workload_type="ReplicaSet"}'
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="gke-duplicate-default-pool-10013-na4g", workload="gke-duplicate-default-pool-10013", workload_type="replicaset"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="gke-duplicate-default-pool-10013-na4g", workload="gke-duplicate-default-pool-10013", workload_type="ReplicaSet"}'
 
 # non-standard job
 - interval: 1m
@@ -152,11 +152,11 @@ tests:
     expr: namespace_workload_pod:kube_pod_owner:relabel
     exp_samples:
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="kube-proxy-gke-duplicate-default-pool-e20e250a", workload_type="job"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-e20e250a-kx2v", workload="kube-proxy-gke-duplicate-default-pool-e20e250a", workload_type="Job"}'
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-f72d976h-632a", workload="kube-proxy-gke-duplicate-default-pool-f72d976h", workload_type="job"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="duplicate",namespace="default", pod="kube-proxy-gke-duplicate-default-pool-f72d976h-632a", workload="kube-proxy-gke-duplicate-default-pool-f72d976h", workload_type="Job"}'
     - value: 1
-      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="prod-us-east-0", namespace="k6-cloud", pod="scripts-to-archive-job-4692155-24m4k", workload="scripts-to-archive-job-4692155", workload_type="job"}'
+      labels: 'namespace_workload_pod:kube_pod_owner:relabel{cluster="prod-us-east-0", namespace="k6-cloud", pod="scripts-to-archive-job-4692155-24m4k", workload="scripts-to-archive-job-4692155", workload_type="Job"}'
 
 # non-standard replicaset
 - interval: 1m
