@@ -224,7 +224,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'replicaset',
+              workload_type: 'ReplicaSet',
             },
           },
           // workload aggregation for deployments
@@ -246,7 +246,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'deployment',
+              workload_type: 'Deployment',
             },
           },
           // workload aggregation for daemonsets
@@ -261,7 +261,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'daemonset',
+              workload_type: 'DaemonSet',
             },
           },
           // workload aggregation for statefulsets
@@ -275,7 +275,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'statefulset',
+              workload_type: 'StatefulSet',
             },
           },
           // backwards compatibility for jobs
@@ -297,7 +297,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'job',
+              workload_type: 'Job',
             },
           },
           // workload aggregation for barepods
@@ -311,7 +311,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'barepod',
+              workload_type: 'BarePod',
             },
           },
           // workload aggregation for staticpods
@@ -325,7 +325,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'staticpod',
+              workload_type: 'StaticPod',
             },
           },
           // workload aggregation for non-standard types (jobs, replicasets)
@@ -346,7 +346,7 @@
                     )
                   , "workload", "", "owner_name")
                 , "workload_type", "", "owner_kind")
-                
+
                 OR
 
                 label_replace(
