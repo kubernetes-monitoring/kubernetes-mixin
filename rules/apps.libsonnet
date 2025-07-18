@@ -2,6 +2,8 @@
   _config+:: {
     cadvisorSelector: 'job="cadvisor"',
     kubeStateMetricsSelector: 'job="kube-state-metrics"',
+    // Controls workload_type label value format: false = lowercase, true = PascalCase
+    usePascalCaseForWorkloadTypeLabelValues: false,
   },
 
   prometheusRules+:: {
@@ -224,7 +226,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'replicaset',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'ReplicaSet' else 'replicaset',
             },
           },
           // workload aggregation for deployments
@@ -246,7 +248,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'deployment',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'Deployment' else 'deployment',
             },
           },
           // workload aggregation for daemonsets
@@ -261,7 +263,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'daemonset',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'DaemonSet' else 'daemonset',
             },
           },
           // workload aggregation for statefulsets
@@ -275,7 +277,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'statefulset',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'StatefulSet' else 'statefulset',
             },
           },
           // backwards compatibility for jobs
@@ -297,7 +299,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'job',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'Job' else 'job',
             },
           },
           // workload aggregation for barepods
@@ -311,7 +313,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'barepod',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'BarePod' else 'barepod',
             },
           },
           // workload aggregation for staticpods
@@ -325,7 +327,7 @@
               )
             ||| % $._config,
             labels: {
-              workload_type: 'staticpod',
+              workload_type: if $._config.usePascalCaseForWorkloadTypeLabelValues then 'StaticPod' else 'staticpod',
             },
           },
           // workload aggregation for non-standard types (jobs, replicasets)
@@ -346,7 +348,7 @@
                     )
                   , "workload", "", "owner_name")
                 , "workload_type", "", "owner_kind")
-                
+
                 OR
 
                 label_replace(
