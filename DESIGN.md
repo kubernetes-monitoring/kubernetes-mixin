@@ -39,36 +39,36 @@ Mixins should not however be opinionated about how this configuration should be 
 Jsonnet offers the ability to parameterise configuration, allowing for basic customisation. Furthermore, in Jsonnet one can reference another part of the data structure, reducing repetition. For example, with jsonnet one can specify a default job name, and then have all the alerts use that:
 
 ```
-{ 
-  _config+:: { 
-    kubeStateMetricsSelector: ‘job=”default/kube-state-metrics"', 
- 
-    allowedNotReadyPods: 0, 
-  }, 
- 
-  groups+: [ 
-    { 
-      name: "kubernetes", 
-      rules: [ 
-        { 
-          alert: "KubePodNotReady", 
-          expr: ||| 
-            sum by (namespace, pod) ( 
-              kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase!~"Running|Succeeded"} 
-            ) > $(allowedNotReadyPods)s 
-          ||| % $._config, 
-          "for": "1h", 
-          labels: { 
-            severity: "critical", 
-          }, 
-          annotations: { 
-            message: "{{ $labels.namespace }}/{{ $labels.pod }} is not ready.", 
-          }, 
-        }, 
-      ], 
-    }, 
-  ], 
-} 
+{
+  _config+:: {
+    kubeStateMetricsSelector: ‘job=”default/kube-state-metrics"',
+
+    allowedNotReadyPods: 0,
+  },
+
+  groups+: [
+    {
+      name: "kubernetes",
+      rules: [
+        {
+          alert: "KubePodNotReady",
+          expr: |||
+            sum by (namespace, pod) (
+              kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase!~"Running|Succeeded"}
+            ) > $(allowedNotReadyPods)s
+          ||| % $._config,
+          "for": "1h",
+          labels: {
+            severity: "critical",
+          },
+          annotations: {
+            message: "{{ $labels.namespace }}/{{ $labels.pod }} is not ready.",
+          },
+        },
+      ],
+    },
+  ],
+}
 ```
 
 **Configuration.* We'd like to suggest some standardisation of how configuration is supplied to mixins. A top level `_config` dictionary should be provided, containing various parameters for substitution into alerts and dashboards. In the above example, this is used to specify the selector for the kube-state-metrics pod, and the threshold for the alert.
@@ -76,38 +76,38 @@ Jsonnet offers the ability to parameterise configuration, allowing for basic cus
 **Extension.** One of jsonnet's basic operations is to "merge” data structures - this also allows you to extend existing configurations. For example, given an existing dashboard:
 
 ```
-local g = import "klumps/lib/grafana.libsonnet"; 
- 
-{ 
-  dashboards+:: { 
-    "foo.json": g.dashboard("Foo") 
-      .addRow( 
-        g.row("Foo") 
-        .addPanel( 
-          g.panel("Bar") + 
-          g.queryPanel('irate(foor_bar_total[1m])', 'Foo Bar') 
-        ) 
-      ) 
-  }, 
-} 
+local g = import "klumps/lib/grafana.libsonnet";
+
+{
+  dashboards+:: {
+    "foo.json": g.dashboard("Foo")
+      .addRow(
+        g.row("Foo")
+        .addPanel(
+          g.panel("Bar") +
+          g.queryPanel('irate(foor_bar_total[1m])', 'Foo Bar')
+        )
+      )
+  },
+}
 ```
 
 It is relatively easy to import it and add extra rows:
 
 ```
-local g = import "foo.libsonnet"; 
- 
-{ 
-  dashboards+:: { 
-    "foo.json"+: 
-      super.addRow( 
-        g.row("A new row") 
-        .addPanel( 
-          g.panel("A new panel") + 
-          g.queryPanel('irate(new_total[1m])', 'New') 
-        ) 
-      ) 
-  }, 
+local g = import "foo.libsonnet";
+
+{
+  dashboards+:: {
+    "foo.json"+:
+      super.addRow(
+        g.row("A new row")
+        .addPanel(
+          g.panel("A new panel") +
+          g.queryPanel('irate(new_total[1m])', 'New')
+        )
+      )
+  },
 }
 ```
 
@@ -116,37 +116,37 @@ These abilities offered by jsonnet are key to being able to separate out "upstre
 **Higher Order Abstractions.** jsonnet is a functional programming language, and as such allows you to build higher order abstractions over your configuration. For example, you can build functions to generate recording rules for a set of percentiles and labels aggregations, given a histogram:
 
 ```
-local histogramRules(metric, labels) = 
-  local vars = { 
-    metric: metric, 
-    labels_underscore: std.join("_", labels), 
-    labels_comma: std.join(", ", labels), 
-  }; 
-  [ 
-    { 
-      record: "%(labels_underscore)s:%(metric)s:99quantile" % vars, 
-      expr: "histogram_quantile(0.99, sum(rate(%(metric)s_bucket[5m])) by (le, 
-%(labels_comma)s))" % vars, 
-    }, 
-    { 
-      record: "%(labels_underscore)s:%(metric)s:50quantile" % vars, 
-      expr: "histogram_quantile(0.50, sum(rate(%(metric)s_bucket[5m])) by (le, 
-%(labels_comma)s))" % vars, 
-    }, 
-    { 
-      record: "%(labels_underscore)s:%(metric)s:avg" % vars, 
-      expr: "sum(rate(%(metric)s_sum[5m])) by (%(labels_comma)s) / 
-sum(rate(%(metric)s_count[5m])) by (%(labels_comma)s)" % vars, 
-    }, 
-  ]; 
- 
-{ 
-    groups+: [{ 
-      name: "frontend_rules", 
-      rules: 
-        histogramRules("frontend_request_duration_seconds", ["job"]) + 
-        histogramRules("frontend_request_duration_seconds", ["job", "route"]), 
-    }], 
+local histogramRules(metric, labels) =
+  local vars = {
+    metric: metric,
+    labels_underscore: std.join("_", labels),
+    labels_comma: std.join(", ", labels),
+  };
+  [
+    {
+      record: "%(labels_underscore)s:%(metric)s:99quantile" % vars,
+      expr: "histogram_quantile(0.99, sum(rate(%(metric)s_bucket[5m])) by (le,
+%(labels_comma)s))" % vars,
+    },
+    {
+      record: "%(labels_underscore)s:%(metric)s:50quantile" % vars,
+      expr: "histogram_quantile(0.50, sum(rate(%(metric)s_bucket[5m])) by (le,
+%(labels_comma)s))" % vars,
+    },
+    {
+      record: "%(labels_underscore)s:%(metric)s:avg" % vars,
+      expr: "sum(rate(%(metric)s_sum[5m])) by (%(labels_comma)s) /
+sum(rate(%(metric)s_count[5m])) by (%(labels_comma)s)" % vars,
+    },
+  ];
+
+{
+    groups+: [{
+      name: "frontend_rules",
+      rules:
+        histogramRules("frontend_request_duration_seconds", ["job"]) +
+        histogramRules("frontend_request_duration_seconds", ["job", "route"]),
+    }],
 }
 ```
 
@@ -157,19 +157,19 @@ Other potential examples include functions to generate alerts at different thres
 **Package Management.** The current proof of concepts for mixins (see below) use the new package manager [jsonnet-bundler](#Notes) enabling the following workflow:
 
 ```
-$ jb install kausal github.com/kausalco/public/consul-mixin 
+$ jb install kausal github.com/kausalco/public/consul-mixin
 ```
 
 This downloads a copy of the mixin into `vendor/consul-mixin` and allows users to include the mixin in their ksonnet config like so:
 
 ```
-local prometheus = import "prometheus-ksonnet/prometheus-ksonnet.libsonnet"; 
-local consul_mixin = import "consul-mixin/mixin.libsonnet"; 
- 
-prometheus + consul_mixin { 
-  _config+:: { 
-    namespace: "default", 
-  }, 
+local prometheus = import "prometheus-ksonnet/prometheus-ksonnet.libsonnet";
+local consul_mixin = import "consul-mixin/mixin.libsonnet";
+
+prometheus + consul_mixin {
+  _config+:: {
+    namespace: "default",
+  },
 }
 ```
 
@@ -186,13 +186,13 @@ However, we think this is a wider problem than just monitoring mixins, and are e
 Each of these values will be expressed as jsonnet objects - not strings. It is the responsibility of the tool consuming the mixin to render these out as JSON or YAML. Jsonnet scripts to do this for you will be provided.
 
 ```
-{ 
-  grafanaDashboards+:: { 
-    "dashboard-name.json”: {...}, 
-  }, 
-  prometheusAlerts+:: [...], 
-  prometheusRules+:: [...], 
-} 
+{
+  grafanaDashboards+:: {
+    "dashboard-name.json”: {...},
+  },
+  prometheusAlerts+:: [...],
+  prometheusRules+:: [...],
+}
 ```
 
 **Consuming a mixin.**
