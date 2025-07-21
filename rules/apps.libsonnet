@@ -2,8 +2,6 @@
   _config+:: {
     cadvisorSelector: 'job="cadvisor"',
     kubeStateMetricsSelector: 'job="kube-state-metrics"',
-    // Controls workload_type label value format: false = lowercase, true = PascalCase
-    usePascalCaseForWorkloadTypeLabelValues: false,
   },
 
   prometheusRules+:: {
