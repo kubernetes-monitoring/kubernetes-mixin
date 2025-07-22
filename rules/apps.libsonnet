@@ -182,8 +182,8 @@
             expr: |||
               kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
               group_left() max by (namespace, pod, %(clusterLabel)s) (
-               (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
-               )
+                (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
+              )
             ||| % $._config,
           },
           {
@@ -346,7 +346,7 @@
                     )
                   , "workload", "", "owner_name")
                 , "workload_type", "", "owner_kind")
-                
+
                 OR
 
                 label_replace(
