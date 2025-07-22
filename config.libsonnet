@@ -119,5 +119,8 @@
 
     // Default timeout value for k8s Jobs. The jobs which are active beyond this duration would trigger KubeJobNotCompleted alert.
     kubeJobTimeoutDuration: 12 * 60 * 60,
+
+    // Controls workload_type label value format: false = lowercase, true = PascalCase
+    usePascalCaseForWorkloadTypeLabelValues: false,
   },
 }
