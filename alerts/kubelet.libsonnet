@@ -164,7 +164,18 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeletPodStartUpLatencyHigh',
             expr: |||
-              histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])) by (%(clusterLabel)s, instance, le)) * on(%(clusterLabel)s, instance) group_left(node) kubelet_node_name{%(kubeletSelector)s} > 60
+              histogram_quantile(0.99,
+                sum by (%(clusterLabel)s, instance, le) (
+                  topk by (%(clusterLabel)s, instance, le, operation_type) (1,
+                    rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])
+                  )
+                )
+              )
+              * on(%(clusterLabel)s, instance) group_left(node)
+              topk by (%(clusterLabel)s, instance, node) (1,
+                kubelet_node_name{%(kubeletSelector)s}
+              )
+              > 60
             ||| % $._config,
             'for': '15m',
             labels: {

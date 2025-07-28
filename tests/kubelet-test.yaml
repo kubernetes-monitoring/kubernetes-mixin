@@ -28,16 +28,24 @@ tests:
     - value: 0.99
       labels: 'node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{cluster="cluster",instance="ip-172-0-0-1", node="ip-172-0-0-1", quantile="0.99"}'
 
-- name: KubeletPodStartUpLatencyHigh
+- name: "KubeletPodStartUpLatencyHigh alert test, including duplicate series check"
   interval: 1m
   input_series:
   - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="+Inf"}'
     values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="+Inf",dupe="dupe"}'
+    values: '0+1x16'
   - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="99"}'
+    values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="99",dupe="dupe"}'
     values: '0+1x16'
   - series: 'kubelet_pod_worker_duration_seconds_count{cluster="cluster",instance="ip-172-0-0-1",job="kubelet"}'
     values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_count{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",dupe="dupe"}'
+    values: '0+1x16'
   - series: 'kubelet_node_name{cluster="cluster",node="ip-172-0-0-1",instance="ip-172-0-0-1",job="kubelet"}'
+    values: '1x16'
+  - series: 'kubelet_node_name{cluster="cluster",node="ip-172-0-0-1",instance="ip-172-0-0-1",job="kubelet",dupe="dupe"}'
     values: '1x16'
   alert_rule_test:
   - eval_time: 15m
