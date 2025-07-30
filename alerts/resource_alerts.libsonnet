@@ -3,7 +3,7 @@ local utils = import '../lib/utils.libsonnet';
 {
   local kubeOvercommitExpression(resource) = if $._config.showMultiCluster then
     |||
-      # Non-HA clusters
+      # Non-HA clusters.
       (
         (
           sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
@@ -14,26 +14,23 @@ local utils = import '../lib/utils.libsonnet';
         count by (%(clusterLabel)s) (max by (%(clusterLabel)s, node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3
       )
       or
-      # HA clusters
+      # HA clusters.
       (
         sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
         -
         (
-          sum by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
-          -
-          max by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
-        ) > 0
-        and
-        (
-          sum by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
-          -
-          max by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
+          # Skip clusters with only one allocatable node.
+          (
+            sum by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
+            -
+            max by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
+          ) > 0
         ) > 0
       )
     ||| % $._config { resource: resource }
   else
     |||
-      # Non-HA clusters
+      # Non-HA clusters.
       (
         (
           sum(namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
@@ -44,20 +41,17 @@ local utils = import '../lib/utils.libsonnet';
         count(max by (node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3
       )
       or
-      # HA clusters
+      # HA clusters.
       (
         sum(namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
         -
         (
-          sum(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
-          -
-          max(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
-        ) > 0
-        and
-        (
-          sum(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
-          -
-          max(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
+          # Skip clusters with only one allocatable node.
+          (
+            sum(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
+            -
+            max(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
+          ) > 0
         ) > 0
       )
     ||| % $._config { resource: resource },
