@@ -1444,7 +1444,7 @@ tests:
     - exp_labels:
         severity: warning
       exp_annotations:
-        description: Cluster has overcommitted CPU resource requests for Pods by 0.10000000000000009 CPU shares and cannot tolerate node failure.
+        description: Cluster has overcommitted CPU resource requests for Pods by 0.10 CPU shares and cannot tolerate node failure.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecpuovercommit
         summary: Cluster has overcommitted CPU resource requests.
 
@@ -1472,7 +1472,7 @@ tests:
     - exp_labels:
         severity: warning
       exp_annotations:
-        description: Cluster has overcommitted CPU resource requests for Pods by 0.20000000000000018 CPU shares and cannot tolerate node failure.
+        description: Cluster has overcommitted CPU resource requests for Pods by 0.20 CPU shares and cannot tolerate node failure.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecpuovercommit
         summary: Cluster has overcommitted CPU resource requests.
 
@@ -1504,7 +1504,7 @@ tests:
         - exp_labels:
             severity: warning
           exp_annotations:
-            description: Cluster has overcommitted CPU resource requests for Pods by 0.20000000000000062 CPU shares and cannot tolerate node failure.
+            description: Cluster has overcommitted CPU resource requests for Pods by 0.20 CPU shares and cannot tolerate node failure.
             runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecpuovercommit
             summary: Cluster has overcommitted CPU resource requests.
 

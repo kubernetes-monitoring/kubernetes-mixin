@@ -86,10 +86,9 @@ local utils = import '../lib/utils.libsonnet';
             },
             annotations: {
               summary: 'Cluster has overcommitted CPU resource requests.',
-              description: if $._config.showMultiCluster then
-                'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted CPU resource requests for Pods by {{ printf "%%.2f" $value }} CPU shares and cannot tolerate node failure.' % $._config
-              else
-                'Cluster has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.',
+              description: 'Cluster%s has overcommitted CPU resource requests for Pods by {{ printf "%%.2f" $value }} CPU shares and cannot tolerate node failure.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
             'for': '10m',
             expr: kubeOvercommitExpression('cpu'),
@@ -101,10 +100,9 @@ local utils = import '../lib/utils.libsonnet';
             },
             annotations: {
               summary: 'Cluster has overcommitted memory resource requests.',
-              description: if $._config.showMultiCluster then
-                'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % $._config
-              else
-                'Cluster has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.',
+              description: 'Cluster%s has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
             'for': '10m',
             expr: kubeOvercommitExpression('memory'),
