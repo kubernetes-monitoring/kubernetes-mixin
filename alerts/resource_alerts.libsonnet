@@ -56,6 +56,27 @@ local utils = import '../lib/utils.libsonnet';
       )
     ||| % $._config { resource: resource },
 
+  local kubeQuotaOvercommitExpression(resource) = if $._config.showMultiCluster then
+    |||
+      sum by(%(clusterLabel)s) (
+        min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(%(resource)s|requests.%(resource)s)"})
+      )
+      /
+      sum by(%(clusterLabel)s) (
+        kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s}
+      ) > %(namespaceOvercommitFactor)s
+    ||| % $._config { resource: resource }
+  else
+    |||
+      sum (
+        min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(%(resource)s|requests.%(resource)s)"})
+      )
+      /
+      sum (
+        kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s}
+      ) > %(namespaceOvercommitFactor)s
+    ||| % $._config { resource: resource },
+
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     nodeExporterSelector: error 'must provide selector for node-exporter',
@@ -114,31 +135,13 @@ local utils = import '../lib/utils.libsonnet';
             },
             annotations: {
               summary: 'Cluster has overcommitted CPU resource requests.',
+              description: 'Cluster%s has overcommitted CPU resource requests for Namespaces.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
+            expr: kubeQuotaOvercommitExpression('cpu'),
             'for': '5m',
-          } +
-          if $._config.showMultiCluster then {
-            expr: |||
-              sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(cpu|requests.cpu)"})) by (%(clusterLabel)s)
-                /
-              sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)
-                > %(namespaceOvercommitFactor)s
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted CPU resource requests for Namespaces.' % $._config,
-            },
-          } else
-            {
-              expr: |||
-                sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(cpu|requests.cpu)"}))
-                  /
-                sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})
-                  > %(namespaceOvercommitFactor)s
-              ||| % $._config,
-              annotations+: {
-                description: 'Cluster has overcommitted CPU resource requests for Namespaces.',
-              },
-            },
+          },
           {
             alert: 'KubeMemoryQuotaOvercommit',
             labels: {
@@ -146,31 +149,13 @@ local utils = import '../lib/utils.libsonnet';
             },
             annotations: {
               summary: 'Cluster has overcommitted memory resource requests.',
+              description: 'Cluster%s has overcommitted memory resource requests for Namespaces.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
+            expr: kubeQuotaOvercommitExpression('memory'),
             'for': '5m',
-          } +
-          if $._config.showMultiCluster then {
-            expr: |||
-              sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(memory|requests.memory)"})) by (%(clusterLabel)s)
-                /
-              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)
-                > %(namespaceOvercommitFactor)s
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted memory resource requests for Namespaces.' % $._config,
-            },
-          } else
-            {
-              expr: |||
-                sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(memory|requests.memory)"}))
-                  /
-                sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})
-                  > %(namespaceOvercommitFactor)s
-              ||| % $._config,
-              annotations+: {
-                description: 'Cluster has overcommitted memory resource requests for Namespaces.',
-              },
-            },
+          },
           {
             alert: 'KubeQuotaAlmostFull',
             expr: |||
