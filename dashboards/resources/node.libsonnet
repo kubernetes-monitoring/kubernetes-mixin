@@ -108,16 +108,16 @@ local var = g.dashboard.variable;
           prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_cpu:active:kube_pod_resource_request_or_kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod) / sum(cluster:namespace:pod_cpu:active:kube_pod_resource_request_or_kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_cpu:active:kube_pod_resource_limit_or_kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod) / sum(cluster:namespace:pod_cpu:active:kube_pod_resource_limit_or_kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
         ])
@@ -235,16 +235,16 @@ local var = g.dashboard.variable;
           prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_memory:active:kube_pod_resource_request_or_kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_resource_request_or_kube_pod_container_resource_requests{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(cluster:namespace:pod_memory:active:kube_pod_resource_limit_or_kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
-          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
+          prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod) / sum(cluster:namespace:pod_memory:active:kube_pod_resource_limit_or_kube_pod_container_resource_limits{%(clusterLabel)s="$cluster", node=~"$node"}) by (pod)' % $._config)
           + prometheus.withInstant(true)
           + prometheus.withFormat('table'),
           prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_memory_rss{%(clusterLabel)s="$cluster", node=~"$node",container!=""}) by (pod)' % $._config)
