@@ -130,6 +130,31 @@
               summary: 'PersistentVolume is having issues with provisioning.',
             },
           },
+          {
+            alert: 'KubernetesStorageUsage85Percent',
+            expr: |||
+              (
+                kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+                  /
+                kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
+              ) * 100 > 85
+              and
+              kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
+              kube_persistentvolumeclaim_access_mode{%(prefixedNamespaceSelector)s access_mode="ReadOnlyMany"} == 1
+              unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
+              kube_persistentvolumeclaim_labels{%(prefixedNamespaceSelector)s%(pvExcludedSelector)s} == 1
+            ||| % $._config,
+            'for': '5m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'Storage usage of PVC {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} {{ with $labels.%(clusterLabel)s -}} on Cluster {{ . }} {{- end }} has exceeded 85%% for the last 5 minutes. Currently {{ $value | humanizePercentage }} is used.' % $._config,
+              summary: 'High storage usage detected (PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }}).',
+              runbook_url: 'https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemspacefillingup/',
+            },
+          },
         ],
       },
     ],
