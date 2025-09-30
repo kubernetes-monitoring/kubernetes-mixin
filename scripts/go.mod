@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
-	github.com/cloudflare/pint v0.74.8
+	github.com/cloudflare/pint v0.75.0
 	github.com/errata-ai/vale/v3 v3.12.0
 	github.com/google/go-jsonnet v0.21.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
@@ -185,9 +185,9 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/alertmanager v0.28.1 // indirect
-	github.com/prometheus/client_golang v1.23.0 // indirect
+	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.65.0 // indirect
+	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/exporter-toolkit v0.14.0 // indirect
 	github.com/prometheus/otlptranslator v0.0.0-20250320144820-d800c8b0eb07 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
@@ -218,9 +218,9 @@ require (
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yuin/goldmark v1.7.8 // indirect
-	github.com/zclconf/go-cty v1.16.4 // indirect
+	github.com/zclconf/go-cty v1.17.0 // indirect
 	github.com/zeitlinger/conflate v0.0.0-20230622100834-279724abda8c // indirect
-	gitlab.com/gitlab-org/api/client-go v0.142.5 // indirect
+	gitlab.com/gitlab-org/api/client-go v0.148.0 // indirect
 	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
@@ -249,23 +249,25 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.39.0 // indirect
+	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
-	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/net v0.41.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
+	golang.org/x/mod v0.26.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/oauth2 v0.31.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/term v0.32.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/term v0.34.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	golang.org/x/tools v0.34.0 // indirect
+	golang.org/x/tools v0.35.0 // indirect
 	google.golang.org/api v0.230.0 // indirect
 	google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250414145226-207652e42e2e // indirect
 	google.golang.org/grpc v1.72.0 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
