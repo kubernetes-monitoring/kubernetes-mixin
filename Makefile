@@ -19,6 +19,44 @@ OUT_DIR ?=dashboards_out
 .PHONY: all
 all: fmt generate lint test
 
+.PHONY: dev
+dev: generate
+	@cd scripts && ./lgtm.sh && \
+	echo '' && \
+	echo '╔═══════════════════════════════════════════════════════════════╗' && \
+	echo '║             🚀 Development Environment Ready! 🚀              ║' && \
+	echo '║                                                               ║' && \
+	echo '║   Run `make dev-port-forward`                                 ║' && \
+	echo '║   Grafana will be available at http://localhost:3000          ║' && \
+	echo '║                                                               ║' && \
+	echo '║   Data will be available in a few minutes.                    ║' && \
+	echo '║                                                               ║' && \
+	echo '║   Dashboards will refresh every 10s, run `make generate`      ║' && \
+	echo '║   and refresh your browser to see the changes.                ║' && \
+	echo '║                                                               ║' && \
+	echo '║   Alert and recording rules require `make dev-reload`.        ║' && \
+	echo '║                                                               ║' && \
+	echo '╚═══════════════════════════════════════════════════════════════╝'
+
+.PHONY: dev-port-forward
+dev-port-forward:
+	kubectl --context k3d-kubernetes-mixin port-forward service/lgtm 3000:3000 4317:4317 4318:4318 9090:9090
+
+dev-reload: generate
+	@cp -v prometheus_alerts.yaml scripts/provisioning/prometheus/ && \
+	cp -v prometheus_rules.yaml scripts/provisioning/prometheus/ && \
+	kubectl --context k3d-kubernetes-mixin rollout restart deployment/lgtm && \
+	echo '╔═══════════════════════════════════════════════════════════════╗' && \
+	echo '║                                                               ║' && \
+	echo '║           🔄 Reloading Alert and Recording Rules...           ║' && \
+	echo '║                                                               ║' && \
+	echo '╚═══════════════════════════════════════════════════════════════╝' && \
+	kubectl --context k3d-kubernetes-mixin rollout status deployment/lgtm
+
+.PHONY: dev-down
+dev-down:
+	k3d cluster delete kubernetes-mixin
+
 .PHONY: generate
 generate: prometheus_alerts.yaml prometheus_rules.yaml $(OUT_DIR)
 
