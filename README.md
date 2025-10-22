@@ -42,7 +42,7 @@ make dev-down
 > Note: Releases up until `release-0.12` are changes in their own branches. Changelogs are included in releases starting from [version-0.13.0](https://github.com/kubernetes-monitoring/kubernetes-mixin/releases/tag/version-0.13.0).
 
 | Release branch | Kubernetes Compatibility | Prometheus Compatibility | Kube-state-metrics Compatibility |
-| -------------- | ------------------------ | ------------------------ | -------------------------------- |
+|----------------|--------------------------|--------------------------|----------------------------------|
 | release-0.1    | v1.13 and before         |                          |                                  |
 | release-0.2    | v1.14.1 and before       | v2.11.0+                 |                                  |
 | release-0.3    | v1.17 and before         | v2.11.0+                 |                                  |
@@ -64,7 +64,7 @@ Some alerts now use Prometheus filters made available in Prometheus 2.11.0, whic
 
 Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings.
 
-Warning: By default the expressions will generate _grafana 7.2+_ compatible rules using the _$\_\_rate_interval_ variable for rate functions. If you need backward compatible rules please set _grafana72: false_ in your _\_config_
+Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$\_\_rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *\_config*
 
 ### Release steps
 
