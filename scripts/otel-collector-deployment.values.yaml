@@ -29,6 +29,7 @@ clusterRole:
         - watch
     - nonResourceURLs:
         - /metrics
+        - /metrics/resources
       verbs:
         - get
     - apiGroups:
@@ -130,7 +131,36 @@ config:
                 target_label: instance
               - source_labels: [__meta_kubernetes_namespace]
                 target_label: namespace
-  
+
+          - job_name: kube-scheduler
+            kubernetes_sd_configs:
+              - role: service
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_service_name]
+                action: keep
+                regex: kube-scheduler
+              - source_labels: [__meta_kubernetes_namespace]
+                action: keep
+                regex: kube-system
+            scheme: https
+            tls_config:
+              insecure_skip_verify: true
+
+          - job_name: kube-scheduler-resources
+            kubernetes_sd_configs:
+              - role: service
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_service_name]
+                action: keep
+                regex: kube-scheduler
+              - source_labels: [__meta_kubernetes_namespace]
+                action: keep
+                regex: kube-system
+            metrics_path: /metrics/resources
+            scheme: https
+            tls_config:
+              insecure_skip_verify: true
+
   processors:
     batch: {}
   

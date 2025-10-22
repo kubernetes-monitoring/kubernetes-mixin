@@ -40,22 +40,23 @@ dev: generate
 
 .PHONY: dev-port-forward
 dev-port-forward:
-	kubectl --context k3d-kubernetes-mixin port-forward service/lgtm 3000:3000 4317:4317 4318:4318 9090:9090
+	kubectl --context kind-kubernetes-mixin wait --for=condition=Ready pods -l app=lgtm --timeout=300s
+	kubectl --context kind-kubernetes-mixin port-forward service/lgtm 3000:3000 4317:4317 4318:4318 9090:9090
 
 dev-reload: generate
 	@cp -v prometheus_alerts.yaml scripts/provisioning/prometheus/ && \
 	cp -v prometheus_rules.yaml scripts/provisioning/prometheus/ && \
-	kubectl --context k3d-kubernetes-mixin rollout restart deployment/lgtm && \
+	kubectl --context kind-kubernetes-mixin rollout restart deployment/lgtm && \
 	echo '╔═══════════════════════════════════════════════════════════════╗' && \
 	echo '║                                                               ║' && \
 	echo '║           🔄 Reloading Alert and Recording Rules...           ║' && \
 	echo '║                                                               ║' && \
 	echo '╚═══════════════════════════════════════════════════════════════╝' && \
-	kubectl --context k3d-kubernetes-mixin rollout status deployment/lgtm
+	kubectl --context kind-kubernetes-mixin rollout status deployment/lgtm
 
 .PHONY: dev-down
 dev-down:
-	k3d cluster delete kubernetes-mixin
+	kind delete cluster --name kubernetes-mixin
 
 .PHONY: generate
 generate: prometheus_alerts.yaml prometheus_rules.yaml $(OUT_DIR)
