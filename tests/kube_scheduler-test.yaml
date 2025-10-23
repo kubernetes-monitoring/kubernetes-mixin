@@ -1,0 +1,131 @@
+rule_files:
+- ../prometheus_rules.yaml
+
+evaluation_interval: 1m
+
+tests:
+# Test scheduler_scheduling_attempt_duration_seconds quantile 0.5
+- interval: 1m
+  input_series:
+  - series: 'scheduler_scheduling_attempt_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_scheduling_attempt_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_scheduling_attempt_duration_seconds:histogram_quantile{quantile="0.5"}
+    exp_samples:
+    - value: 0.5
+      labels: 'cluster_quantile:scheduler_scheduling_attempt_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.5"}'
+
+# Test scheduler_scheduling_attempt_duration_seconds quantile 0.9
+- interval: 1m
+  input_series:
+  - series: 'scheduler_scheduling_attempt_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_scheduling_attempt_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_scheduling_attempt_duration_seconds:histogram_quantile{quantile="0.9"}
+    exp_samples:
+    - value: 0.9
+      labels: 'cluster_quantile:scheduler_scheduling_attempt_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.9"}'
+
+# Test scheduler_scheduling_attempt_duration_seconds quantile 0.99
+- interval: 1m
+  input_series:
+  - series: 'scheduler_scheduling_attempt_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_scheduling_attempt_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_scheduling_attempt_duration_seconds:histogram_quantile{quantile="0.99"}
+    exp_samples:
+    - value: 0.99
+      labels: 'cluster_quantile:scheduler_scheduling_attempt_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.99"}'
+
+# Test scheduler_scheduling_algorithm_duration_seconds quantile 0.5
+- interval: 1m
+  input_series:
+  - series: 'scheduler_scheduling_algorithm_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_scheduling_algorithm_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_scheduling_algorithm_duration_seconds:histogram_quantile{quantile="0.5"}
+    exp_samples:
+    - value: 0.5
+      labels: 'cluster_quantile:scheduler_scheduling_algorithm_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.5"}'
+
+# Test scheduler_scheduling_algorithm_duration_seconds quantile 0.9
+- interval: 1m
+  input_series:
+  - series: 'scheduler_scheduling_algorithm_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_scheduling_algorithm_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_scheduling_algorithm_duration_seconds:histogram_quantile{quantile="0.9"}
+    exp_samples:
+    - value: 0.9
+      labels: 'cluster_quantile:scheduler_scheduling_algorithm_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.9"}'
+
+# Test scheduler_scheduling_algorithm_duration_seconds quantile 0.99
+- interval: 1m
+  input_series:
+  - series: 'scheduler_scheduling_algorithm_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_scheduling_algorithm_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_scheduling_algorithm_duration_seconds:histogram_quantile{quantile="0.99"}
+    exp_samples:
+    - value: 0.99
+      labels: 'cluster_quantile:scheduler_scheduling_algorithm_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.99"}'
+
+# Test scheduler_binding_duration_seconds quantile 0.5
+- interval: 1m
+  input_series:
+  - series: 'scheduler_binding_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_binding_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_binding_duration_seconds:histogram_quantile{quantile="0.5"}
+    exp_samples:
+    - value: 0.5
+      labels: 'cluster_quantile:scheduler_binding_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.5"}'
+
+# Test scheduler_binding_duration_seconds quantile 0.9
+- interval: 1m
+  input_series:
+  - series: 'scheduler_binding_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_binding_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_binding_duration_seconds:histogram_quantile{quantile="0.9"}
+    exp_samples:
+    - value: 0.9
+      labels: 'cluster_quantile:scheduler_binding_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.9"}'
+
+# Test scheduler_binding_duration_seconds quantile 0.99
+- interval: 1m
+  input_series:
+  - series: 'scheduler_binding_duration_seconds_bucket{job="kube-scheduler",le="+Inf"}'
+    values: '0+60x5'
+  - series: 'scheduler_binding_duration_seconds_bucket{job="kube-scheduler",le="1"}'
+    values: '0+60x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: cluster_quantile:scheduler_binding_duration_seconds:histogram_quantile{quantile="0.99"}
+    exp_samples:
+    - value: 0.99
+      labels: 'cluster_quantile:scheduler_binding_duration_seconds:histogram_quantile{job="kube-scheduler",quantile="0.99"}'
