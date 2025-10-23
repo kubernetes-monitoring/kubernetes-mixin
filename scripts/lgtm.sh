@@ -1,27 +1,47 @@
 #!/bin/bash
-
 set -ex
-
-# export time in milliseconds
-# export OTEL_METRIC_EXPORT_INTERVAL=500
-
-# use http instead of https (needed because of https://github.com/open-telemetry/opentelemetry-go/issues/4834)
-# export OTEL_EXPORTER_OTLP_INSECURE="true"
-
-# https://github.com/grafana/docker-otel-lgtm/tree/main/examples
-
-# docker run -p 3001:3000 -p 4317:4317 -p 4318:4318 \
-#     -v ./provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards \
-#     -v ../dashboards_out:/kubernetes-mixin/dashboards_out \
-#     --rm -ti grafana/otel-lgtm
 
 cp ../prometheus_alerts.yaml provisioning/prometheus/
 cp ../prometheus_rules.yaml provisioning/prometheus/
 
-# set up 1-node k3d cluster
-k3d cluster create kubernetes-mixin \
-    -v "$PWD"/provisioning:/kubernetes-mixin/provisioning \
-    -v "$PWD"/../dashboards_out:/kubernetes-mixin/dashboards_out
+# Create kind cluster with kube-scheduler resource metrics enabled
+kind create cluster --name kubernetes-mixin --config - <<EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        scheduler:
+          extraArgs:
+            authorization-always-allow-paths: "/metrics,/metrics/resources"
+            bind-address: "0.0.0.0"
+    extraMounts:
+    - hostPath: "$PWD/provisioning"
+      containerPath: /kubernetes-mixin/provisioning
+    - hostPath: "$PWD/../dashboards_out"
+      containerPath: /kubernetes-mixin/dashboards_out
+EOF
+
+# Wait for cluster to be ready
+kubectl wait --for=condition=Ready nodes --all --timeout=300s
+
+# Create kube-scheduler service for metrics access
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-scheduler
+  namespace: kube-system
+spec:
+  selector:
+    component: kube-scheduler
+  ports:
+  - port: 10259
+    targetPort: 10259
+    protocol: TCP
+EOF
 
 # run grafana, prometheus
 kubectl apply -f lgtm.yaml
