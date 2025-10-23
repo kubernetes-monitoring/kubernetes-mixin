@@ -1,0 +1,64 @@
+rule_files:
+- ../prometheus_rules.yaml
+- ../prometheus_alerts.yaml
+
+evaluation_interval: 1m
+
+tests:
+- interval: 1m
+  input_series:
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="+Inf",source="kubernetes"}'
+    values: '0+60x5'
+  - series: 'kubelet_pleg_relist_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="1",source="kubernetes"}'
+    values: '0+60x5'
+  - series: 'kubelet_pleg_relist_duration_seconds_count{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",source="kubernetes"}'
+    values: '0+1x5'
+  - series: 'kubelet_node_name{cluster="cluster",node="ip-172-0-0-1",instance="ip-172-0-0-1",job="kubelet",source="kubernetes"}'
+    values: '1x5'
+  - series: 'kubelet_node_name{cluster="cluster",node="ip-172-0-0-1",instance="ip-172-0-0-1",job="kubelet",source="kubernetes2"}'
+    values: '1x5'
+  promql_expr_test:
+  - eval_time: 5m
+    expr: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
+    exp_samples:
+    - value: 0.5
+      labels: 'node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{cluster="cluster",instance="ip-172-0-0-1", node="ip-172-0-0-1", quantile="0.5"}'
+    - value: 0.9
+      labels: 'node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{cluster="cluster",instance="ip-172-0-0-1", node="ip-172-0-0-1", quantile="0.9"}'
+    - value: 0.99
+      labels: 'node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{cluster="cluster",instance="ip-172-0-0-1", node="ip-172-0-0-1", quantile="0.99"}'
+
+- name: "KubeletPodStartUpLatencyHigh alert test, including duplicate series check"
+  interval: 1m
+  input_series:
+  - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="+Inf"}'
+    values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="+Inf",dupe="dupe"}'
+    values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="99"}'
+    values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_bucket{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",le="99",dupe="dupe"}'
+    values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_count{cluster="cluster",instance="ip-172-0-0-1",job="kubelet"}'
+    values: '0+1x16'
+  - series: 'kubelet_pod_worker_duration_seconds_count{cluster="cluster",instance="ip-172-0-0-1",job="kubelet",dupe="dupe"}'
+    values: '0+1x16'
+  - series: 'kubelet_node_name{cluster="cluster",node="ip-172-0-0-1",instance="ip-172-0-0-1",job="kubelet"}'
+    values: '1x16'
+  - series: 'kubelet_node_name{cluster="cluster",node="ip-172-0-0-1",instance="ip-172-0-0-1",job="kubelet",dupe="dupe"}'
+    values: '1x16'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubeletPodStartUpLatencyHigh
+  - eval_time: 16m
+    alertname: KubeletPodStartUpLatencyHigh
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        cluster: cluster
+        instance: ip-172-0-0-1
+        node: ip-172-0-0-1
+      exp_annotations:
+        summary: "Kubelet Pod startup latency is too high."
+        description: "Kubelet Pod startup 99th percentile latency is 98.01 seconds on node ip-172-0-0-1."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletpodstartuplatencyhigh"

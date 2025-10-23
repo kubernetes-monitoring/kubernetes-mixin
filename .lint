@@ -1,3 +1,9 @@
 exclusions:
- template-job-rule:
- panel-job-instance-rule:
+  template-job-rule:
+  template-instance-rule:
+  target-job-rule:
+  target-instance-rule:
+  panel-title-description-rule:
+  panel-units-rule:
+  panel-datasource-rule:
+    reason: The new Grafonnet promotes the use of datasources at the query level. This should probably end up in the linter as a valid option.

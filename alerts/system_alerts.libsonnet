@@ -1,6 +1,9 @@
+local utils = import '../lib/utils.libsonnet';
+
 {
   _config+:: {
     notKubeDnsCoreDnsSelector: 'job!~"kube-dns|coredns"',
+    kubeApiserverSelector: 'job="kube-apiserver"',
   },
 
   prometheusAlerts+:: {
@@ -18,7 +21,9 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'There are {{ $value }} different semantic versions of Kubernetes components running.',
+              description: 'There are {{ $value }} different semantic versions of Kubernetes components running%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Different semantic versions of Kubernetes components running.',
             },
           },
@@ -28,9 +33,9 @@
             // this is normal and an expected error, therefore it should be
             // ignored in this alert.
             expr: |||
-              (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (%(clusterLabel)s, instance, job, namespace)
+              (sum(rate(rest_client_requests_total{%(kubeApiserverSelector)s,code=~"5.."}[5m])) by (%(clusterLabel)s, instance, job, namespace)
                 /
-              sum(rate(rest_client_requests_total[5m])) by (%(clusterLabel)s, instance, job, namespace))
+              sum(rate(rest_client_requests_total{%(kubeApiserverSelector)s}[5m])) by (%(clusterLabel)s, instance, job, namespace))
               > 0.01
             ||| % $._config,
             'for': '15m',
@@ -38,7 +43,9 @@
               severity: 'warning',
             },
             annotations: {
-              description: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors.'",
+              description: "Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ $value | humanizePercentage }} errors%s." % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Kubernetes API server client is experiencing errors.',
             },
           },

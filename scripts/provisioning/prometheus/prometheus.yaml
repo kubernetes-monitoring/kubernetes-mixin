@@ -1,0 +1,3 @@
+rule_files:
+  - "/kubernetes-mixin/prometheus/prometheus_rules.yaml"
+  - "/kubernetes-mixin/prometheus/prometheus_alerts.yaml"

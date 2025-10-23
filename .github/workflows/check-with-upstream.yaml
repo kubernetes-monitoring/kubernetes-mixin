@@ -1,0 +1,15 @@
+name: check-with-upstream
+permissions: {}
+# Run every Monday.
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+jobs:
+  check-selectors-ksm:
+    runs-on: ubuntu-latest
+    name: Check if KSM selectors are present on applicable metrics.
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - run: make --always-make check-selectors-ksm

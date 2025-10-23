@@ -1,0 +1,38 @@
+name: Check whether issues or PRs need attention
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 0 * * *"
+permissions:
+  issues: write
+  pull-requests: write
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008 # v10.1.0
+        with:
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-message: |
+            This issue has not had any activity in the past 30 days, so the
+            `stale` label has been added to it.
+
+            * The `stale` label will be removed if there is new activity
+            * The issue will be closed in 7 days if there is no new activity
+            * Add the `keepalive` label to exempt this issue from the stale check action
+
+            Thank you for your contributions!
+          stale-pr-message: |
+            This PR has been automatically marked as stale because it has not
+            had any activity in the past 30 days.
+
+            The next time this stale check runs, the stale label will be
+            removed if there is new activity. The issue will be closed in 7
+            days if there is no new activity.
+
+            Thank you for your contributions!
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: keepalive
+          exempt-pr-labels: keepalive

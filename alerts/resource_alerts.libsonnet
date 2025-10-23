@@ -1,4 +1,82 @@
+local utils = import '../lib/utils.libsonnet';
+
 {
+  local kubeOvercommitExpression(resource) = if $._config.showMultiCluster then
+    |||
+      # Non-HA clusters.
+      (
+        (
+          sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+          -
+          sum by(%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"}) > 0
+        )
+        and
+        count by (%(clusterLabel)s) (max by (%(clusterLabel)s, node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3
+      )
+      or
+      # HA clusters.
+      (
+        sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+        -
+        (
+          # Skip clusters with only one allocatable node.
+          (
+            sum by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
+            -
+            max by (%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"})
+          ) > 0
+        ) > 0
+      )
+    ||| % $._config { resource: resource }
+  else
+    |||
+      # Non-HA clusters.
+      (
+        (
+          sum(namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+          -
+          sum(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s}) > 0
+        )
+        and
+        count(max by (node) (kube_node_role{%(kubeStateMetricsSelector)s, role="control-plane"})) < 3
+      )
+      or
+      # HA clusters.
+      (
+        sum(namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+        -
+        (
+          # Skip clusters with only one allocatable node.
+          (
+            sum(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
+            -
+            max(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s})
+          ) > 0
+        ) > 0
+      )
+    ||| % $._config { resource: resource },
+
+  local kubeQuotaOvercommitExpression(resource) = if $._config.showMultiCluster then
+    |||
+      sum by(%(clusterLabel)s) (
+        min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(%(resource)s|requests.%(resource)s)"})
+      )
+      /
+      sum by(%(clusterLabel)s) (
+        kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s}
+      ) > %(namespaceOvercommitFactor)s
+    ||| % $._config { resource: resource }
+  else
+    |||
+      sum (
+        min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(%(resource)s|requests.%(resource)s)"})
+      )
+      /
+      sum (
+        kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s}
+      ) > %(namespaceOvercommitFactor)s
+    ||| % $._config { resource: resource },
+
   _config+:: {
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     nodeExporterSelector: error 'must provide selector for node-exporter',
@@ -29,27 +107,12 @@
             },
             annotations: {
               summary: 'Cluster has overcommitted CPU resource requests.',
+              description: 'Cluster%s has overcommitted CPU resource requests for Pods by {{ printf "%%.2f" $value }} CPU shares and cannot tolerate node failure.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
             'for': '10m',
-          } +
-          if $._config.showMultiCluster then {
-            expr: |||
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s)) > 0
-              and
-              (sum(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="cpu"}) by (%(clusterLabel)s)) > 0
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.' % $._config,
-            },
-          } else {
-            expr: |||
-              sum(namespace_cpu:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="cpu"}) - max(kube_node_status_allocatable{resource="cpu"})) > 0
-              and
-              (sum(kube_node_status_allocatable{resource="cpu"}) - max(kube_node_status_allocatable{resource="cpu"})) > 0
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster has overcommitted CPU resource requests for Pods by {{ $value }} CPU shares and cannot tolerate node failure.' % $._config,
-            },
+            expr: kubeOvercommitExpression('cpu'),
           },
           {
             alert: 'KubeMemoryOvercommit',
@@ -58,29 +121,13 @@
             },
             annotations: {
               summary: 'Cluster has overcommitted memory resource requests.',
+              description: 'Cluster%s has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
             'for': '10m',
-          } +
-          if $._config.showMultiCluster then {
-            expr: |||
-              sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) by (%(clusterLabel)s) - (sum(kube_node_status_allocatable{resource="memory"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="memory"}) by (%(clusterLabel)s)) > 0
-              and
-              (sum(kube_node_status_allocatable{resource="memory"}) by (%(clusterLabel)s) - max(kube_node_status_allocatable{resource="memory"}) by (%(clusterLabel)s)) > 0
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }} has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % $._config,
-            },
-          } else
-            {
-              expr: |||
-                sum(namespace_memory:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s}) - (sum(kube_node_status_allocatable{resource="memory"}) - max(kube_node_status_allocatable{resource="memory"})) > 0
-                and
-                (sum(kube_node_status_allocatable{resource="memory"}) - max(kube_node_status_allocatable{resource="memory"})) > 0
-              ||| % $._config,
-              annotations+: {
-                description: 'Cluster has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.',
-              },
-            },
+            expr: kubeOvercommitExpression('memory'),
+          },
           {
             alert: 'KubeCPUQuotaOvercommit',
             labels: {
@@ -88,31 +135,13 @@
             },
             annotations: {
               summary: 'Cluster has overcommitted CPU resource requests.',
+              description: 'Cluster%s has overcommitted CPU resource requests for Namespaces.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
+            expr: kubeQuotaOvercommitExpression('cpu'),
             'for': '5m',
-          } +
-          if $._config.showMultiCluster then {
-            expr: |||
-              sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(cpu|requests.cpu)"})) by (%(clusterLabel)s)
-                /
-              sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)
-                > %(namespaceOvercommitFactor)s
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted CPU resource requests for Namespaces.' % $._config,
-            },
-          } else
-            {
-              expr: |||
-                sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(cpu|requests.cpu)"}))
-                  /
-                sum(kube_node_status_allocatable{resource="cpu", %(kubeStateMetricsSelector)s})
-                  > %(namespaceOvercommitFactor)s
-              ||| % $._config,
-              annotations+: {
-                description: 'Cluster has overcommitted CPU resource requests for Namespaces.',
-              },
-            },
+          },
           {
             alert: 'KubeMemoryQuotaOvercommit',
             labels: {
@@ -120,31 +149,13 @@
             },
             annotations: {
               summary: 'Cluster has overcommitted memory resource requests.',
+              description: 'Cluster%s has overcommitted memory resource requests for Namespaces.' % [
+                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
             },
+            expr: kubeQuotaOvercommitExpression('memory'),
             'for': '5m',
-          } +
-          if $._config.showMultiCluster then {
-            expr: |||
-              sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(memory|requests.memory)"})) by (%(clusterLabel)s)
-                /
-              sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s}) by (%(clusterLabel)s)
-                > %(namespaceOvercommitFactor)s
-            ||| % $._config,
-            annotations+: {
-              description: 'Cluster {{ $labels.%(clusterLabel)s }}  has overcommitted memory resource requests for Namespaces.' % $._config,
-            },
-          } else
-            {
-              expr: |||
-                sum(min without(resource) (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard", resource=~"(memory|requests.memory)"}))
-                  /
-                sum(kube_node_status_allocatable{resource="memory", %(kubeStateMetricsSelector)s})
-                  > %(namespaceOvercommitFactor)s
-              ||| % $._config,
-              annotations+: {
-                description: 'Cluster has overcommitted memory resource requests for Namespaces.',
-              },
-            },
+          },
           {
             alert: 'KubeQuotaAlmostFull',
             expr: |||
@@ -158,7 +169,9 @@
               severity: 'info',
             },
             annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Namespace quota is going to be full.',
             },
           },
@@ -175,7 +188,9 @@
               severity: 'info',
             },
             annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Namespace quota is fully used.',
             },
           },
@@ -192,16 +207,18 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota.',
+              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Namespace quota has exceeded the limits.',
             },
           },
           {
             alert: 'CPUThrottlingHigh',
             expr: |||
-              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
-                /
-              sum(increase(container_cpu_cfs_periods_total{%(cpuThrottlingSelector)s}[5m])) by (container, pod, namespace)
+              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cadvisorSelector)s, %(cpuThrottlingSelector)s}[5m])) without (id, metrics_path, name, image, endpoint, job, node)
+                / on (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) group_left
+              sum(increase(container_cpu_cfs_periods_total{%(cadvisorSelector)s, %(cpuThrottlingSelector)s}[5m])) without (id, metrics_path, name, image, endpoint, job, node)
                 > ( %(cpuThrottlingPercent)s / 100 )
             ||| % $._config,
             'for': '15m',
@@ -209,7 +226,9 @@
               severity: 'info',
             },
             annotations: {
-              description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}.',
+              description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
               summary: 'Processes experience elevated CPU throttling.',
             },
           },
