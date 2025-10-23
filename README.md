@@ -2,9 +2,40 @@
 
 [![ci](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml/badge.svg)](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml)
 
-> NOTE: This project is *pre-release* stage. Flags, configuration, behaviour and design may change significantly in following releases.
-
 A set of Grafana dashboards and Prometheus alerts for Kubernetes.
+
+## Local development
+
+Run the following command to setup a local [kind](https://kind.sigs.k8s.io) cluster:
+
+```shell
+make dev
+```
+
+You should see the following output if successful:
+
+```shell
+╔═══════════════════════════════════════════════════════════════╗
+║             🚀 Development Environment Ready! 🚀              ║
+║                                                               ║
+║   Run `make dev-port-forward`                                 ║
+║   Grafana will be available at http://localhost:3000          ║
+║                                                               ║
+║   Data will be available in a few minutes.                    ║
+║                                                               ║
+║   Dashboards will refresh every 10s, run `make generate`      ║
+║   and refresh your browser to see the changes.                ║
+║                                                               ║
+║   Alert and recording rules require `make dev-reload`.        ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+To delete the cluster, run the following:
+
+```shell
+make dev-down
+```
 
 ## Releases
 
@@ -33,7 +64,7 @@ Some alerts now use Prometheus filters made available in Prometheus 2.11.0, whic
 
 Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings.
 
-Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$__rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *_config*
+Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$\_\_rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *\_config*
 
 ### Release steps
 
@@ -75,6 +106,7 @@ node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
 This mixin is designed to be vendored into the repo with your infrastructure config. To do this, use [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler):
 
 You then have three options for deploying your dashboards
+
 1. Generate the config files and deploy them yourself
 2. Use ksonnet to deploy this mixin along with Prometheus and Grafana
 3. Use prometheus-operator to deploy this mixin (TODO)
@@ -109,11 +141,12 @@ The `prometheus_alerts.yaml` and `prometheus_rules.yaml` file then need to passe
 ### Dashboards for Windows Nodes
 
 There exist separate dashboards for windows resources.
-1) Compute Resources / Cluster(Windows)
-2) Compute Resources / Namespace(Windows)
-3) Compute Resources / Pod(Windows)
-4) USE Method / Cluster(Windows)
-5) USE Method / Node(Windows)
+
+1. Compute Resources / Cluster(Windows)
+2. Compute Resources / Namespace(Windows)
+3. Compute Resources / Pod(Windows)
+4. USE Method / Cluster(Windows)
+5. USE Method / Node(Windows)
 
 These dashboards are based on metrics populated by [windows-exporter](https://github.com/prometheus-community/windows_exporter) from each Windows node.
 
@@ -270,14 +303,14 @@ Same result can be achieved by modyfying the existing `config.libsonnet` with th
 
 While the community has not yet fully agreed on alert severities and their to be used, this repository assumes the following paradigms when setting the severities:
 
-* Critical: An issue, that needs to page a person to take instant action
-* Warning: An issue, that needs to be worked on but in the regular work queue or for during office hours rather than paging the oncall
-* Info: Is meant to support a trouble shooting process by informing about a non-normal situation for one or more systems but not worth a page or ticket on its own.
+- Critical: An issue, that needs to page a person to take instant action
+- Warning: An issue, that needs to be worked on but in the regular work queue or for during office hours rather than paging the oncall
+- Info: Is meant to support a trouble shooting process by informing about a non-normal situation for one or more systems but not worth a page or ticket on its own.
 
 ### Architecture and Technical Decisions
 
-* For more motivation, see "[The RED Method: How to instrument your services](https://kccncna17.sched.com/event/CU8K/the-red-method-how-to-instrument-your-services-b-tom-wilkie-kausal?iframe=no&w=100%&sidebar=yes&bg=no)" talk from CloudNativeCon Austin.
-* For more information about monitoring mixins, see this [design doc](DESIGN.md).
+- For more motivation, see "[The RED Method: How to instrument your services](https://kccncna17.sched.com/event/CU8K/the-red-method-how-to-instrument-your-services-b-tom-wilkie-kausal?iframe=no&w=100%&sidebar=yes&bg=no)" talk from CloudNativeCon Austin.
+- For more information about monitoring mixins, see this [design doc](DESIGN.md).
 
 ## Note
 

@@ -774,6 +774,11 @@ tests:
 
 - interval: 1m
   input_series:
+  # Failed pods must be ignored - see https://github.com/kubernetes-monitoring/kubernetes-mixin/pull/821
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",phase="Failed",pod="failed-pods-must-be-ignored",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="<None>",owner_name="failed-pods-example",pod="failed-pods-must-be-ignored",service="ksm"}'
+    values: '1+0x20'
   - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",phase="Pending",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
     values: '1+0x20'
   - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="<None>",owner_name="ds-7cc77d965f",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
