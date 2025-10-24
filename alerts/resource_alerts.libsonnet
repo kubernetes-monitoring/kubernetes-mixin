@@ -216,10 +216,22 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'CPUThrottlingHigh',
             expr: |||
-              sum(increase(container_cpu_cfs_throttled_periods_total{container!="", %(cadvisorSelector)s, %(cpuThrottlingSelector)s}[5m])) without (id, metrics_path, name, image, endpoint, job, node)
-                / on (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) group_left
-              sum(increase(container_cpu_cfs_periods_total{%(cadvisorSelector)s, %(cpuThrottlingSelector)s}[5m])) without (id, metrics_path, name, image, endpoint, job, node)
-                > ( %(cpuThrottlingPercent)s / 100 )
+              sum without (id, metrics_path, name, image, endpoint, job, node) (
+                topk by (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) (1,
+                  increase(
+                    container_cpu_cfs_throttled_periods_total{container!="", %(cadvisorSelector)s, %(cpuThrottlingSelector)s}
+                  [5m])
+                )
+              )
+              / on (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) group_left
+              sum without (id, metrics_path, name, image, endpoint, job, node) (
+                topk by (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) (1,
+                  increase(
+                    container_cpu_cfs_periods_total{%(cadvisorSelector)s, %(cpuThrottlingSelector)s}
+                  [5m])
+                )
+              )
+              > ( %(cpuThrottlingPercent)s / 100 )
             ||| % $._config,
             'for': '15m',
             labels: {
