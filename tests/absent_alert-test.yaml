@@ -6,7 +6,7 @@ tests:
   name: KubeAPIDown fires when kube-apiserver target is absent
   input_series:
   - series: 'up{job="kube-apiserver", instance="apiserver1"}'
-    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+    values: '1 1 1 1 1 0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeAPIDown
@@ -25,7 +25,7 @@ tests:
   name: KubeletDown fires when kubelet target is absent
   input_series:
   - series: 'up{job="kubelet", instance="node1"}'
-    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+    values: '1 1 1 1 1 0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeletDown
@@ -44,7 +44,7 @@ tests:
   name: KubeSchedulerDown fires when kube-scheduler target is absent
   input_series:
   - series: 'up{job="kube-scheduler", instance="scheduler1"}'
-    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+    values: '1 1 1 1 1 0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeSchedulerDown
@@ -63,7 +63,7 @@ tests:
   name: KubeControllerManagerDown fires when kube-controller-manager target is absent
   input_series:
   - series: 'up{job="kube-controller-manager", instance="controller1"}'
-    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+    values: '1 1 1 1 1 0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeControllerManagerDown
@@ -82,7 +82,7 @@ tests:
   name: KubeProxyDown fires when kube-proxy target is absent
   input_series:
   - series: 'up{job="kube-proxy", instance="proxy1"}'
-    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+    values: '1 1 1 1 1 0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeProxyDown
