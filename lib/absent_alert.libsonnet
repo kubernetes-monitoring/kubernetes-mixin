@@ -5,7 +5,7 @@
 
   alert: '%sDown' % absentAlert.componentName,
   expr: |||
-    absent(up{%s} == 1)
+    absent_over_time(up{%s}[5m])
   ||| % absentAlert.selector,
   'for': '15m',
   labels: {
