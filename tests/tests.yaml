@@ -484,25 +484,15 @@ tests:
     values: '1+0x10'
   promql_expr_test:
   - eval_time: 0m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 0m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 1m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 1m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
 
 - interval: 1m
   input_series:
@@ -529,25 +519,15 @@ tests:
     values: '1+0x10'
   promql_expr_test:
   - eval_time: 0m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 0m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
   - eval_time: 1m
-    expr: namespace_cpu:kube_pod_container_resource_requests:sum
+    expr: namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum
     exp_samples:
-    - value: 0.15
-      labels: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
-  - eval_time: 1m
-    expr: namespace_memory:kube_pod_container_resource_requests:sum
-    exp_samples:
-    - value: 1.0e+9
-      labels: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
+    - value: 0.3
+      labels: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes",namespace="kube-apiserver"}'
 
 - interval: 1m
   input_series:
@@ -1432,9 +1412,9 @@ tests:
 - name: KubeCPUOvercommit alert (single-node)
   interval: 1m
   input_series:
-  - series: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
+  - series: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
     values: '1x10'
-  - series: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
+  - series: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
     values: '1x10'
   - series: 'kube_node_status_allocatable{cluster="kubernetes", node="n1", resource="cpu", job="kube-state-metrics"}'
     values: '1.9x10' # This value was seen on a 2x vCPU node
@@ -1456,9 +1436,9 @@ tests:
 - name: KubeCPUOvercommit alert (multi-node; non-HA)
   interval: 1m
   input_series:
-  - series: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
+  - series: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
     values: '2x10'
-  - series: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
+  - series: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
     values: '2x10'
   - series: 'kube_node_status_allocatable{cluster="kubernetes", node="n1", resource="cpu", job="kube-state-metrics"}'
     values: '1.9x10' # This value was seen on a 2x vCPU node
@@ -1484,9 +1464,9 @@ tests:
 - name: KubeCPUOvercommit alert (multi-node; HA)
   interval: 1m
   input_series:
-    - series: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
+    - series: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
       values: '2x10'
-    - series: 'namespace_cpu:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
+    - series: 'namespace_cpu:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
       values: '2x10'
     - series: 'kube_node_status_allocatable{cluster="kubernetes", node="n1", resource="cpu", job="kube-state-metrics"}'
       values: '1.9x10' # This value was seen on a 2x vCPU node
@@ -1516,9 +1496,9 @@ tests:
 - name: KubeMemoryOvercommit alert (single-node)
   interval: 1m
   input_series:
-  - series: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
+  - series: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
     values: '1000000000x10' # 1 GB
-  - series: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
+  - series: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
     values: '1000000000x10'
   - series: 'kube_node_status_allocatable{cluster="kubernetes", node="n1", resource="memory", job="kube-state-metrics"}'
     values: '1000000000x10'
@@ -1540,9 +1520,9 @@ tests:
 - name: KubeMemoryOvercommit alert (multi-node; non-HA)
   interval: 1m
   input_series:
-  - series: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
+  - series: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
     values: '2000000000x10' # 2 GB
-  - series: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
+  - series: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
     values: '2000000000x10'
   - series: 'kube_node_status_allocatable{cluster="kubernetes", node="n1", resource="memory", job="kube-state-metrics"}'
     values: '1000000000x10'
@@ -1568,9 +1548,9 @@ tests:
 - name: KubeMemoryOvercommit alert (multi-node; HA)
   interval: 1m
   input_series:
-    - series: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
+    - series: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="default"}'
       values: '2000000000x10' # 2 GB
-    - series: 'namespace_memory:kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
+    - series: 'namespace_memory:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{cluster="kubernetes", namespace="kube-system"}'
       values: '2000000000x10'
     - series: 'kube_node_status_allocatable{cluster="kubernetes", node="n1", resource="memory", job="kube-state-metrics"}'
       values: '1000000000x10'

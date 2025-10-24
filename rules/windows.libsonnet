@@ -218,28 +218,28 @@
             record: 'kube_pod_windows_container_resource_memory_request',
             expr: |||
               max by (%(clusterLabel)s, namespace, pod, container) (
-                kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}
+                kube_pod_resource_request{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}
               ) * on(container,pod,namespace,%(clusterLabel)s) (windows_pod_container_available)
             ||| % $._config,
           },
           {
             record: 'kube_pod_windows_container_resource_memory_limit',
             expr: |||
-              kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s} * on(container,pod,namespace,%(clusterLabel)s) (windows_pod_container_available)
+              (kube_pod_resource_limit{resource="memory",%(kubeSchedulerSelector)s} or kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s}) * on(container,pod,namespace,%(clusterLabel)s) (windows_pod_container_available)
             ||| % $._config,
           },
           {
             record: 'kube_pod_windows_container_resource_cpu_cores_request',
             expr: |||
               max by (%(clusterLabel)s, namespace, pod, container) (
-                kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}
+                kube_pod_resource_request{resource="cpu",%(kubeSchedulerSelector)s} or kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}
               ) * on(container,pod,namespace,%(clusterLabel)s) (windows_pod_container_available)
             ||| % $._config,
           },
           {
             record: 'kube_pod_windows_container_resource_cpu_cores_limit',
             expr: |||
-              kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s} * on(container,pod,namespace,%(clusterLabel)s) (windows_pod_container_available)
+              (kube_pod_resource_limit{resource="cpu",%(kubeSchedulerSelector)s} or kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}) * on(container,pod,namespace,%(clusterLabel)s) (windows_pod_container_available)
             ||| % $._config,
           },
           {
