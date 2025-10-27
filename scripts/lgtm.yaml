@@ -48,6 +48,9 @@ spec:
             - containerPort: 4317
             - containerPort: 4318
             - containerPort: 9090
+          env:
+            - name: ENABLE_LOGS_ALL
+              value: "true"
           readinessProbe:
             exec:
               command:
