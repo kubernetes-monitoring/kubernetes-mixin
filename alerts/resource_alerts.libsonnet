@@ -6,7 +6,7 @@ local utils = import '../lib/utils.libsonnet';
       # Non-HA clusters.
       (
         (
-          sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+          sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
           -
           sum by(%(clusterLabel)s) (kube_node_status_allocatable{%(kubeStateMetricsSelector)s,resource="%(resource)s"}) > 0
         )
@@ -16,7 +16,7 @@ local utils = import '../lib/utils.libsonnet';
       or
       # HA clusters.
       (
-        sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+        sum by(%(clusterLabel)s) (namespace_%(resource)s:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
         -
         (
           # Skip clusters with only one allocatable node.
@@ -33,7 +33,7 @@ local utils = import '../lib/utils.libsonnet';
       # Non-HA clusters.
       (
         (
-          sum(namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+          sum(namespace_%(resource)s:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
           -
           sum(kube_node_status_allocatable{resource="%(resource)s", %(kubeStateMetricsSelector)s}) > 0
         )
@@ -43,7 +43,7 @@ local utils = import '../lib/utils.libsonnet';
       or
       # HA clusters.
       (
-        sum(namespace_%(resource)s:kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
+        sum(namespace_%(resource)s:kube_pod_resource_request_or_kube_pod_container_resource_requests:sum{%(ignoringOverprovisionedWorkloadSelector)s})
         -
         (
           # Skip clusters with only one allocatable node.
