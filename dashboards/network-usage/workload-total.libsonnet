@@ -106,7 +106,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -125,7 +125,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -144,7 +144,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(avg(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -163,7 +163,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(avg(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -177,7 +177,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -191,7 +191,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -205,7 +205,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_receive_packets_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -219,7 +219,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_transmit_packets_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -233,7 +233,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_receive_packets_dropped_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
@@ -247,7 +247,7 @@ local var = g.dashboard.variable;
             '${datasource}',
             |||
               sort_desc(sum(rate(container_network_transmit_packets_dropped_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
-              * on (namespace,pod)
+              * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
             ||| % $._config
           )
