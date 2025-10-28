@@ -6,32 +6,9 @@ on:
       - master
   pull_request:
 jobs:
-  matrix:
+  build-tools:
     runs-on: ubuntu-latest
-    name: ${{ matrix.name }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Lint Alerts
-            run: make --always-make alerts-lint
-          - name: Generate YAML
-            run: make --always-make generate && git diff --exit-code
-          - name: Lint Grafana Dashboards
-            run: make --always-make dashboards-lint
-          - name: Format JSONNET
-            run: make --always-make jsonnet-fmt && git diff --exit-code
-          - name: Lint JSONNET
-            run: make --always-make jsonnet-lint
-          - name: Format MD
-            run: make --always-make markdownfmt && git diff --exit-code
-          - name: Lint MD
-            run: make --always-make vale && git diff --exit-code
-          - name: Lint YAML
-            run: make --always-make pint-lint
-          - name: Run unit tests
-            run: make --always-make test
-
+    name: Build Go Tools
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -40,4 +17,56 @@ jobs:
         with:
           go-version-file: scripts/go.mod
           cache-dependency-path: scripts/go.sum
+      - name: Build Go tools
+        run: |
+          mkdir -p tmp/bin
+          cd scripts && go list -e -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o ../tmp/bin %
+      - name: Upload built tools
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: go-tools
+          path: tmp/bin/
+          retention-days: 1
+          if-no-files-found: error
+
+  matrix:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    needs: build-tools
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Lint Alerts
+            run: make alerts-lint
+          - name: Generate YAML
+            run: make generate && git diff --exit-code
+          - name: Lint Grafana Dashboards
+            run: make dashboards-lint
+          - name: Format JSONNET
+            run: make jsonnet-fmt && git diff --exit-code
+          - name: Lint JSONNET
+            run: make jsonnet-lint
+          - name: Format MD
+            run: make markdownfmt && git diff --exit-code
+          - name: Lint MD
+            run: make vale && git diff --exit-code
+          - name: Lint YAML
+            run: make pint-lint
+          - name: Run unit tests
+            run: make test
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - name: Download built tools
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: go-tools
+          path: tmp/bin/
+      - name: Make tools executable and update timestamps
+        run: |
+          chmod +x tmp/bin/*
+          touch tmp/bin/*
       - run: ${{ matrix.run }}
