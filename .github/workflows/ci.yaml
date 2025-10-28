@@ -65,6 +65,8 @@ jobs:
         with:
           name: go-tools
           path: tmp/bin/
-      - name: Make tools executable
-        run: chmod +x tmp/bin/*
+      - name: Make tools executable and update timestamps
+        run: |
+          chmod +x tmp/bin/*
+          touch tmp/bin/*
       - run: ${{ matrix.run }}
