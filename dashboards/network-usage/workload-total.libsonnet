@@ -97,7 +97,7 @@ local var = g.dashboard.variable;
         barGauge.new('Current Rate of Bytes Received')
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
-        + barGauge.standardOptions.withUnit('Bps')
+        + barGauge.standardOptions.withUnit($._config.units.network)
         + barGauge.standardOptions.color.withMode('fixed')
         + barGauge.standardOptions.color.withFixedColor('green')
         + barGauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
@@ -116,7 +116,7 @@ local var = g.dashboard.variable;
         barGauge.new('Current Rate of Bytes Transmitted')
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
-        + barGauge.standardOptions.withUnit('Bps')
+        + barGauge.standardOptions.withUnit($._config.units.network)
         + barGauge.standardOptions.color.withMode('fixed')
         + barGauge.standardOptions.color.withFixedColor('green')
         + barGauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
@@ -135,7 +135,7 @@ local var = g.dashboard.variable;
         barGauge.new('Average Rate of Bytes Received')
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
-        + barGauge.standardOptions.withUnit('Bps')
+        + barGauge.standardOptions.withUnit($._config.units.network)
         + barGauge.standardOptions.color.withMode('fixed')
         + barGauge.standardOptions.color.withFixedColor('green')
         + barGauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
@@ -154,7 +154,7 @@ local var = g.dashboard.variable;
         barGauge.new('Average Rate of Bytes Transmitted')
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
-        + barGauge.standardOptions.withUnit('Bps')
+        + barGauge.standardOptions.withUnit($._config.units.network)
         + barGauge.standardOptions.color.withMode('fixed')
         + barGauge.standardOptions.color.withFixedColor('green')
         + barGauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
@@ -171,7 +171,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Receive Bandwidth')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -185,7 +185,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Transmit Bandwidth')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',

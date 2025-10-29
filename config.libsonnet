@@ -90,6 +90,12 @@
       grafanaTimezone: 'UTC',
     },
 
+    // Units for panels
+    units: {
+      // Use 'bps' for bits per second (SI), or 'binBps' for bytes per second (IEC).
+      network: 'bps',
+    },
+
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
     clusterLabel: 'cluster',
