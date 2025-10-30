@@ -63,7 +63,7 @@ local var = g.dashboard.variable;
 
       local panels = [
         tsPanel.new('Current Rate of Bytes Received')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||
@@ -81,7 +81,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Current Rate of Bytes Transmitted')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||
@@ -267,7 +267,7 @@ local var = g.dashboard.variable;
             properties: [
               {
                 id: 'unit',
-                value: 'binBps',
+                value: $._config.units.network,
               },
             ],
           },
@@ -298,7 +298,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Average Rate of Bytes Received')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||
@@ -316,7 +316,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Average Rate of Bytes Transmitted')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||
@@ -334,7 +334,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Receive Bandwidth')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||
@@ -352,7 +352,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Transmit Bandwidth')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}', |||

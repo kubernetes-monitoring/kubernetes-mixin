@@ -896,7 +896,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Net Utilisation (Transmitted)')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -906,7 +906,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Net Utilisation (Dropped)')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -1067,7 +1067,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Net Utilisation (Transmitted)')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -1077,7 +1077,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Net Saturation (Dropped)')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',

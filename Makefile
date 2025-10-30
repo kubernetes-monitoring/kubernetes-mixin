@@ -43,7 +43,7 @@ dev-port-forward:
 	kubectl --context kind-kubernetes-mixin wait --for=condition=Ready pods -l app=lgtm --timeout=300s
 	kubectl --context kind-kubernetes-mixin port-forward service/lgtm 3000:3000 4317:4317 4318:4318 9090:9090
 
-dev-reload: generate lint
+dev-reload: clean-alerts clean-rules generate lint
 	@cp -v prometheus_alerts.yaml scripts/provisioning/prometheus/ && \
 	cp -v prometheus_rules.yaml scripts/provisioning/prometheus/ && \
 	kubectl --context kind-kubernetes-mixin apply -f scripts/lgtm.yaml && \
@@ -73,7 +73,7 @@ clean-dashboards:
 DASHBOARD_SOURCES = $(shell find $(SRC_DIR) -name '*.libsonnet' 2>/dev/null)
 
 .PHONY: generate
-generate: clean-alerts clean-rules prometheus_alerts.yaml prometheus_rules.yaml $(OUT_DIR)/.dashboards-generated
+generate: prometheus_alerts.yaml prometheus_rules.yaml $(OUT_DIR)/.dashboards-generated
 
 $(JSONNET_VENDOR): $(JB_BIN) jsonnetfile.json
 	$(JB_BIN) install

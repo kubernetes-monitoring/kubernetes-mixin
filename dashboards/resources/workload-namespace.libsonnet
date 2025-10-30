@@ -600,7 +600,7 @@ local var = g.dashboard.variable;
             properties: [
               {
                 id: 'unit',
-                value: 'Bps',
+                value: $._config.units.network,
               },
             ],
           },
@@ -631,7 +631,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Receive Bandwidth')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -645,7 +645,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Transmit Bandwidth')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -659,7 +659,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Average Container Bandwidth by Workload: Received')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -673,7 +673,7 @@ local var = g.dashboard.variable;
         ]),
 
         tsPanel.new('Average Container Bandwidth by Workload: Transmitted')
-        + tsPanel.standardOptions.withUnit('Bps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
