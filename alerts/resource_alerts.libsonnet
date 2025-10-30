@@ -159,10 +159,16 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeQuotaAlmostFull',
             expr: |||
-              kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
-                / ignoring(instance, job, type)
-              (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
-                > 0.9 < 1
+              max without (instance, job, type) (
+                kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+              )
+              / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
+              (
+                max without (instance, job, type) (
+                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
+                ) > 0
+              )
+              > 0.9 < 1
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -178,10 +184,16 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeQuotaFullyUsed',
             expr: |||
-              kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
-                / ignoring(instance, job, type)
-              (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
-                == 1
+              max without (instance, job, type) (
+                kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+              )
+              / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
+              (
+                max without (instance, job, type) (
+                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
+                ) > 0
+              )
+              == 1
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -197,10 +209,15 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeQuotaExceeded',
             expr: |||
-              kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
-                / ignoring(instance, job, type)
-              (kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"} > 0)
-                > 1
+              max without (instance, job, type) (
+                kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+              )
+              / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
+              (
+                max without (instance, job, type) (
+                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
+                ) > 0
+              ) > 1
             ||| % $._config,
             'for': '15m',
             labels: {
