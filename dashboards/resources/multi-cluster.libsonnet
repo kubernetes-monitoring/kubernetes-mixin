@@ -99,7 +99,7 @@ local var = g.dashboard.variable;
           cpuUsage: [
             tsPanel.new('CPU Usage')
             + tsPanel.queryOptions.withTargets([
-              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (%(clusterLabel)s)' % $._config)
               + prometheus.withLegendFormat('__auto'),
             ]),
           ],
@@ -107,19 +107,19 @@ local var = g.dashboard.variable;
           cpuQuota: [
             g.panel.table.new('CPU Quota')
             + g.panel.table.queryOptions.withTargets([
-              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
               prometheus.new('${datasource}', 'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
               prometheus.new('${datasource}', 'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="cpu"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
             ])
@@ -197,7 +197,7 @@ local var = g.dashboard.variable;
             + tsPanel.standardOptions.withUnit('bytes')
             + tsPanel.queryOptions.withTargets([
               // Not using container_memory_usage_bytes here because that includes page cache
-              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(container_memory_rss{%(cadvisorSelector)s, container!=""})) by (%(clusterLabel)s)' % $._config)
               + prometheus.withLegendFormat('__auto'),
             ]),
           ],
@@ -206,19 +206,19 @@ local var = g.dashboard.variable;
             g.panel.table.new('Memory Requests by Cluster')
             + g.panel.table.standardOptions.withUnit('bytes')
             + g.panel.table.queryOptions.withTargets([
-              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(container_memory_rss{%(cadvisorSelector)s, container!=""})) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
               prometheus.new('${datasource}', 'sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(container_memory_rss{%(cadvisorSelector)s, container!=""})) by (%(clusterLabel)s) / sum(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
               prometheus.new('${datasource}', 'sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
-              prometheus.new('${datasource}', 'sum(container_memory_rss{%(cadvisorSelector)s, container!=""}) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
+              prometheus.new('${datasource}', 'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(container_memory_rss{%(cadvisorSelector)s, container!=""})) by (%(clusterLabel)s) / sum(kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, resource="memory"}) by (%(clusterLabel)s)' % $._config)
               + prometheus.withInstant(true)
               + prometheus.withFormat('table'),
             ])
