@@ -103,7 +103,7 @@ local var = g.dashboard.variable;
 
       local cpuUsageQuery = |||
         sum(
-            node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", namespace="$namespace"}
+            max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", namespace="$namespace"})
           * on(%(clusterLabel)s, namespace, pod)
             group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type=~"$type"}
         ) by (pod)
@@ -111,7 +111,7 @@ local var = g.dashboard.variable;
 
       local cpuRequestsQuery = |||
         sum(
-            kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"}
+            max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", resource="cpu"})
           * on(%(clusterLabel)s, namespace, pod)
             group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type=~"$type"}
         ) by (pod)
@@ -121,7 +121,7 @@ local var = g.dashboard.variable;
 
       local memUsageQuery = |||
         sum(
-            container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!="", image!=""}
+            max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(container_memory_working_set_bytes{%(clusterLabel)s="$cluster", namespace="$namespace", container!="", image!=""})
           * on(%(clusterLabel)s, namespace, pod)
             group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload="$workload", workload_type=~"$type"}
         ) by (pod)

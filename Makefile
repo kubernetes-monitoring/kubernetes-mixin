@@ -43,7 +43,7 @@ dev-port-forward:
 	kubectl --context kind-kubernetes-mixin wait --for=condition=Ready pods -l app=lgtm --timeout=300s
 	kubectl --context kind-kubernetes-mixin port-forward service/lgtm 3000:3000 4317:4317 4318:4318 9090:9090
 
-dev-reload: clean-alerts clean-rules generate lint
+dev-reload: clean-dashboards clean-alerts clean-rules generate lint
 	@cp -v prometheus_alerts.yaml scripts/provisioning/prometheus/ && \
 	cp -v prometheus_rules.yaml scripts/provisioning/prometheus/ && \
 	kubectl --context kind-kubernetes-mixin apply -f scripts/lgtm.yaml && \
