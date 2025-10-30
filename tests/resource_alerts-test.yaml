@@ -33,9 +33,13 @@ tests:
 - interval: 1m
   name: KubeQuotaAlmostFull fires when quota usage is above 90%
   input_series:
-  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.cpu", type="used", job="kube-state-metrics"}'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.cpu", type="used", job="kube-state-metrics", instance="ksm1"}'
     values: '95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95'
-  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.cpu", type="hard", job="kube-state-metrics"}'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.cpu", type="hard", job="kube-state-metrics", instance="ksm1"}'
+    values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.cpu", type="used", job="kube-state-metrics", instance="ksm2"}'
+    values: '95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95 95'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.cpu", type="hard", job="kube-state-metrics", instance="ksm2"}'
     values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
   alert_rule_test:
   - eval_time: 14m
@@ -56,9 +60,13 @@ tests:
 - interval: 1m
   name: KubeQuotaFullyUsed fires when quota is 100% used
   input_series:
-  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.memory", type="used", job="kube-state-metrics"}'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.memory", type="used", job="kube-state-metrics", instance="ksm1"}'
     values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
-  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.memory", type="hard", job="kube-state-metrics"}'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.memory", type="hard", job="kube-state-metrics", instance="ksm1"}'
+    values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.memory", type="used", job="kube-state-metrics", instance="ksm2"}'
+    values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="requests.memory", type="hard", job="kube-state-metrics", instance="ksm2"}'
     values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
   alert_rule_test:
   - eval_time: 14m
@@ -79,9 +87,13 @@ tests:
 - interval: 1m
   name: KubeQuotaExceeded fires when quota usage exceeds 100%
   input_series:
-  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="pods", type="used", job="kube-state-metrics"}'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="pods", type="used", job="kube-state-metrics", instance="ksm1"}'
     values: '120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120'
-  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="pods", type="hard", job="kube-state-metrics"}'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="pods", type="hard", job="kube-state-metrics", instance="ksm1"}'
+    values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="pods", type="used", job="kube-state-metrics", instance="ksm2"}'
+    values: '120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120'
+  - series: 'kube_resourcequota{cluster="cluster1", namespace="test-ns", resource="pods", type="hard", job="kube-state-metrics", instance="ksm2"}'
     values: '100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100'
   alert_rule_test:
   - eval_time: 14m
