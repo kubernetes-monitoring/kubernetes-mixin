@@ -1,5 +1,5 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
-local queries = import './queries/cluster-queries.libsonnet';
+local defaultQueries = import './queries/cluster-queries.libsonnet';
 
 local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
@@ -36,6 +36,11 @@ local var = g.dashboard.variable;
 
   grafanaDashboards+:: {
     'k8s-resources-cluster.json':
+      // Allow overriding queries via $._queries.cluster, otherwise use default
+      local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'cluster')
+        then $._queries.cluster
+        else defaultQueries;
+
       local variables = {
         datasource:
           var.datasource.new('datasource', 'prometheus')
