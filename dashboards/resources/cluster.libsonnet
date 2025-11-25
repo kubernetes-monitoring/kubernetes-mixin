@@ -1,5 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local defaultQueries = import './queries/cluster-queries.libsonnet';
+local defaultVariables = import './variables/cluster-variables.libsonnet';
 
 local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
@@ -41,36 +42,10 @@ local var = g.dashboard.variable;
         then $._queries.cluster
         else defaultQueries;
 
-      local variables = {
-        datasource:
-          var.datasource.new('datasource', 'prometheus')
-          + var.datasource.withRegex($._config.datasourceFilterRegex)
-          + var.datasource.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.datasource.generalOptions.withLabel('Data source')
-          + {
-            current: {
-              selected: true,
-              text: $._config.datasourceName,
-              value: $._config.datasourceName,
-            },
-          },
-
-        cluster:
-          var.query.new('cluster')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            $._config.clusterLabel,
-            'up{%(cadvisorSelector)s}' % $._config,
-          )
-          + var.query.generalOptions.withLabel('cluster')
-          + var.query.refresh.onTime()
-          + (
-            if $._config.showMultiCluster
-            then var.query.generalOptions.showOnDashboard.withLabelAndValue()
-            else var.query.generalOptions.showOnDashboard.withNothing()
-          )
-          + var.query.withSort(type='alphabetical'),
-      };
+      // Allow overriding variables via $._variables.cluster, otherwise use default
+      local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'cluster')
+        then $._variables.cluster($._config)
+        else defaultVariables.cluster($._config);
 
       local links = {
         namespace: {
