@@ -1,6 +1,6 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local defaultQueries = import './queries/cluster-queries.libsonnet';
 local defaultVariables = import './variables/cluster-variables.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
 local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
@@ -38,13 +38,13 @@ local timeSeries = g.panel.timeSeries;
     'k8s-resources-cluster.json':
       // Allow overriding queries via $._queries.cluster, otherwise use default
       local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'cluster')
-        then $._queries.cluster
-        else defaultQueries;
+      then $._queries.cluster
+      else defaultQueries;
 
       // Allow overriding variables via $._variables.cluster, otherwise use default
       local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'cluster')
-        then $._variables.cluster($._config)
-        else defaultVariables.cluster($._config);
+      then $._variables.cluster($._config)
+      else defaultVariables.cluster($._config);
 
       local links = {
         namespace: {
