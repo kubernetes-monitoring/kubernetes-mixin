@@ -120,23 +120,15 @@ $ go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
 $ brew install jsonnet
 ```
 
-Then, grab the mixin and its dependencies:
+Then, grab the mixin, its dependencies, and build:
 
 ```
 $ git clone https://github.com/kubernetes-monitoring/kubernetes-mixin
 $ cd kubernetes-mixin
-$ jb install
+$ make generate
 ```
 
-Finally, build the mixin:
-
-```
-$ make prometheus_alerts.yaml
-$ make prometheus_rules.yaml
-$ make dashboards_out
-```
-
-The `prometheus_alerts.yaml` and `prometheus_rules.yaml` file then need to passed to your Prometheus server, and the files in `dashboards_out` need to be imported into you Grafana server. The exact details will depending on how you deploy your monitoring stack to Kubernetes.
+The `prometheus_alerts.yaml` and `prometheus_rules.yaml` files then need to passed to your Prometheus server, and the files in `dashboards_out` need to be imported into you Grafana server. The exact details will depending on how you deploy your monitoring stack to Kubernetes.
 
 ### Dashboards for Windows Nodes
 
