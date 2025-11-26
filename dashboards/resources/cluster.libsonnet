@@ -6,7 +6,6 @@ local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
 local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
-local var = g.dashboard.variable;
 
 {
   local statPanel(title, unit, query) =
