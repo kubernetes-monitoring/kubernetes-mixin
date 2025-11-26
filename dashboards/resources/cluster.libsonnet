@@ -1,5 +1,5 @@
-local defaultQueries = import './queries/cluster-queries.libsonnet';
-local defaultVariables = import './variables/cluster-variables.libsonnet';
+local defaultQueries = import './queries/cluster.libsonnet';
+local defaultVariables = import './variables/cluster.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
 local prometheus = g.query.prometheus;
