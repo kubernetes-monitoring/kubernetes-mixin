@@ -1,11 +1,10 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local defaultQueries = import './queries/pod.libsonnet';
 local defaultVariables = import './variables/pod.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
 local prometheus = g.query.prometheus;
 local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
-local var = g.dashboard.variable;
 
 {
   local tsPanel =
@@ -28,13 +27,13 @@ local var = g.dashboard.variable;
     'k8s-resources-pod.json':
       // Allow overriding queries via $._queries.pod, otherwise use default
       local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'pod')
-        then $._queries.pod
-        else defaultQueries;
+      then $._queries.pod
+      else defaultQueries;
 
       // Allow overriding variables via $._variables.pod, otherwise use default
       local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'pod')
-        then $._variables.pod($._config)
-        else defaultVariables.pod($._config);
+      then $._variables.pod($._config)
+      else defaultVariables.pod($._config);
 
       local panels = [
         tsPanel.new('CPU Usage')

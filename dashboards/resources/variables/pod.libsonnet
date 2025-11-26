@@ -59,4 +59,3 @@ local var = g.dashboard.variable;
       + var.query.withSort(type='alphabetical'),
   },
 }
-

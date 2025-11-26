@@ -1,12 +1,11 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local defaultQueries = import './queries/namespace.libsonnet';
 local defaultVariables = import './variables/namespace.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
 local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
 local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
-local var = g.dashboard.variable;
 
 {
   local statPanel(title, unit, query) =
@@ -39,13 +38,13 @@ local var = g.dashboard.variable;
     'k8s-resources-namespace.json':
       // Allow overriding queries via $._queries.namespace, otherwise use default
       local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'namespace')
-        then $._queries.namespace
-        else defaultQueries;
+      then $._queries.namespace
+      else defaultQueries;
 
       // Allow overriding variables via $._variables.namespace, otherwise use default
       local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'namespace')
-        then $._variables.namespace($._config)
-        else defaultVariables.namespace($._config);
+      then $._variables.namespace($._config)
+      else defaultVariables.namespace($._config);
 
       local links = {
         pod: {
