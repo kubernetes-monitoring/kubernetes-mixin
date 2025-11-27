@@ -2,7 +2,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 local var = g.dashboard.variable;
 
 {
-  datasource(config):: 
+  datasource(config)::
     var.datasource.new('datasource', 'prometheus')
     + var.datasource.withRegex(config.datasourceFilterRegex)
     + var.datasource.generalOptions.showOnDashboard.withLabelAndValue()
@@ -15,7 +15,7 @@ local var = g.dashboard.variable;
       },
     },
 
-  cluster(config, datasourceVar, selectorTemplate):: 
+  cluster(config, datasourceVar, selectorTemplate)::
     var.query.new('cluster')
     + var.query.withDatasourceFromVariable(datasourceVar)
     + var.query.queryTypes.withLabelValues(
@@ -31,7 +31,7 @@ local var = g.dashboard.variable;
     )
     + var.query.withSort(type='alphabetical'),
 
-  namespace(config, datasourceVar):: 
+  namespace(config, datasourceVar)::
     var.query.new('namespace')
     + var.query.withDatasourceFromVariable(datasourceVar)
     + var.query.queryTypes.withLabelValues(
@@ -43,7 +43,7 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.showOnDashboard.withLabelAndValue()
     + var.query.withSort(type='alphabetical'),
 
-  pod(config, datasourceVar):: 
+  pod(config, datasourceVar)::
     var.query.new('pod')
     + var.query.withDatasourceFromVariable(datasourceVar)
     + var.query.queryTypes.withLabelValues(
@@ -55,4 +55,3 @@ local var = g.dashboard.variable;
     + var.query.generalOptions.showOnDashboard.withLabelAndValue()
     + var.query.withSort(type='alphabetical'),
 }
-

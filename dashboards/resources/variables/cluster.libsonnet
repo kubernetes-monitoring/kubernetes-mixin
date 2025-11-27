@@ -1,8 +1,6 @@
 local common = import './common.libsonnet';
 
 {
-  // Cluster dashboard variables
-  // Returns both datasource and cluster variables
   cluster(config)::
     local datasource = common.datasource(config);
     {
