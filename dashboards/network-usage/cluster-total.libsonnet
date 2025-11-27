@@ -72,7 +72,7 @@ local var = g.dashboard.variable;
                 * on (%(clusterLabel)s,namespace,pod) group_left ()
                   topk by (%(clusterLabel)s,namespace,pod) (
                     1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                   )
               )
             ||| % $._config
@@ -90,7 +90,7 @@ local var = g.dashboard.variable;
                 * on (%(clusterLabel)s,namespace,pod) group_left ()
                   topk by (%(clusterLabel)s,namespace,pod) (
                     1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                   )
               )
             ||| % $._config
@@ -107,7 +107,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -120,7 +120,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -133,7 +133,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -146,7 +146,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -159,7 +159,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -172,7 +172,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -185,7 +185,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -198,7 +198,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -307,7 +307,7 @@ local var = g.dashboard.variable;
                 * on (%(clusterLabel)s,namespace,pod) group_left ()
                   topk by (%(clusterLabel)s,namespace,pod) (
                     1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                   )
               )
             ||| % $._config
@@ -325,7 +325,7 @@ local var = g.dashboard.variable;
                 * on (%(clusterLabel)s,namespace,pod) group_left ()
                   topk by (%(clusterLabel)s,namespace,pod) (
                     1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                   )
               )
             ||| % $._config
@@ -343,7 +343,7 @@ local var = g.dashboard.variable;
                 * on (%(clusterLabel)s,namespace,pod) group_left ()
                   topk by (%(clusterLabel)s,namespace,pod) (
                     1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                   )
               )
             ||| % $._config
@@ -361,7 +361,7 @@ local var = g.dashboard.variable;
                 * on (%(clusterLabel)s,namespace,pod) group_left ()
                   topk by (%(clusterLabel)s,namespace,pod) (
                     1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                   )
               )
             ||| % $._config
@@ -378,7 +378,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -394,7 +394,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -410,7 +410,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
@@ -426,7 +426,7 @@ local var = g.dashboard.variable;
               * on (%(clusterLabel)s,namespace,pod) group_left ()
                 topk by (%(clusterLabel)s,namespace,pod) (
                   1,
-                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
+                  max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false",%(clusterLabel)s="$cluster"})
                 )
             )
           ||| % $._config)
