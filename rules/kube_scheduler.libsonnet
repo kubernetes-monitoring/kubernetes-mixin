@@ -22,7 +22,7 @@
           for metric in [
             'scheduler_scheduling_attempt_duration_seconds',
             'scheduler_scheduling_algorithm_duration_seconds',
-            'scheduler_binding_duration_seconds',
+            'scheduler_pod_scheduling_sli_duration_seconds',
           ]
         ],
       },
