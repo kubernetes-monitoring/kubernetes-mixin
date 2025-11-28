@@ -5,6 +5,6 @@ local common = import './common.libsonnet';
     local datasource = common.datasource(config);
     {
       datasource: datasource,
-      cluster: common.cluster(config, datasource, 'up{%(cadvisorSelector)s}'),
+      cluster: common.cluster(config, datasource),
     },
 }

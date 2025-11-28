@@ -15,20 +15,16 @@ local var = g.dashboard.variable;
       },
     },
 
-  cluster(config, datasourceVar, selectorTemplate)::
+  cluster(config, datasourceVar)::
     var.query.new('cluster')
     + var.query.withDatasourceFromVariable(datasourceVar)
     + var.query.queryTypes.withLabelValues(
       config.clusterLabel,
-      selectorTemplate % config,
+      'up{%(kubeStateMetricsSelector)s}' % config,
     )
     + var.query.generalOptions.withLabel('cluster')
     + var.query.refresh.onTime()
-    + (
-      if config.showMultiCluster
-      then var.query.generalOptions.showOnDashboard.withLabelAndValue()
-      else var.query.generalOptions.showOnDashboard.withNothing()
-    )
+    + var.query.generalOptions.showOnDashboard.withLabelAndValue()
     + var.query.withSort(type='alphabetical'),
 
   namespace(config, datasourceVar)::
