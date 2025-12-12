@@ -37,11 +37,7 @@
     local labels = {
       join_labels: config['%ss_join_labels' % kind],
       // since the label 'job' is reserved, the resource with kind Job uses the label 'job_name' instead
-      on_labels:
-        if kind == 'pod' then
-          ['pod', 'job', '%s' % config.namespaceLabel, '%s' % config.clusterLabel]
-        else
-          ['%s' % (if kind == 'job' then 'job_name' else kind), '%s' % config.namespaceLabel, '%s' % config.clusterLabel],
+      on_labels: ['%s' % (if kind == 'job' then 'job_name' else kind), '%s' % config.namespaceLabel, '%s' % config.clusterLabel],
       metric: 'kube_%s_labels' % kind,
     };
 
