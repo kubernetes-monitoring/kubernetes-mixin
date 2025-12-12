@@ -790,6 +790,7 @@ tests:
     alertname: KubePodNotReady
     exp_alerts:
     - exp_labels:
+        job: kube-state-metrics
         cluster: kubernetes
         namespace: ns1
         pod: pod-ds-7cc77d965f-cgsdv
