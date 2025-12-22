@@ -169,40 +169,40 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum by (cluster, namespace, deployment) (kube_deployment_spec_replicas{%(clusterLabel)s="$cluster", namespace="$namespace", deployment="$workload"})' % $._config
+            'sum by (%(clusterLabel)s, %(namespaceLabel)s, deployment) (kube_deployment_spec_replicas{%(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace", deployment="$workload"})' % $._config
           ) + prometheus.withLegendFormat('{{deployment}} desired')
           + prometheus.withRefId('D'),
 
           prometheus.new(
             '${datasource}',
-            'sum by (cluster, namespace, deployment) (kube_deployment_status_replicas_available{%(clusterLabel)s="$cluster", namespace="$namespace", deployment="$workload"})' % $._config
+            'sum by (%(clusterLabel)s, %(namespaceLabel)s, deployment) (kube_deployment_status_replicas_available{%(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace", deployment="$workload"})' % $._config
           ) + prometheus.withLegendFormat('{{deployment}} available')
           + prometheus.withRefId('E'),
 
           prometheus.new(
             '${datasource}',
-            'sum by (cluster, namespace, statefulset) (kube_statefulset_replicas{%(clusterLabel)s="$cluster", namespace="$namespace", statefulset="$workload"})' % $._config
+            'sum by (%(clusterLabel)s, %(namespaceLabel)s, statefulset) (kube_statefulset_replicas{%(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace", statefulset="$workload"})' % $._config
           ) + prometheus.withLegendFormat('{{statefulset}} desired')
           + prometheus.withRefId('F'),
 
           prometheus.new(
             '${datasource}',
-            'sum by (cluster, namespace, statefulset) (kube_statefulset_status_replicas_ready{%(clusterLabel)s="$cluster", namespace="$namespace", statefulset="$workload"})' % $._config
+            'sum by (%(clusterLabel)s, %(namespaceLabel)s, statefulset) (kube_statefulset_status_replicas_ready{%(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace", statefulset="$workload"})' % $._config
           ) + prometheus.withLegendFormat('{{statefulset}} available')
           + prometheus.withRefId('G'),
 
           prometheus.new(
             '${datasource}',
-            'sum by (cluster, namespace, daemonset) (kube_daemonset_status_desired_number_scheduled{%(clusterLabel)s="$cluster", namespace="$namespace", daemonset="$workload"})' % $._config
+            'sum by (%(clusterLabel)s, %(namespaceLabel)s, daemonset) (kube_daemonset_status_desired_number_scheduled{%(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace", daemonset="$workload"})' % $._config
           ) + prometheus.withLegendFormat('{{daemonset}} desired')
           + prometheus.withRefId('H'),
 
           prometheus.new(
             '${datasource}',
-            'sum by (cluster, namespace, daemonset) (kube_daemonset_status_number_available{%(clusterLabel)s="$cluster", namespace="$namespace", daemonset="$workload"})' % $._config
+            'sum by (%(clusterLabel)s, %(namespaceLabel)s, daemonset) (kube_daemonset_status_number_available{%(clusterLabel)s="$cluster", %(namespaceLabel)s="$namespace", daemonset="$workload"})' % $._config
           ) + prometheus.withLegendFormat('{{daemonset}} available')
           + prometheus.withRefId('I'),
-        ]),        
+        ]),
         tsPanel.new('CPU Usage')
         + tsPanel.gridPos.withW(24)
         + tsPanel.queryOptions.withTargets([
