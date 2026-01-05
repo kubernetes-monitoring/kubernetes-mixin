@@ -82,18 +82,6 @@
   avgContainerTransmitBandwidth(config)::
     'avg(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster", %(namespaceLabel)s=~".+"}[%(grafanaIntervalVar)s])) by (namespace)' % config,
 
-  rateOfReceivedPackets(config)::
-    self.networkReceivePackets(config),
-
-  rateOfTransmittedPackets(config)::
-    self.networkTransmitPackets(config),
-
-  rateOfReceivedPacketsDropped(config)::
-    self.networkreceivepacketsdropped(config),
-
-  rateOfTransmittedPacketsDropped(config)::
-    self.networkTransmitPacketsDropped(config),
-
   // Storage Queries
   iopsReadsWrites(config)::
     'ceil(sum by(namespace) (rate(container_fs_reads_total{%(cadvisorSelector)s, %(containerfsSelector)s, %(diskDeviceSelector)s, %(clusterLabel)s="$cluster", namespace!=""}[%(grafanaIntervalVar)s]) + rate(container_fs_writes_total{%(cadvisorSelector)s, %(containerfsSelector)s, %(clusterLabel)s="$cluster", namespace!=""}[%(grafanaIntervalVar)s])))' % config,
