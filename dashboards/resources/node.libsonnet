@@ -87,6 +87,12 @@ local var = g.dashboard.variable;
 
           prometheus.new(
             '${datasource}',
+            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="cpu"})' % $._config,
+          )
+          + prometheus.withLegendFormat('max allocatable'),
+
+          prometheus.new(
+            '${datasource}',
             'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster", node=~"$node"})) by (pod)' % $._config,
           )
           + prometheus.withLegendFormat('{{pod}}'),
@@ -101,6 +107,15 @@ local var = g.dashboard.variable;
           + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
           + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
           + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
+          fieldOverride.byName.new('max allocatable')
+          + fieldOverride.byName.withPropertiesFromOptions(
+            timeSeries.standardOptions.color.withMode('fixed')
+            + timeSeries.standardOptions.color.withFixedColor('super-light-red')
+          )
+          + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
+          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
+          + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] })
+          + fieldOverride.byName.withProperty('custom.fillOpacity', 0),
         ]),
 
         table.new('CPU Quota')
@@ -186,6 +201,12 @@ local var = g.dashboard.variable;
 
           prometheus.new(
             '${datasource}',
+            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
+          )
+          + prometheus.withLegendFormat('max allocatable'),
+
+          prometheus.new(
+            '${datasource}',
             'sum(max by (%(clusterLabel)s, %(namespaceLabel)s, pod, container)(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", node=~"$node", container!=""})) by (pod)' % $._config,
           )
           + prometheus.withLegendFormat('{{pod}}'),
@@ -200,6 +221,15 @@ local var = g.dashboard.variable;
           + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
           + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
           + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
+          fieldOverride.byName.new('max allocatable')
+          + fieldOverride.byName.withPropertiesFromOptions(
+            timeSeries.standardOptions.color.withMode('fixed')
+            + timeSeries.standardOptions.color.withFixedColor('super-light-red')
+          )
+          + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
+          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
+          + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] })
+          + fieldOverride.byName.withProperty('custom.fillOpacity', 0),
         ]),
 
         tsPanel.new('Memory Usage (w/o cache)')
@@ -210,6 +240,12 @@ local var = g.dashboard.variable;
             'sum(kube_node_status_capacity{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
           )
           + prometheus.withLegendFormat('max capacity'),
+
+          prometheus.new(
+            '${datasource}',
+            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, node=~"$node", resource="memory"})' % $._config,
+          )
+          + prometheus.withLegendFormat('max allocatable'),
 
           prometheus.new(
             '${datasource}',
@@ -227,6 +263,15 @@ local var = g.dashboard.variable;
           + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
           + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
           + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] }),
+          fieldOverride.byName.new('max allocatable')
+          + fieldOverride.byName.withPropertiesFromOptions(
+            timeSeries.standardOptions.color.withMode('fixed')
+            + timeSeries.standardOptions.color.withFixedColor('super-light-red')
+          )
+          + fieldOverride.byName.withProperty('custom.stacking', { mode: 'none' })
+          + fieldOverride.byName.withProperty('custom.hideFrom', { tooltip: true, viz: false, legend: false })
+          + fieldOverride.byName.withProperty('custom.lineStyle', { fill: 'dash', dash: [10, 10] })
+          + fieldOverride.byName.withProperty('custom.fillOpacity', 0),
         ]),
 
         table.new('Memory Quota')
