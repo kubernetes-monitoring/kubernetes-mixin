@@ -571,7 +571,7 @@ local timeSeries = g.panel.timeSeries;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            queries.rateOfReceivedPackets($._config)
+            queries.networkReceivePackets($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -581,7 +581,7 @@ local timeSeries = g.panel.timeSeries;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            queries.rateOfTransmittedPackets($._config)
+            queries.networkTransmitPackets($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -591,7 +591,7 @@ local timeSeries = g.panel.timeSeries;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            queries.rateOfReceivedPacketsDropped($._config)
+            queries.networkReceivePacketsDropped($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -601,7 +601,7 @@ local timeSeries = g.panel.timeSeries;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            queries.rateOfTransmittedPacketsDropped($._config)
+            queries.networkTransmitPacketsDropped($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
