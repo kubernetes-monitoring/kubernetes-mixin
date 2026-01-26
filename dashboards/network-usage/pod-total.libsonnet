@@ -79,7 +79,7 @@ local var = g.dashboard.variable;
       };
 
       local panels = [
-        gauge.new('Current Rate of Bytes Received')
+        gauge.new('Current Rate of %(unit)s Received' % { unit: $._config.units.networkUnitLabel })
         + gauge.standardOptions.withDisplayName('$pod')
         + gauge.standardOptions.withUnit($._config.units.network)
         + gauge.standardOptions.withMin(0)
@@ -105,12 +105,12 @@ local var = g.dashboard.variable;
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))' % $._config
+            'sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])))' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
-        gauge.new('Current Rate of Bytes Transmitted')
+        gauge.new('Current Rate of %(unit)s Transmitted' % { unit: $._config.units.networkUnitLabel })
         + gauge.standardOptions.withDisplayName('$pod')
         + gauge.standardOptions.withUnit($._config.units.network)
         + gauge.standardOptions.withMin(0)
@@ -136,7 +136,7 @@ local var = g.dashboard.variable;
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))' % $._config
+            'sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])))' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -146,7 +146,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config
+            'sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))) by (pod)' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -156,7 +156,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config
+            'sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))) by (pod)' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
