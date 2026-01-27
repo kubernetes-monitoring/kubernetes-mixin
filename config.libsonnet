@@ -94,6 +94,12 @@
     units: {
       // Use 'bps' for bits per second (SI), or 'binBps' for bytes per second (IEC).
       network: 'bps',
+
+      // Use a multiplier of 8 when using a "bits" unit (e.g. 'bps'), or 1 when using a "bytes" unit (e.g. 'binBps').
+      networkMultiplier: 8,
+
+      // Returns "Bytes" if networkMultiplier is 1, or "Bits" if networkMultiplier is 8
+      networkUnitLabel: if self.networkMultiplier == 1 then 'Bytes' else 'Bits',
     },
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.

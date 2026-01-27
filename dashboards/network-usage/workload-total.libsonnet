@@ -94,7 +94,7 @@ local var = g.dashboard.variable;
       };
 
       local panels = [
-        barGauge.new('Current Rate of Bytes Received')
+        barGauge.new('Current Rate of %(unit)s Received' % { unit: $._config.units.networkUnitLabel })
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
         + barGauge.standardOptions.withUnit($._config.units.network)
@@ -105,15 +105,15 @@ local var = g.dashboard.variable;
           prometheus.new(
             '${datasource}',
             |||
-              sort_desc(sum(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
+              sort_desc(sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s]))
               * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
-            ||| % $._config
+            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
-        barGauge.new('Current Rate of Bytes Transmitted')
+        barGauge.new('Current Rate of %(unit)s Transmitted' % { unit: $._config.units.networkUnitLabel })
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
         + barGauge.standardOptions.withUnit($._config.units.network)
@@ -124,15 +124,15 @@ local var = g.dashboard.variable;
           prometheus.new(
             '${datasource}',
             |||
-              sort_desc(sum(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
+              sort_desc(sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s]))
               * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
-            ||| % $._config
+            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
-        barGauge.new('Average Rate of Bytes Received')
+        barGauge.new('Average Rate of %(unit)s Received' % { unit: $._config.units.networkUnitLabel })
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
         + barGauge.standardOptions.withUnit($._config.units.network)
@@ -143,15 +143,15 @@ local var = g.dashboard.variable;
           prometheus.new(
             '${datasource}',
             |||
-              sort_desc(avg(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
+              sort_desc(avg((%(multiplier)s * rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s]))
               * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
-            ||| % $._config
+            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
-        barGauge.new('Average Rate of Bytes Transmitted')
+        barGauge.new('Average Rate of %(unit)s Transmitted' % { unit: $._config.units.networkUnitLabel })
         + barGauge.options.withDisplayMode('basic')
         + barGauge.options.withShowUnfilled(false)
         + barGauge.standardOptions.withUnit($._config.units.network)
@@ -162,10 +162,10 @@ local var = g.dashboard.variable;
           prometheus.new(
             '${datasource}',
             |||
-              sort_desc(avg(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
+              sort_desc(avg((%(multiplier)s * rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s]))
               * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
-            ||| % $._config
+            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -176,10 +176,10 @@ local var = g.dashboard.variable;
           prometheus.new(
             '${datasource}',
             |||
-              sort_desc(sum(rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
+              sort_desc(sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s]))
               * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
-            ||| % $._config
+            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -190,10 +190,10 @@ local var = g.dashboard.variable;
           prometheus.new(
             '${datasource}',
             |||
-              sort_desc(sum(rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s])
+              sort_desc(sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(cadvisorSelector)s, %(clusterLabel)s="$cluster",namespace=~"$namespace"}[%(grafanaIntervalVar)s]))
               * on (%(clusterLabel)s, namespace, pod)
               group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace=~"$namespace", workload=~"$workload", workload_type=~"$type"}) by (pod))
-            ||| % $._config
+            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
