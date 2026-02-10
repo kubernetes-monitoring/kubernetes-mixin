@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
 	github.com/cloudflare/pint v0.79.0
-	github.com/errata-ai/vale/v3 v3.13.0
+	github.com/errata-ai/vale/v3 v3.13.1
 	github.com/google/go-jsonnet v0.21.0
 	github.com/grafana/dashboard-linter v0.0.0-20231114210226-c458893a5731
 	github.com/jsonnet-bundler/jsonnet-bundler v0.6.0
