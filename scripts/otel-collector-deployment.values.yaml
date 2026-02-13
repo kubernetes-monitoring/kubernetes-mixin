@@ -1,0 +1,191 @@
+# Based on the following guide:
+# https://grafana.com/docs/grafana-cloud/monitor-infrastructure/kubernetes-monitoring/configuration/config-other-methods/otel-collector/
+mode: deployment
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+
+clusterRole:
+  create: true
+  rules:
+    - apiGroups:
+        - ''
+      resources:
+        - nodes
+        - nodes/proxy
+        - services
+        - endpoints
+        - pods
+        - events
+        - namespaces
+        - namespaces/status
+        - pods/status
+        - replicationcontrollers
+        - replicationcontrollers/status
+        - resourcequotas
+      verbs:
+        - get
+        - list
+        - watch
+    - nonResourceURLs:
+        - /metrics
+        - /metrics/resources
+      verbs:
+        - get
+    - apiGroups:
+        - apps
+      resources:
+        - daemonsets
+        - deployments
+        - replicasets
+        - statefulsets
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - extensions
+      resources:
+        - daemonsets
+        - deployments
+        - replicasets
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - batch
+      resources:
+        - jobs
+        - cronjobs
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - autoscaling
+      resources:
+        - horizontalpodautoscalers
+      verbs:
+        - get
+        - list
+        - watch
+
+config:
+  receivers:
+    prometheus:
+      config:
+        scrape_configs:
+          - job_name: cadvisor
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            kubernetes_sd_configs:
+              - role: node
+            relabel_configs:
+              - replacement: kubernetes.default.svc.cluster.local:443
+                target_label: __address__
+              - regex: (.+)
+                replacement: /api/v1/nodes/$${1}/proxy/metrics/cadvisor
+                source_labels:
+                  - __meta_kubernetes_node_name
+                target_label: __metrics_path__
+            scheme: https
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: false
+              server_name: kubernetes
+          
+          - job_name: kubelet
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            kubernetes_sd_configs:
+              - role: node
+            relabel_configs:
+              - replacement: kubernetes.default.svc.cluster.local:443
+                target_label: __address__
+              - regex: (.+)
+                replacement: /api/v1/nodes/$${1}/proxy/metrics
+                source_labels:
+                  - __meta_kubernetes_node_name
+                target_label: __metrics_path__
+            scheme: https
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: false
+              server_name: kubernetes
+          
+          - job_name: kube-state-metrics
+            kubernetes_sd_configs:
+              - role: pod
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                action: keep
+                regex: kube-state-metrics
+          
+          - job_name: node-exporter
+            kubernetes_sd_configs:
+              - role: pod
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                action: keep
+                regex: prometheus-node-exporter.*
+              - source_labels: [__meta_kubernetes_pod_node_name]
+                target_label: instance
+              - source_labels: [__meta_kubernetes_namespace]
+                target_label: namespace
+
+          - job_name: kube-scheduler
+            kubernetes_sd_configs:
+              - role: service
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_service_name]
+                action: keep
+                regex: kube-scheduler
+              - source_labels: [__meta_kubernetes_namespace]
+                action: keep
+                regex: kube-system
+            scheme: https
+            tls_config:
+              insecure_skip_verify: true
+
+          - job_name: kube-scheduler-resources
+            kubernetes_sd_configs:
+              - role: service
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_service_name]
+                action: keep
+                regex: kube-scheduler
+              - source_labels: [__meta_kubernetes_namespace]
+                action: keep
+                regex: kube-system
+            metrics_path: /metrics/resources
+            scheme: https
+            tls_config:
+              insecure_skip_verify: true
+
+  processors:
+    batch: {}
+  
+  exporters:
+    prometheusremotewrite:
+      external_labels:
+        cluster: 'kubernetes-mixin'
+      endpoint: 'http://lgtm:9090/api/v1/write'
+    
+    prometheus:
+      endpoint: "0.0.0.0:8889"
+      resource_to_telemetry_conversion:
+        enabled: true
+
+  service:
+    extensions: [health_check]
+    pipelines:
+      metrics:
+        receivers: [prometheus]
+        processors: [batch]
+        exporters: [prometheus, prometheusremotewrite]
+
+ports:
+  prometheus:
+    enabled: true
+    containerPort: 8889
+    servicePort: 8889
+    protocol: TCP

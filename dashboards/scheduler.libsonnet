@@ -86,10 +86,10 @@ local var = g.dashboard.variable;
         + tsPanel.gridPos.withW(10)
         + tsPanel.standardOptions.withUnit('ops')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'sum(rate(scheduler_e2e_scheduling_duration_seconds_count{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance)' % $._config)
+          prometheus.new('${datasource}', 'sum(rate(scheduler_scheduling_attempt_duration_seconds_count{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance)' % $._config)
           + prometheus.withLegendFormat('{{%(clusterLabel)s}} {{instance}} e2e' % $._config),
 
-          prometheus.new('${datasource}', 'sum(rate(scheduler_binding_duration_seconds_count{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance)' % $._config)
+          prometheus.new('${datasource}', 'sum(rate(scheduler_pod_scheduling_sli_duration_seconds_count{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance)' % $._config)
           + prometheus.withLegendFormat('{{%(clusterLabel)s}} {{instance}} binding' % $._config),
 
           prometheus.new('${datasource}', 'sum(rate(scheduler_scheduling_algorithm_duration_seconds_count{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s, instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance)' % $._config)
@@ -103,10 +103,10 @@ local var = g.dashboard.variable;
         + tsPanel.gridPos.withW(10)
         + tsPanel.standardOptions.withUnit('s')
         + tsPanel.queryOptions.withTargets([
-          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(scheduler_e2e_scheduling_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance, le))' % $._config)
+          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(scheduler_scheduling_attempt_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance, le))' % $._config)
           + prometheus.withLegendFormat('{{%(clusterLabel)s}} {{instance}} e2e' % $._config),
 
-          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(scheduler_binding_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance, le))' % $._config)
+          prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(scheduler_pod_scheduling_sli_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance, le))' % $._config)
           + prometheus.withLegendFormat('{{%(clusterLabel)s}} {{instance}} binding' % $._config),
 
           prometheus.new('${datasource}', 'histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeSchedulerSelector)s,instance=~"$instance"}[%(grafanaIntervalVar)s])) by (%(clusterLabel)s, instance, le))' % $._config)

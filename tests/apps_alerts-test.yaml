@@ -1,0 +1,55 @@
+rule_files:
+- ../prometheus_alerts.yaml
+
+tests:
+- interval: 1m
+  name: KubePdbNotEnoughHealthyPods fires when current healthly pods are less than desired
+  input_series:
+  - series: 'kube_poddisruptionbudget_status_desired_healthy{cluster="cluster1", namespace="ns1", poddisruptionbudget="pdb1", job="kube-state-metrics"}'
+    values: '4x15'
+  - series: 'kube_poddisruptionbudget_status_current_healthy{cluster="cluster1", namespace="ns1", poddisruptionbudget="pdb1", job="kube-state-metrics"}'
+    values: '3x15'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubePdbNotEnoughHealthyPods
+  - eval_time: 15m
+    alertname: KubePdbNotEnoughHealthyPods
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        cluster: "cluster1"
+        namespace: "ns1"
+        poddisruptionbudget: "pdb1"
+        job: "kube-state-metrics"
+      exp_annotations:
+        description: "PDB ns1/pdb1 expects 1 more healthy pods. The desired number of healthy pods has not been met for at least 15m."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepdbnotenoughhealthypods"
+        summary: "PDB does not have enough healthy pods."
+
+- interval: 1m
+  name: KubeStatefulSetUpdateNotRolledOut still fires even if another label (e.g. instance) is present
+  input_series:
+  - series: 'kube_statefulset_status_current_revision{job="kube-state-metrics", cluster="c1", namespace="ns1", statefulset="ss1", revision="foo", instance="custom"}'
+    values: '1x15'
+  - series: 'kube_statefulset_status_update_revision{job="kube-state-metrics", cluster="c1", namespace="ns1", statefulset="ss1", revision="bar", instance="custom"}'
+    values: '1x15'
+  - series: 'kube_statefulset_replicas{job="kube-state-metrics", cluster="c1", namespace="ns1", statefulset="ss1", instance="custom"}'
+    values: '5x15'
+  - series: 'kube_statefulset_status_replicas_updated{job="kube-state-metrics", cluster="c1", namespace="ns1", statefulset="ss1", instance="custom"}'
+    values: '1x15'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeStatefulSetUpdateNotRolledOut
+  - eval_time: 15m
+    alertname: KubeStatefulSetUpdateNotRolledOut
+    exp_alerts:
+    - exp_labels:
+        cluster: "c1"
+        job: "kube-state-metrics"
+        namespace: "ns1"
+        severity: "warning"
+        statefulset: "ss1"
+      exp_annotations:
+        description: "StatefulSet ns1/ss1 update has not been rolled out."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubestatefulsetupdatenotrolledout"
+        summary: "StatefulSet update has not been rolled out."

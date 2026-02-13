@@ -12,6 +12,9 @@ local utils = import '../lib/utils.libsonnet';
 
     kubeletCertExpirationWarningSeconds: 7 * 24 * 3600,
     kubeletCertExpirationCriticalSeconds: 1 * 24 * 3600,
+
+    // Evictions per second that will trigger an alert. The default value will trigger on any evictions.
+    KubeNodeEvictionRateThreshold: 0.0,
   },
 
   prometheusAlerts+:: {
@@ -38,6 +41,24 @@ local utils = import '../lib/utils.libsonnet';
             alert: 'KubeNodeNotReady',
           },
           {
+            alert: 'KubeNodePressure',
+            expr: |||
+              kube_node_status_condition{%(kubeStateMetricsSelector)s,condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1
+              and on (%(clusterLabel)s, node)
+              kube_node_spec_unschedulable{%(kubeStateMetricsSelector)s} == 0
+            ||| % $._config,
+            labels: {
+              severity: 'info',
+            },
+            'for': '10m',
+            annotations: {
+              description: '{{ $labels.node }}%s has active Condition {{ $labels.condition }}. This is caused by resource usage exceeding eviction thresholds.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Node has as active Condition.',
+            },
+          },
+          {
             expr: |||
               (kube_node_spec_taint{%(kubeStateMetricsSelector)s,key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{%(kubeStateMetricsSelector)s,key=~"%(kubeNodeUnreachableIgnoreKeys)s"}) == 1
             ||| % $._config {
@@ -60,14 +81,16 @@ local utils = import '../lib/utils.libsonnet';
             // Some node has a capacity of 1 like AWS's Fargate and only exists while a pod is running on it.
             // We have to ignore this special node in the KubeletTooManyPods alert.
             expr: |||
-              count by (%(clusterLabel)s, node) (
-                (kube_pod_status_phase{%(kubeStateMetricsSelector)s, phase="Running"} == 1)
-                * on (%(clusterLabel)s, namespace, pod) group_left (node)
-                group by (%(clusterLabel)s, namespace, pod, node) (
-                  kube_pod_info{%(kubeStateMetricsSelector)s}
+              (
+                max by (%(clusterLabel)s, instance) (
+                  kubelet_running_pods{%(kubeletSelector)s} > 1
+                )
+                * on (%(clusterLabel)s, instance) group_left(node)
+                max by (%(clusterLabel)s, instance, node) (
+                  kubelet_node_name{%(kubeletSelector)s}
                 )
               )
-              /
+              / on (%(clusterLabel)s, node) group_left()
               max by (%(clusterLabel)s, node) (
                 kube_node_status_capacity{%(kubeStateMetricsSelector)s, resource="pods"} != 1
               ) > 0.95
@@ -102,6 +125,27 @@ local utils = import '../lib/utils.libsonnet';
             },
           },
           {
+            alert: 'KubeNodeEviction',
+            expr: |||
+              sum(rate(kubelet_evictions{%(kubeletSelector)s}[15m])) by(%(clusterLabel)s, eviction_signal, instance)
+              * on (%(clusterLabel)s, instance) group_left(node)
+              max by (%(clusterLabel)s, instance, node) (
+                kubelet_node_name{%(kubeletSelector)s}
+              )
+              > %(KubeNodeEvictionRateThreshold)s
+            ||| % $._config,
+            labels: {
+              severity: 'info',
+            },
+            'for': '0s',
+            annotations: {
+              description: 'Node {{ $labels.node }}%s is evicting Pods due to {{ $labels.eviction_signal }}.  Eviction occurs when eviction thresholds are crossed, typically caused by Pods exceeding RAM/ephemeral-storage limits.' % [
+                utils.ifShowMultiCluster($._config, ' on {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Node is evicting pods.',
+            },
+          },
+          {
             alert: 'KubeletPlegDurationHigh',
             expr: |||
               node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
@@ -120,7 +164,18 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeletPodStartUpLatencyHigh',
             expr: |||
-              histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])) by (%(clusterLabel)s, instance, le)) * on(%(clusterLabel)s, instance) group_left(node) kubelet_node_name{%(kubeletSelector)s} > 60
+              histogram_quantile(0.99,
+                sum by (%(clusterLabel)s, instance, le) (
+                  topk by (%(clusterLabel)s, instance, le, operation_type) (1,
+                    rate(kubelet_pod_worker_duration_seconds_bucket{%(kubeletSelector)s}[5m])
+                  )
+                )
+              )
+              * on(%(clusterLabel)s, instance) group_left(node)
+              topk by (%(clusterLabel)s, instance, node) (1,
+                kubelet_node_name{%(kubeletSelector)s}
+              )
+              > 60
             ||| % $._config,
             'for': '15m',
             labels: {

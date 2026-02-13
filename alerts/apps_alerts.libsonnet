@@ -5,6 +5,7 @@ local utils = import '../lib/utils.libsonnet';
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeJobTimeoutDuration: error 'must provide value for kubeJobTimeoutDuration',
     kubeDaemonSetRolloutStuckFor: '15m',
+    kubePdbNotEnoughHealthyPodsFor: '15m',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
@@ -37,9 +38,9 @@ local utils = import '../lib/utils.libsonnet';
             // label exists for 2 values. This avoids "many-to-many matching
             // not allowed" errors when joining with kube_pod_status_phase.
             expr: |||
-              sum by (namespace, pod, %(clusterLabel)s) (
-                max by(namespace, pod, %(clusterLabel)s) (
-                  kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown|Failed"}
+              sum by (namespace, pod, job, %(clusterLabel)s) (
+                max by(namespace, pod, job, %(clusterLabel)s) (
+                  kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}
                 ) * on(namespace, pod, %(clusterLabel)s) group_left(owner_kind) topk by(namespace, pod, %(clusterLabel)s) (
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
@@ -121,7 +122,7 @@ local utils = import '../lib/utils.libsonnet';
               (
                 kube_statefulset_status_replicas_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   !=
-                kube_statefulset_status_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                kube_statefulset_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
               ) and (
                 changes(kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m])
                   ==
@@ -166,13 +167,13 @@ local utils = import '../lib/utils.libsonnet';
                     unless
                   kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 )
-                  *
+                  * on(namespace, statefulset, job, %(clusterLabel)s)
                 (
                   kube_statefulset_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                     !=
                   kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 )
-              )  and (
+              )  and on(namespace, statefulset, job, %(clusterLabel)s) (
                 changes(kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
                   ==
                 0
@@ -196,19 +197,19 @@ local utils = import '../lib/utils.libsonnet';
               (
                 (
                   kube_daemonset_status_current_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                   !=
+                    !=
                   kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 ) or (
                   kube_daemonset_status_number_misscheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                   !=
+                    !=
                   0
                 ) or (
                   kube_daemonset_status_updated_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                   !=
+                    !=
                   kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 ) or (
                   kube_daemonset_status_number_available{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                   !=
+                    !=
                   kube_daemonset_status_desired_number_scheduled{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 )
               ) and (
@@ -358,6 +359,28 @@ local utils = import '../lib/utils.libsonnet';
             },
             'for': '15m',
             alert: 'KubeHpaMaxedOut',
+          },
+          {
+            expr: |||
+              (
+                kube_poddisruptionbudget_status_desired_healthy{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+                -
+                kube_poddisruptionbudget_status_current_healthy{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+              )
+              > 0
+            ||| % $._config,
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'PDB %s{{ $labels.namespace }}/{{ $labels.poddisruptionbudget }} expects {{ $value }} more healthy pods. The desired number of healthy pods has not been met for at least %s.' % [
+                utils.ifShowMultiCluster($._config, '{{ $labels.%(clusterLabel)s }}/' % $._config),
+                $._config.kubePdbNotEnoughHealthyPodsFor,
+              ],
+              summary: 'PDB does not have enough healthy pods.',
+            },
+            'for': $._config.kubePdbNotEnoughHealthyPodsFor,
+            alert: 'KubePdbNotEnoughHealthyPods',
           },
         ],
       },

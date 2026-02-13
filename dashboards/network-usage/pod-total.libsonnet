@@ -79,82 +79,84 @@ local var = g.dashboard.variable;
       };
 
       local panels = [
-        gauge.new('Current Rate of Bytes Received')
+        gauge.new('Current Rate of %(unit)s Received' % { unit: $._config.units.networkUnitLabel })
         + gauge.standardOptions.withDisplayName('$pod')
-        + gauge.standardOptions.withUnit('Bps')
+        + gauge.standardOptions.withUnit($._config.units.network)
         + gauge.standardOptions.withMin(0)
-        + gauge.standardOptions.withMax(10000000000)  // 10GBs
+        + gauge.standardOptions.withMax(10000000000)  // 10Gbps
         + gauge.standardOptions.thresholds.withSteps([
           {
             color: 'dark-green',
             index: 0,
-            value: null,  // 0GBs
+            value: null,  // 0Gbps
           },
           {
             color: 'dark-yellow',
             index: 1,
-            value: 5000000000,  // 5GBs
+            value: 5000000000,  // 5Gbps
           },
           {
             color: 'dark-red',
             index: 2,
-            value: 7000000000,  // 7GBs
+            value: 7000000000,  // 7Gbps
           },
         ])
+        + gauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))' % $._config
+            'sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])))' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
-        gauge.new('Current Rate of Bytes Transmitted')
+        gauge.new('Current Rate of %(unit)s Transmitted' % { unit: $._config.units.networkUnitLabel })
         + gauge.standardOptions.withDisplayName('$pod')
-        + gauge.standardOptions.withUnit('Bps')
+        + gauge.standardOptions.withUnit($._config.units.network)
         + gauge.standardOptions.withMin(0)
-        + gauge.standardOptions.withMax(10000000000)  // 10GBs
+        + gauge.standardOptions.withMax(10000000000)  // 10Gbps
         + gauge.standardOptions.thresholds.withSteps([
           {
             color: 'dark-green',
             index: 0,
-            value: null,  // 0GBs
+            value: null,  // 0Gbps
           },
           {
             color: 'dark-yellow',
             index: 1,
-            value: 5000000000,  // 5GBs
+            value: 5000000000,  // 5Gbps
           },
           {
             color: 'dark-red',
             index: 2,
-            value: 7000000000,  // 7GBs
+            value: 7000000000,  // 7Gbps
           },
         ])
+        + gauge.queryOptions.withInterval($._config.grafanaK8s.minimumTimeInterval)
         + gauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))' % $._config
+            'sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])))' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Receive Bandwidth')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config
+            'sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))) by (pod)' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
 
         tsPanel.new('Transmit Bandwidth')
-        + tsPanel.standardOptions.withUnit('binBps')
+        + tsPanel.standardOptions.withUnit($._config.units.network)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s])) by (pod)' % $._config
+            'sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace=~"$namespace", pod=~"$pod"}[%(grafanaIntervalVar)s]))) by (pod)' % ($._config { multiplier: $._config.units.networkMultiplier })
           )
           + prometheus.withLegendFormat('__auto'),
         ]),

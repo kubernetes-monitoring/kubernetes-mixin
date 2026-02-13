@@ -5,7 +5,7 @@
 
   alert: '%sDown' % absentAlert.componentName,
   expr: |||
-    absent(up{%s} == 1)
+    absent(up{%s})
   ||| % absentAlert.selector,
   'for': '15m',
   labels: {

@@ -9,7 +9,7 @@
             record: 'node:windows_node:sum',
             expr: |||
               count by (%(clusterLabel)s) (
-                windows_system_system_up_time{%(windowsExporterSelector)s}
+                windows_system_boot_time_timestamp_seconds{%(windowsExporterSelector)s}
               )
             ||| % $._config,
           },
@@ -122,7 +122,7 @@
             expr: |||
               avg by (%(clusterLabel)s, instance) (
                 (irate(windows_logical_disk_read_seconds_total{%(windowsExporterSelector)s}[1m]) +
-                 irate(windows_logical_disk_write_seconds_total{%(windowsExporterSelector)s}[1m]))
+                irate(windows_logical_disk_write_seconds_total{%(windowsExporterSelector)s}[1m]))
               )
             ||| % $._config,
           },
@@ -130,9 +130,10 @@
             record: 'node:windows_node_filesystem_usage:',
             expr: |||
               max by (%(clusterLabel)s,instance,volume)(
-                (windows_logical_disk_size_bytes{%(windowsExporterSelector)s}
-              - windows_logical_disk_free_bytes{%(windowsExporterSelector)s})
-              / windows_logical_disk_size_bytes{%(windowsExporterSelector)s}
+                (windows_logical_disk_size_bytes{%(windowsExporterSelector)s} -
+                windows_logical_disk_free_bytes{%(windowsExporterSelector)s})
+                /
+                windows_logical_disk_size_bytes{%(windowsExporterSelector)s}
               )
             ||| % $._config,
           },
