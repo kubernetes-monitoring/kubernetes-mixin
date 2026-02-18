@@ -280,9 +280,26 @@ local utils = import '../lib/utils.libsonnet';
               summary: 'Kubelet has failed to renew its server certificate.',
             },
           },
-          (import '../lib/absent_alert.libsonnet') {
-            componentName:: 'Kubelet',
-            selector:: $._config.kubeletSelector,
+          {
+            // Use kube-state-metrics as an anchor to detect kubelet down while
+            // preserving the cluster label. This fires when kube-state-metrics
+            // reports nodes exist but no kubelet targets are up for that cluster.
+            alert: 'KubeletDown',
+            expr: |||
+              count by (%(clusterLabel)s) (kube_node_info{%(kubeStateMetricsSelector)s})
+              unless on (%(clusterLabel)s)
+              count by (%(clusterLabel)s) (up{%(kubeletSelector)s} == 1)
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'critical',
+            },
+            annotations: {
+              description: 'Kubelet has disappeared from Prometheus target discovery%s.' % [
+                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+              ],
+              summary: 'Target disappeared from Prometheus target discovery.',
+            },
           },
         ],
       },

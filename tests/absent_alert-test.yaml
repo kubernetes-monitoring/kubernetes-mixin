@@ -22,10 +22,14 @@ tests:
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapidown"
 
 - interval: 1m
-  name: KubeletDown fires when kubelet target is absent
+  name: KubeletDown fires when kubelet target is absent but nodes exist
   input_series:
-  - series: 'up{job="kubelet", instance="node1"}'
-    values: '1 1 1 1 1 0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+  # kube_node_info from kube-state-metrics - stays present to indicate nodes exist
+  - series: 'kube_node_info{job="kube-state-metrics", cluster="test-cluster", node="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  # kubelet up metric - goes absent after 5 minutes
+  - series: 'up{job="kubelet", cluster="test-cluster", instance="node1"}'
+    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
   alert_rule_test:
   - eval_time: 10m
     alertname: KubeletDown
@@ -34,11 +38,79 @@ tests:
     exp_alerts:
     - exp_labels:
         severity: "critical"
-        job: "kubelet"
+        cluster: "test-cluster"
       exp_annotations:
         description: "Kubelet has disappeared from Prometheus target discovery."
         summary: "Target disappeared from Prometheus target discovery."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletdown"
+
+- interval: 1m
+  name: KubeletDown does not fire when kubelet is up
+  input_series:
+  - series: 'kube_node_info{job="kube-state-metrics", cluster="test-cluster", node="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'up{job="kubelet", cluster="test-cluster", instance="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeletDown
+    exp_alerts: []
+
+- interval: 1m
+  name: KubeletDown does not fire when no nodes exist (no kube_node_info)
+  input_series:
+  # No kube_node_info means no nodes in this cluster - kubelet absence is expected
+  - series: 'up{job="kubelet", cluster="test-cluster", instance="node1"}'
+    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeletDown
+    exp_alerts: []
+
+- interval: 1m
+  name: KubeletDown fires without cluster label (single-cluster setup)
+  input_series:
+  # Metrics without cluster label - common in single-cluster setups without external_labels
+  - series: 'kube_node_info{job="kube-state-metrics", node="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'up{job="kubelet", instance="node1"}'
+    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeletDown
+  - eval_time: 25m
+    alertname: KubeletDown
+    exp_alerts:
+    - exp_labels:
+        severity: "critical"
+      exp_annotations:
+        description: "Kubelet has disappeared from Prometheus target discovery."
+        summary: "Target disappeared from Prometheus target discovery."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletdown"
+
+- interval: 1m
+  name: KubeletDown does not fire when kubelet is up (single-cluster setup)
+  input_series:
+  # Metrics without cluster label - healthy single-cluster setup
+  - series: 'kube_node_info{job="kube-state-metrics", node="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  - series: 'up{job="kubelet", instance="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeletDown
+    exp_alerts: []
+
+- interval: 1m
+  name: KubeletDown does not fire when no nodes exist (single-cluster setup)
+  input_series:
+  # No kube_node_info and no cluster label - kubelet absence is expected
+  - series: 'up{job="kubelet", instance="node1"}'
+    values: '1 1 1 1 1 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeletDown
+    exp_alerts: []
 
 - interval: 1m
   name: KubeSchedulerDown fires when kube-scheduler target is absent
