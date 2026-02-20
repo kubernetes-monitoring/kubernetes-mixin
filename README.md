@@ -1,224 +1,309 @@
-# go-jsonnet
+# Prometheus Monitoring Mixin for Kubernetes
 
-[![GoDoc Widget]][GoDoc] [![Travis Widget]][Travis] [![Coverage Status Widget]][Coverage Status]
+[![ci](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml/badge.svg)](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml)
 
-[GoDoc]: https://godoc.org/github.com/google/go-jsonnet
-[GoDoc Widget]: https://godoc.org/github.com/google/go-jsonnet?status.png
-[Travis]: https://travis-ci.org/google/go-jsonnet
-[Travis Widget]: https://travis-ci.org/google/go-jsonnet.svg?branch=master
-[Coverage Status Widget]: https://coveralls.io/repos/github/google/go-jsonnet/badge.svg?branch=master
-[Coverage Status]: https://coveralls.io/github/google/go-jsonnet?branch=master
+A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 
-This an implementation of [Jsonnet](http://jsonnet.org/) in pure Go. It is a feature complete, production-ready implementation. It is compatible with the original [Jsonnet C++ implementation](https://github.com/google/jsonnet). Bindings to C and Python are available (but not battle-tested yet).
+## Local development
 
-This code is known to work on Go 1.12 and above. We recommend always using the newest stable release of Go.
-
-## Installation instructions
+Run the following command to setup a local [kind](https://kind.sigs.k8s.io) cluster:
 
 ```shell
-# Using `go get` to install binaries is deprecated.
-# The version suffix is mandatory.
-go install github.com/google/go-jsonnet/cmd/jsonnet@latest
-
-# Or other tools in the 'cmd' directory
-go install github.com/google/go-jsonnet/cmd/jsonnet-lint@latest
+make dev
 ```
 
-It's also available on Homebrew:
+You should see the following output if successful:
+
+```shell
+╔═══════════════════════════════════════════════════════════════╗
+║             🚀 Development Environment Ready! 🚀              ║
+║                                                               ║
+║   Run `make dev-port-forward`                                 ║
+║   Grafana will be available at http://localhost:3000          ║
+║                                                               ║
+║   Data will be available in a few minutes.                    ║
+║                                                               ║
+║   Dashboards will refresh every 10s, run `make generate`      ║
+║   and refresh your browser to see the changes.                ║
+║                                                               ║
+║   Alert and recording rules require `make dev-reload`.        ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+To delete the cluster, run the following:
+
+```shell
+make dev-down
+```
+
+## Releases
+
+> Note: Releases up until `release-0.12` are changes in their own branches. Changelogs are included in releases starting from [version-0.13.0](https://github.com/kubernetes-monitoring/kubernetes-mixin/releases/tag/version-0.13.0).
+
+| Release branch | Kubernetes Compatibility | Prometheus Compatibility | Kube-state-metrics Compatibility |
+|----------------|--------------------------|--------------------------|----------------------------------|
+| release-0.1    | v1.13 and before         |                          |                                  |
+| release-0.2    | v1.14.1 and before       | v2.11.0+                 |                                  |
+| release-0.3    | v1.17 and before         | v2.11.0+                 |                                  |
+| release-0.4    | v1.18                    | v2.11.0+                 |                                  |
+| release-0.5    | v1.19                    | v2.11.0+                 |                                  |
+| release-0.6    | v1.19+                   | v2.11.0+                 |                                  |
+| release-0.7    | v1.19+                   | v2.11.0+                 | v1.x                             |
+| release-0.8    | v1.20+                   | v2.11.0+                 | v2.0+                            |
+| release-0.9    | v1.20+                   | v2.11.0+                 | v2.0+                            |
+| release-0.10   | v1.20+                   | v2.11.0+                 | v2.0+                            |
+| release-0.11   | v1.23+                   | v2.11.0+                 | v2.0+                            |
+| release-0.12   | v1.23+                   | v2.11.0+                 | v2.0+                            |
+| release-0.13   | v1.23+                   | v2.11.0+                 | v2.0+                            |
+| master         | v1.26+                   | v2.11.0+                 | v2.0+                            |
+
+In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented. Therefore v0.1.x of this repository is the last release to support Kubernetes 1.13 and previous version on a best effort basis.
+
+Some alerts now use Prometheus filters made available in Prometheus 2.11.0, which makes this version of Prometheus a dependency.
+
+Warning: This compatibility matrix was initially created based on experience, we do not guarantee the compatibility, it may be updated based on new learnings.
+
+Warning: By default the expressions will generate *grafana 7.2+* compatible rules using the *$\_\_rate_interval* variable for rate functions. If you need backward compatible rules please set *grafana72: false* in your *\_config*
+
+### Release steps
+
+Maintainers can trigger the [release workflow](.github/workflows/release.yaml) by pushing a git tag that matches the pattern: `version-*`.
+
+1. Checkout `master` branch and pull for latest.
+
+   ```bash
+   git checkout master
+   ```
+
+2. Create a tag following sem-ver versioning for the version and trigger release.
+
+   ```bash
+   # replace MAJOR.MINOR.PATCH with e.g. 1.2.3
+   tag=version-MAJOR.MINOR.PATCH; git tag $tag && git push origin $tag
+   ```
+
+#### Decisions on backfilling releases
+
+We wanted to backfill `release-0.1` to `release-0.12` to have a changelog, but we were not able to use a GitHub action in a newer commit to trigger a release that generates a changelog on older commits. See #489 for full discussion.
+
+## Metrics Deprecation
+
+The following recording rule is marked deprecated. It will be removed in v2.0.0.
+
+```bash
+node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
+```
+
+It will be replaced by the following recording rule to preserve data points using `rate` and add `5m` to indicate the range of the rate query in the recording rule name.
+
+```bash
+node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
+```
+
+## How to use
+
+This mixin is designed to be vendored into the repo with your infrastructure config. To do this, use [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler):
+
+You then have three options for deploying your dashboards
+
+1. Generate the config files and deploy them yourself
+2. Use ksonnet to deploy this mixin along with Prometheus and Grafana
+3. Use prometheus-operator to deploy this mixin (TODO)
+
+## Generate config files
+
+You can manually generate the alerts, dashboards and rules files, but first you must install some tools:
 
 ```
-brew install go-jsonnet
+$ go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
+$ brew install jsonnet
 ```
 
-`jsonnetfmt` and `jsonnet-lint` are also available as [pre-commit](https://github.com/pre-commit/pre-commit) hooks. Example `.pre-commit-config.yaml`:
-```yaml
-- repo: https://github.com/google/go-jsonnet
-  rev: # ref you want to point at, e.g. v0.17.0
-  hooks:
-    - id: jsonnet-format
-    - id: jsonnet-lint
+Then, grab the mixin, its dependencies, and build:
+
+```
+$ git clone https://github.com/kubernetes-monitoring/kubernetes-mixin
+$ cd kubernetes-mixin
+$ make generate
 ```
 
-It can also be embedded in your own Go programs as a library:
+The `prometheus_alerts.yaml` and `prometheus_rules.yaml` files then need to passed to your Prometheus server, and the files in `dashboards_out` need to be imported into you Grafana server. The exact details will depending on how you deploy your monitoring stack to Kubernetes.
 
-```go
-package main
+### Dashboards for Windows Nodes
 
-import (
-	"fmt"
-	"log"
+There exist separate dashboards for windows resources.
 
-	"github.com/google/go-jsonnet"
-)
+1. Compute Resources / Cluster(Windows)
+2. Compute Resources / Namespace(Windows)
+3. Compute Resources / Pod(Windows)
+4. USE Method / Cluster(Windows)
+5. USE Method / Node(Windows)
 
-func main() {
-	vm := jsonnet.MakeVM()
+These dashboards are based on metrics populated by [windows-exporter](https://github.com/prometheus-community/windows_exporter) from each Windows node.
 
-	snippet := `{
-		person1: {
-		    name: "Alice",
-		    welcome: "Hello " + self.name + "!",
-		},
-		person2: self.person1 { name: "Bob" },
-	}`
+## Running the tests
 
-	jsonStr, err := vm.EvaluateAnonymousSnippet("example1.jsonnet", snippet)
-	if err != nil {
-		log.Fatal(err)
-	}
+```sh
+make test
+```
 
-	fmt.Println(jsonStr)
-	/*
-	   {
-	     "person1": {
-	         "name": "Alice",
-	         "welcome": "Hello Alice!"
-	     },
-	     "person2": {
-	         "name": "Bob",
-	         "welcome": "Hello Bob!"
-	     }
-	   }
-	*/
+## Using with prometheus-ksonnet
+
+Alternatively you can also use the mixin with [prometheus-ksonnet](https://github.com/kausalco/public/tree/master/prometheus-ksonnet), a [ksonnet](https://github.com/ksonnet/ksonnet) module to deploy a fully-fledged Prometheus-based monitoring system for Kubernetes:
+
+Make sure you have the ksonnet v0.8.0:
+
+```
+$ brew install https://raw.githubusercontent.com/ksonnet/homebrew-tap/82ef24cb7b454d1857db40e38671426c18cd8820/ks.rb
+$ brew pin ks
+$ ks version
+ksonnet version: v0.8.0
+jsonnet version: v0.9.5
+client-go version: v1.6.8-beta.0+$Format:%h$
+```
+
+In your config repo, if you don't have a ksonnet application, make a new one (will copy credentials from current context):
+
+```
+$ ks init <application name>
+$ cd <application name>
+$ ks env add default
+```
+
+Grab the kubernetes-jsonnet module using and its dependencies, which include the kubernetes-mixin:
+
+```
+$ go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+$ jb init
+$ jb install github.com/kausalco/public/prometheus-ksonnet
+```
+
+Assuming you want to run in the default namespace ('environment' in ksonnet parlance), add the follow to the file `environments/default/main.jsonnet`:
+
+```jsonnet
+local prometheus = import "prometheus-ksonnet/prometheus-ksonnet.libsonnet";
+
+prometheus {
+  _config+:: {
+    namespace: "default",
+  },
 }
 ```
 
-## Build instructions (go 1.12+)
-
-```bash
-git clone git@github.com:google/go-jsonnet.git
-cd go-jsonnet
-go build ./cmd/jsonnet
-go build ./cmd/jsonnetfmt
-go build ./cmd/jsonnet-deps
-```
-To build with [Bazel](https://bazel.build/) instead:
-```bash
-git clone git@github.com:google/go-jsonnet.git
-cd go-jsonnet
-git submodule init
-git submodule update
-bazel build //cmd/jsonnet
-bazel build //cmd/jsonnetfmt
-bazel build //cmd/jsonnet-deps
-```
-The resulting _jsonnet_ program will then be available at a platform-specific path, such as _bazel-bin/cmd/jsonnet/darwin_amd64_stripped/jsonnet_ for macOS.
-
-Bazel also accommodates cross-compiling the program. To build the _jsonnet_ program for various popular platforms, run the following commands:
-
-Target platform | Build command
---------------- | -------------------------------------------------------------------------------------
-Current host    | _bazel build //cmd/jsonnet_
-Linux           | _bazel build --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //cmd/jsonnet_
-macOS           | _bazel build --platforms=@io_bazel_rules_go//go/toolchain:darwin_amd64 //cmd/jsonnet_
-Windows         | _bazel build --platforms=@io_bazel_rules_go//go/toolchain:windows_amd64 //cmd/jsonnet_
-
-For additional target platform names, see the per-Go release definitions [here](https://github.com/bazelbuild/rules_go/blob/master/go/private/sdk_list.bzl#L21-L31) in the _rules_go_ Bazel package.
-
-Additionally if any files were moved around, see the section [Keeping the Bazel files up to date](#keeping-the-bazel-files-up-to-date).
-
-## Building libjsonnet.wasm
-
-```bash
-GOOS=js GOARCH=wasm go build -o libjsonnet.wasm ./cmd/wasm 
-```
-
-Or if using bazel:
+Apply your config:
 
 ```
-bazel build //cmd/wasm:libjsonnet.wasm
+$ ks apply default
 ```
 
-## Running tests
+## Using prometheus-operator
 
-```bash
-./tests.sh  # Also runs `go test ./...`
+TODO
+
+## Multi-cluster support
+
+Kubernetes-mixin can support dashboards across multiple clusters. You need either a multi-cluster [Thanos](https://github.com/improbable-eng/thanos) installation with `external_labels` configured or a [Cortex](https://github.com/cortexproject/cortex) system where a cluster label exists. To enable this feature you need to configure the following:
+
+```jsonnet
+    // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
+    showMultiCluster: true,
+    clusterLabel: '<your cluster label>',
 ```
 
-## Running Benchmarks
+## Customising the mixin
 
-### Method 1
+Kubernetes-mixin allows you to override the selectors used for various jobs, to match those used in your Prometheus set. You can also customize the dashboard names and add grafana tags.
 
-```bash
-go get golang.org/x/tools/cmd/benchcmp
+In a new directory, add a file `mixin.libsonnet`:
+
+```jsonnet
+local kubernetes = import "kubernetes-mixin/mixin.libsonnet";
+
+kubernetes {
+  _config+:: {
+    kubeStateMetricsSelector: 'job="kube-state-metrics"',
+    cadvisorSelector: 'job="kubernetes-cadvisor"',
+    nodeExporterSelector: 'job="kubernetes-node-exporter"',
+    kubeletSelector: 'job="kubernetes-kubelet"',
+    grafanaK8s+:: {
+      dashboardNamePrefix: 'Mixin / ',
+      dashboardTags: ['kubernetes', 'infrastucture'],
+    },
+  },
+}
 ```
 
-1. Make sure you build a jsonnet binary _prior_ to making changes.
+Then, install the kubernetes-mixin:
 
-```bash
-go build -o jsonnet-old ./cmd/jsonnet
+```
+$ jb init
+$ jb install github.com/kubernetes-monitoring/kubernetes-mixin
 ```
 
-2. Make changes (iterate as needed), and rebuild new binary
+Generate the alerts, rules and dashboards:
 
-```bash
-go build ./cmd/jsonnet
+```
+$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "mixin.libsonnet").prometheusAlerts)' > alerts.yml
+$ jsonnet -J vendor -S -e 'std.manifestYamlDoc((import "mixin.libsonnet").prometheusRules)' >files/rules.yml
+$ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDashboards'
 ```
 
-3. Run benchmark:
+### Customising alert annotations
 
-```bash
-# e.g. ./benchmark.sh Builtin
-./benchmark.sh <TestNameFilter>
+The steps described below extend on the existing mixin library without modifying the original git repository. This is to make consuming updates to your extended alert definitions easier. These definitions can reside outside of this repository and added to your own custom location, where you can define your alert dependencies in your `jsonnetfile.json` and add customisations to the existing definitions.
+
+In your working directory, create a new file `kubernetes_mixin_override.libsonnet` with the following:
+
+```jsonnet
+local utils = import 'lib/utils.libsonnet';
+(import 'mixin.libsonnet') +
+(
+  {
+    prometheusAlerts+::
+      // The specialAlerts can be in any other config file
+      local slack = 'observability';
+      local specialAlerts = {
+        KubePodCrashLooping: { slack_channel: slack },
+        KubePodNotReady: { slack_channel: slack },
+      };
+
+      local addExtraAnnotations(rule) = rule {
+        [if 'alert' in rule then 'annotations']+: {
+          dashboard: 'https://foo.bar.co',
+          [if rule.alert in specialAlerts then 'slack_channel']: specialAlerts[rule.alert].slack_channel,
+        },
+      };
+      utils.mapRuleGroups(addExtraAnnotations),
+  }
+)
 ```
 
-### Method 2
+Create new file: `lib/kubernetes_customised_alerts.jsonnet` with the following:
 
-1. get `benchcmp`
-
-```bash
-go get golang.org/x/tools/cmd/benchcmp
+```jsonnet
+std.manifestYamlDoc((import '../kubernetes_mixin_override.libsonnet').prometheusAlerts)
 ```
 
-2. Make sure you build a jsonnet binary _prior_ to making changes.
+Running `jsonnet -S lib/kubernetes_customised_alerts.jsonnet` will build the alerts with your customisations.
 
-```bash
-make build-old
-```
+Same result can be achieved by modyfying the existing `config.libsonnet` with the content of `kubernetes_mixin_override.libsonnet`.
 
-3. iterate with (which will also automatically rebuild the new binary `./jsonnet`)
+## Background
 
-_replace the FILTER with the name of the test you are working on_
+### Alert Severities
 
-```bash
-FILTER=Builtin_manifestJsonEx make benchmark
-```
+While the community has not yet fully agreed on alert severities and their to be used, this repository assumes the following paradigms when setting the severities:
 
-## Update cpp-jsonnet sub-repo
+- Critical: An issue, that needs to page a person to take instant action
+- Warning: An issue, that needs to be worked on but in the regular work queue or for during office hours rather than paging the oncall
+- Info: Is meant to support a trouble shooting process by informing about a non-normal situation for one or more systems but not worth a page or ticket on its own.
 
-This repo depends on [the original Jsonnet repo](https://github.com/google/jsonnet). Shared parts include the standard library, headers files for C API and some tests.
+### Architecture and Technical Decisions
 
-You can update the submodule and regenerate dependent files with one command:
-```
-./update_cpp_jsonnet.sh
-```
+- For more motivation, see "[The RED Method: How to instrument your services](https://kccncna17.sched.com/event/CU8K/the-red-method-how-to-instrument-your-services-b-tom-wilkie-kausal?iframe=no&w=100%&sidebar=yes&bg=no)" talk from CloudNativeCon Austin.
+- For more information about monitoring mixins, see this [design doc](DESIGN.md).
 
-Note: It needs to be run from repo root.
+## Note
 
-## Updating and modifying the standard library
-
-Standard library source code is kept in `cpp-jsonnet` submodule, because it is shared with [Jsonnet C++
-implementation](https://github.com/google/jsonnet).
-
-For performance reasons we perform preprocessing on the standard library, so for the changes to be visible, regeneration is necessary:
-
-```bash
-go run cmd/dumpstdlibast/dumpstdlibast.go cpp-jsonnet/stdlib/std.jsonnet > astgen/stdast.go
-```
-
-**The
-
-The above command creates the _astgen/stdast.go_ file which puts the desugared standard library into the right data structures, which lets us avoid the parsing overhead during execution. Note that this step is not necessary to perform manually when building with Bazel; the Bazel target regenerates the _astgen/stdast.go_ (writing it into Bazel's build sandbox directory tree) file when necessary.
-
-## Keeping the Bazel files up to date
-Note that we maintain the Go-related Bazel targets with [the Gazelle tool](https://github.com/bazelbuild/bazel-gazelle). The Go module (_go.mod_ in the root directory) remains the primary source of truth. Gazelle analyzes both that file and the rest of the Go files in the repository to create and adjust appropriate Bazel targets for building Go packages and executable programs.
-
-After changing any dependencies within the files covered by this Go module, it is helpful to run _go mod tidy_ to ensure that the module declarations match the state of the Go source code. In order to synchronize the Bazel rules with material changes to the Go module, run the following command to invoke [Gazelle's `update-repos` command](https://github.com/bazelbuild/bazel-gazelle#update-repos):
-```bash
-bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=bazel/deps.bzl%jsonnet_go_dependencies
-```
-
-Similarly, after adding or removing Go source files, it may be necessary to synchronize the Bazel rules by running the following command:
-```bash
-bazel run //:gazelle
-```
+You can use the external tool call [prom-metrics-check](https://github.com/ContainerSolutions/prom-metrics-check) to validate the created dashboards. This tool allows you to check if the metrics installed and used in Grafana dashboards exist in the Prometheus instance. Please have a look at https://github.com/ContainerSolutions/prom-metrics-check.
