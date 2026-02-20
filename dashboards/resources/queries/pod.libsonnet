@@ -7,14 +7,14 @@
     |||
       sum(
           kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", resource="cpu"}
-      )
+      ) by (container)
     ||| % config,
 
   cpuLimits(config)::
     |||
       sum(
           kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", resource="cpu"}
-      )
+      ) by (container)
     ||| % config,
 
   cpuThrottling(config)::
@@ -41,14 +41,15 @@
     |||
       sum(
           kube_pod_container_resource_requests{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", resource="memory"}
-      )
+      ) by (container)
     ||| % config,
+
 
   memoryLimits(config)::
     |||
       sum(
           kube_pod_container_resource_limits{%(kubeStateMetricsSelector)s, %(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod", resource="memory"}
-      )
+      ) by (container)
     ||| % config,
 
   // Memory Quota Table Queries

@@ -612,7 +612,8 @@ local timeSeries = g.panel.timeSeries;
       + g.dashboard.time.withFrom('now-1h')
       + g.dashboard.time.withTo('now')
       + g.dashboard.withRefresh($._config.grafanaK8s.refresh)
-      + g.dashboard.withVariables([variables.datasource, variables.cluster, variables.namespace, variables.pod])
+      // UPDATED LINE BELOW
+      + g.dashboard.withVariables([variables.datasource, variables.cluster, variables.namespace, variables.pod, variables.container])
       + g.dashboard.withPanels(g.util.grid.wrapPanels(panels, panelWidth=12, panelHeight=7)),
   },
 }
