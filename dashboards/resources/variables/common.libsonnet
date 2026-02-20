@@ -50,4 +50,18 @@ local var = g.dashboard.variable;
     + var.query.refresh.onTime()
     + var.query.generalOptions.showOnDashboard.withLabelAndValue()
     + var.query.withSort(type='alphabetical'),
+
+  container(config, datasourceVar)::
+    var.query.new('container')
+    + var.query.withDatasourceFromVariable(datasourceVar)
+    + var.query.queryTypes.withLabelValues(
+      'container',
+      'container_cpu_usage_seconds_total{%(clusterLabel)s="$cluster", namespace="$namespace", pod="$pod"}' % config,
+    )
+    + var.query.generalOptions.withLabel('container')
+    + var.query.refresh.onTime()
+    + var.query.generalOptions.showOnDashboard.withLabelAndValue()
+    + var.query.selectionOptions.withMulti()
+    + var.query.selectionOptions.withIncludeAll()
+    + var.query.withSort(type='alphabetical'),
 }
