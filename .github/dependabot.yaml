@@ -9,7 +9,19 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      actions-production:
+        dependency-type: production
+      actions-development:
+        dependency-type: development
+
   - package-ecosystem: gomod
     directory: /scripts
     schedule:
       interval: weekly
+    groups:
+      golang-production:
+        dependency-type: production
+      golang-development:
+        dependency-type: development
+
