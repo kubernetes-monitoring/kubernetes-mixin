@@ -168,3 +168,33 @@ tests:
         description: "KubeProxy has disappeared from Prometheus target discovery."
         summary: "Target disappeared from Prometheus target discovery."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeproxydown"
+
+- interval: 1m
+  name: KubeProxyInstanceUnreachable fires when kube-proxy scrape fails
+  input_series:
+  - series: 'up{job="kube-proxy", instance="proxy1"}'
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeProxyInstanceUnreachable
+  - eval_time: 25m
+    alertname: KubeProxyInstanceUnreachable
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kube-proxy"
+        instance: "proxy1"
+      exp_annotations:
+        description: "A KubeProxy instance has been unreachable for more than 15 minutes."
+        summary: "KubeProxy instance is unreachable."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeproxyinstanceunreachable"
+
+- interval: 1m
+  name: KubeProxyInstanceUnreachable does not fire when kube-proxy is up
+  input_series:
+  - series: 'up{job="kube-proxy", instance="proxy1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeProxyInstanceUnreachable
+    exp_alerts: []

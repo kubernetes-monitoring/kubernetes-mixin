@@ -12,6 +12,18 @@
             componentName:: 'KubeProxy',
             selector:: $._config.kubeProxySelector,
           },
+          {
+            alert: 'KubeProxyInstanceUnreachable',
+            expr: 'up{%s} == 0' % $._config.kubeProxySelector,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              description: 'A KubeProxy instance has been unreachable for more than 15 minutes.',
+              summary: 'KubeProxy instance is unreachable.',
+            },
+          },
         ],
       },
     ],
