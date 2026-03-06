@@ -1597,3 +1597,23 @@ tests:
             description: Cluster has overcommitted memory resource requests for Pods by 2G bytes and cannot tolerate node failure.
             runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubememoryovercommit
             summary: Cluster has overcommitted memory resource requests.
+
+- name: KubeProxyUnreachable alert (scrape failing)
+  interval: 1m
+  input_series:
+    - series: 'up{job="kube-proxy", pod="kube-proxy-abc123"}'
+      values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+    - eval_time: 10m
+      alertname: KubeProxyUnreachable
+    - eval_time: 25m
+      alertname: KubeProxyUnreachable
+      exp_alerts:
+        - exp_labels:
+            severity: critical
+            job: kube-proxy
+            pod: kube-proxy-abc123
+          exp_annotations:
+            description: Pod kube-proxy-abc123 is not being scraped successfully.
+            summary: KubeProxy is unreachable.
+            runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeproxyunreachable
