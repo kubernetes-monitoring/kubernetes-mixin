@@ -53,3 +53,42 @@ tests:
         description: "StatefulSet ns1/ss1 update has not been rolled out."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubestatefulsetupdatenotrolledout"
         summary: "StatefulSet update has not been rolled out."
+
+- interval: 1m
+  name: KubeHpaMaxedOut fires when current replicas hit max and min is not equal to max
+  input_series:
+  - series: 'kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '10x15'
+  - series: 'kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '10x15'
+  - series: 'kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '2x15'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeHpaMaxedOut
+  - eval_time: 15m
+    alertname: KubeHpaMaxedOut
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        cluster: "cluster1"
+        namespace: "ns1"
+        horizontalpodautoscaler: "hpa1"
+        job: "kube-state-metrics"
+      exp_annotations:
+        description: "HPA ns1/hpa1 has been running at max replicas for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubehpamaxedout"
+        summary: "HPA is running at max replicas"
+
+- interval: 1m
+  name: KubeHpaMaxedOut does not fire when HPA is intentionally pinned to a fixed scale (min == max)
+  input_series:
+  - series: 'kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa2"}'
+    values: '5x15'
+  - series: 'kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa2"}'
+    values: '5x15'
+  - series: 'kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa2"}'
+    values: '5x15'
+  alert_rule_test:
+  - eval_time: 15m
+    alertname: KubeHpaMaxedOut
