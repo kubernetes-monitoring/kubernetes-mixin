@@ -9,5 +9,6 @@ local common = import './common.libsonnet';
       cluster: clusterVar,
       namespace: common.namespace(config, datasource),
       pod: common.pod(config, datasource),
+      container: common.container(config, datasource), // I Added this line
     },
 }
