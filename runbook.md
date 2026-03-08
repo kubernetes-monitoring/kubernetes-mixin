@@ -37,6 +37,10 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: critical
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeproxydown/)
 
+##### Alert Name: KubeProxyUnreachable
++ *Message*: `Pod {{ $labels.pod }} is not being scraped successfully.`
++ *Severity*: critical
+
 ### Group Name: kubernetes-apps
 
 ##### Alert Name: KubePodCrashLooping
