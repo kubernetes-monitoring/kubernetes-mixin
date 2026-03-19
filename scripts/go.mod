@@ -232,7 +232,7 @@ require (
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/tomwright/dasel/v2 v2.8.1 // indirect
-	github.com/tomwright/dasel/v3 v3.3.1 // indirect
+	github.com/tomwright/dasel/v3 v3.3.2 // indirect
 	github.com/urfave/cli/v3 v3.6.2 // indirect
 	github.com/vultr/govultr/v2 v2.17.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
