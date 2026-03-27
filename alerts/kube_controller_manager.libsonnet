@@ -12,6 +12,10 @@
             componentName:: 'KubeControllerManager',
             selector:: $._config.kubeControllerManagerSelector,
           },
+          (import '../lib/instance_unreachable_alert.libsonnet') {
+            componentName:: 'KubeControllerManager',
+            selector:: $._config.kubeControllerManagerSelector,
+          },
         ],
       },
     ],

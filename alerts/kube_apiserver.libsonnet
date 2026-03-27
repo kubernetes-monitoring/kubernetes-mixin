@@ -123,6 +123,10 @@ local utils = import '../lib/utils.libsonnet';
             componentName:: 'KubeAPI',
             selector:: $._config.kubeApiserverSelector,
           },
+          (import '../lib/instance_unreachable_alert.libsonnet') {
+            componentName:: 'KubeAPI',
+            selector:: $._config.kubeApiserverSelector,
+          },
           {
             alert: 'KubeAPITerminatedRequests',
             expr: |||
