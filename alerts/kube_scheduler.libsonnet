@@ -12,6 +12,10 @@
             componentName:: 'KubeScheduler',
             selector:: $._config.kubeSchedulerSelector,
           },
+          (import '../lib/instance_unreachable_alert.libsonnet') {
+            componentName:: 'KubeScheduler',
+            selector:: $._config.kubeSchedulerSelector,
+          },
         ],
       },
     ],

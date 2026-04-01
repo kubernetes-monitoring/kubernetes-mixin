@@ -17,20 +17,36 @@ This page collects this repositories alerts and begins the process of describing
 + *Severity*: critical
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapidown/)
 
+##### Alert Name: "KubeAPIInstanceUnreachable"
++ *Message*: `A KubeAPI instance has been unreachable for more than 15 minutes.`
++ *Severity*: warning
+
 ##### Alert Name: "KubeControllerManagerDown"
 + *Message*: `KubeControllerManager has disappeared from Prometheus target discovery.`
 + *Severity*: critical
 + *Runbook*: [Link](https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-controller-manager)
+
+##### Alert Name: "KubeControllerManagerInstanceUnreachable"
++ *Message*: `A KubeControllerManager instance has been unreachable for more than 15 minutes.`
++ *Severity*: warning
 
 ##### Alert Name: KubeSchedulerDown
 + *Message*: `KubeScheduler has disappeared from Prometheus target discovery`
 + *Severity*: critical
 + *Runbook*: [Link](https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-scheduler)
 
+##### Alert Name: "KubeSchedulerInstanceUnreachable"
++ *Message*: `A KubeScheduler instance has been unreachable for more than 15 minutes.`
++ *Severity*: warning
+
 ##### Alert Name: KubeletDown
 + *Message*: `Kubelet has disappeared from Prometheus target discovery.`
 + *Severity*: critical
 + *Runbook*: [Link](https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeletdown/)
+
+##### Alert Name: "KubeletInstanceUnreachable"
++ *Message*: `A Kubelet instance has been unreachable for more than 15 minutes.`
++ *Severity*: warning
 
 ##### Alert Name: KubeProxyDown
 + *Message*: `KubeProxy has disappeared from Prometheus target discovery`

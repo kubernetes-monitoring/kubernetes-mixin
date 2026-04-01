@@ -280,6 +280,10 @@ local utils = import '../lib/utils.libsonnet';
               summary: 'Kubelet has failed to renew its server certificate.',
             },
           },
+          (import '../lib/instance_unreachable_alert.libsonnet') {
+            componentName:: 'Kubelet',
+            selector:: $._config.kubeletSelector,
+          },
           {
             // Use kube-state-metrics as an anchor to detect kubelet down while
             // preserving the cluster label. This fires when kube-state-metrics

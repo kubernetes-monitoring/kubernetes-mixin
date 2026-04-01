@@ -169,6 +169,128 @@ tests:
         summary: "Target disappeared from Prometheus target discovery."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeproxydown"
 
+# InstanceUnreachable alerts - fire when scrape targets exist in service discovery but are failing (up == 0)
+
+- interval: 1m
+  name: KubeAPIInstanceUnreachable fires when kube-apiserver scrape fails
+  input_series:
+  - series: 'up{job="kube-apiserver", instance="apiserver1"}'
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeAPIInstanceUnreachable
+  - eval_time: 25m
+    alertname: KubeAPIInstanceUnreachable
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kube-apiserver"
+        instance: "apiserver1"
+      exp_annotations:
+        description: "A KubeAPI instance has been unreachable for more than 15 minutes."
+        summary: "KubeAPI instance is unreachable."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiinstanceunreachable"
+
+- interval: 1m
+  name: KubeAPIInstanceUnreachable does not fire when kube-apiserver is up
+  input_series:
+  - series: 'up{job="kube-apiserver", instance="apiserver1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeAPIInstanceUnreachable
+    exp_alerts: []
+
+- interval: 1m
+  name: KubeletInstanceUnreachable fires when kubelet scrape fails
+  input_series:
+  - series: 'up{job="kubelet", instance="node1"}'
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeletInstanceUnreachable
+  - eval_time: 25m
+    alertname: KubeletInstanceUnreachable
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kubelet"
+        instance: "node1"
+      exp_annotations:
+        description: "A Kubelet instance has been unreachable for more than 15 minutes."
+        summary: "Kubelet instance is unreachable."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeletinstanceunreachable"
+
+- interval: 1m
+  name: KubeletInstanceUnreachable does not fire when kubelet is up
+  input_series:
+  - series: 'up{job="kubelet", instance="node1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeletInstanceUnreachable
+    exp_alerts: []
+
+- interval: 1m
+  name: KubeSchedulerInstanceUnreachable fires when kube-scheduler scrape fails
+  input_series:
+  - series: 'up{job="kube-scheduler", instance="scheduler1"}'
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeSchedulerInstanceUnreachable
+  - eval_time: 25m
+    alertname: KubeSchedulerInstanceUnreachable
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kube-scheduler"
+        instance: "scheduler1"
+      exp_annotations:
+        description: "A KubeScheduler instance has been unreachable for more than 15 minutes."
+        summary: "KubeScheduler instance is unreachable."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeschedulerinstanceunreachable"
+
+- interval: 1m
+  name: KubeSchedulerInstanceUnreachable does not fire when kube-scheduler is up
+  input_series:
+  - series: 'up{job="kube-scheduler", instance="scheduler1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeSchedulerInstanceUnreachable
+    exp_alerts: []
+
+- interval: 1m
+  name: KubeControllerManagerInstanceUnreachable fires when kube-controller-manager scrape fails
+  input_series:
+  - series: 'up{job="kube-controller-manager", instance="controller1"}'
+    values: '1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: KubeControllerManagerInstanceUnreachable
+  - eval_time: 25m
+    alertname: KubeControllerManagerInstanceUnreachable
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        job: "kube-controller-manager"
+        instance: "controller1"
+      exp_annotations:
+        description: "A KubeControllerManager instance has been unreachable for more than 15 minutes."
+        summary: "KubeControllerManager instance is unreachable."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubecontrollermanagerinstanceunreachable"
+
+- interval: 1m
+  name: KubeControllerManagerInstanceUnreachable does not fire when kube-controller-manager is up
+  input_series:
+  - series: 'up{job="kube-controller-manager", instance="controller1"}'
+    values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+  alert_rule_test:
+  - eval_time: 25m
+    alertname: KubeControllerManagerInstanceUnreachable
+    exp_alerts: []
+
 - interval: 1m
   name: KubeProxyInstanceUnreachable fires when kube-proxy scrape fails
   input_series:
