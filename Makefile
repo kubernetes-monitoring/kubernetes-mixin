@@ -150,9 +150,13 @@ test: $(PROMTOOL_BIN) prometheus_alerts.yaml prometheus_rules.yaml
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
-$(TOOLING): $(BIN_DIR)
-	@echo Installing tools from hack/tools.go
+.PHONY: build-tools
+build-tools: $(BIN_DIR)
+	@echo Installing tools from scripts/tools.go
 	@cd scripts && go list -e -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -t -P $(NPROC) -I % go build -mod=mod -o $(BIN_DIR) %
+
+$(TOOLING): $(BIN_DIR)
+	@$(MAKE) build-tools
 
 ########################################
 # "check-with-upstream" workflow checks.
