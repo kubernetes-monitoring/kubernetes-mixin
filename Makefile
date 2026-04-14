@@ -12,6 +12,7 @@ VALE_BIN=$(BIN_DIR)/vale
 PROMTOOL_BIN=$(BIN_DIR)/promtool
 PINT_BIN=$(BIN_DIR)/pint
 TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(GRAFANA_DASHBOARD_LINTER_BIN) $(MARKDOWNFMT_BIN) $(VALE_BIN) $(PINT_BIN)
+NPROC ?= $(shell nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo 4)
 JSONNETFMT_ARGS=-n 2 --max-blank-lines 2 --string-style s --comment-style s
 SRC_DIR ?=dashboards
 OUT_DIR ?=dashboards_out
@@ -84,7 +85,7 @@ fmt: jsonnet-fmt markdownfmt
 .PHONY: jsonnet-fmt
 jsonnet-fmt: $(JSONNETFMT_BIN)
 	@find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print | \
-		xargs -n 1 -- $(JSONNETFMT_BIN) $(JSONNETFMT_ARGS) -i
+		xargs -n 1 -P $(NPROC) -- $(JSONNETFMT_BIN) $(JSONNETFMT_ARGS) -i
 
 .PHONY: markdownfmt
 markdownfmt: $(MARKDOWNFMT_BIN)
@@ -107,7 +108,7 @@ lint: jsonnet-lint alerts-lint dashboards-lint vale pint-lint
 .PHONY: jsonnet-lint
 jsonnet-lint: $(JSONNETLINT_BIN) $(JSONNET_VENDOR)
 	@find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print | \
-		xargs -n 1 -- $(JSONNETLINT_BIN) -J vendor
+		xargs -n 1 -P $(NPROC) -- $(JSONNETLINT_BIN) -J vendor
 
 .PHONY: alerts-lint
 alerts-lint: $(PROMTOOL_BIN) prometheus_alerts.yaml prometheus_rules.yaml
@@ -121,7 +122,7 @@ $(OUT_DIR)/.lint: $(OUT_DIR)/.dashboards-generated
 dashboards-lint: $(GRAFANA_DASHBOARD_LINTER_BIN) $(OUT_DIR)/.lint
 	# Replace $$interval:$$resolution var with $$__rate_interval to make dashboard-linter happy.
 	@sed -i -e 's/$$interval:$$resolution/$$__rate_interval/g' $(OUT_DIR)/*.json
-	@find $(OUT_DIR) -name '*.json' -print0 | xargs -n 1 -0 $(GRAFANA_DASHBOARD_LINTER_BIN) lint --strict
+	@find $(OUT_DIR) -name '*.json' -print0 | xargs -n 1 -P $(NPROC) -0 $(GRAFANA_DASHBOARD_LINTER_BIN) lint --strict
 
 .PHONY: vale
 vale: $(VALE_BIN)
@@ -129,7 +130,7 @@ vale: $(VALE_BIN)
 		$(VALE_BIN) $(MD_FILES)
 
 .PHONY: pint-lint
-pint-lint: generate $(PINT_BIN)
+pint-lint: prometheus_alerts.yaml prometheus_rules.yaml $(PINT_BIN)
 	@# Pint will not exit with a non-zero status code if there are linting issues.
 	@output=$$($(PINT_BIN) -n -o -l WARN lint prometheus_alerts.yaml prometheus_rules.yaml 2>&1); \
 	if [ -n "$$output" ]; then \
@@ -151,7 +152,7 @@ $(BIN_DIR):
 
 $(TOOLING): $(BIN_DIR)
 	@echo Installing tools from hack/tools.go
-	@cd scripts && go list -e -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o $(BIN_DIR) %
+	@cd scripts && go list -e -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -t -P $(NPROC) -I % go build -mod=mod -o $(BIN_DIR) %
 
 ########################################
 # "check-with-upstream" workflow checks.
