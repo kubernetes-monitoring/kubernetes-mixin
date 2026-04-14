@@ -18,9 +18,7 @@ jobs:
           go-version-file: scripts/go.mod
           cache-dependency-path: scripts/go.sum
       - name: Build Go tools
-        run: |
-          mkdir -p tmp/bin
-          cd scripts && go list -e -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o ../tmp/bin %
+        run: make build-tools
       - name: Upload built tools
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
