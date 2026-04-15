@@ -81,7 +81,7 @@ local var = g.dashboard.variable;
         statRunningPods:
           statPanel('Running Pods', 'none', 'sum(kubelet_running_pods{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance"})' % $._config),
         statRunningContainers:
-          statPanel('Running Containers', 'none', 'sum(kubelet_running_containers{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance"})' % $._config),
+          statPanel('Running Containers', 'none', 'sum(kubelet_running_containers{%(clusterLabel)s="$cluster", %(kubeletSelector)s, container_state="running", instance=~"$instance"})' % $._config),
         statActualVolumeCount:
           statPanel('Actual Volume Count', 'none', 'sum(volume_manager_total_volumes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, instance=~"$instance", state="actual_state_of_world"})' % $._config),
         statDesiredVolumeCount:
