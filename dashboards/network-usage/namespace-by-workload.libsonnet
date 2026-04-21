@@ -93,13 +93,16 @@ local var = g.dashboard.variable;
       };
 
       local columnQuery(aggFunc, metric, multiplier) =
-        local rateExpr = '(%(multiplier)s * rate(%(metric)s{%%(clusterLabel)s="$cluster",namespace="$namespace"}[%%(grafanaIntervalVar)s]))' % { metric: metric, multiplier: multiplier };
+        local rateExpr = 'sum by (%%(clusterLabel)s, namespace, pod) (%(multiplier)s * rate(%(metric)s{%%(clusterLabel)s="$cluster",namespace="$namespace"}[%%(grafanaIntervalVar)s]))' % { metric: metric, multiplier: multiplier };
         |||
           sort_desc(
             %(aggFunc)s by (workload, workload_type) (
               %(rateExpr)s
-              * on (%%(clusterLabel)s, namespace, pod) group_left
-              kube_pod_info{%%(clusterLabel)s="$cluster",namespace="$namespace",host_network="false"}
+              * on (%%(clusterLabel)s, namespace, pod)
+              topk by (%%(clusterLabel)s, namespace, pod) (
+                1,
+                max by (%%(clusterLabel)s, namespace, pod) (kube_pod_info{%%(clusterLabel)s="$cluster",namespace="$namespace",host_network="false"})
+              )
               * on (%%(clusterLabel)s, namespace, pod) group_left (workload, workload_type)
               namespace_workload_pod:kube_pod_owner:relabel{%%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}
             )
