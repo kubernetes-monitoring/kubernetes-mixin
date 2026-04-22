@@ -94,7 +94,7 @@ tests:
     alertname: KubeHpaMaxedOut
 
 - interval: 1m
-  name: KubeHpaMaxedOut filters per cluster - does not fire for pinned HPA on cluster2 despite same namespace/hpa existing on cluster1
+  name: KubeHpaMaxedOut does not fire for pinned HPA (min == max) on cluster2 when non-pinned same-named HPA exists on cluster1
   input_series:
   # cluster1 - HPA at max, min != max -> should fire
   - series: 'kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
