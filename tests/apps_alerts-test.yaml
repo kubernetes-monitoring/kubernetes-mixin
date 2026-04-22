@@ -92,3 +92,47 @@ tests:
   alert_rule_test:
   - eval_time: 15m
     alertname: KubeHpaMaxedOut
+
+- interval: 1m
+  name: KubeHpaMaxedOut fires independently per cluster when same namespace and HPA name exist across clusters
+  input_series:
+  # cluster1 - HPA at max, min != max -> should fire
+  - series: 'kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '10x15'
+  - series: 'kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '10x15'
+  - series: 'kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", cluster="cluster1", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '2x15'
+  # cluster2 - same namespace/hpa name, also at max, min != max -> should fire
+  - series: 'kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", cluster="cluster2", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '8x15'
+  - series: 'kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", cluster="cluster2", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '8x15'
+  - series: 'kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", cluster="cluster2", namespace="ns1", horizontalpodautoscaler="hpa1"}'
+    values: '1x15'
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: KubeHpaMaxedOut
+  - eval_time: 15m
+    alertname: KubeHpaMaxedOut
+    exp_alerts:
+    - exp_labels:
+        severity: "warning"
+        cluster: "cluster1"
+        namespace: "ns1"
+        horizontalpodautoscaler: "hpa1"
+        job: "kube-state-metrics"
+      exp_annotations:
+        description: "HPA ns1/hpa1 has been running at max replicas for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubehpamaxedout"
+        summary: "HPA is running at max replicas"
+    - exp_labels:
+        severity: "warning"
+        cluster: "cluster2"
+        namespace: "ns1"
+        horizontalpodautoscaler: "hpa1"
+        job: "kube-state-metrics"
+      exp_annotations:
+        description: "HPA ns1/hpa1 has been running at max replicas for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubehpamaxedout"
+        summary: "HPA is running at max replicas"
