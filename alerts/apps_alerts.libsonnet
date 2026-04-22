@@ -349,7 +349,7 @@ local utils = import '../lib/utils.libsonnet';
                   ==
                 kube_horizontalpodautoscaler_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
               )
-              and on(namespace, horizontalpodautoscaler) (
+              and on(namespace, horizontalpodautoscaler, %(clusterLabel)s) (
                 kube_horizontalpodautoscaler_spec_max_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                   !=
                 kube_horizontalpodautoscaler_spec_min_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
