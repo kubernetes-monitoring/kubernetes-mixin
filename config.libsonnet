@@ -51,6 +51,7 @@
       'k8s-resources-multicluster.json': std.md5('k8s-resources-multicluster.json'),
       'k8s-resources-namespace.json': std.md5('k8s-resources-namespace.json'),
       'k8s-resources-node.json': std.md5('k8s-resources-node.json'),
+      'k8s-resources-nodes-overview.json': std.md5('k8s-resources-nodes-overview.json'),
       'k8s-resources-pod.json': std.md5('k8s-resources-pod.json'),
       'k8s-resources-windows-cluster.json': std.md5('k8s-resources-windows-cluster.json'),
       'k8s-resources-windows-namespace.json': std.md5('k8s-resources-windows-namespace.json'),
