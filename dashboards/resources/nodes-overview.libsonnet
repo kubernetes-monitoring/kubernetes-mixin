@@ -1,5 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
+local fieldOverride = g.panel.timeSeries.fieldOverride;
 local prometheus = g.query.prometheus;
 local stat = g.panel.stat;
 local timeSeries = g.panel.timeSeries;
@@ -55,8 +56,8 @@ local var = g.dashboard.variable;
       };
 
       local panels = [
-        // Node count over time
-        tsPanel.new('Node Count')
+        // Node and pod count over time (dual y-axis)
+        tsPanel.new('Node & Pod Count')
         + tsPanel.standardOptions.withUnit('short')
         + tsPanel.standardOptions.withDecimals(0)
         + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
@@ -66,10 +67,21 @@ local var = g.dashboard.variable;
             'count(kube_node_info{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s})' % $._config,
           )
           + prometheus.withLegendFormat('nodes'),
+
+          prometheus.new(
+            '${datasource}',
+            'sum(kubelet_running_pods{%(clusterLabel)s="$cluster", %(kubeletSelector)s})' % $._config,
+          )
+          + prometheus.withLegendFormat('pods'),
+        ])
+        + tsPanel.standardOptions.withOverrides([
+          fieldOverride.byName.new('pods')
+          + fieldOverride.byName.withProperty('custom.axisPlacement', 'right')
+          + fieldOverride.byName.withProperty('custom.axisSoftMin', 0),
         ]),
 
-        // Total CPU — available vs used
-        tsPanel.new('CPU — Total Available & Used')
+        // Total CPU — allocatable, requests, usage
+        tsPanel.new('CPU Usage')
         + tsPanel.standardOptions.withUnit('short')
         + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
         + tsPanel.queryOptions.withTargets([
@@ -81,13 +93,19 @@ local var = g.dashboard.variable;
 
           prometheus.new(
             '${datasource}',
+            'sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster"})' % $._config,
+          )
+          + prometheus.withLegendFormat('requests'),
+
+          prometheus.new(
+            '${datasource}',
             'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster"})' % $._config,
           )
-          + prometheus.withLegendFormat('used'),
+          + prometheus.withLegendFormat('usage'),
         ]),
 
-        // Total Memory — available vs used
-        tsPanel.new('Memory — Total Available & Used')
+        // Total Memory — allocatable, requests, usage
+        tsPanel.new('Memory Usage')
         + tsPanel.standardOptions.withUnit('bytes')
         + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
         + tsPanel.queryOptions.withTargets([
@@ -99,9 +117,15 @@ local var = g.dashboard.variable;
 
           prometheus.new(
             '${datasource}',
+            'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster"})' % $._config,
+          )
+          + prometheus.withLegendFormat('requests'),
+
+          prometheus.new(
+            '${datasource}',
             'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", container!=""})' % $._config,
           )
-          + prometheus.withLegendFormat('used'),
+          + prometheus.withLegendFormat('usage'),
         ]),
 
         // CPU utilization per node (percentage)
@@ -132,19 +156,6 @@ local var = g.dashboard.variable;
               /
               sum by (node) (kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, resource="memory"})
             ||| % $._config,
-          )
-          + prometheus.withLegendFormat('{{node}}'),
-        ]),
-
-        // Pod count per node
-        tsPanel.new('Pod Count per Node')
-        + tsPanel.standardOptions.withUnit('short')
-        + tsPanel.standardOptions.withDecimals(0)
-        + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
-        + tsPanel.queryOptions.withTargets([
-          prometheus.new(
-            '${datasource}',
-            'sum by (node) (kubelet_running_pods{%(clusterLabel)s="$cluster", %(kubeletSelector)s})' % $._config,
           )
           + prometheus.withLegendFormat('{{node}}'),
         ]),
