@@ -83,7 +83,6 @@ local var = g.dashboard.variable;
         // Total CPU — allocatable, requests, usage
         tsPanel.new('CPU Usage')
         + tsPanel.standardOptions.withUnit('short')
-        + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -107,7 +106,6 @@ local var = g.dashboard.variable;
         // Total Memory — allocatable, requests, usage
         tsPanel.new('Memory Usage')
         + tsPanel.standardOptions.withUnit('bytes')
-        + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -131,7 +129,6 @@ local var = g.dashboard.variable;
         // CPU utilization per node (percentage)
         tsPanel.new('CPU Utilization per Node')
         + tsPanel.standardOptions.withUnit('percentunit')
-        + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
@@ -147,7 +144,6 @@ local var = g.dashboard.variable;
         // Memory utilization per node (percentage)
         tsPanel.new('Memory Utilization per Node')
         + tsPanel.standardOptions.withUnit('percentunit')
-        + tsPanel.fieldConfig.defaults.custom.withFillOpacity(0)
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
