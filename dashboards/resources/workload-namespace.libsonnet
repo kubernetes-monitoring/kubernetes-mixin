@@ -82,7 +82,7 @@ local var = g.dashboard.variable;
       local links = {
         workload: {
           title: 'Drill down to workloads',
-          url: '%(prefix)s/d/%(uid)s/k8s-resources-workload?${datasource:queryparam}&var-cluster=$cluster&var-namespace=$namespace&var-type=${__data.fields.Type}&var-workload=${__data.fields.Workload}' % {
+          url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=$cluster&var-namespace=$namespace&var-type=${__data.fields.Type}&var-workload=${__data.fields.Workload}' % {
             uid: $._config.grafanaDashboardIDs['k8s-resources-workload.json'],
             prefix: $._config.grafanaK8s.linkPrefix,
           },

@@ -49,7 +49,7 @@ local timeSeries = g.panel.timeSeries;
       local links = {
         namespace: {
           title: 'Drill down to pods',
-          url: '%(prefix)s/d/%(uid)s/k8s-resources-namespace?${datasource:queryparam}&var-cluster=$cluster&var-namespace=${__data.fields.Namespace}' % {
+          url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=$cluster&var-namespace=${__data.fields.Namespace}' % {
             uid: $._config.grafanaDashboardIDs['k8s-resources-namespace.json'],
             prefix: $._config.grafanaK8s.linkPrefix,
           },

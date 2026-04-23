@@ -70,7 +70,7 @@ local var = g.dashboard.variable;
       local links = {
         pod: {
           title: 'Drill down',
-          url: '%(prefix)s/d/%(uid)s/kubernetes-networking-pod?${datasource:queryparam}&var-cluster=${cluster}&var-namespace=${namespace}&var-pod=${__data.fields.Pod}' % {
+          url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=${cluster}&var-namespace=${namespace}&var-pod=${__data.fields.Pod}' % {
             uid: $._config.grafanaDashboardIDs['pod-total.json'],
             prefix: $._config.grafanaK8s.linkPrefix,
           },
