@@ -50,7 +50,7 @@ local var = g.dashboard.variable;
         local links = {
           cluster: {
             title: 'Drill down',
-            url: '%(prefix)s/d/%(uid)s/kubernetes-compute-resources-cluster?${datasource:queryparam}&var-cluster=${__data.fields.Cluster}' % {
+            url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=${__data.fields.Cluster}' % {
               uid: $._config.grafanaDashboardIDs['k8s-resources-cluster.json'],
               prefix: $._config.grafanaK8s.linkPrefix,
             },

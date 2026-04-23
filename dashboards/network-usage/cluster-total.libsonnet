@@ -54,7 +54,7 @@ local var = g.dashboard.variable;
       local links = {
         namespace: {
           title: 'Drill down',
-          url: '%(prefix)s/d/%(uid)s/kubernetes-networking-namespace-pods?${datasource:queryparam}&var-cluster=${cluster}&var-namespace=${__data.fields.Namespace}' % {
+          url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=${cluster}&var-namespace=${__data.fields.Namespace}' % {
             uid: $._config.grafanaDashboardIDs['namespace-by-pod.json'],
             prefix: $._config.grafanaK8s.linkPrefix,
           },

@@ -102,7 +102,7 @@ local var = g.dashboard.variable;
   local links = {
     namespace: {
       title: 'Drill down to pods',
-      url: '%(prefix)s/d/%(uid)s/k8s-resources-windows-namespace?${datasource:queryparam}&var-cluster=$cluster&var-namespace=${__data.fields.Namespace}' % {
+      url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=$cluster&var-namespace=${__data.fields.Namespace}' % {
         uid: $._config.grafanaDashboardIDs['k8s-resources-windows-namespace.json'],
         prefix: $._config.grafanaK8s.linkPrefix,
       },
@@ -110,7 +110,7 @@ local var = g.dashboard.variable;
 
     pod: {
       title: 'Drill down to pods',
-      url: '%(prefix)s/d/%(uid)s/k8s-resources-windows-pod?${datasource:queryparam}&var-cluster=$cluster&var-namespace=$namespace&var-pod=${__data.fields.Pod}' % {
+      url: '%(prefix)s/d/%(uid)s?${datasource:queryparam}&var-cluster=$cluster&var-namespace=$namespace&var-pod=${__data.fields.Pod}' % {
         uid: $._config.grafanaDashboardIDs['k8s-resources-windows-pod.json'],
         prefix: $._config.grafanaK8s.linkPrefix,
       },
