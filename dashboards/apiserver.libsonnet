@@ -103,8 +103,8 @@ local override = ts.standardOptions.override;
           + stat.panelOptions.withGridPos(w=8),
 
         errorBudget:
-          timeSeries.new('ErrorBudget (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target])
-          + timeSeries.panelOptions.withDescription('How much error budget is left looking at our %.3f%% availability guarantees?' % $._config.SLOs.apiserver.target)
+          timeSeries.new('Error Budget (%dd) > %.3f%%' % [$._config.SLOs.apiserver.days, 100 * $._config.SLOs.apiserver.target])
+          + timeSeries.panelOptions.withDescription('How much error budget is left looking at our %.3f%% availability guarantee?' % (100 * $._config.SLOs.apiserver.target))
           + timeSeries.panelOptions.withGridPos(w=16)
           + timeSeries.standardOptions.withUnit('percentunit')
           + timeSeries.standardOptions.withDecimals(3)
@@ -114,7 +114,7 @@ local override = ts.standardOptions.override;
               '${datasource}',
               '100 * (apiserver_request:availability%dd{verb="all", %(clusterLabel)s="$cluster"} - %f)' % [$._config.SLOs.apiserver.days, $._config.clusterLabel, $._config.SLOs.apiserver.target],
             )
-            + g.query.prometheus.withLegendFormat('errorbudget'),
+            + g.query.prometheus.withLegendFormat('error budget'),
           ]),
 
         readAvailability:
