@@ -1,6 +1,7 @@
 BIN_DIR ?= $(shell pwd)/tmp/bin
 
 JSONNET_VENDOR=vendor
+GRAFANA_DASHBOARD_LINTER_VERSION=v0.1.0
 GRAFANA_DASHBOARD_LINTER_BIN=$(BIN_DIR)/dashboard-linter
 JB_BIN=$(BIN_DIR)/jb
 JSONNET_BIN=$(BIN_DIR)/jsonnet
@@ -11,7 +12,7 @@ MARKDOWNFMT_BIN=$(BIN_DIR)/markdownfmt
 VALE_BIN=$(BIN_DIR)/vale
 PROMTOOL_BIN=$(BIN_DIR)/promtool
 PINT_BIN=$(BIN_DIR)/pint
-TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(GRAFANA_DASHBOARD_LINTER_BIN) $(MARKDOWNFMT_BIN) $(VALE_BIN) $(PINT_BIN)
+TOOLING=$(JB_BIN) $(JSONNETLINT_BIN) $(JSONNET_BIN) $(JSONNETFMT_BIN) $(PROMTOOL_BIN) $(MARKDOWNFMT_BIN) $(VALE_BIN) $(PINT_BIN)
 NPROC ?= $(shell nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo 4)
 JSONNETFMT_ARGS=-n 2 --max-blank-lines 2 --string-style s --comment-style s
 SRC_DIR ?=dashboards
@@ -157,6 +158,22 @@ build-tools: $(BIN_DIR)
 
 $(TOOLING): $(BIN_DIR)
 	@$(MAKE) build-tools
+
+# dashboard-linter is distributed as a prebuilt binary; building from source is
+# unsupported upstream because its go.mod uses a `replace` directive.
+DASHBOARD_LINTER_OS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+DASHBOARD_LINTER_ARCH = $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+DASHBOARD_LINTER_ARCHIVE = dashboard-linter_$(GRAFANA_DASHBOARD_LINTER_VERSION:v%=%)_$(DASHBOARD_LINTER_OS)_$(DASHBOARD_LINTER_ARCH).tar.gz
+DASHBOARD_LINTER_URL = https://github.com/grafana/dashboard-linter/releases/download/$(GRAFANA_DASHBOARD_LINTER_VERSION)/$(DASHBOARD_LINTER_ARCHIVE)
+
+$(GRAFANA_DASHBOARD_LINTER_BIN): | $(BIN_DIR)
+	@echo "Downloading dashboard-linter $(GRAFANA_DASHBOARD_LINTER_VERSION) ($(DASHBOARD_LINTER_OS)/$(DASHBOARD_LINTER_ARCH))"
+	@tmp=$$(mktemp -d) && \
+		curl -sSfL "$(DASHBOARD_LINTER_URL)" -o "$$tmp/$(DASHBOARD_LINTER_ARCHIVE)" && \
+		curl -sSfL "https://github.com/grafana/dashboard-linter/releases/download/$(GRAFANA_DASHBOARD_LINTER_VERSION)/checksums.txt" -o "$$tmp/checksums.txt" && \
+		(cd "$$tmp" && grep "  $(DASHBOARD_LINTER_ARCHIVE)$$" checksums.txt | shasum -a 256 -c -) && \
+		tar -xzf "$$tmp/$(DASHBOARD_LINTER_ARCHIVE)" -C "$(BIN_DIR)" dashboard-linter && \
+		rm -rf "$$tmp"
 
 ########################################
 # "check-with-upstream" workflow checks.
