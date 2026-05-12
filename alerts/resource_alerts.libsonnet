@@ -159,11 +159,13 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeQuotaAlmostFull',
             expr: |||
-              max without (instance, job, type) (
-                kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+                max without (instance, job, type) (
+                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+                )
               )
               / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
-              (
+              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
                 max without (instance, job, type) (
                   kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
                 ) > 0
@@ -184,11 +186,13 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeQuotaFullyUsed',
             expr: |||
-              max without (instance, job, type) (
-                kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+                max without (instance, job, type) (
+                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+                )
               )
               / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
-              (
+              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
                 max without (instance, job, type) (
                   kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
                 ) > 0
@@ -209,11 +213,13 @@ local utils = import '../lib/utils.libsonnet';
           {
             alert: 'KubeQuotaExceeded',
             expr: |||
-              max without (instance, job, type) (
-                kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+                max without (instance, job, type) (
+                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+                )
               )
               / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
-              (
+              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
                 max without (instance, job, type) (
                   kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
                 ) > 0
