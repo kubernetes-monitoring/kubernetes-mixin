@@ -1,5 +1,13 @@
 # Security Policy
 
+## Security Announcements
+
+Join the [kubernetes-security-announce](https://groups.google.com/forum/#!forum/kubernetes-security-announce) group for security and vulnerability announcements.
+
 ## Reporting a Vulnerability
 
-If you discover a security issue in this project, please report it to the project's [SECURITY_CONTACTS](SECURITY_CONTACTS). You can also ping the project's maintainers through the project's [Slack](https://kubernetes.slack.com/archives/CAX9GU941), privately.
+Instructions for reporting a vulnerability can be found on the [Kubernetes Security and Disclosure Information](https://kubernetes.io/docs/reference/issues-security/security/#report-a-vulnerability) page.
+
+## Supported Versions
+
+Information about supported Kubernetes versions can be found on the [Kubernetes version and version skew support policy](https://kubernetes.io/docs/setup/release/version-skew-policy/#supported-versions) page on the Kubernetes website.
