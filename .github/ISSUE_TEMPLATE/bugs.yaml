@@ -39,7 +39,7 @@ body:
       attributes:
         label: "I agree to the following terms:"
         options:
-        - label: I agree to follow this project's [Code of Conduct](../../CODE_OF_CONDUCT.md).
+        - label: I agree to follow this project's [Code of Conduct](../../code-of-conduct.md).
           required: true
         - label: I have filled out all the required information above to the best of my ability.
           required: true
