@@ -1,19 +1,13 @@
 # See the OWNERS docs: https://git.k8s.io/community/contributors/guide/owners.md
+# Membership to kubernetes-sigs org is required: https://github.com/orgs/kubernetes-sigs/people
 
 approvers:
 - brancz
-- metalmatze
-- tomwilkie
 - s-urbaniak
 - skl
-- povilasv
-- paulfantom
 
 reviewers:
 - brancz
-- metalmatze
-- tomwilkie
 - s-urbaniak
 - skl
-- povilasv
-- paulfantom
+
