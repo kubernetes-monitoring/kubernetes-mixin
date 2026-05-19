@@ -142,7 +142,8 @@ dashboards-lint: $(GRAFANA_DASHBOARD_LINTER_BIN) $(OUT_DIR)/.lint
 
 .PHONY: vale
 vale: $(VALE_BIN)
-	@$(VALE_BIN) sync && \
+	@mkdir -p .vale/styles && \
+		$(VALE_BIN) sync && \
 		$(VALE_BIN) $(MD_FILES)
 
 .PHONY: pint-lint
