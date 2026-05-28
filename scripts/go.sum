@@ -151,8 +151,8 @@ github.com/clipperhouse/displaywidth v0.10.0 h1:GhBG8WuerxjFQQYeuZAeVTuyxuX+Urai
 github.com/clipperhouse/displaywidth v0.10.0/go.mod h1:XqJajYsaiEwkxOj4bowCTMcT1SgvHo9flfF3jQasdbs=
 github.com/clipperhouse/uax29/v2 v2.6.0 h1:z0cDbUV+aPASdFb2/ndFnS9ts/WNXgTNNGFoKXuhpos=
 github.com/clipperhouse/uax29/v2 v2.6.0/go.mod h1:Wn1g7MK6OoeDT0vL+Q0SQLDz/KpfsVRgg6W7ihQeh4g=
-github.com/cloudflare/pint v0.83.0 h1:T+SJt5aHUF4HIhiqVV7IV9SVZTRVQeeCxkQD8RKxmW0=
-github.com/cloudflare/pint v0.83.0/go.mod h1:QcfmtMz4PiZ2+5Ry5fBtjTZJXemV9vdwLPXI5g8amx0=
+github.com/cloudflare/pint v0.84.0 h1:CVfCqFctza4sDcSiasl16K2vw7f9NM4PC5fO+Vh84iU=
+github.com/cloudflare/pint v0.84.0/go.mod h1:QcfmtMz4PiZ2+5Ry5fBtjTZJXemV9vdwLPXI5g8amx0=
 github.com/cncf/xds/go v0.0.0-20251210132809-ee656c7534f5 h1:6xNmx7iTtyBRev0+D/Tv1FZd4SCg8axKApyNyRsAt/w=
 github.com/cncf/xds/go v0.0.0-20251210132809-ee656c7534f5/go.mod h1:KdCmV+x/BuvyMxRnYBlmVaq4OLiKW6iRQfvC62cvdkI=
 github.com/containerd/console v1.0.3 h1:lIr7SlA5PxZyMV30bDW0MGbiOPXwc63yRuCP0ARubLw=
