@@ -1,0 +1,34 @@
+# Copyright kubernetes-mixin Authors
+# SPDX-License-Identifier: Apache-2.0
+#
+# osv-scanner ignore list, consumed by ossf/scorecard-action (Vulnerabilities
+# check) and by ad-hoc osv-scanner runs.
+#
+# Every entry must point at a vulnerability in a build-time-only transitive
+# dependency of scripts/go.mod (the tooling module used by `make` to fetch
+# promtool, vale, pint, jb, jsonnet, markdownfmt). None of this code is
+# shipped: the released artifact is YAML rendered from Jsonnet.
+
+[[IgnoredVulns]]
+id = "GO-2026-4883"  # CVE-2026-33997, GHSA-pxq6-2prw-chj9
+reason = "github.com/docker/docker pulled in transitively by github.com/prometheus/prometheus/discovery/moby. Upstream fix is in github.com/moby/moby/v2 under a new import path; Prometheus has not migrated. The Docker discovery code path is never invoked by our build, which only runs `promtool test rules`."
+
+[[IgnoredVulns]]
+id = "GO-2026-4887"  # GHSA-x744-4wpc-v9h2
+reason = "github.com/docker/docker, same transitive path as GO-2026-4883. AuthZ plugin bypass is unreachable from `promtool test rules`."
+
+[[IgnoredVulns]]
+id = "GHSA-rg2x-37c3-w2rh"
+reason = "github.com/docker/docker, same transitive path as GO-2026-4883. `docker cp` race condition is unreachable from `promtool test rules`."
+
+[[IgnoredVulns]]
+id = "GHSA-vp62-88p7-qqf5"
+reason = "github.com/docker/docker, same transitive path as GO-2026-4883. `docker cp` symlink race is unreachable from `promtool test rules`."
+
+[[IgnoredVulns]]
+id = "GHSA-x86f-5xw2-fm2r"
+reason = "github.com/docker/docker, same transitive path as GO-2026-4883. Container archive RCE is unreachable from `promtool test rules`."
+
+[[IgnoredVulns]]
+id = "GO-2026-4768"
+reason = "github.com/tomwright/dasel/v2 pulled in transitively by github.com/errata-ai/vale/v3 (latest, v3.14.2). Fix exists in dasel/v3 but vale has not migrated. Unbounded YAML alias DoS only affects attacker-controlled YAML; we run vale on this repo's own Markdown."
