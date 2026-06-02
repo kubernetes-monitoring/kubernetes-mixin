@@ -24,6 +24,10 @@
     // the data-set it might be useful to change the sampling-time for the
     // prediction
     volumeFullPredictionSampleTime: '6h',
+
+    // thresholds for KubePersistentVolumeFillingUp alerts
+    alertKubePersistentVolumeFillingUpCrit: '0.03',
+    alertKubePersistentVolumeFillingUpWarn: '0.15',
   },
 
   prometheusAlerts+:: {
@@ -38,7 +42,7 @@
                 kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < 0.03
+              ) < %(alertKubePersistentVolumeFillingUpCrit)s
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
@@ -62,7 +66,7 @@
                 kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < 0.15
+              ) < %(alertKubePersistentVolumeFillingUpWarn)s
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
