@@ -800,6 +800,28 @@ tests:
     values: '1+0x20'
   - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="ReplicaSet",owner_name="ds-7cc77d965f",pod="pod-ds-7cc77d965f-cgsdv",service="ksm"}'
     values: '1+0x20'
+  # Pod in Running phase but Not Ready - see https://github.com/kubernetes-monitoring/kubernetes-mixin/pull/1239
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",phase="Running",pod="pod-running-but-not-ready",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_status_ready{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",pod="pod-running-but-not-ready",service="ksm"}'
+    values: '0+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="Deployment",owner_name="running-but-not-ready-example",pod="pod-running-but-not-ready",service="ksm"}'
+    values: '1+0x20'
+  # Pod in Succeeded phase - should be ignored - see https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/1260
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",phase="Succeeded",pod="pod-succeeded-batch-job",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_status_ready{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",pod="pod-succeeded-batch-job",service="ksm"}'
+    values: '0+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="Job",owner_name="succeeded-batch-job-example",pod="pod-succeeded-batch-job",service="ksm"}'
+    values: '1+0x20'
+  # Pod in Running and Ready phase - should not trigger alert
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",phase="Running",pod="pod-running-and-ready",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_status_ready{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",pod="pod-running-and-ready",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="Deployment",owner_name="running-and-ready-example",pod="pod-running-and-ready",service="ksm"}'
+    values: '1+0x20'
+    
   alert_rule_test:
   - eval_time: 15m
     alertname: KubePodNotReady
@@ -813,6 +835,16 @@ tests:
       exp_annotations:
         summary: "Pod has been in a non-ready state for more than 15 minutes."
         description: "Pod ns1/pod-ds-7cc77d965f-cgsdv has been in a non-ready state for longer than 15 minutes."
+        runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready"
+    - exp_labels:
+        job: kube-state-metrics
+        cluster: kubernetes
+        namespace: ns1
+        pod: pod-running-but-not-ready
+        severity: warning
+      exp_annotations:
+        summary: "Pod has been in a non-ready state for more than 15 minutes."
+        description: "Pod ns1/pod-running-but-not-ready has been in a non-ready state for longer than 15 minutes."
         runbook_url: "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready"
 
 - interval: 1m

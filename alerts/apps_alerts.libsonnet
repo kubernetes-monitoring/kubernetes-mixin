@@ -56,6 +56,12 @@ local utils = import '../lib/utils.libsonnet';
               sum by (namespace, pod, job, %(clusterLabel)s) (
                 max by(namespace, pod, job, %(clusterLabel)s) (
                   kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase=~"Pending|Unknown"}
+                  or
+                  (
+                    kube_pod_status_phase{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, phase="Running"} == 1
+                    and on(namespace, pod, %(clusterLabel)s)
+                    kube_pod_status_ready{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} == 0
+                  )
                 ) * on(namespace, pod, %(clusterLabel)s) group_left() topk by(namespace, pod, %(clusterLabel)s) (
                   1, max by(namespace, pod, owner_kind, %(clusterLabel)s) (kube_pod_owner{owner_kind!="Job"})
                 )
