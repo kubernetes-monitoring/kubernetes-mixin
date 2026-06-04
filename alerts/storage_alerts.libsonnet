@@ -26,8 +26,12 @@
     volumeFullPredictionSampleTime: '6h',
 
     // thresholds for KubePersistentVolumeFillingUp alerts
-    volumeFreePercentageCritical: '0.03',
-    volumeFreePercentageWarning: '0.15',
+    volumeFreeSpacePercentageCritical: '0.03',
+    volumeFreeSpacePercentageWarning: '0.15',
+
+    // thresholds for KubePersistentVolumeInodesFillingUp alerts
+    volumeFreeInodesPercentageCritical: '0.03',
+    volumeFreeInodesPercentageWarning: '0.15',
   },
 
   prometheusAlerts+:: {
@@ -92,7 +96,7 @@
                 kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_inodes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < 0.03
+              ) < %(volumeFreeInodesPercentageCritical)s
               and
               kubelet_volume_stats_inodes_used{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
@@ -116,7 +120,7 @@
                 kubelet_volume_stats_inodes_free{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_inodes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < 0.15
+              ) < %(volumeFreeInodesPercentageWarning)s
               and
               kubelet_volume_stats_inodes_used{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
