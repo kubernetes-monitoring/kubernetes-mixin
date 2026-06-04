@@ -26,8 +26,8 @@
     volumeFullPredictionSampleTime: '6h',
 
     // thresholds for KubePersistentVolumeFillingUp alerts
-    alertKubePersistentVolumeFillingUpCrit: '0.03',
-    alertKubePersistentVolumeFillingUpWarn: '0.15',
+    volumeFreePercentageCritical: '0.03',
+    volumeFreePercentageWarning: '0.15',
   },
 
   prometheusAlerts+:: {
