@@ -70,7 +70,7 @@
                 kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < %(volumeFreePercentageWarning)s
+              ) < %(volumeFreeSpacePercentageWarning)s
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
