@@ -42,7 +42,7 @@
                 kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < %(alertKubePersistentVolumeFillingUpCrit)s
+              ) < %(volumeFreePercentageCritical)s
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               unless on(%(clusterLabel)s, namespace, persistentvolumeclaim)
@@ -66,7 +66,7 @@
                 kubelet_volume_stats_available_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
                   /
                 kubelet_volume_stats_capacity_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s}
-              ) < %(alertKubePersistentVolumeFillingUpWarn)s
+              ) < %(volumeFreePercentageWarning)s
               and
               kubelet_volume_stats_used_bytes{%(prefixedNamespaceSelector)s%(kubeletSelector)s} > 0
               and
