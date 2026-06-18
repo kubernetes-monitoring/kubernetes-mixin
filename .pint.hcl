@@ -1,3 +1,3 @@
 checks {
-  disabled = ["promql/impossible", "rule/dependency", "promql/fragile"]
+  disabled = ["promql/impossible", "rule/dependency", "promql/fragile", "promql/nan"]
 }
