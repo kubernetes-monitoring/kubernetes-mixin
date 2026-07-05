@@ -13,11 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+local defaultQueries = import './queries/persistentvolumesusage.libsonnet';
+local defaultVariables = import './variables/persistentvolumesusage.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local prometheus = g.query.prometheus;
 local gauge = g.panel.gauge;
 local timeSeries = g.panel.timeSeries;
-local var = g.dashboard.variable;
 
 {
   local gaugePanel(title, unit, query) =
@@ -47,95 +48,32 @@ local var = g.dashboard.variable;
 
   grafanaDashboards+:: {
     'persistentvolumesusage.json':
-      local variables = {
-        datasource:
-          var.datasource.new('datasource', 'prometheus')
-          + var.datasource.withRegex($._config.datasourceFilterRegex)
-          + var.datasource.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.datasource.generalOptions.withLabel('Data source')
-          + {
-            current: {
-              selected: true,
-              text: $._config.datasourceName,
-              value: $._config.datasourceName,
-            },
-          },
+      // Allow overriding queries via $._queries.persistentVolume, otherwise use default
+      local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'persistentVolume')
+      then $._queries.persistentVolume
+      else defaultQueries;
 
-        cluster:
-          var.query.new('cluster')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            $._config.clusterLabel,
-            'kubelet_volume_stats_capacity_bytes{%(kubeletSelector)s}' % $._config,
-          )
-          + var.query.generalOptions.withLabel('cluster')
-          + var.query.refresh.onTime()
-          + (
-            if $._config.showMultiCluster
-            then var.query.generalOptions.showOnDashboard.withLabelAndValue()
-            else var.query.generalOptions.showOnDashboard.withNothing()
-          )
-          + var.query.withSort(type='alphabetical'),
-
-        namespace:
-          var.query.new('namespace')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            'namespace',
-            'kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s}' % $._config,
-          )
-          + var.query.generalOptions.withLabel('Namespace')
-          + var.query.refresh.onTime()
-          + var.query.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.query.withSort(type='alphabetical'),
-
-        volume:
-          var.query.new('volume')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            'persistentvolumeclaim',
-            'kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace"}' % $._config,
-          )
-          + var.query.generalOptions.withLabel('PersistentVolumeClaim')
-          + var.query.refresh.onTime()
-          + var.query.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.query.withSort(type='alphabetical'),
-      };
+      // Allow overriding variables via $._variables.persistentVolume, otherwise use default
+      local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'persistentVolume')
+      then $._variables.persistentVolume($._config)
+      else defaultVariables.persistentVolume($._config);
 
       local panels = {
         tsUsage:
           tsPanel.new('Volume Space Usage')
           + tsPanel.standardOptions.withUnit('bytes')
           + tsPanel.queryOptions.withTargets([
-            prometheus.new('${datasource}', |||
-              (
-                sum without(instance, node) (topk(1, (kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-                -
-                sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-              )
-            ||| % $._config)
+            prometheus.new('${datasource}', queries.volumeSpaceUsageUsed($._config))
             + prometheus.withLegendFormat('Used Space'),
 
-            prometheus.new('${datasource}', |||
-              sum without(instance, node) (topk(1, (kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-            ||| % $._config)
+            prometheus.new('${datasource}', queries.volumeSpaceUsageFree($._config))
             + prometheus.withLegendFormat('Free Space'),
           ]),
         gaugeUsage:
           gaugePanel(
             'Volume Space Usage',
             'percent',
-            |||
-              max without(instance,node) (
-              (
-                topk(1, kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
-                -
-                topk(1, kubelet_volume_stats_available_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
-              )
-              /
-              topk(1, kubelet_volume_stats_capacity_bytes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
-              * 100)
-            ||| % $._config
+            queries.volumeSpaceUsagePercent($._config)
           )
           + gauge.standardOptions.withMin(0)
           + gauge.standardOptions.withMax(100)
@@ -158,29 +96,17 @@ local var = g.dashboard.variable;
           tsPanel.new('Volume inodes Usage')
           + tsPanel.standardOptions.withUnit('none')
           + tsPanel.queryOptions.withTargets([
-            prometheus.new('${datasource}', 'sum without(instance, node) (topk(1, (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))' % $._config)
+            prometheus.new('${datasource}', queries.volumeInodesUsageUsed($._config))
             + prometheus.withLegendFormat('Used inodes'),
 
-            prometheus.new('${datasource}', |||
-              (
-                sum without(instance, node) (topk(1, (kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-                -
-                sum without(instance, node) (topk(1, (kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})))
-              )
-            ||| % $._config)
+            prometheus.new('${datasource}', queries.volumeInodesUsageFree($._config))
             + prometheus.withLegendFormat('Free inodes'),
           ]),
         gaugeInodes:
           gaugePanel(
             'Volume inodes Usage',
             'percent',
-            |||
-              max without(instance,node) (
-              topk(1, kubelet_volume_stats_inodes_used{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
-              /
-              topk(1, kubelet_volume_stats_inodes{%(clusterLabel)s="$cluster", %(kubeletSelector)s, namespace="$namespace", persistentvolumeclaim="$volume"})
-              * 100)
-            ||| % $._config
+            queries.volumeInodesUsagePercent($._config)
           )
           + gauge.standardOptions.withMin(0)
           + gauge.standardOptions.withMax(100)

@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+local defaultQueries = import './queries/nodes-overview.libsonnet';
+local defaultVariables = import './variables/nodes-overview.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 
 local fieldOverride = g.panel.timeSeries.fieldOverride;
 local prometheus = g.query.prometheus;
 local timeSeries = g.panel.timeSeries;
-local var = g.dashboard.variable;
 
 {
   local tsPanel =
@@ -39,35 +40,15 @@ local var = g.dashboard.variable;
 
   grafanaDashboards+:: {
     'k8s-resources-nodes-overview.json':
-      local variables = {
-        datasource:
-          var.datasource.new('datasource', 'prometheus')
-          + var.datasource.withRegex($._config.datasourceFilterRegex)
-          + var.datasource.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.datasource.generalOptions.withLabel('Data source')
-          + {
-            current: {
-              selected: true,
-              text: $._config.datasourceName,
-              value: $._config.datasourceName,
-            },
-          },
-        cluster:
-          var.query.new('cluster')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            $._config.clusterLabel,
-            'up{%(kubeStateMetricsSelector)s}' % $._config
-          )
-          + var.query.generalOptions.withLabel('cluster')
-          + var.query.refresh.onTime()
-          + (
-            if $._config.showMultiCluster
-            then var.query.generalOptions.showOnDashboard.withLabelAndValue()
-            else var.query.generalOptions.showOnDashboard.withNothing()
-          )
-          + var.query.withSort(type='alphabetical'),
-      };
+      // Allow overriding queries via $._queries.nodesOverview, otherwise use default
+      local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'nodesOverview')
+      then $._queries.nodesOverview
+      else defaultQueries;
+
+      // Allow overriding variables via $._variables.nodesOverview, otherwise use default
+      local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'nodesOverview')
+      then $._variables.nodesOverview($._config)
+      else defaultVariables.nodesOverview($._config);
 
       local panels = [
         // Node and pod count over time (dual y-axis)
@@ -78,13 +59,13 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'count(kube_node_info{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s})' % $._config,
+            queries.nodeCount($._config),
           )
           + prometheus.withLegendFormat('nodes'),
 
           prometheus.new(
             '${datasource}',
-            'sum(kubelet_running_pods{%(clusterLabel)s="$cluster", %(kubeletSelector)s})' % $._config,
+            queries.podCount($._config),
           )
           + prometheus.withLegendFormat('pods'),
         ])
@@ -100,19 +81,19 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, resource="cpu"})' % $._config,
+            queries.cpuAllocatable($._config),
           )
           + prometheus.withLegendFormat('allocatable'),
 
           prometheus.new(
             '${datasource}',
-            'sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster"})' % $._config,
+            queries.cpuRequests($._config),
           )
           + prometheus.withLegendFormat('requests'),
 
           prometheus.new(
             '${datasource}',
-            'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster"})' % $._config,
+            queries.cpuUsage($._config),
           )
           + prometheus.withLegendFormat('usage'),
         ]),
@@ -123,19 +104,19 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            'sum(kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, resource="memory"})' % $._config,
+            queries.memoryAllocatable($._config),
           )
           + prometheus.withLegendFormat('allocatable'),
 
           prometheus.new(
             '${datasource}',
-            'sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{%(clusterLabel)s="$cluster"})' % $._config,
+            queries.memoryRequests($._config),
           )
           + prometheus.withLegendFormat('requests'),
 
           prometheus.new(
             '${datasource}',
-            'sum(node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", container!=""})' % $._config,
+            queries.memoryUsage($._config),
           )
           + prometheus.withLegendFormat('usage'),
         ]),
@@ -146,11 +127,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sum by (node) (node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{%(clusterLabel)s="$cluster"})
-              /
-              sum by (node) (kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, resource="cpu"})
-            ||| % $._config,
+            queries.cpuUtilizationPerNode($._config),
           )
           + prometheus.withLegendFormat('{{node}}'),
         ]),
@@ -161,11 +138,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sum by (node) (node_namespace_pod_container:container_memory_working_set_bytes{%(clusterLabel)s="$cluster", container!=""})
-              /
-              sum by (node) (kube_node_status_allocatable{%(clusterLabel)s="$cluster", %(kubeStateMetricsSelector)s, resource="memory"})
-            ||| % $._config,
+            queries.memoryUtilizationPerNode($._config),
           )
           + prometheus.withLegendFormat('{{node}}'),
         ]),

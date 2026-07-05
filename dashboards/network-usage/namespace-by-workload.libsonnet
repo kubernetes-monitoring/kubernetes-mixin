@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+local defaultQueries = import './queries/namespace-by-workload.libsonnet';
+local defaultVariables = import './variables/namespace-by-workload.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local barGauge = g.panel.barGauge;
 local prometheus = g.query.prometheus;
 local table = g.panel.table;
 local timeSeries = g.panel.timeSeries;
-local var = g.dashboard.variable;
 
 {
   local tsPanel =
@@ -39,63 +40,15 @@ local var = g.dashboard.variable;
 
   grafanaDashboards+:: {
     'namespace-by-workload.json':
+      // Allow overriding queries via $._queries.namespaceByWorkload, otherwise use default
+      local queries = if std.objectHas($, '_queries') && std.objectHas($._queries, 'namespaceByWorkload')
+      then $._queries.namespaceByWorkload
+      else defaultQueries;
 
-      local variables = {
-        datasource:
-          var.datasource.new('datasource', 'prometheus')
-          + var.datasource.withRegex($._config.datasourceFilterRegex)
-          + var.datasource.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.datasource.generalOptions.withLabel('Data source')
-          + {
-            current: {
-              selected: true,
-              text: $._config.datasourceName,
-              value: $._config.datasourceName,
-            },
-          },
-
-        cluster:
-          var.query.new('cluster')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            $._config.clusterLabel,
-            'up{%(cadvisorSelector)s}' % $._config,
-          )
-          + var.query.generalOptions.withLabel('cluster')
-          + var.query.refresh.onTime()
-          + (
-            if $._config.showMultiCluster
-            then var.query.generalOptions.showOnDashboard.withLabelAndValue()
-            else var.query.generalOptions.showOnDashboard.withNothing()
-          )
-          + var.query.withSort(type='alphabetical'),
-
-        namespace:
-          var.query.new('namespace')
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            'namespace',
-            'container_network_receive_packets_total{%(clusterLabel)s="$cluster"}' % $._config,
-          )
-          + var.query.generalOptions.withCurrent('kube-system')
-          + var.query.generalOptions.withLabel('namespace')
-          + var.query.refresh.onTime()
-          + var.query.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.query.withSort(type='alphabetical'),
-
-        workload_type:
-          var.query.new('type')
-          + var.query.selectionOptions.withIncludeAll()
-          + var.query.withDatasourceFromVariable(self.datasource)
-          + var.query.queryTypes.withLabelValues(
-            'workload_type',
-            'namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster", namespace="$namespace", workload=~".+"}' % $._config,
-          )
-          + var.query.generalOptions.withLabel('workload_type')
-          + var.query.refresh.onTime()
-          + var.query.generalOptions.showOnDashboard.withLabelAndValue()
-          + var.query.withSort(type='alphabetical'),
-      };
+      // Allow overriding variables via $._variables.namespaceByWorkload, otherwise use default
+      local variables = if std.objectHas($, '_variables') && std.objectHas($._variables, 'namespaceByWorkload')
+      then $._variables.namespaceByWorkload($._config)
+      else defaultVariables.namespaceByWorkload($._config);
 
       local links = {
         workload: {
@@ -107,33 +60,7 @@ local var = g.dashboard.variable;
         },
       };
 
-      local columnQuery(aggFunc, metric, multiplier) =
-        local rateExpr = 'sum by (%%(clusterLabel)s, namespace, pod) (%(multiplier)s * rate(%(metric)s{%%(clusterLabel)s="$cluster",namespace="$namespace"}[%%(grafanaIntervalVar)s]))' % { metric: metric, multiplier: multiplier };
-        |||
-          sort_desc(
-            %(aggFunc)s by (workload, workload_type) (
-              %(rateExpr)s
-              * on (%%(clusterLabel)s, namespace, pod)
-              topk by (%%(clusterLabel)s, namespace, pod) (
-                1,
-                max by (%%(clusterLabel)s, namespace, pod) (kube_pod_info{%%(clusterLabel)s="$cluster",namespace="$namespace",host_network="false"})
-              )
-              * on (%%(clusterLabel)s, namespace, pod) group_left (workload, workload_type)
-              namespace_workload_pod:kube_pod_owner:relabel{%%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}
-            )
-          )
-        ||| % { aggFunc: aggFunc, rateExpr: rateExpr } % $._config;
-
-      local colQueries = [
-        columnQuery('sum', 'container_network_receive_bytes_total', $._config.units.networkMultiplier),
-        columnQuery('sum', 'container_network_transmit_bytes_total', $._config.units.networkMultiplier),
-        columnQuery('avg', 'container_network_receive_bytes_total', $._config.units.networkMultiplier),
-        columnQuery('avg', 'container_network_transmit_bytes_total', $._config.units.networkMultiplier),
-        columnQuery('sum', 'container_network_receive_packets_total', 1),
-        columnQuery('sum', 'container_network_transmit_packets_total', 1),
-        columnQuery('sum', 'container_network_receive_packets_dropped_total', 1),
-        columnQuery('sum', 'container_network_transmit_packets_dropped_total', 1),
-      ];
+      local colQueries = queries.currentStatusColumns($._config);
 
       local panels = [
         barGauge.new('Current Rate of %(unit)s Received' % { unit: $._config.units.networkUnitLabel })
@@ -146,16 +73,7 @@ local var = g.dashboard.variable;
         + barGauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
+            queries.receiveBandwidth($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -170,16 +88,7 @@ local var = g.dashboard.variable;
         + barGauge.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
+            queries.transmitBandwidth($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -325,16 +234,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
+            queries.receiveBandwidth($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -344,16 +244,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
+            queries.transmitBandwidth($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -363,16 +254,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(avg((%(multiplier)s * rate(container_network_receive_bytes_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
+            queries.avgContainerReceiveBandwidth($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -382,16 +264,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(avg((%(multiplier)s * rate(container_network_transmit_bytes_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s]))
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % ($._config { multiplier: $._config.units.networkMultiplier })
+            queries.avgContainerTransmitBandwidth($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -401,16 +274,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum(rate(container_network_receive_packets_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s])
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % $._config
+            queries.rateReceivedPackets($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -420,16 +284,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum(rate(container_network_transmit_packets_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s])
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % $._config
+            queries.rateTransmittedPackets($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -439,16 +294,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum(rate(container_network_receive_packets_dropped_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s])
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % $._config
+            queries.rateReceivedPacketsDropped($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
@@ -458,16 +304,7 @@ local var = g.dashboard.variable;
         + tsPanel.queryOptions.withTargets([
           prometheus.new(
             '${datasource}',
-            |||
-              sort_desc(sum(rate(container_network_transmit_packets_dropped_total{%(clusterLabel)s="$cluster",namespace="$namespace"}[%(grafanaIntervalVar)s])
-              * on (%(clusterLabel)s,namespace,pod) group_left ()
-                  topk by (%(clusterLabel)s,namespace,pod) (
-                    1,
-                    max by (%(clusterLabel)s,namespace,pod) (kube_pod_info{host_network="false"})
-                  )
-              * on (%(clusterLabel)s,namespace,pod)
-              group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{%(clusterLabel)s="$cluster",namespace="$namespace", workload=~".+", workload_type=~"$type"}) by (workload))
-            ||| % $._config
+            queries.rateTransmittedPacketsDropped($._config)
           )
           + prometheus.withLegendFormat('__auto'),
         ]),
