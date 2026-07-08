@@ -827,7 +827,14 @@ tests:
     values: '0+0x20'
   - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="false",owner_kind="Deployment",owner_name="running-and-ready-example",pod="pod-running-and-ready",service="ksm"}'
     values: '1+0x20'
-    
+  # Pod held by scheduling gates - phase is Pending by design - should not trigger alert
+  - series: 'kube_pod_status_phase{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",phase="Pending",pod="pod-scheduling-gated",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_status_reason{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",reason="SchedulingGated",pod="pod-scheduling-gated",service="ksm"}'
+    values: '1+0x20'
+  - series: 'kube_pod_owner{endpoint="https",instance="instance1",job="kube-state-metrics",cluster="kubernetes",namespace="ns1",owner_is_controller="true",owner_kind="StatefulSet",owner_name="scheduling-gated-example",pod="pod-scheduling-gated",service="ksm"}'
+    values: '1+0x20'
+
   alert_rule_test:
   - eval_time: 15m
     alertname: KubePodNotReady
