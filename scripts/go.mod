@@ -4,11 +4,11 @@ go 1.26.0
 
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
-	github.com/cloudflare/pint v0.86.0
+	github.com/cloudflare/pint v0.87.0
 	github.com/errata-ai/vale/v3 v3.15.1
 	github.com/google/go-jsonnet v0.22.0
 	github.com/jsonnet-bundler/jsonnet-bundler v0.6.0
-	github.com/prometheus/prometheus v0.313.0
+	github.com/prometheus/prometheus v0.313.1
 )
 
 require (
@@ -39,6 +39,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v17 v17.0.1 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aws/aws-sdk-go v1.55.8 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.42.0 // indirect
@@ -158,7 +159,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.18.6 // indirect
+	github.com/klauspost/compress v1.19.0 // indirect
 	github.com/kolo/xmlrpc v0.0.0-20220921171641-a4b6fa1dd06b // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/linode/linodego v1.69.1 // indirect
@@ -220,14 +221,14 @@ require (
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/tomwright/dasel/v2 v2.8.1 // indirect
 	github.com/tomwright/dasel/v3 v3.10.1 // indirect
-	github.com/urfave/cli/v3 v3.9.1 // indirect
+	github.com/urfave/cli/v3 v3.10.1 // indirect
 	github.com/vultr/govultr/v3 v3.31.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yuin/goldmark v1.7.8 // indirect
-	github.com/zclconf/go-cty v1.18.1 // indirect
-	gitlab.com/gitlab-org/api/client-go/v2 v2.38.0 // indirect
+	github.com/zclconf/go-cty v1.19.0 // indirect
+	gitlab.com/gitlab-org/api/client-go/v2 v2.46.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.69.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0 // indirect
