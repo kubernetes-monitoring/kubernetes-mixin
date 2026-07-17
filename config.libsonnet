@@ -91,8 +91,8 @@
 
     // Config for the Grafana dashboards in the Kubernetes Mixin
     grafanaK8s: {
-      dashboardNamePrefix: 'Kubernetes / ',
-      dashboardTags: ['kubernetes-mixin'],
+      dashboardNamePrefix: '',
+      dashboardTags: ['kubernetes'],
 
       // For links between grafana dashboards, you need to tell us if your grafana
       // servers under some non-root path.
@@ -119,10 +119,10 @@
     },
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
-    showMultiCluster: false,
+    showMultiCluster: true,
     clusterLabel: 'cluster',
 
-    namespaceLabel: 'namespace',
+    namespaceLabel: 'kube_namespace',
 
     // Default datasource name
     datasourceName: 'default',

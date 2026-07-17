@@ -26,11 +26,11 @@
     volumeFullPredictionSampleTime: '6h',
 
     // thresholds for KubePersistentVolumeFillingUp alerts
-    volumeFreeSpacePercentageCritical: '0.03',
-    volumeFreeSpacePercentageWarning: '0.15',
+    volumeFreeSpacePercentageCritical: '0.10',
+    volumeFreeSpacePercentageWarning: '0.20',
 
     // thresholds for KubePersistentVolumeInodesFillingUp alerts
-    volumeFreeInodesPercentageCritical: '0.03',
+    volumeFreeInodesPercentageCritical: '0.10',
     volumeFreeInodesPercentageWarning: '0.15',
   },
 

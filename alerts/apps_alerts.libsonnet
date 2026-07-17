@@ -20,7 +20,7 @@ local utils = import '../lib/utils.libsonnet';
     kubeStateMetricsSelector: error 'must provide selector for kube-state-metrics',
     kubeJobTimeoutDuration: error 'must provide value for kubeJobTimeoutDuration',
     kubeDaemonSetRolloutStuckFor: '15m',
-    kubePdbNotEnoughHealthyPodsFor: '15m',
+    kubePdbNotEnoughHealthyPodsFor: '60m',
     namespaceSelector: null,
     prefixedNamespaceSelector: if self.namespaceSelector != null then self.namespaceSelector + ',' else '',
   },
@@ -182,38 +182,38 @@ local utils = import '../lib/utils.libsonnet';
             'for': '15m',
             alert: 'KubeStatefulSetGenerationMismatch',
           },
-          {
-            expr: |||
-              (
-                max by(namespace, statefulset, job, %(clusterLabel)s) (
-                  kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                    unless
-                  kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                )
-                  * on(namespace, statefulset, job, %(clusterLabel)s)
-                (
-                  kube_statefulset_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                    !=
-                  kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                )
-              )  and on(namespace, statefulset, job, %(clusterLabel)s) (
-                changes(kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
-                  ==
-                0
-              )
-            ||| % $._config,
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out%s.' % [
-                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-              summary: 'StatefulSet update has not been rolled out.',
-            },
-            'for': '15m',
-            alert: 'KubeStatefulSetUpdateNotRolledOut',
-          },
+          // {
+          //   expr: |||
+          //     (
+          //       max by(namespace, statefulset, job, %(clusterLabel)s) (
+          //         kube_statefulset_status_current_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+          //           unless
+          //         kube_statefulset_status_update_revision{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+          //       )
+          //         * on(namespace, statefulset, job, %(clusterLabel)s)
+          //       (
+          //         kube_statefulset_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+          //           !=
+          //         kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
+          //       )
+          //     )  and on(namespace, statefulset, job, %(clusterLabel)s) (
+          //       changes(kube_statefulset_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m])
+          //         ==
+          //       0
+          //     )
+          //   ||| % $._config,
+          //   labels: {
+          //     severity: 'warning',
+          //   },
+          //   annotations: {
+          //     description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out%s.' % [
+          //       utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //     summary: 'StatefulSet update has not been rolled out.',
+          //   },
+          //   'for': '15m',
+          //   alert: 'KubeStatefulSetUpdateNotRolledOut',
+          // },
           {
             alert: 'KubeDaemonSetRolloutStuck',
             expr: |||

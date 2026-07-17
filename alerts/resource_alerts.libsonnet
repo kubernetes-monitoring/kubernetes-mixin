@@ -115,62 +115,62 @@ local utils = import '../lib/utils.libsonnet';
       {
         name: 'kubernetes-resources',
         rules: [
-          {
-            alert: 'KubeCPUOvercommit',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              summary: 'Cluster has overcommitted CPU resource requests.',
-              description: 'Cluster%s has overcommitted CPU resource requests for Pods by {{ printf "%%.2f" $value }} CPU shares and cannot tolerate node failure.' % [
-                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-            },
-            'for': '10m',
-            expr: kubeOvercommitExpression('cpu'),
-          },
-          {
-            alert: 'KubeMemoryOvercommit',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              summary: 'Cluster has overcommitted memory resource requests.',
-              description: 'Cluster%s has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % [
-                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-            },
-            'for': '10m',
-            expr: kubeOvercommitExpression('memory'),
-          },
-          {
-            alert: 'KubeCPUQuotaOvercommit',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              summary: 'Cluster has overcommitted CPU resource requests.',
-              description: 'Cluster%s has overcommitted CPU resource requests for Namespaces.' % [
-                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-            },
-            expr: kubeQuotaOvercommitExpression('cpu'),
-            'for': '5m',
-          },
-          {
-            alert: 'KubeMemoryQuotaOvercommit',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              summary: 'Cluster has overcommitted memory resource requests.',
-              description: 'Cluster%s has overcommitted memory resource requests for Namespaces.' % [
-                utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-            },
-            expr: kubeQuotaOvercommitExpression('memory'),
-            'for': '5m',
-          },
+          // {
+          //   alert: 'KubeCPUOvercommit',
+          //   labels: {
+          //     severity: 'warning',
+          //   },
+          //   annotations: {
+          //     summary: 'Cluster has overcommitted CPU resource requests.',
+          //     description: 'Cluster%s has overcommitted CPU resource requests for Pods by {{ printf "%%.2f" $value }} CPU shares and cannot tolerate node failure.' % [
+          //       utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //   },
+          //   'for': '10m',
+          //   expr: kubeOvercommitExpression('cpu'),
+          // },
+          // {
+          //   alert: 'KubeMemoryOvercommit',
+          //   labels: {
+          //     severity: 'warning',
+          //   },
+          //   annotations: {
+          //     summary: 'Cluster has overcommitted memory resource requests.',
+          //     description: 'Cluster%s has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.' % [
+          //       utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //   },
+          //   'for': '10m',
+          //   expr: kubeOvercommitExpression('memory'),
+          // },
+          // {
+          //   alert: 'KubeCPUQuotaOvercommit',
+          //   labels: {
+          //     severity: 'warning',
+          //   },
+          //   annotations: {
+          //     summary: 'Cluster has overcommitted CPU resource requests.',
+          //     description: 'Cluster%s has overcommitted CPU resource requests for Namespaces.' % [
+          //       utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //   },
+          //   expr: kubeQuotaOvercommitExpression('cpu'),
+          //   'for': '5m',
+          // },
+          // {
+          //   alert: 'KubeMemoryQuotaOvercommit',
+          //   labels: {
+          //     severity: 'warning',
+          //   },
+          //   annotations: {
+          //     summary: 'Cluster has overcommitted memory resource requests.',
+          //     description: 'Cluster%s has overcommitted memory resource requests for Namespaces.' % [
+          //       utils.ifShowMultiCluster($._config, ' {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //   },
+          //   expr: kubeQuotaOvercommitExpression('memory'),
+          //   'for': '5m',
+          // },
           {
             alert: 'KubeQuotaAlmostFull',
             expr: |||
@@ -185,7 +185,7 @@ local utils = import '../lib/utils.libsonnet';
                   kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
                 ) > 0
               )
-              > 0.9 < 1
+              > 0.95
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -198,90 +198,90 @@ local utils = import '../lib/utils.libsonnet';
               summary: 'Namespace quota is going to be full.',
             },
           },
-          {
-            alert: 'KubeQuotaFullyUsed',
-            expr: |||
-              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
-                max without (instance, job, type) (
-                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
-                )
-              )
-              / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
-              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
-                max without (instance, job, type) (
-                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
-                ) > 0
-              )
-              == 1
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'info',
-            },
-            annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
-                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-              summary: 'Namespace quota is fully used.',
-            },
-          },
-          {
-            alert: 'KubeQuotaExceeded',
-            expr: |||
-              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
-                max without (instance, job, type) (
-                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
-                )
-              )
-              / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
-              topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
-                max without (instance, job, type) (
-                  kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
-                ) > 0
-              ) > 1
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
-                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-              summary: 'Namespace quota has exceeded the limits.',
-            },
-          },
-          {
-            alert: 'CPUThrottlingHigh',
-            expr: |||
-              sum without (id, metrics_path, name, image, endpoint, job, node) (
-                topk by (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) (1,
-                  increase(
-                    container_cpu_cfs_throttled_periods_total{container!="", %(cadvisorSelector)s, %(cpuThrottlingSelector)s}
-                  [5m])
-                )
-              )
-              / on (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) group_left
-              sum without (id, metrics_path, name, image, endpoint, job, node) (
-                topk by (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) (1,
-                  increase(
-                    container_cpu_cfs_periods_total{%(cadvisorSelector)s, %(cpuThrottlingSelector)s}
-                  [5m])
-                )
-              )
-              > ( %(cpuThrottlingPercent)s / 100 )
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'info',
-            },
-            annotations: {
-              description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}%s.' % [
-                utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
-              ],
-              summary: 'Processes experience elevated CPU throttling.',
-            },
-          },
+          // {
+          //   alert: 'KubeQuotaFullyUsed',
+          //   expr: |||
+          //     topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+          //       max without (instance, job, type) (
+          //         kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+          //       )
+          //     )
+          //     / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
+          //     topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+          //       max without (instance, job, type) (
+          //         kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
+          //       ) > 0
+          //     )
+          //     == 1
+          //   ||| % $._config,
+          //   'for': '15m',
+          //   labels: {
+          //     severity: 'info',
+          //   },
+          //   annotations: {
+          //     description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+          //       utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //     summary: 'Namespace quota is fully used.',
+          //   },
+          // },
+          // {
+          //   alert: 'KubeQuotaExceeded',
+          //   expr: |||
+          //     topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+          //       max without (instance, job, type) (
+          //         kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="used"}
+          //       )
+          //     )
+          //     / on (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) group_left()
+          //     topk by (%(clusterLabel)s, %(namespaceLabel)s, resource, resourcequota) (1,
+          //       max without (instance, job, type) (
+          //         kube_resourcequota{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s, type="hard"}
+          //       ) > 0
+          //     ) > 1
+          //   ||| % $._config,
+          //   'for': '15m',
+          //   labels: {
+          //     severity: 'warning',
+          //   },
+          //   annotations: {
+          //     description: 'Namespace {{ $labels.namespace }} is using {{ $value | humanizePercentage }} of its {{ $labels.resource }} quota%s.' % [
+          //       utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //     summary: 'Namespace quota has exceeded the limits.',
+          //   },
+          // },
+          // {
+          //   alert: 'CPUThrottlingHigh',
+          //   expr: |||
+          //     sum without (id, metrics_path, name, image, endpoint, job, node) (
+          //       topk by (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) (1,
+          //         increase(
+          //           container_cpu_cfs_throttled_periods_total{container!="", %(cadvisorSelector)s, %(cpuThrottlingSelector)s}
+          //         [5m])
+          //       )
+          //     )
+          //     / on (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) group_left
+          //     sum without (id, metrics_path, name, image, endpoint, job, node) (
+          //       topk by (%(clusterLabel)s, %(namespaceLabel)s, pod, container, instance) (1,
+          //         increase(
+          //           container_cpu_cfs_periods_total{%(cadvisorSelector)s, %(cpuThrottlingSelector)s}
+          //         [5m])
+          //       )
+          //     )
+          //     > ( %(cpuThrottlingPercent)s / 100 )
+          //   ||| % $._config,
+          //   'for': '15m',
+          //   labels: {
+          //     severity: 'info',
+          //   },
+          //   annotations: {
+          //     description: '{{ $value | humanizePercentage }} throttling of CPU in namespace {{ $labels.namespace }} for container {{ $labels.container }} in pod {{ $labels.pod }}%s.' % [
+          //       utils.ifShowMultiCluster($._config, ' on cluster {{ $labels.%(clusterLabel)s }}' % $._config),
+          //     ],
+          //     summary: 'Processes experience elevated CPU throttling.',
+          //   },
+          // },
         ],
       },
     ],
