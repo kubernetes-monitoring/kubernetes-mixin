@@ -309,6 +309,8 @@ local utils = import '../lib/utils.libsonnet';
               time() - max by(namespace, job_name, %(clusterLabel)s) (kube_job_status_start_time{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
                 and
               kube_job_status_active{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s} > 0) > %(kubeJobTimeoutDuration)s
+                unless on(namespace, job_name, %(clusterLabel)s)
+              max by(namespace, job_name, %(clusterLabel)s) (kube_job_labels{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s,%(kubeJobExcludedSelector)s} == 1)
             ||| % $._config,
             labels: {
               severity: 'warning',
