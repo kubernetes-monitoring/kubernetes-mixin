@@ -1301,6 +1301,19 @@ tests:
   - eval_time: 12h
     alertname: KubeJobNotCompleted
 
+  # Don't alert when Job has been labelled as excluded from alerts
+- interval: 1m
+  input_series:
+  - series: 'kube_job_status_start_time{cluster="kubernetes",namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '0+0x740'
+  - series: 'kube_job_status_active{cluster="kubernetes",namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1"}'
+    values: '1+0x740'
+  - series: 'kube_job_labels{cluster="kubernetes",namespace="ns1", job="kube-state-metrics", instance="instance1", job_name="job1",label_excluded_from_alerts="true"}'
+    values: '1+0x740'
+  alert_rule_test:
+  - eval_time: 12h1m
+    alertname: KubeJobNotCompleted
+
 - interval: 1m
   input_series:
   - series: 'apiserver_request_terminations_total{cluster="kubernetes",job="kube-apiserver",apiserver="kube-apiserver"}'

@@ -148,6 +148,11 @@
     // Default timeout value for k8s Jobs. The jobs which are active beyond this duration would trigger KubeJobNotCompleted alert.
     kubeJobTimeoutDuration: 12 * 60 * 60,
 
+    // This selector allows an admin to 'pre-mark' a Job (e.g. a long-running batch/Spark job)
+    // so that the KubeJobNotCompleted alert will not fire for it. With the default selector,
+    // adding a label `excluded-from-alerts: 'true'` to the Job will have the desired effect.
+    kubeJobExcludedSelector: 'label_excluded_from_alerts="true"',
+
     // Controls workload_type label value format: false = lowercase, true = PascalCase
     usePascalCaseForWorkloadTypeLabelValues: false,
   },
