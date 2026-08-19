@@ -434,7 +434,11 @@
                      "workload", "$1", "statefulset", "(.+)"),
                    "workload_type", "%(statefulSet)s", "", "")
                  OR
-                 label_replace(label_replace(kube_job_owner{owner_name=""},
+                 label_replace(label_replace(kube_job_owner{owner_kind=""},
+                     "workload", "$1", "job_name", "(.+)"),
+                   "workload_type", "%(job)s", "", "")
+                 OR
+                 label_replace(label_replace(kube_job_owner{owner_kind="Pod", owner_is_controller="true"},
                      "workload", "$1", "job_name", "(.+)"),
                    "workload_type", "%(job)s", "", "")
                  OR
