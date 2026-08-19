@@ -388,6 +388,83 @@
           },
         ],
       },
+      {
+        name: 'k8s.rules.workload',
+        local workloadTypes = (
+           if $._config.usePascalCaseForWorkloadTypeLabelValues then
+           {
+             barePod: "BarePod",
+             daemonSet: "DaemonSet",
+             deployment: "Deployment",
+             job: "Job",
+             replicaSet: "ReplicaSet",
+             statefulSet: "StatefulSet",
+             staticPod: "StaticPod",
+           }
+           else
+           {
+             barePod: "barepod",
+             daemonSet: "daemonset",
+             deployment: "deployment",
+             job: "job",
+             replicaSet: "replicaset",
+             statefulSet: "statefulset",
+             staticPod: "staticpod",
+           }
+        ),
+        local knownManagedPodOwnerMatchers = "%(daemonSet)s|%(deployment)s|%(job)s|%(replicaSet)s|%(statefulSet)s" % workloadTypes,
+        rules: [
+          {
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+              ||| % $._config) +
+              (
+               |||
+                 label_replace(label_replace(kube_deployment_spec_replicas,
+                     "workload", "$1", "deployment", "(.+)"),
+                   "workload_type", "%(deployment)s", "", "")
+                 OR
+                 label_replace(label_replace(kube_daemonset_status_desired_number_scheduled,
+                     "workload", "$1", "daemonset", "(.+)"),
+                   "workload_type", "%(daemonSet)s", "", "")
+                 OR
+                 label_replace(label_replace(kube_statefulset_replicas,
+                     "workload", "$1", "statefulset", "(.+)"),
+                   "workload_type", "%(statefulSet)s", "", "")
+                 OR
+                 label_replace(label_replace(kube_job_owner{owner_name=""},
+                     "workload", "$1", "job_name", "(.+)"),
+                   "workload_type", "%(job)s", "", "")
+                 OR
+                 label_replace(label_replace(
+                     kube_replicaset_spec_replicas
+                       * on (%(clusterLabel)s, %(namespaceLabel)s, replicaset) group_left ()
+                       kube_replicaset_owner{owner_kind=""},
+                     "workload", "$1", "replicaset", "(.+)"),
+                   "workload_type", "%(replicaSet)s", "", "")
+               ||| % (workloadTypes + {
+                 clusterLabel: $._config.clusterLabel,
+                 namespaceLabel: $._config.namespaceLabel,
+               })
+               ) +
+               (|||
+                  OR
+                    max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                      namespace_workload_pod:kube_pod_owner:relabel{
+                        workload_type!~"%(knownManagedPodOwnerMatchers)s"
+                      }
+                    )
+                  ) * 0) + 1
+                |||) % {
+                  knownManagedPodOwnerMatchers: knownManagedPodOwnerMatchers,
+                  clusterLabel: $._config.clusterLabel,
+                  namespaceLabel: $._config.namespaceLabel,
+                }
+          },
+        ]
+      },
     ],
   },
 }
