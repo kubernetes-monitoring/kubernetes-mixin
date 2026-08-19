@@ -463,6 +463,30 @@
                   namespaceLabel: $._config.namespaceLabel,
                 }
           },
+          {
+            record: 'namespace_workload:kube_pods_ready:sum',
+            expr: (
+              |||
+                sum by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                  kube_pod_status_ready{condition="true"}
+                  * on (%(clusterLabel)s, %(namespaceLabel)s, pod) group_left (workload, workload_type)
+                  namespace_workload_pod:kube_pod_owner:relabel
+                )
+              |||
+            ) % $._config
+          },
+          {
+            record: 'namespace_workload:kube_pods_phase:sum',
+            expr: (
+              |||
+                sum by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type, phase) (
+                  kube_pod_status_phase
+                  * on (%(clusterLabel)s, %(namespaceLabel)s, pod) group_left (workload, workload_type)
+                  namespace_workload_pod:kube_pod_owner:relabel
+                )
+              |||
+            ) % $._config
+          },
         ]
       },
     ],
