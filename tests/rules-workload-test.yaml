@@ -1,0 +1,56 @@
+# Copyright kubernetes-mixin Authors
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+rule_files:
+- ../prometheus_rules.yaml
+
+evaluation_interval: 1m
+
+tests:
+  # Prefer the controller owner when a pod has multiple owner references
+  - interval: 1m
+    input_series:
+    - series: 'kube_pod_owner{cluster="test",namespace="default",pod="agent-abc",owner_is_controller="true",owner_kind="DaemonSet",owner_name="agent",job="kube-state-metrics",instance="ksm-1"}'
+      values: '1 1'
+    - series: 'kube_pod_owner{cluster="test",namespace="default",pod="agent-abc",owner_is_controller="false",owner_kind="ConfigMap",owner_name="agent-config",job="kube-state-metrics",instance="ksm-1"}'
+      values: '1 1'
+    - series: 'kube_pod_status_ready{cluster="test",namespace="default",pod="agent-abc",condition="true",job="kube-state-metrics",instance="ksm-1"}'
+      values: '1 1'
+
+    promql_expr_test:
+    - eval_time: 1m
+      expr: namespace_workload:kube_pods_ready:sum
+      exp_samples:
+      - labels: 'namespace_workload:kube_pods_ready:sum{cluster="test",namespace="default",workload="agent",workload_type="daemonset"}'
+        value: 1
+
+  # Deduplicate standalone ReplicaSet metrics from redundant KSM instances.
+  - interval: 1m
+    input_series:
+    - series: 'kube_replicaset_spec_replicas{cluster="test",namespace="default",replicaset="standalone-rs",job="kube-state-metrics",instance="ksm-1"}'
+      values: '2 2'
+    - series: 'kube_replicaset_spec_replicas{cluster="test",namespace="default",replicaset="standalone-rs",job="kube-state-metrics",instance="ksm-2"}'
+      values: '2 2'
+    - series: 'kube_replicaset_owner{cluster="test",namespace="default",replicaset="standalone-rs",owner_kind="",owner_name="",job="kube-state-metrics",instance="ksm-1"}'
+      values: '1 1'
+    - series: 'kube_replicaset_owner{cluster="test",namespace="default",replicaset="standalone-rs",owner_kind="",owner_name="",job="kube-state-metrics",instance="ksm-2"}'
+      values: '1 1'
+
+    promql_expr_test:
+    - eval_time: 1m
+      expr: namespace_workload:kube_workload:relabel
+      exp_samples:
+      - labels: 'namespace_workload:kube_workload:relabel{cluster="test",namespace="default",workload="standalone-rs",workload_type="replicaset"}'
+        value: 1
