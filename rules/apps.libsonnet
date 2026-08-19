@@ -453,9 +453,9 @@
                    "workload_type", "%(job)s", "", "")
                  OR
                  label_replace(label_replace(
-                     kube_replicaset_spec_replicas
+                     max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_spec_replicas)
                        * on (%(clusterLabel)s, %(namespaceLabel)s, replicaset) group_left ()
-                       kube_replicaset_owner{owner_kind=""},
+                       max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_owner{owner_kind=""}),
                      "workload", "$1", "replicaset", "(.+)"),
                    "workload_type", "%(replicaSet)s", "", "")
                ||| % (workloadTypes + {
