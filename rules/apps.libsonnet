@@ -501,6 +501,50 @@
               |||
             ) % $._config
           },
+        ] + [
+          {
+            record: 'namespace_workload:kube_pods_desired:sum',
+            expr: (
+              |||
+                sum by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                 label_replace(label_replace(%(workloadMetric)s,
+                     "workload", "$1", "%(workloadLabel)s", "(.+)"),
+                   "workload_type", "%(workloadType)s", "", "")
+                  * on (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) group_left ()
+                  namespace_workload:kube_workload:relabel
+                )
+              |||
+            ) % ($._config + metricTuple),
+            labels: {
+              workload_type: metricTuple.workloadType
+            },
+          } for metricTuple in [
+            {
+              workloadMetric: "kube_daemonset_status_desired_number_scheduled",
+              workloadLabel: "daemonset",
+              workloadType: workloadTypes.daemonSet,
+            },
+            {
+              workloadMetric: "kube_deployment_spec_replicas",
+              workloadLabel: "deployment",
+              workloadType: workloadTypes.deployment,
+            },
+            {
+              workloadMetric: "kube_job_spec_completions",
+              workloadLabel: "job_name",
+              workloadType: workloadTypes.job,
+            },
+            {
+              workloadMetric: "kube_replicaset_spec_replicas",
+              workloadLabel: "replicaset",
+              workloadType: workloadTypes.replicaSet,
+            },
+            {
+              workloadMetric: "kube_statefulset_replicas",
+              workloadLabel: "statefulset",
+              workloadType: workloadTypes.statefulSet,
+            },
+          ]
         ]
       },
     ],
