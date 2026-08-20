@@ -461,7 +461,12 @@
               |||
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                    label_replace(label_replace(kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind=""},
+                    label_replace(label_replace(
+                        (
+                          kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind=""}
+                          OR
+                          (kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind!=""} unless on(%(clusterLabel)s, namespace, job_name) kube_job_owner{%(kubeStateMetricsSelector)s, owner_is_controller="true"})
+                        ),
                         "workload", "$1", "job_name", "(.+)"),
                       "workload_type", "%(job)s", "", "")
                   ) * 0
