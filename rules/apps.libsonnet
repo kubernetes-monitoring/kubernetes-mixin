@@ -431,7 +431,7 @@
               |||
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                    label_replace(label_replace(kube_daemonset_status_desired_number_scheduled,
+                    label_replace(label_replace(kube_daemonset_status_desired_number_scheduled{%(kubeStateMetricsSelector)s},
                       "workload", "$1", "daemonset", "(.+)"),
                     "workload_type", "%(daemonSet)s", "", "")
                   ) * 0
@@ -446,7 +446,7 @@
               |||
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                    label_replace(label_replace(kube_deployment_spec_replicas,
+                    label_replace(label_replace(kube_deployment_spec_replicas{%(kubeStateMetricsSelector)s},
                       "workload", "$1", "deployment", "(.+)"),
                     "workload_type", "%(deployment)s", "", "")
                   ) * 0
@@ -461,7 +461,7 @@
               |||
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                    label_replace(label_replace(kube_job_owner{owner_kind=""},
+                    label_replace(label_replace(kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind=""},
                         "workload", "$1", "job_name", "(.+)"),
                       "workload_type", "%(job)s", "", "")
                   ) * 0
@@ -476,7 +476,7 @@
               |||
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                    label_replace(label_replace(kube_job_owner{owner_kind="Pod", owner_is_controller="true"},
+                    label_replace(label_replace(kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind="Pod", owner_is_controller="true"},
                         "workload", "$1", "job_name", "(.+)"),
                       "workload_type", "%(job)s", "", "")
                   ) * 0
@@ -492,9 +492,9 @@
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
                     label_replace(label_replace(
-                        max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_spec_replicas)
+                        max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_spec_replicas{%(kubeStateMetricsSelector)s})
                           * on (%(clusterLabel)s, %(namespaceLabel)s, replicaset) group_left ()
-                          max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_owner{owner_kind=""}),
+                          max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_owner{%(kubeStateMetricsSelector)s, owner_kind=""}),
                         "workload", "$1", "replicaset", "(.+)"),
                       "workload_type", "%(replicaSet)s", "", "")
                   ) * 0
@@ -509,7 +509,7 @@
               |||
                 (
                   max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                    label_replace(label_replace(kube_statefulset_replicas,
+                    label_replace(label_replace(kube_statefulset_replicas{%(kubeStateMetricsSelector)s},
                         "workload", "$1", "statefulset", "(.+)"),
                       "workload_type", "%(statefulSet)s", "", "")
                   ) * 0
@@ -539,7 +539,7 @@
             expr: (
               |||
                 sum by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                  kube_pod_status_ready{condition="true"}
+                  kube_pod_status_ready{%(kubeStateMetricsSelector)s, condition="true"}
                   * on (%(clusterLabel)s, %(namespaceLabel)s, pod) group_left (workload, workload_type)
                   namespace_workload_pod:kube_pod_owner:relabel
                 )
@@ -551,7 +551,7 @@
             expr: (
               |||
                 sum by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type, phase) (
-                  kube_pod_status_phase
+                  kube_pod_status_phase{%(kubeStateMetricsSelector)s}
                   * on (%(clusterLabel)s, %(namespaceLabel)s, pod) group_left (workload, workload_type)
                   namespace_workload_pod:kube_pod_owner:relabel
                 )
@@ -564,7 +564,7 @@
             expr: (
               |||
                 sum by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                 label_replace(label_replace(%(workloadMetric)s,
+                 label_replace(label_replace(%(workloadMetric)s{%(kubeStateMetricsSelector)s},
                      "workload", "$1", "%(workloadLabel)s", "(.+)"),
                    "workload_type", "%(workloadType)s", "", "")
                   * on (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) group_left ()
