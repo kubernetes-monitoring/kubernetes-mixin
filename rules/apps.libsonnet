@@ -425,57 +425,114 @@
         local knownManagedPodOwnerMatchers = "%(daemonSet)s|%(deployment)s|%(job)s|%(replicaSet)s|%(statefulSet)s" % workloadTypes,
         rules: [
           {
+            // DaemonSet
             record: 'namespace_workload:kube_workload:relabel',
             expr: (
               |||
-                (max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-              ||| % $._config) +
-              (
-               |||
-                 label_replace(label_replace(kube_deployment_spec_replicas,
-                     "workload", "$1", "deployment", "(.+)"),
-                   "workload_type", "%(deployment)s", "", "")
-                 OR
-                 label_replace(label_replace(kube_daemonset_status_desired_number_scheduled,
-                     "workload", "$1", "daemonset", "(.+)"),
-                   "workload_type", "%(daemonSet)s", "", "")
-                 OR
-                 label_replace(label_replace(kube_statefulset_replicas,
-                     "workload", "$1", "statefulset", "(.+)"),
-                   "workload_type", "%(statefulSet)s", "", "")
-                 OR
-                 label_replace(label_replace(kube_job_owner{owner_kind=""},
-                     "workload", "$1", "job_name", "(.+)"),
-                   "workload_type", "%(job)s", "", "")
-                 OR
-                 label_replace(label_replace(kube_job_owner{owner_kind="Pod", owner_is_controller="true"},
-                     "workload", "$1", "job_name", "(.+)"),
-                   "workload_type", "%(job)s", "", "")
-                 OR
-                 label_replace(label_replace(
-                     max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_spec_replicas)
-                       * on (%(clusterLabel)s, %(namespaceLabel)s, replicaset) group_left ()
-                       max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_owner{owner_kind=""}),
-                     "workload", "$1", "replicaset", "(.+)"),
-                   "workload_type", "%(replicaSet)s", "", "")
-               ||| % (workloadTypes + {
-                 clusterLabel: $._config.clusterLabel,
-                 namespaceLabel: $._config.namespaceLabel,
-               })
-               ) +
-               (|||
-                  OR
+                (
+                  max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                    label_replace(label_replace(kube_daemonset_status_desired_number_scheduled,
+                      "workload", "$1", "daemonset", "(.+)"),
+                    "workload_type", "%(daemonSet)s", "", "")
+                  ) * 0
+                ) + 1
+              ||| % ($._config + workloadTypes)
+            )
+          },
+          {
+            // Deployment
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                    label_replace(label_replace(kube_deployment_spec_replicas,
+                      "workload", "$1", "deployment", "(.+)"),
+                    "workload_type", "%(deployment)s", "", "")
+                  ) * 0
+                ) + 1
+              ||| % ($._config + workloadTypes)
+            )
+          },
+          {
+            // Job (Bare/StandAlone)
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                    label_replace(label_replace(kube_job_owner{owner_kind=""},
+                        "workload", "$1", "job_name", "(.+)"),
+                      "workload_type", "%(job)s", "", "")
+                  ) * 0
+                ) + 1
+              ||| % ($._config + workloadTypes)
+            )
+          },
+          {
+            // Job (owned by Pod)
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                    label_replace(label_replace(kube_job_owner{owner_kind="Pod", owner_is_controller="true"},
+                        "workload", "$1", "job_name", "(.+)"),
+                      "workload_type", "%(job)s", "", "")
+                  ) * 0
+                ) + 1
+              ||| % ($._config + workloadTypes)
+            )
+          },
+          {
+            // ReplicaSet (Bare/StandAlone)
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                    label_replace(label_replace(
+                        max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_spec_replicas)
+                          * on (%(clusterLabel)s, %(namespaceLabel)s, replicaset) group_left ()
+                          max by(%(clusterLabel)s, %(namespaceLabel)s, replicaset) (kube_replicaset_owner{owner_kind=""}),
+                        "workload", "$1", "replicaset", "(.+)"),
+                      "workload_type", "%(replicaSet)s", "", "")
+                  ) * 0
+                ) + 1
+              ||| % ($._config + workloadTypes)
+            )
+          },
+          {
+            // StatefulSet
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                    label_replace(label_replace(kube_statefulset_replicas,
+                        "workload", "$1", "statefulset", "(.+)"),
+                      "workload_type", "%(statefulSet)s", "", "")
+                  ) * 0
+                ) + 1
+              ||| % ($._config + workloadTypes)
+            )
+          },
+          {
+            // Fallback
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  (
                     max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
                       namespace_workload_pod:kube_pod_owner:relabel{
                         workload_type!~"%(knownManagedPodOwnerMatchers)s"
                       }
-                    )
-                  ) * 0) + 1
-                |||) % {
-                  knownManagedPodOwnerMatchers: knownManagedPodOwnerMatchers,
-                  clusterLabel: $._config.clusterLabel,
-                  namespaceLabel: $._config.namespaceLabel,
-                }
+                    ) unless namespace_workload:kube_workload:relabel
+                  ) * 0
+                ) + 1
+              ||| % ($._config + {knownManagedPodOwnerMatchers: knownManagedPodOwnerMatchers})
+            )
           },
           {
             record: 'namespace_workload:kube_pods_ready:sum',
