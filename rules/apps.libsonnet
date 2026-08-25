@@ -400,29 +400,34 @@
       },
       {
         name: 'k8s.rules.workload',
+        local pascalCaseWorkloadTypes = {
+          barePod: "BarePod",
+          daemonSet: "DaemonSet",
+          deployment: "Deployment",
+          job: "Job",
+          pod: "Pod",
+          replicaSet: "ReplicaSet",
+          statefulSet: "StatefulSet",
+          staticPod: "StaticPod",
+        },
+        local downcaseWorkloadTypes = {
+          barePod: "barepod",
+          daemonSet: "daemonset",
+          deployment: "deployment",
+          job: "job",
+          pod: "pod",
+          replicaSet: "replicaset",
+          statefulSet: "statefulset",
+          staticPod: "staticpod",
+        },
         local workloadTypes = (
-           if $._config.usePascalCaseForWorkloadTypeLabelValues then
-           {
-             barePod: "BarePod",
-             daemonSet: "DaemonSet",
-             deployment: "Deployment",
-             job: "Job",
-             replicaSet: "ReplicaSet",
-             statefulSet: "StatefulSet",
-             staticPod: "StaticPod",
-           }
-           else
-           {
-             barePod: "barepod",
-             daemonSet: "daemonset",
-             deployment: "deployment",
-             job: "job",
-             replicaSet: "replicaset",
-             statefulSet: "statefulset",
-             staticPod: "staticpod",
-           }
+          if $._config.usePascalCaseForWorkloadTypeLabelValues then
+            pascalCaseWorkloadTypes
+          else
+            downcaseWorkloadTypes
         ),
-        local knownManagedPodOwnerMatchers = "%(daemonSet)s|%(deployment)s|%(job)s|%(replicaSet)s|%(statefulSet)s" % workloadTypes,
+        local knownManagedPodOwnerMatchers = "%(daemonSet)s|%(deployment)s|%(job)s|%(replicaSet)s|%(statefulSet)s" % pascalCaseWorkloadTypes,
+        local knownManagedJobOwnerMatchers = "%(pod)s" % pascalCaseWorkloadTypes,
         rules: [
           {
             // DaemonSet
@@ -523,20 +528,43 @@
             )
           },
           {
-            // Fallback
+            // workload aggregation for unknown pod owner types
             record: 'namespace_workload:kube_workload:relabel',
             expr: (
               |||
                 (
                   (
                     max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
-                      namespace_workload_pod:kube_pod_owner:relabel{
-                        workload_type!~"%(knownManagedPodOwnerMatchers)s"
-                      }
-                    ) unless namespace_workload:kube_workload:relabel
+                      label_replace(
+                        label_replace(
+                          kube_pod_owner{%(kubeStateMetricsSelector)s, owner_kind!~"%(knownManagedPodOwnerMatchers)s", owner_kind!="", owner_is_controller="true"}
+                          , "workload", "$1", "owner_name", "(.+)"
+                        )
+                      , "workload_type", "$1", "owner_kind", "(.+)")
+                    )
                   ) * 0
                 ) + 1
               ||| % ($._config + {knownManagedPodOwnerMatchers: knownManagedPodOwnerMatchers})
+            )
+          },
+          {
+            // workload aggregation for unknown job owner types (note: this includes cronjobs)
+            record: 'namespace_workload:kube_workload:relabel',
+            expr: (
+              |||
+                (
+                  (
+                    max by (%(clusterLabel)s, %(namespaceLabel)s, workload, workload_type) (
+                      label_replace(
+                        label_replace(
+                          kube_job_owner{%(kubeStateMetricsSelector)s, owner_kind!~"%(knownManagedJobOwnerMatchers)s", owner_kind!="", owner_is_controller="true"}
+                          , "workload", "$1", "owner_name", "(.+)"
+                        )
+                      , "workload_type", "$1", "owner_kind", "(.+)")
+                    )
+                  ) * 0
+                ) + 1
+              ||| % ($._config + {knownManagedJobOwnerMatchers: knownManagedJobOwnerMatchers})
             )
           },
           {
